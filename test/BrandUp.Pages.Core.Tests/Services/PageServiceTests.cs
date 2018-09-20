@@ -34,7 +34,7 @@ namespace BrandUp.Pages.Services
             pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
         }
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
             serviceScope.Dispose();
             serviceProvider.Dispose();
@@ -42,7 +42,7 @@ namespace BrandUp.Pages.Services
 
         #region IAsyncLifetime members
 
-        public async Task InitializeAsync()
+        async Task IAsyncLifetime.InitializeAsync()
         {
             var contentMetadataManager = serviceScope.ServiceProvider.GetService<IContentMetadataManager>();
             var pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
@@ -60,7 +60,7 @@ namespace BrandUp.Pages.Services
             var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, contentMetadataManager.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(testPage.Id, "test");
         }
-        public Task DisposeAsync()
+        Task IAsyncLifetime.DisposeAsync()
         {
             return Task.CompletedTask;
         }
