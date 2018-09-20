@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
     <ProjectReference Include="..\BrandUp.Pages.Core\BrandUp.Pages.Core.csproj" />
   </ItemGroup>
 

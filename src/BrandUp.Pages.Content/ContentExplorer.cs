@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Content
 
         public IContentMetadataManager MetadataManager => metadataManager;
         public IContentViewManager ViewManager => viewManager;
-        public IContentMetadataProvider Metadata { get; }
+        public ContentMetadataProvider Metadata { get; }
         public Field Field { get; }
         public object Content { get; }
         public string FieldPath { get; }
@@ -34,7 +34,7 @@ namespace BrandUp.Pages.Content
 
         #endregion
 
-        private ContentExplorer(IContentMetadataManager metadataManager, IContentViewManager viewManager, object content, IContentMetadataProvider contentMetadata)
+        private ContentExplorer(IContentMetadataManager metadataManager, IContentViewManager viewManager, object content, ContentMetadataProvider contentMetadata)
         {
             this.metadataManager = metadataManager;
             this.viewManager = viewManager;
@@ -47,7 +47,7 @@ namespace BrandUp.Pages.Content
             rootExplorer = null;
             name = contentMetadata.Name;
         }
-        private ContentExplorer(ContentExplorer parent, Field field, int index, object content, IContentMetadataProvider contentMetadata)
+        private ContentExplorer(ContentExplorer parent, Field field, int index, object content, ContentMetadataProvider contentMetadata)
         {
             metadataManager = parent.metadataManager;
             viewManager = parent.viewManager;

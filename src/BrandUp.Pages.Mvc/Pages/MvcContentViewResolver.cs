@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Mvc
             viewsRootPath = System.IO.Path.Combine(environment.ContentRootPath, "ContentViews");
         }
 
-        public IContentViewConfiguration GetViewsConfiguration(IContentMetadataProvider contentMetadata)
+        public IContentViewConfiguration GetViewsConfiguration(ContentMetadataProvider contentMetadata)
         {
             var viewsDescriptionFile = System.IO.Path.Combine(viewsRootPath, contentMetadata.Name, "views.json");
             if (!System.IO.File.Exists(viewsDescriptionFile))

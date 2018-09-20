@@ -5,7 +5,7 @@ namespace BrandUp.Pages.Content
 {
     public static class IContentMetadataProviderExtensions
     {
-        public static IEnumerable<IContentMetadataProvider> GetDerivedMetadataWithHierarhy(this IContentMetadataProvider contentMetadata, bool includeCurrent)
+        public static IEnumerable<ContentMetadataProvider> GetDerivedMetadataWithHierarhy(this ContentMetadataProvider contentMetadata, bool includeCurrent)
         {
             if (includeCurrent)
                 yield return contentMetadata;
@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Content
             }
         }
 
-        public static bool TryGetField<TField>(this IContentMetadataProvider contentMetadata, string fieldName, out TField field)
+        public static bool TryGetField<TField>(this ContentMetadataProvider contentMetadata, string fieldName, out TField field)
             where TField : Fields.Field
         {
             if (!contentMetadata.TryGetField(fieldName, out Fields.Field f))

@@ -13,8 +13,6 @@ namespace BrandUp.Pages.Services
         private readonly Dictionary<string, int> typeNames = new Dictionary<string, int>();
         private readonly Dictionary<Type, int> typeObjectTypes = new Dictionary<Type, int>();
 
-        public IEnumerable<IPageMetadataProvider> PageTypes => types;
-
         public PageMetadataManager(IContentMetadataManager contentManager)
         {
             this.contentManager = contentManager ?? throw new ArgumentNullException(nameof(contentManager));
@@ -23,7 +21,7 @@ namespace BrandUp.Pages.Services
                 TryRegisterPageType(contentMetadata, out PageMetadataProvider pageMetadata);
         }
 
-        private bool TryRegisterPageType(IContentMetadataProvider contentMetadata, out PageMetadataProvider pageMetadata)
+        private bool TryRegisterPageType(ContentMetadataProvider contentMetadata, out PageMetadataProvider pageMetadata)
         {
             if (TryGetPageMetadataByContentType(contentMetadata.ModelType, out pageMetadata))
                 return true;
@@ -44,18 +42,18 @@ namespace BrandUp.Pages.Services
             ValidateContentMetadata(contentMetadata);
 
             PageMetadataProvider parentPageMetadata = null;
-            if (contentMetadata.ParentMetadata != null)
-                TryRegisterPageType(contentMetadata.ParentMetadata, out parentPageMetadata);
+            if (contentMetadata.BaseMetadata != null)
+                TryRegisterPageType(contentMetadata.BaseMetadata, out parentPageMetadata);
 
             pageMetadata = AddPageType(contentMetadata, pageAttribute, parentPageMetadata);
             return true;
         }
-        private void ValidateContentMetadata(IContentMetadataProvider contentMetadata)
+        private void ValidateContentMetadata(ContentMetadataProvider contentMetadata)
         {
             if (!contentMetadata.SupportViews)
                 throw new InvalidOperationException($"Тип контента страницы {contentMetadata.Name} не поддерживает представления.");
         }
-        private PageMetadataProvider AddPageType(IContentMetadataProvider contentMetadata, PageModelAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
+        private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadata, PageModelAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
         {
             var pageMetadata = new PageMetadataProvider(contentMetadata, parentPageMetadata);
 
@@ -79,9 +77,9 @@ namespace BrandUp.Pages.Services
             return true;
         }
 
-        #region IPageTypeManager members
+        #region IPageMetadataManager members
 
-        public IEnumerable<IPageMetadataProvider> Types => types;
+        public IEnumerable<IPageMetadataProvider> PageTypes => types;
         public IPageMetadataProvider FindPageMetadataByContentType(Type contentType)
         {
             if (contentType == null)
@@ -123,7 +121,7 @@ namespace BrandUp.Pages.Services
             private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
             private readonly Content.Fields.TextField titleTitle;
 
-            public IContentMetadataProvider ContentMetadata { get; }
+            public ContentMetadataProvider ContentMetadata { get; }
             public string Name => ContentMetadata.Name;
             public string Title => ContentMetadata.Title;
             public string Description => ContentMetadata.Description;
@@ -131,7 +129,7 @@ namespace BrandUp.Pages.Services
             public IPageMetadataProvider ParentMetadata { get; }
             public IEnumerable<IPageMetadataProvider> DerivedTypes => derivedTypes;
 
-            public PageMetadataProvider(IContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
+            public PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
             {
                 ContentMetadata = contentMetadata;
                 ParentMetadata = parentPageMetadata;
@@ -174,15 +172,5 @@ namespace BrandUp.Pages.Services
                 return (string)titleTitle.GetModelValue(pageModel);
             }
         }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class PageModelAttribute : ContentModelAttribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public class PageTitleAttribute : ContentModelAttribute
-    {
     }
 }

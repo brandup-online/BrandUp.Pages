@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
     <ProjectReference Include="..\..\src\BrandUp.Pages.Core\BrandUp.Pages.Core.csproj" />
     <ProjectReference Include="..\..\src\BrandUp.Pages.Testing\BrandUp.Pages.Testing.csproj" />
   </ItemGroup>

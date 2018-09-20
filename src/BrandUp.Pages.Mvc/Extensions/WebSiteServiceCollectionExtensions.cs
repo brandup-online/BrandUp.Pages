@@ -26,7 +26,6 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<IContentTypeResolver, ContentFeature>();
             services.AddSingleton<IContentViewResolver, MvcContentViewResolver>();
-            services.AddSingleton<IContentDefaultModelResolver, MvcContentDefaultModelResolver>();
         }
 
         private static void ConfigureDefaultFeatureProviders(ApplicationPartManager manager)

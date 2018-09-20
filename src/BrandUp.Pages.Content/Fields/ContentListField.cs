@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Content.Fields
         private ContentMetadataManager metadataManager;
         private ConstructorInfo _valueConstructor;
 
-        public IContentMetadataProvider ValueContentMetadata { get; private set; }
+        public ContentMetadataProvider ValueContentMetadata { get; private set; }
 
         #region Field members
 
@@ -32,7 +32,7 @@ namespace BrandUp.Pages.Content.Fields
             if (!ContentMetadataManager.IsContent(listItemType.GetTypeInfo()))
                 throw new InvalidOperationException();
 
-            if (!metadataManager.TryGetMetadata(listItemType, out IContentMetadataProvider contentMetadata))
+            if (!metadataManager.TryGetMetadata(listItemType, out ContentMetadataProvider contentMetadata))
                 throw new InvalidOperationException();
             ValueContentMetadata = contentMetadata;
         }

@@ -6,14 +6,14 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageMetadataManager
     {
-        IEnumerable<IPageMetadataProvider> Types { get; }
+        IEnumerable<IPageMetadataProvider> PageTypes { get; }
         IPageMetadataProvider FindPageMetadataByContentType(Type contentType);
         IPageMetadataProvider FindPageMetadataByName(string name);
     }
 
     public interface IPageMetadataProvider
     {
-        IContentMetadataProvider ContentMetadata { get; }
+        ContentMetadataProvider ContentMetadata { get; }
         string Name { get; }
         string Title { get; }
         string Description { get; }

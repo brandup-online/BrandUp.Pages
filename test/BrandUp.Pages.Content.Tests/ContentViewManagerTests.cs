@@ -1,36 +1,18 @@
 ﻿using BrandUp.Pages.ContentModels;
-using BrandUp.Pages.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Linq;
 using Xunit;
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentViewManagerTests : IDisposable
+    public class ContentViewManagerTests
     {
-        private readonly ServiceProvider serviceProvider;
-        private readonly IServiceScope serviceScope;
         private readonly IContentViewManager manager;
 
         public ContentViewManagerTests()
         {
-            var services = new ServiceCollection();
+            var metadataManager = new ContentMetadataManager(new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly }));
 
-            services.AddWebSiteCore()
-                .UseContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .UseContentViewsFromAttributes();
-
-            serviceProvider = services.BuildServiceProvider();
-            serviceScope = serviceProvider.CreateScope();
-
-            manager = serviceScope.ServiceProvider.GetService<IContentViewManager>();
-        }
-
-        public void Dispose()
-        {
-            serviceScope.Dispose();
-            serviceProvider.Dispose();
+            manager = new ContentViewManager(metadataManager, new AttributesContentViewResolver());
         }
 
         [Fact]

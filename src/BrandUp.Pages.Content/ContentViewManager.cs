@@ -20,7 +20,7 @@ namespace BrandUp.Pages.Content
                 InitializeViews(contentMetadata, out ContentViewsContainer contentViews);
         }
 
-        private void InitializeViews(IContentMetadataProvider contentMetadata, out ContentViewsContainer contentViews)
+        private void InitializeViews(ContentMetadataProvider contentMetadata, out ContentViewsContainer contentViews)
         {
             if (!contentMetadata.SupportViews)
             {
@@ -32,8 +32,8 @@ namespace BrandUp.Pages.Content
                 return;
 
             ContentViewsContainer baseContentViews = null;
-            if (contentMetadata.ParentMetadata != null)
-                InitializeViews(contentMetadata.ParentMetadata, out baseContentViews);
+            if (contentMetadata.BaseMetadata != null)
+                InitializeViews(contentMetadata.BaseMetadata, out baseContentViews);
 
             var viewConfiguration = contentViewResolver.GetViewsConfiguration(contentMetadata);
 
@@ -87,12 +87,12 @@ namespace BrandUp.Pages.Content
             private readonly List<ContentView> declaredViews = new List<ContentView>();
             private readonly IContentView defaultView = null;
 
-            public IContentMetadataProvider ContentMetadata { get; }
+            public ContentMetadataProvider ContentMetadata { get; }
             public IEnumerable<IContentView> Views => views;
             public IEnumerable<IContentView> DeclaredViews => declaredViews;
             public IContentView DefaultView => defaultView;
 
-            public ContentViewsContainer(IContentMetadataProvider contentMetadata, IContentViewConfiguration viewConfiguration, ContentViewsContainer baseContentViews)
+            public ContentViewsContainer(ContentMetadataProvider contentMetadata, IContentViewConfiguration viewConfiguration, ContentViewsContainer baseContentViews)
             {
                 ContentMetadata = contentMetadata ?? throw new ArgumentNullException(nameof(contentMetadata));
 
@@ -157,9 +157,9 @@ namespace BrandUp.Pages.Content
             public string Name { get; }
             public string Title { get; }
             public string Description { get; }
-            public IContentMetadataProvider ContentMetadata { get; }
+            public ContentMetadataProvider ContentMetadata { get; }
 
-            public ContentView(IContentViewDefinitiuon viewDefinitiuon, IContentMetadataProvider contentMetadata)
+            public ContentView(IContentViewDefinitiuon viewDefinitiuon, ContentMetadataProvider contentMetadata)
             {
                 Name = string.Concat(contentMetadata.Name, ".", viewDefinitiuon.Name);
                 Title = viewDefinitiuon.Title;
@@ -178,7 +178,7 @@ namespace BrandUp.Pages.Content
 
     public interface IContentView
     {
-        IContentMetadataProvider ContentMetadata { get; }
+        ContentMetadataProvider ContentMetadata { get; }
         string Name { get; }
         string Title { get; }
         string Description { get; }
@@ -186,7 +186,7 @@ namespace BrandUp.Pages.Content
 
     public interface IContentViewResolver
     {
-        IContentViewConfiguration GetViewsConfiguration(IContentMetadataProvider contentMetadata);
+        IContentViewConfiguration GetViewsConfiguration(ContentMetadataProvider contentMetadata);
     }
     public interface IContentViewConfiguration
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [PageModel(Title = ContentTypeTitle)]
+    [ContentModel(Title = ContentTypeTitle)]
     [ViewDefinition("Default")]
     public class TestPageContent
     {
@@ -13,7 +13,7 @@ namespace BrandUp.Pages.ContentModels
         [View]
         public string ViewName { get; set; }
 
-        [PageTitle, Text(title: "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Text(title: "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
         [ContentValue(title: "Шапка страницы")]
@@ -21,9 +21,6 @@ namespace BrandUp.Pages.ContentModels
 
         [ContentList(title: "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
-
-        [PageCollection("Pages")]
-        public PageCollectionReference<TestPageContent> Pages { get; set; }
 
         public static TestPageContent CreateWithOnlyTitle(string title)
         {
@@ -41,13 +38,10 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
-    [ContentModel]
+    [ContentModel(Title = "Заголовок", Description = "Заголовок страницы")]
     public class PageHeaderContent
     {
         [Text(title: "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
-
-        [ContentValue(title: "Шапка страницы")]
-        public PageHeaderContent Header { get; set; }
     }
 }

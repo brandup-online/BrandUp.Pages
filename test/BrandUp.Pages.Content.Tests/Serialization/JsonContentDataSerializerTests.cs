@@ -1,37 +1,18 @@
 ﻿using BrandUp.Pages.ContentModels;
-using BrandUp.Pages.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Collections.Generic;
 using Xunit;
 
 namespace BrandUp.Pages.Content.Serialization
 {
-    public class JsonContentDataSerializerTests : IDisposable
+    public class JsonContentDataSerializerTests
     {
-        private readonly ServiceProvider serviceProvider;
-        private readonly IServiceScope serviceScope;
         private readonly IContentMetadataManager metadataManager;
         private readonly JsonContentDataSerializer serializer;
 
         public JsonContentDataSerializerTests()
         {
-            var services = new ServiceCollection();
-
-            services.AddWebSiteCore()
-                .UseContentTypesFromAssemblies(typeof(TestPageContent).Assembly);
-
-            serviceProvider = services.BuildServiceProvider();
-            serviceScope = serviceProvider.CreateScope();
-
-            metadataManager = serviceScope.ServiceProvider.GetService<IContentMetadataManager>();
+            metadataManager = new ContentMetadataManager(new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly }));
             serializer = new JsonContentDataSerializer();
-        }
-
-        public void Dispose()
-        {
-            serviceScope.Dispose();
-            serviceProvider.Dispose();
         }
 
         [Fact]
