@@ -10,18 +10,18 @@ namespace BrandUp.Pages.Services
     {
         private readonly IPageRepositiry pageRepositiry;
         private readonly IPageCollectionRepositiry pageCollectionRepositiry;
-        private readonly IPageMetadataManager pageTypeManager;
+        private readonly IPageMetadataManager pageMetadataManager;
         private readonly Content.IContentMetadataManager contentMetadataManager;
 
         public PageService(
             IPageRepositiry pageRepositiry,
             IPageCollectionRepositiry pageCollectionRepositiry,
-            IPageMetadataManager pageTypeManager,
+            IPageMetadataManager pageMetadataManager,
             Content.IContentMetadataManager contentMetadataManager)
         {
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
             this.pageCollectionRepositiry = pageCollectionRepositiry ?? throw new ArgumentNullException(nameof(pageCollectionRepositiry));
-            this.pageTypeManager = pageTypeManager ?? throw new ArgumentNullException(nameof(pageTypeManager));
+            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
             this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
         }
 
@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Services
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            var pageMetadata = pageTypeManager.FindPageMetadataByName(collection.PageTypeName);
+            var pageMetadata = pageMetadataManager.FindPageMetadataByName(collection.PageTypeName);
             if (pageMetadata == null)
                 throw new InvalidOperationException();
 
@@ -74,7 +74,7 @@ namespace BrandUp.Pages.Services
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            var pageType = pageTypeManager.FindPageMetadataByName(page.TypeName);
+            var pageType = pageMetadataManager.FindPageMetadataByName(page.TypeName);
             if (pageType == null)
                 throw new InvalidOperationException();
             return Task.FromResult(pageType);

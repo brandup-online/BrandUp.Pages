@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
             services.AddSingleton<IContentViewManager, ContentViewManager>();
 
-            services.AddSingleton<PageMetadataManager>();
+            services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
 
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
