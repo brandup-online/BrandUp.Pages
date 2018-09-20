@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,20 +8,20 @@ namespace BrandUp.Pages.Data.Repositories
 {
     public class FakePageRepositiry : IPageRepositiry
     {
-        readonly IPageMetadataManager pageTypeManager;
-        readonly FakePageHierarhyRepository pageHierarhy;
+        private readonly IPageMetadataManager pageMetadataManager;
+        private readonly FakePageHierarhyRepository pageHierarhy;
 
         private int pageIndex = 0;
-        readonly Dictionary<int, Page> pages = new Dictionary<int, Page>();
-        readonly Dictionary<Guid, int> pageIds = new Dictionary<Guid, int>();
-        readonly Dictionary<string, int> pagePaths = new Dictionary<string, int>();
-        readonly Dictionary<int, PageContent> pageContents = new Dictionary<int, PageContent>();
+        private readonly Dictionary<int, Page> pages = new Dictionary<int, Page>();
+        private readonly Dictionary<Guid, int> pageIds = new Dictionary<Guid, int>();
+        private readonly Dictionary<string, int> pagePaths = new Dictionary<string, int>();
+        private readonly Dictionary<int, PageContent> pageContents = new Dictionary<int, PageContent>();
         private Guid defaultPageId = Guid.Empty;
 
-        public FakePageRepositiry(FakePageHierarhyRepository pageHierarhy, IPageMetadataManager pageTypeManager)
+        public FakePageRepositiry(FakePageHierarhyRepository pageHierarhy, IPageMetadataManager pageMetadataManager)
         {
             this.pageHierarhy = pageHierarhy ?? throw new ArgumentNullException(nameof(pageHierarhy));
-            this.pageTypeManager = pageTypeManager ?? throw new ArgumentNullException(nameof(pageTypeManager));
+            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
         public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, IDictionary<string, object> contentData)
@@ -135,7 +136,7 @@ namespace BrandUp.Pages.Data.Repositories
             return Task.FromResult(pageHierarhy.HasPages(ownCollectionId));
         }
 
-        class Page : IPage
+        private class Page : IPage
         {
             public Guid Id { get; }
             public DateTime CreatedDate { get; set; }

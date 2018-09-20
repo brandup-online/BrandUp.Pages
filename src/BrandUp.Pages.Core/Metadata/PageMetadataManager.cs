@@ -1,10 +1,9 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace BrandUp.Pages.Services
+namespace BrandUp.Pages.Metadata
 {
     public class PageMetadataManager : IPageMetadataManager
     {
@@ -79,8 +78,11 @@ namespace BrandUp.Pages.Services
 
         #region IPageMetadataManager members
 
-        public IEnumerable<IPageMetadataProvider> PageTypes => types;
-        public IPageMetadataProvider FindPageMetadataByContentType(Type contentType)
+        public IEnumerable<PageMetadataProvider> GetAllMetadata()
+        {
+            return types;
+        }
+        public PageMetadataProvider FindPageMetadataByContentType(Type contentType)
         {
             if (contentType == null)
                 throw new ArgumentNullException(nameof(contentType));
@@ -90,7 +92,7 @@ namespace BrandUp.Pages.Services
 
             return types[index];
         }
-        public IPageMetadataProvider FindPageMetadataByName(string name)
+        public PageMetadataProvider FindPageMetadataByName(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
@@ -114,63 +116,6 @@ namespace BrandUp.Pages.Services
             if (!typeInfo.IsDefined(typeof(PageModelAttribute), false))
                 return false;
             return true;
-        }
-
-        private class PageMetadataProvider : IPageMetadataProvider
-        {
-            private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
-            private readonly Content.Fields.TextField titleTitle;
-
-            public ContentMetadataProvider ContentMetadata { get; }
-            public string Name => ContentMetadata.Name;
-            public string Title => ContentMetadata.Title;
-            public string Description => ContentMetadata.Description;
-            public Type ContentType => ContentMetadata.ModelType;
-            public IPageMetadataProvider ParentMetadata { get; }
-            public IEnumerable<IPageMetadataProvider> DerivedTypes => derivedTypes;
-
-            public PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
-            {
-                ContentMetadata = contentMetadata;
-                ParentMetadata = parentPageMetadata;
-
-                if (parentPageMetadata != null)
-                    parentPageMetadata.derivedTypes.Add(this);
-
-                PageTitleAttribute titleAttribute = null;
-                foreach (var field in contentMetadata.Fields)
-                {
-                    titleAttribute = field.Member.Member.GetCustomAttribute<PageTitleAttribute>(true);
-                    if (titleAttribute == null)
-                        continue;
-
-                    if (!(field is Content.Fields.TextField title))
-                        throw new InvalidOperationException();
-
-                    titleTitle = title;
-                }
-                if (titleTitle == null)
-                    throw new InvalidOperationException();
-            }
-
-            public object CreatePageModel()
-            {
-                var model = ContentMetadata.CreateModelInstance();
-
-                var title = GetPageName(model);
-                if (string.IsNullOrEmpty(title))
-                {
-                    title = "Новая страница";
-                    titleTitle.SetModelValue(model, title);
-                }
-
-                return model;
-            }
-
-            public string GetPageName(object pageModel)
-            {
-                return (string)titleTitle.GetModelValue(pageModel);
-            }
         }
     }
 }

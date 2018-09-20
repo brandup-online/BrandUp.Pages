@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace BrandUp.Pages.Interfaces
+namespace BrandUp.Pages.Metadata
 {
-    public static class IPageMetadataProviderExtensions
+    public static class PageMetadataProviderExtensions
     {
-        public static IEnumerable<IPageMetadataProvider> GetDerivedMetadataWithHierarhy(this IPageMetadataProvider pageMetadata, bool includeCurrent)
+        public static IEnumerable<PageMetadataProvider> GetDerivedMetadataWithHierarhy(this PageMetadataProvider pageMetadata, bool includeCurrent)
         {
             if (includeCurrent)
                 yield return pageMetadata;

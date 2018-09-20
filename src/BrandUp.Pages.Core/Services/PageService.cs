@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -68,7 +69,7 @@ namespace BrandUp.Pages.Services
 
             return pageRepositiry.GetPagesAsync(collection.Id, collection.SortMode, pagination);
         }
-        public Task<IPageMetadataProvider> GetPageTypeAsync(IPage page)
+        public Task<PageMetadataProvider> GetPageTypeAsync(IPage page)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));

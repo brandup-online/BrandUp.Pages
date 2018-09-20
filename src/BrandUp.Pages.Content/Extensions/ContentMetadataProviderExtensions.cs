@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.Content
 {
-    public static class IContentMetadataProviderExtensions
+    public static class ContentMetadataProviderExtensions
     {
         public static IEnumerable<ContentMetadataProvider> GetDerivedMetadataWithHierarhy(this ContentMetadataProvider contentMetadata, bool includeCurrent)
         {
