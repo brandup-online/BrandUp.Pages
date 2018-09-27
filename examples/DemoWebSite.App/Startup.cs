@@ -42,7 +42,13 @@ namespace DemoWebSite.App
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddPages()
-                .UseMvcViews();
+                .AddContentTypesFromAssemblies(typeof(ContentModels.Pages.PageContent).Assembly)
+                .UseMvcViews()
+                .UseMongoDbStore((o) =>
+                {
+                    o.ConnectionString = Configuration.GetValue<string>("Pages:ConntectionString");
+                    o.DatabaseName = Configuration.GetValue<string>("Pages:Database");
+                });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

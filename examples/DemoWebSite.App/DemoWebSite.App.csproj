@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
     <ProjectReference Include="..\..\src\BrandUp.Pages.Core\BrandUp.Pages.Core.csproj" />
+    <ProjectReference Include="..\..\src\BrandUp.Pages.MongoDb\BrandUp.Pages.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\BrandUp.Pages.Mvc\BrandUp.Pages.Mvc.csproj" />
   </ItemGroup>
 
