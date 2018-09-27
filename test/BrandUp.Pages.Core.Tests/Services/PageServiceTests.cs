@@ -1,8 +1,8 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Builder;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
-using BrandUp.Pages.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -22,10 +22,10 @@ namespace BrandUp.Pages.Services
         {
             var services = new ServiceCollection();
 
-            services.AddWebSiteCore()
-                .UseContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .UseContentViewsFromAttributes()
-                .UseFakeRepositories();
+            services.AddPages()
+                .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
+                .UseFakeViews()
+                .AddFakeRepositories();
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();

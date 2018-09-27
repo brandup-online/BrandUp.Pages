@@ -1,41 +1,21 @@
-﻿using BrandUp.Pages;
-using BrandUp.Pages.Content;
-using BrandUp.Pages.Files;
-using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Metadata;
-using BrandUp.Pages.Services;
+﻿using BrandUp.Pages.Builder;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IWebSiteBuilder AddWebSiteCore(this IServiceCollection services)
+        public static IPagesBuilder AddPages(this IServiceCollection services)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            AddWebSiteServices(services);
-
-            return new WebSiteBuilder(services);
+            return new PagesBuilder(services);
         }
 
-        private static void AddWebSiteServices(IServiceCollection services)
+        public static IPagesBuilder AddPages(this IServiceCollection services, Action<PagesOptions> setupAction)
         {
-            services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
-            services.AddSingleton<IContentViewManager, ContentViewManager>();
-
-            services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
-
-            services.AddScoped<IPageCollectionService, PageCollectionService>();
-            services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IFileService, FileService>();
-            services.AddScoped<IPageEditingService, PageEditingService>();
-        }
-
-        public static IWebSiteBuilder AddWebSiteCore(this IServiceCollection services, Action<WebSiteOptions> setupAction)
-        {
-            var webSiteBuilder = services.AddWebSiteCore();
+            var webSiteBuilder = services.AddPages();
             webSiteBuilder.Services.Configure(setupAction);
             return webSiteBuilder;
         }

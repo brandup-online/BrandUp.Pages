@@ -2,23 +2,18 @@
 using BrandUp.Pages.Data.Repositories;
 using BrandUp.Pages.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
-namespace BrandUp.Pages.Testing
+namespace BrandUp.Pages.Builder
 {
-    public static class WebSiteBuilderExtensions
+    public static class PagesBuilderExtensions
     {
-        public static IWebSiteBuilder UseContentTypesFromAssemblies(this IWebSiteBuilder builder, params Assembly[] assemblies)
-        {
-            builder.Services.AddSingleton<IContentTypeResolver>(new AssemblyContentTypeResolver(assemblies));
-            return builder;
-        }
-        public static IWebSiteBuilder UseContentViewsFromAttributes(this IWebSiteBuilder builder)
+        public static IPagesBuilder UseFakeViews(this IPagesBuilder builder)
         {
             builder.Services.AddSingleton<IContentViewResolver>(new AttributesContentViewResolver());
             return builder;
         }
-        public static IWebSiteBuilder UseFakeRepositories(this IWebSiteBuilder builder)
+
+        public static IPagesBuilder AddFakeRepositories(this IPagesBuilder builder)
         {
             builder.Services.AddSingleton<FakePageHierarhyRepository>();
 

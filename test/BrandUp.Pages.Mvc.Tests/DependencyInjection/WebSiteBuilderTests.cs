@@ -1,6 +1,5 @@
 using BrandUp.Pages.Content;
 using BrandUp.Pages.Metadata;
-using BrandUp.Pages.Mvc.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -58,14 +57,13 @@ namespace BrandUp.Pages.Mvc
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddMvc()
-                .AddApplicationPart(typeof(TestPageContent).Assembly)
-                .AddWebSite();
+            services.AddMvc();
+            services.AddPages();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UsePages();
         }
     }
 }
