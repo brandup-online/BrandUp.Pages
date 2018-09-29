@@ -1,0 +1,20 @@
+{
+  "_type": "Page",
+  "viewName": "page.default",
+  "title": "Новая страница",
+  "blocks": [
+    {
+      "_type": "HtmlTextBlock",
+      "html": "<p>Test test test test test test test test test test test test test test test test test test test test</p>"
+    },
+    {
+      "_type": "ImageBlock",
+      "title": "Test image",
+      "alt": "Test image"
+    },
+    {
+      "_type": "HtmlTextBlock",
+      "html": "<p>Test test test test test test test test test test test test test test test test test test test test</p>"
+    }
+  ]
+}

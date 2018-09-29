@@ -21,6 +21,8 @@ namespace BrandUp.Pages.Middlewares
                 var pageMetadata = await pageService.GetPageTypeAsync(page);
                 var pageContent = await pageService.GetPageContentAsync(page);
 
+                pageMetadata.ContentMetadata.GetViewName(pageContent);
+
                 var pageContext = new Rendering.PageContext(page, pageMetadata, pageContent);
                 var pageRenderer = context.RequestServices.GetRequiredService<Rendering.IPageRenderer>();
 

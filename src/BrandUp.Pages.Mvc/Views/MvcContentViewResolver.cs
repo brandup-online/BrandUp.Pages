@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Views;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using System.Collections.Generic;

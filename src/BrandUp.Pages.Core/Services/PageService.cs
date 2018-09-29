@@ -60,6 +60,13 @@ namespace BrandUp.Pages.Services
         {
             return pageRepositiry.GetDefaultPageAsync();
         }
+        public Task SetDefaultPageAsync(IPage page)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            return pageRepositiry.SetDefaultPageAsync(page);
+        }
         public Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination)
         {
             if (collection == null)

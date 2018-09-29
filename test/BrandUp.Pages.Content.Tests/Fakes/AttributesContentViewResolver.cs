@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace BrandUp.Pages.Content
+namespace BrandUp.Pages.Content.Views
 {
     public class AttributesContentViewResolver : IContentViewResolver
     {

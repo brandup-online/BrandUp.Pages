@@ -1,5 +1,6 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Content.Views;
 using BrandUp.Pages.Mvc;
+using BrandUp.Pages.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -20,6 +21,7 @@ namespace BrandUp.Pages.Builder
         private static void AddServices(IServiceCollection services)
         {
             services.AddSingleton<IContentViewResolver, MvcContentViewResolver>();
+            services.AddTransient<IPageRenderer, MvcPageRenderer>();
         }
     }
 }

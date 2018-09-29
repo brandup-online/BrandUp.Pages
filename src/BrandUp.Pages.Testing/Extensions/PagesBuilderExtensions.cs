@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Content.Views;
 using BrandUp.Pages.Data.Repositories;
 using BrandUp.Pages.Interfaces;
 using Microsoft.Extensions.DependencyInjection;

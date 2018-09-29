@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Views;
 using BrandUp.Pages.ContentModels;
 using Xunit;
 
@@ -10,7 +11,10 @@ namespace BrandUp.Pages.Metadata
 
         public PageMetadataManagerTests()
         {
-            var contentMetadataManager = new ContentMetadataManager(new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly }));
+            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentViewResolver = new AttributesContentViewResolver();
+            var contentMetadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
+
             pageMetadataManager = new PageMetadataManager(contentMetadataManager);
         }
 

@@ -1,9 +1,7 @@
 using BrandUp.Pages.Content;
 using BrandUp.Pages.Metadata;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Xunit;
@@ -18,7 +16,7 @@ namespace BrandUp.Pages.Mvc
 
         public WebSiteBuilderTests()
         {
-            server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            server = new TestServer(new WebHostBuilder().UseStartup<TestStartup>());
         }
 
         [Fact]
@@ -30,40 +28,11 @@ namespace BrandUp.Pages.Mvc
         }
 
         [Fact]
-        public void Resolve_ContentViewManager()
-        {
-            var service = Services.GetService<IContentViewManager>();
-
-            Assert.NotNull(service);
-        }
-
-        [Fact]
         public void Resolve_PageTypeManager()
         {
-            var service = Services.GetService<PageMetadataManager>();
+            var service = Services.GetService<IPageMetadataManager>();
 
             Assert.NotNull(service);
-        }
-    }
-
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc();
-            services.AddPages();
-        }
-
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            app.UsePages();
         }
     }
 }

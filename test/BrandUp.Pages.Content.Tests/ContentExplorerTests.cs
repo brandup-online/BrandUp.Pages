@@ -6,23 +6,22 @@ namespace BrandUp.Pages.Content
     public class ContentExplorerTests
     {
         private readonly IContentMetadataManager metadataManager;
-        private readonly IContentViewManager viewManager;
 
         public ContentExplorerTests()
         {
-            metadataManager = new ContentMetadataManager(new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly }));
-            viewManager = new ContentViewManager(metadataManager, new AttributesContentViewResolver());
+            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentViewResolver = new Views.AttributesContentViewResolver();
+
+            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
         }
 
         [Fact]
         public void Create_Root()
         {
             var content = new TestPageContent();
-            var explorer = ContentExplorer.Create(metadataManager, viewManager, content);
+            var explorer = ContentExplorer.Create(metadataManager, content);
 
             Assert.NotNull(explorer);
-            Assert.Equal(explorer.MetadataManager, metadataManager);
-            Assert.Equal(explorer.ViewManager, viewManager);
             Assert.NotNull(explorer.Metadata);
             Assert.Null(explorer.Field);
             Assert.Equal(explorer.Content, content);
@@ -37,11 +36,9 @@ namespace BrandUp.Pages.Content
         public void Create_SpecifyPath()
         {
             var content = new TestPageContent { Header = new PageHeaderContent() };
-            var explorer = ContentExplorer.Create(metadataManager, viewManager, content, "Header");
+            var explorer = ContentExplorer.Create(metadataManager, content, "Header");
 
             Assert.NotNull(explorer);
-            Assert.Equal(explorer.MetadataManager, metadataManager);
-            Assert.Equal(explorer.ViewManager, viewManager);
             Assert.NotNull(explorer.Metadata);
             Assert.NotNull(explorer.Field);
             Assert.Equal(explorer.Content, content.Header);
@@ -56,7 +53,7 @@ namespace BrandUp.Pages.Content
         public void Navigate_ContentField_Null()
         {
             var content = new TestPageContent();
-            var explorer = ContentExplorer.Create(metadataManager, viewManager, content, "Header");
+            var explorer = ContentExplorer.Create(metadataManager, content, "Header");
 
             Assert.Null(explorer);
         }
@@ -65,7 +62,7 @@ namespace BrandUp.Pages.Content
         public void Navigate_ContentListField_Null()
         {
             var content = new TestPageContent();
-            var explorer = ContentExplorer.Create(metadataManager, viewManager, content, "Headers[0]");
+            var explorer = ContentExplorer.Create(metadataManager, content, "Headers[0]");
 
             Assert.Null(explorer);
         }

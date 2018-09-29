@@ -1,0 +1,13 @@
+{
+  "views": [
+    {
+      "name": "default",
+      "title": "По умолчанию"
+    },
+    {
+      "name": "default2",
+      "title": "Второй"
+    }
+  ],
+  "defaultView": "default"
+}

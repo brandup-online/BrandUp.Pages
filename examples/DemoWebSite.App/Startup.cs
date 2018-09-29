@@ -69,7 +69,10 @@ namespace DemoWebSite.App
 
             //app.UseAuthentication();
 
-            app.UsePages();
+            app.UseMvc((routes) =>
+            {
+                routes.MapPageRoute();
+            });
         }
     }
 }

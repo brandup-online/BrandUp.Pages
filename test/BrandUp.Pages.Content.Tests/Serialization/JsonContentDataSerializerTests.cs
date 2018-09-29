@@ -11,7 +11,10 @@ namespace BrandUp.Pages.Content.Serialization
 
         public JsonContentDataSerializerTests()
         {
-            metadataManager = new ContentMetadataManager(new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly }));
+            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentViewResolver = new Views.AttributesContentViewResolver();
+
+            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
             serializer = new JsonContentDataSerializer();
         }
 

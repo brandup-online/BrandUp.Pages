@@ -1,19 +1,21 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Content.Views;
 using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [ContentModel(Title = ContentTypeTitle)]
+    [ContentModel(Title = ContentTypeTitle, Description = ContentTypeDescription)]
     [ViewDefinition("Default")]
     public class TestPageContent
     {
         public const string ContentTypeTitle = "Test page";
+        public const string ContentTypeDescription = "Test page description";
 
         [View]
         public string ViewName { get; set; }
 
-        [Text(title: "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Text(title: "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
         [ContentValue(title: "Шапка страницы")]

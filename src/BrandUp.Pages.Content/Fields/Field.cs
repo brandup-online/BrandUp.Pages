@@ -69,21 +69,23 @@ namespace BrandUp.Pages.Content.Fields
         {
             return value != null;
         }
-        /// <summary>
-        /// Получает значение поля у элемента модели.
-        /// </summary>
-        /// <param name="model">Элемент модели.</param>
-        /// <returns>Текущее значение поля.</returns>
         [System.Diagnostics.DebuggerStepThrough]
         public object GetModelValue(object model)
         {
             return fieldDeclaration.GetValue(model);
         }
-        /// <summary>
-        /// Задаёт значение поля у элемента модели.
-        /// </summary>
-        /// <param name="model">Элемент модели.</param>
-        /// <param name="value">Новое значение поля.</param>
+        public bool TryGetValue(object model, out object value)
+        {
+            var val = fieldDeclaration.GetValue(model);
+            if (!HasValue(val))
+            {
+                value = null;
+                return false;
+            }
+
+            value = val;
+            return true;
+        }
         [System.Diagnostics.DebuggerStepThrough]
         public void SetModelValue(object model, object value)
         {

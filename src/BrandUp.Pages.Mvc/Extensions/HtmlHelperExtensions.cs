@@ -29,11 +29,8 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
             var metadataManager = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IContentMetadataManager>();
             if (metadataManager == null)
                 throw new InvalidOperationException();
-            var viewManager = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IContentViewManager>();
-            if (viewManager == null)
-                throw new InvalidOperationException();
 
-            var contentExplorer = ContentExplorer.Create(metadataManager, viewManager, htmlHelper.ViewData.Model);
+            var contentExplorer = ContentExplorer.Create(metadataManager, htmlHelper.ViewData.Model);
             if (!contentExplorer.Metadata.SupportViews)
                 throw new InvalidOperationException("Модель контента не поддерживает представления.");
 

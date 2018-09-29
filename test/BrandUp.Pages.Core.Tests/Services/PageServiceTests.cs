@@ -89,6 +89,16 @@ namespace BrandUp.Pages.Services
             Assert.NotNull(page);
         }
         [Fact]
+        public async Task SetDefaultPage()
+        {
+            var testPage = await pageService.FindPageByPathAsync("test");
+            await pageService.SetDefaultPageAsync(testPage);
+
+            var defaultPage = await pageService.GetDefaultPageAsync();
+
+            Assert.Equal(testPage.Id, defaultPage.Id);
+        }
+        [Fact]
         public async Task GetPageType()
         {
             var page = await pageService.FindPageByPathAsync(string.Empty);

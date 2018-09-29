@@ -23,4 +23,13 @@
     <ProjectReference Include="..\..\src\BrandUp.Pages.Testing\BrandUp.Pages.Testing.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ContentViews\TestPage\model.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ContentViews\TestPage\views.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

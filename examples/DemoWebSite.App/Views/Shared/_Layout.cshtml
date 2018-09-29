@@ -1,22 +1,108 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="ru">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DemoWebSite.App</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <meta content="ru" http-equiv="content-language" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="origin" name="referrer" />
+    <link href="~/favicon.ico" rel="icon" />
 
-    <environment include="Development">
-        <link rel="stylesheet" href="~/css/site.css" />
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <environment names="Development,Staging,Production">
+        <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700" rel="stylesheet">
+
+        <link rel="stylesheet" href="~/lib/ckeditor/styles.css" />
+        <link rel="stylesheet" href="~/assets/website.css" />
+        <link rel="stylesheet" href="~/css/site.all.css" />
     </environment>
 </head>
 <body>
-    <div class="body-content">
-        @RenderBody()
-    </div>
+    <main class="app-container page">
+        <nav role="navigation" class="navbar">
+            <div class="page-width">
+                <div class="navbar-header">
+                    <a href="@Url.Action("Index", "Home")" class="logo applink">
+                        <img src="~/images/logo.png" alt="" />
+                        <span>ёlka.store</span>
+                    </a>
+                </div>
+                <ul class="navbar-nav slogan">
+                    <li>сервис подбора искусственных ёлок</li>
+                </ul>
+                <ul class="navbar-nav menu">
+                    <li>
+                        <a id="submenu" href="" class="expander" data-command-name="open-menu">Ёлки</a>
+                        <div class="navbar-nav-popup menu">
+                            <ol>
+                                <li><a href="@Url.Action("Classic", "ProductType")" class="applink">Класические ёлки</a></li>
+                                <li><a href="@Url.Action("Premium", "ProductType")" class="applink">Премиум ёлки</a></li>
+                                <li><a href="@Url.Action("White", "ProductType")" class="applink">Белые ёлки</a></li>
+                                <li><a href="@Url.Action("Light", "ProductType")" class="applink">Световые ёлки</a></li>
+                                <li><a href="@Url.Action("Snow", "ProductType")" class="applink">Заснеженные ёлки</a></li>
+                                <li><a href="@Url.Action("Street", "ProductType")" class="applink">Ёлки с шишками</a></li>
+                                <li><a href="@Url.Action("Interior", "ProductType")" class="applink">Искусственные сосны</a></li>
+                                <li><a href="@Url.Action("Interior", "ProductType")" class="applink">Интерьерные ёлки</a></li>
+                                <li><a href="@Url.Action("Street", "ProductType")" class="applink">Уличные ёлки</a></li>
+                            </ol>
+                        </div>
+                    </li>
+                    <li><a href="@Url.Action("List", "Shops")" class="applink">Магазины</a></li>
+                    <li><a href="@Url.Action("List", "Manufacturers")" class="applink">Производители</a></li>
+                </ul>
+            </div>
+        </nav>
 
-    @RenderSection("Scripts", required: false)
+        <div class="page-content">
+            @RenderBody()
+        </div>
+
+        <footer class="page-footer">
+            <div class="page-width">
+                <div class="info">
+                    <p>©2016-2018 elka.store</p>
+                    <p>Все материалы и цены, размещенные на сайте, носят справочный характер и не являются ни публичной офертой, ни рекламой. Используя сайт, вы принимаете условия <a href="">пользовательского соглашения и положения об обработке персональных данных</a></p>
+                </div>
+                <div class="menu">
+                    <p class="header">Покупателям</p>
+                    <ul>
+                        <li><a href="@Url.Action("Index", "About")" class="applink">О проекте</a></li>
+                        <li><a href="">Вопрос-ответ</a></li>
+                        <li><a href="">Отзывы</a></li>
+                        <li><a href="">Оплата и гарантии</a></li>
+                        <li><a href="">Контакты</a></li>
+                        <li><a href="">Карта сайта</a></li>
+                    </ul>
+                </div>
+                <div class="menu">
+                    <p class="header">Магазинам</p>
+                    <ul>
+                        <li><a href="@Url.Action("ShopInfo", "About")" class="applink">Условия и цены</a></li>
+                        <li><a href="">Регистрация</a></li>
+                        <li><a href="">Контакты</a></li>
+                        <li><a href="">Вход для магазинов</a></li>
+                    </ul>
+                </div>
+                <div class="contacts">
+                    <p class="phone"><a href="">8 923 114 5449</a></p>
+                    <p class="email"><a href="">info@elka.store</a></p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script type="text/javascript" src="~/lib/ckeditor/ckeditor.js"></script>
+
+    <environment names="Development,Staging,Production">
+        <script type="text/javascript" src="~/lib/requirejs/require.js"></script>
+        <script type="text/javascript">requirejs.config({ baseUrl: '@Url.Content("~/assets/")' });</script>
+        <script type="text/javascript" src="~/assets/website.js"></script>
+        <script type="text/javascript" src="~/assets/app.js"></script>
+    </environment>
+
+    <script type="text/javascript">
+        require(["website"], function (website) {
+            website.init(@Json.Serialize(Html.GetWebSitePageInitializeModel()));
+        });
+    </script>
 </body>
 </html>

@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Mvc
 
         public async Task<IHtmlContent> RenderAsync(ViewContext viewContext)
         {
-            var view = Explorer.ViewManager.GetContentView(Explorer.Content);
+            var viewName = Explorer.Metadata.GetViewName(Explorer.Content);
 
             var model = Explorer.Content;
             var viewData = new ViewDataDictionary<object>(viewContext.ViewData.ModelMetadata.GetMetadataForType(model.GetType()), new ModelStateDictionary()) { Model = model };
@@ -32,8 +32,8 @@ namespace BrandUp.Pages.Mvc
             {
                 var newViewContext = new ViewContext(viewContext, viewContext.View, viewData, viewContext.TempData, writer, new HtmlHelperOptions());
 
-                var temp = view.Name.Split(new char[] { '.' });
-                var viewName = "~/ContentViews/" + temp[0] + "/" + temp[1] + ".cshtml";
+                var temp = viewName.Split(new char[] { '.' });
+                viewName = "~/ContentViews/" + temp[0] + "/" + temp[1] + ".cshtml";
 
                 await RenderPartialViewAsync(newViewContext, viewName);
 
@@ -61,7 +61,6 @@ namespace BrandUp.Pages.Mvc
             await viewResult.View.RenderAsync(context);
 
             return context.Writer.ToString();
-
         }
     }
 }

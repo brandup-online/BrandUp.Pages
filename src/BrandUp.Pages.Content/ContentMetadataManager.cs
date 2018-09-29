@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Content.Views;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -13,16 +14,27 @@ namespace BrandUp.Pages.Content
         private readonly Dictionary<Type, int> metadataTypes = new Dictionary<Type, int>();
         private readonly Dictionary<string, int> metadataNames = new Dictionary<string, int>();
 
-        public ContentMetadataManager(IContentTypeResolver typeResolver)
+        public ContentMetadataManager(IContentTypeResolver contentTypeResolver, IContentViewResolver contentViewResolver)
         {
-            if (typeResolver == null)
-                throw new ArgumentNullException(nameof(typeResolver));
+            if (contentTypeResolver == null)
+                throw new ArgumentNullException(nameof(contentTypeResolver));
+            if (contentViewResolver == null)
+                throw new ArgumentNullException(nameof(contentViewResolver));
 
-            foreach (var contentModelType in typeResolver.GetContentTypes())
+            foreach (var contentModelType in contentTypeResolver.GetContentTypes())
                 TryRegisterType(contentModelType, out ContentMetadataProvider typeMetadata);
 
             foreach (var metadata in metadatas)
                 metadata.InitializeFields();
+
+            foreach (var metadata in metadatas)
+            {
+                if (!metadata.SupportViews)
+                    continue;
+
+                var viewConfiguration = contentViewResolver.GetViewsConfiguration(metadata);
+                metadata.InitializeViews(viewConfiguration);
+            }
         }
 
         private bool TryRegisterType(Type contentType, out ContentMetadataProvider contentMetadata)

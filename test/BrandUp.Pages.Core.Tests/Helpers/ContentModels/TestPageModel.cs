@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Content.Views;
 using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels

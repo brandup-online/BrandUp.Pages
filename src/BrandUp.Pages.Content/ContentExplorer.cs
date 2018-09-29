@@ -11,8 +11,6 @@ namespace BrandUp.Pages.Content
         public const char IndexStart = '[';
         public const char IndexEnd = ']';
         public static readonly char[] IndexTrimChars = new char[] { IndexStart, IndexEnd };
-        private readonly IContentMetadataManager metadataManager;
-        private readonly IContentViewManager viewManager;
         private readonly ContentExplorer rootExplorer;
         private readonly string name;
 
@@ -20,8 +18,6 @@ namespace BrandUp.Pages.Content
 
         #region Properties
 
-        public IContentMetadataManager MetadataManager => metadataManager;
-        public IContentViewManager ViewManager => viewManager;
         public ContentMetadataProvider Metadata { get; }
         public Field Field { get; }
         public object Content { get; }
@@ -34,10 +30,8 @@ namespace BrandUp.Pages.Content
 
         #endregion
 
-        private ContentExplorer(IContentMetadataManager metadataManager, IContentViewManager viewManager, object content, ContentMetadataProvider contentMetadata)
+        private ContentExplorer(object content, ContentMetadataProvider contentMetadata)
         {
-            this.metadataManager = metadataManager;
-            this.viewManager = viewManager;
             Field = null;
             Content = content;
             Metadata = contentMetadata;
@@ -49,8 +43,6 @@ namespace BrandUp.Pages.Content
         }
         private ContentExplorer(ContentExplorer parent, Field field, int index, object content, ContentMetadataProvider contentMetadata)
         {
-            metadataManager = parent.metadataManager;
-            viewManager = parent.viewManager;
             Field = field;
             Content = content;
             Metadata = contentMetadata;
@@ -67,7 +59,7 @@ namespace BrandUp.Pages.Content
             name = rootExplorer.name + ":" + Path;
         }
 
-        public static ContentExplorer Create(IContentMetadataManager metadataManager, IContentViewManager viewManager, object content)
+        public static ContentExplorer Create(IContentMetadataManager metadataManager, object content)
         {
             if (metadataManager == null)
                 throw new ArgumentNullException(nameof(metadataManager));
@@ -75,11 +67,11 @@ namespace BrandUp.Pages.Content
                 throw new ArgumentNullException(nameof(content));
 
             var contentMetadata = metadataManager.GetMetadata(content.GetType());
-            return new ContentExplorer(metadataManager, viewManager, content, contentMetadata);
+            return new ContentExplorer(content, contentMetadata);
         }
-        public static ContentExplorer Create(IContentMetadataManager metadataManager, IContentViewManager viewManager, object content, string path)
+        public static ContentExplorer Create(IContentMetadataManager metadataManager, object content, string path)
         {
-            var explorer = Create(metadataManager, viewManager, content);
+            var explorer = Create(metadataManager, content);
             return explorer.Navigate(path);
         }
 
@@ -99,10 +91,6 @@ namespace BrandUp.Pages.Content
             }
 
             return navExplorer;
-        }
-        public ContentEditor Edit()
-        {
-            return new ContentEditor(this);
         }
 
         private static bool VisitField(ref ContentExplorer parentExplorer, string fieldName)
@@ -132,7 +120,7 @@ namespace BrandUp.Pages.Content
                 return false;
             }
 
-            var contentMetadata = parentExplorer.metadataManager.GetMetadata(contentModel.GetType());
+            var contentMetadata = parentExplorer.Metadata.Manager.GetMetadata(contentModel.GetType());
 
             parentExplorer = new ContentExplorer(parentExplorer, field, itemIndex, contentModel, contentMetadata);
             return true;

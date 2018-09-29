@@ -10,30 +10,38 @@ namespace BrandUp.Pages.Content
 
         public ContentMetadataProviderTests()
         {
-            metadataManager = new ContentMetadataManager(new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly }));
-            contentMetadata = metadataManager.GetMetadata(typeof(PageHeaderContent));
+            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentViewResolver = new Views.AttributesContentViewResolver();
+
+            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
+            contentMetadata = metadataManager.GetMetadata(typeof(TestPageContent));
         }
 
         [Fact]
         public void Properties()
         {
             Assert.Equal(metadataManager, contentMetadata.Manager);
-            Assert.Equal(typeof(PageHeaderContent), contentMetadata.ModelType);
-            Assert.Equal("PageHeader", contentMetadata.Name);
-            Assert.Equal("Заголовок", contentMetadata.Title);
-            Assert.Equal("Заголовок страницы", contentMetadata.Description);
+            Assert.Equal(typeof(TestPageContent), contentMetadata.ModelType);
+            Assert.Equal("TestPage", contentMetadata.Name);
+            Assert.Equal(TestPageContent.ContentTypeTitle, contentMetadata.Title);
+            Assert.Equal(TestPageContent.ContentTypeDescription, contentMetadata.Description);
             Assert.Null(contentMetadata.BaseMetadata);
             Assert.Empty(contentMetadata.DerivedContents);
             Assert.NotEmpty(contentMetadata.Fields);
+            Assert.True(contentMetadata.SupportViews);
+            Assert.True(contentMetadata.HasViews);
+            Assert.NotEmpty(contentMetadata.Views);
         }
 
         [Fact]
         public void TryGetField_name_is_original()
         {
-            var result = contentMetadata.TryGetField("Title", out Fields.Field field);
+            var fieldName = "Title";
+            var result = contentMetadata.TryGetField(fieldName, out Fields.Field field);
 
             Assert.True(result);
             Assert.NotNull(field);
+            Assert.Equal(fieldName, field.Name);
             Assert.Equal("Название", field.Title);
         }
 
@@ -44,6 +52,35 @@ namespace BrandUp.Pages.Content
 
             Assert.True(result);
             Assert.NotNull(field);
+        }
+
+        [Fact]
+        public void TryGetView()
+        {
+            var viewName = "TestPage.Default";
+            var result = contentMetadata.TryGetView(viewName, out Views.ContentView view);
+
+            Assert.True(result);
+            Assert.NotNull(view);
+            Assert.Equal(viewName, view.Name);
+            Assert.Equal(viewName, view.Title);
+        }
+
+        [Fact]
+        public void GetViewName_ReturnIsNull()
+        {
+            var viewName = contentMetadata.GetViewName(new TestPageContent());
+
+            Assert.Null(viewName);
+        }
+
+        [Fact]
+        public void GetViewName_ReturnNotIsNull()
+        {
+            var viewNameValue = "TestPage.Default";
+            var viewName = contentMetadata.GetViewName(new TestPageContent() { ViewName = viewNameValue });
+
+            Assert.Equal(viewNameValue, viewName);
         }
 
         [Fact]

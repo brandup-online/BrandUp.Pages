@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -14,11 +14,11 @@ namespace BrandUp.Pages.Rendering
 {
     public class MvcPageRenderer : IPageRenderer
     {
-        private readonly IRazorViewEngine razorViewEngine;
+        private readonly ICompositeViewEngine razorViewEngine;
         private readonly ITempDataProvider tempDataProvider;
         private readonly IServiceProvider serviceProvider;
 
-        public MvcPageRenderer(IRazorViewEngine razorViewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
+        public MvcPageRenderer(ICompositeViewEngine razorViewEngine, ITempDataProvider tempDataProvider, IServiceProvider serviceProvider)
         {
             this.razorViewEngine = razorViewEngine;
             this.tempDataProvider = tempDataProvider;
@@ -32,14 +32,11 @@ namespace BrandUp.Pages.Rendering
 
             using (var streamWriter = new StreamWriter(output, System.Text.Encoding.UTF8, 1024, true))
             {
-                string viewName = "";
+                string viewName = "~/ContentViews/Page/Default.cshtml";
 
                 var viewResult = razorViewEngine.FindView(actionContext, viewName, true);
-
-                if (viewResult.View == null)
-                {
+                if (!viewResult.Success)
                     throw new ArgumentNullException($"{viewName} does not match any available view");
-                }
 
                 var viewDictionary = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
                 {
