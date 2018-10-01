@@ -11,18 +11,15 @@ namespace BrandUp.Pages.Services
         private readonly IPageRepositiry pageRepositiry;
         private readonly IPageCollectionRepositiry pageCollectionRepositiry;
         private readonly IPageMetadataManager pageMetadataManager;
-        private readonly Content.IContentMetadataManager contentMetadataManager;
 
         public PageService(
             IPageRepositiry pageRepositiry,
             IPageCollectionRepositiry pageCollectionRepositiry,
-            IPageMetadataManager pageMetadataManager,
-            Content.IContentMetadataManager contentMetadataManager)
+            IPageMetadataManager pageMetadataManager)
         {
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
             this.pageCollectionRepositiry = pageCollectionRepositiry ?? throw new ArgumentNullException(nameof(pageCollectionRepositiry));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
-            this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
         }
 
         public async Task<IPage> CreatePageAsync(IPageCollection collection)
@@ -35,7 +32,7 @@ namespace BrandUp.Pages.Services
                 throw new InvalidOperationException();
 
             var pageContentModel = pageMetadata.CreatePageModel();
-            var pageContentData = contentMetadataManager.ConvertContentModelToDictionary(pageContentModel);
+            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContentModel);
 
             return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageContentData);
         }
@@ -83,7 +80,7 @@ namespace BrandUp.Pages.Services
 
             var pageType = pageMetadataManager.FindPageMetadataByName(page.TypeName);
             if (pageType == null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"Тип страницы {page.TypeName} не зарегистрирован.");
             return Task.FromResult(pageType);
         }
         public async Task<object> GetPageContentAsync(IPage page)
@@ -95,7 +92,22 @@ namespace BrandUp.Pages.Services
             if (contentData == null)
                 throw new InvalidOperationException();
 
-            return contentMetadataManager.ConvertDictionaryToContentModel(contentData.Data);
+            var pageMetadata = await GetPageTypeAsync(page);
+
+            return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData.Data);
+        }
+        public async Task SetPageContentAsync(IPage page, object contentModel)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            var pageMetadata = await GetPageTypeAsync(page);
+            if (contentModel.GetType() != pageMetadata.ContentType)
+                throw new ArgumentException();
+
+            var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
+
+            await pageRepositiry.SetContentAsync(page.Id, new PageContent(page.ContentVersion, pageData));
         }
         public async Task PublishPageAsync(IPage page, string urlPathName)
         {

@@ -51,11 +51,11 @@ namespace BrandUp.Pages.Services
 
             var pageCollection = await pageCollectionRepository.CreateCollectionAsync("Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
-            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, contentMetadataManager.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(mainPage.Id, "main");
             await pageRepository.SetDefaultPageAsync(mainPage);
 
-            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, contentMetadataManager.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(testPage.Id, "test");
         }
         Task IAsyncLifetime.DisposeAsync()

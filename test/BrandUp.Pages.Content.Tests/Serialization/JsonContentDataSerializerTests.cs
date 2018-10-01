@@ -27,7 +27,8 @@ namespace BrandUp.Pages.Content.Serialization
                 Header = new PageHeaderContent { Title = "header" },
                 Headers = new List<PageHeaderContent> { new PageHeaderContent { Title = "header" } }
             };
-            var contentData = metadataManager.ConvertContentModelToDictionary(content);
+            var contentMetadata = metadataManager.GetMetadata(content.GetType());
+            var contentData = contentMetadata.ConvertContentModelToDictionary(content);
 
             var json = serializer.SerializeToString(contentData);
             Assert.NotNull(json);
@@ -42,11 +43,12 @@ namespace BrandUp.Pages.Content.Serialization
                 Header = new PageHeaderContent { Title = "header" },
                 Headers = new List<PageHeaderContent> { new PageHeaderContent { Title = "header" } }
             };
-            var contentData = metadataManager.ConvertContentModelToDictionary(content);
+            var contentMetadata = metadataManager.GetMetadata(content.GetType());
+            var contentData = contentMetadata.ConvertContentModelToDictionary(content);
             var json = serializer.SerializeToString(contentData);
 
             var deserializedContentData = serializer.DeserializeFromString(json);
-            var deserializedContent = (TestPageContent)metadataManager.ConvertDictionaryToContentModel(deserializedContentData);
+            var deserializedContent = (TestPageContent)contentMetadata.ConvertDictionaryToContentModel(deserializedContentData);
 
             Assert.NotNull(deserializedContent);
             Assert.Equal(deserializedContent.Title, content.Title);

@@ -50,7 +50,7 @@ namespace BrandUp.Pages.Content.Fields
 
             var result = new List<IDictionary<string, object>>();
             foreach (var item in list)
-                result.Add(metadataManager.ConvertContentModelToDictionary(item));
+                result.Add(ValueContentMetadata.ConvertContentModelToDictionary(item));
 
             return result;
         }
@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Content.Fields
 
             foreach (var itemData in dataList)
             {
-                var item = metadataManager.ConvertDictionaryToContentModel(itemData);
+                var item = ValueContentMetadata.ConvertDictionaryToContentModel(itemData);
                 result.Add(item);
             }
 

@@ -53,11 +53,11 @@ namespace BrandUp.Pages.Services
 
             var pageCollection = await pageCollectionRepository.CreateCollectionAsync("Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
-            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, contentMetadataManager.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(mainPage.Id, "main");
             await pageRepository.SetDefaultPageAsync(mainPage);
 
-            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, contentMetadataManager.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(testPage.Id, "test");
         }
         Task IAsyncLifetime.DisposeAsync()
@@ -115,6 +115,17 @@ namespace BrandUp.Pages.Services
             var pageModel = await pageService.GetPageContentAsync(page);
 
             Assert.NotNull(pageModel);
+        }
+        [Fact]
+        public async Task SetPageContent()
+        {
+            var page = await pageService.FindPageByPathAsync(string.Empty);
+
+            var newContent = new TestPageContent { Title = "custom" };
+            await pageService.SetPageContentAsync(page, newContent);
+            var pageModel = (TestPageContent)await pageService.GetPageContentAsync(page);
+
+            Assert.Equal(newContent.Title, pageModel.Title);
         }
         [Fact]
         public async Task CreatePageAsync()

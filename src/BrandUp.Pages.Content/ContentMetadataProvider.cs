@@ -10,6 +10,7 @@ namespace BrandUp.Pages.Content
     {
         #region Fields
 
+        public const string ContentTypeNameDataKey = "_type";
         private static readonly object[] ModelConstructorParameters = new object[0];
         private readonly ConstructorInfo modelConstructor = null;
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
@@ -61,6 +62,7 @@ namespace BrandUp.Pages.Content
         public ViewField ViewField => viewField;
         public IEnumerable<ContentView> Views => views;
         public bool HasViews => views.Count > 0;
+        public ContentView DefaultView => defaultView;
 
         #endregion
 
@@ -217,6 +219,56 @@ namespace BrandUp.Pages.Content
         public object CreateModelInstance()
         {
             return modelConstructor.Invoke(new object[0]);
+        }
+        public IDictionary<string, object> ConvertContentModelToDictionary(object contentModel)
+        {
+            if (contentModel == null)
+                throw new ArgumentNullException(nameof(contentModel));
+            if (contentModel.GetType() != ModelType)
+                throw new ArgumentException("Is not valid content model type.", nameof(contentModel));
+
+            var result = new SortedDictionary<string, object>
+            {
+                { ContentTypeNameDataKey, Name }
+            };
+
+            foreach (var field in Fields)
+            {
+                var fieldValue = field.GetModelValue(contentModel);
+                if (!field.HasValue(fieldValue))
+                    continue;
+
+                var dataValue = field.ConvetValueToData(fieldValue);
+                result.Add(field.JsonPropertyName, dataValue);
+            }
+
+            return result;
+        }
+        public object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary)
+        {
+            if (dictionary == null)
+                throw new ArgumentNullException(nameof(dictionary));
+
+            if (!dictionary.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
+                throw new ArgumentException("Справочник данных не содержит названия типа контента.");
+            dictionary.Remove(ContentTypeNameDataKey);
+
+            if (string.Compare((string)contentTypeNameValue, Name, true) != 0)
+                throw new ArgumentException("Dictionary containt invalid type name.");
+
+            var contentModel = CreateModelInstance();
+
+            foreach (var kv in dictionary)
+            {
+                if (!TryGetField(kv.Key, out Field field))
+                    continue;
+
+                var dataValue = kv.Value;
+                var value = field.ConvetValueFromData(dataValue);
+                field.SetModelValue(contentModel, value);
+            }
+
+            return contentModel;
         }
 
         #endregion

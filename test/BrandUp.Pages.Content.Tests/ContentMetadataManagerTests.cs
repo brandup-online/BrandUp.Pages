@@ -83,29 +83,5 @@ namespace BrandUp.Pages.Content
 
             Assert.Null(viewName);
         }
-
-        [Fact]
-        public void ConvertContentModelToDictionary()
-        {
-            var data = metadataManager.ConvertContentModelToDictionary(new TestPageContent { ViewName = "test" });
-
-            Assert.NotNull(data);
-            Assert.True(data.Count > 0);
-            Assert.True(data.ContainsKey(ContentMetadataManager.ContentTypeNameDataKey));
-            Assert.True(data.ContainsKey("viewName"));
-        }
-
-        [Fact]
-        public void ConvertDictionaryToContentModel()
-        {
-            var sourceModel = new TestPageContent { ViewName = "test" };
-            var data = metadataManager.ConvertContentModelToDictionary(sourceModel);
-
-            var model = metadataManager.ConvertDictionaryToContentModel(data) as TestPageContent;
-
-            Assert.NotNull(model);
-            Assert.Equal(model.GetType(), sourceModel.GetType());
-            Assert.Equal(model.ViewName, sourceModel.ViewName);
-        }
     }
 }

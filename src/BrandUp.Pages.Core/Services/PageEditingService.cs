@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Metadata;
 using System;
 using System.Threading.Tasks;
 
@@ -7,14 +8,17 @@ namespace BrandUp.Pages.Services
     public class PageEditingService : IPageEditingService
     {
         private readonly IPageEditSessionRepository editSessionRepository;
-        private readonly IPageRepositiry pageRepositiry;
-        private readonly Content.IContentMetadataManager contentMetadataManager;
+        private readonly IPageService pageRepositiry;
+        private readonly IPageMetadataManager pageMetadataManager;
 
-        public PageEditingService(IPageEditSessionRepository editSessionRepository, IPageRepositiry pageRepositiry, Content.IContentMetadataManager contentMetadataManager)
+        public PageEditingService(IPageEditSessionRepository editSessionRepository,
+            IPageService pageRepositiry,
+            IPageMetadataManager pageMetadataManager,
+            Content.IContentMetadataManager contentMetadataManager)
         {
             this.editSessionRepository = editSessionRepository ?? throw new ArgumentNullException(nameof(editSessionRepository));
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
-            this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
+            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
         public async Task<IPageEditSession> BeginEditAsync(IPage page)
@@ -22,9 +26,11 @@ namespace BrandUp.Pages.Services
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            var contentData = await pageRepositiry.GetContentAsync(page.Id);
+            var contentData = await pageRepositiry.GetPageContentAsync(page);
+            var pageMetadata = await pageRepositiry.GetPageTypeAsync(page);
+            var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentData);
 
-            return await editSessionRepository.CreateEditSessionAsync(page.Id, "test", contentData);
+            return await editSessionRepository.CreateEditSessionAsync(page.Id, "test", new PageContent(page.ContentVersion, pageData));
         }
 
         public Task<IPageEditSession> FindEditSessionById(Guid id)
@@ -34,15 +40,26 @@ namespace BrandUp.Pages.Services
 
         public async Task<object> GetContentAsync(IPageEditSession editSession)
         {
+            if (editSession == null)
+                throw new ArgumentNullException(nameof(editSession));
+
+            var page = await pageRepositiry.FindPageByIdAsync(editSession.PageId);
+            var pageMetadata = await pageRepositiry.GetPageTypeAsync(page);
             var contentData = await editSessionRepository.GetContentAsync(editSession.Id);
 
-            return contentMetadataManager.ConvertDictionaryToContentModel(contentData.Data);
+            return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData.Data);
         }
-        public Task SetContentAsync(IPageEditSession editSession, object content)
+        public async Task SetContentAsync(IPageEditSession editSession, object content)
         {
-            var contentData = contentMetadataManager.ConvertContentModelToDictionary(content);
+            if (editSession == null)
+                throw new ArgumentNullException(nameof(editSession));
 
-            return editSessionRepository.SetContentAsync(editSession.Id, new PageContent(1, contentData));
+            var page = await pageRepositiry.FindPageByIdAsync(editSession.PageId);
+            var pageMetadata = await pageRepositiry.GetPageTypeAsync(page);
+
+            var contentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(content);
+
+            await editSessionRepository.SetContentAsync(editSession.Id, new PageContent(1, contentData));
         }
 
         public async Task CommitEditSessionAsync(IPageEditSession editSession)
@@ -51,9 +68,11 @@ namespace BrandUp.Pages.Services
                 throw new ArgumentNullException(nameof(editSession));
 
             var page = await pageRepositiry.FindPageByIdAsync(editSession.PageId);
-            var newContentData = await editSessionRepository.GetContentAsync(editSession.Id);
+            var pageMetadata = await pageRepositiry.GetPageTypeAsync(page);
+            var newContent = await editSessionRepository.GetContentAsync(editSession.Id);
+            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(newContent.Data);
 
-            await pageRepositiry.SetContentAsync(editSession.PageId, new PageContent(page.ContentVersion, newContentData.Data));
+            await pageRepositiry.SetPageContentAsync(page, new PageContent(page.ContentVersion, pageContentData));
 
             await editSessionRepository.DeleteEditSession(editSession.Id);
         }

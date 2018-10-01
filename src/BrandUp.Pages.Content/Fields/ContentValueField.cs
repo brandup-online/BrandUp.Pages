@@ -36,11 +36,11 @@ namespace BrandUp.Pages.Content.Fields
         }
         public override object ConvetValueToData(object value)
         {
-            return metadataProvider.ConvertContentModelToDictionary(value);
+            return ValueContentMetadata.ConvertContentModelToDictionary(value);
         }
         public override object ConvetValueFromData(object value)
         {
-            return metadataProvider.ConvertDictionaryToContentModel((IDictionary<string, object>)value);
+            return ValueContentMetadata.ConvertDictionaryToContentModel((IDictionary<string, object>)value);
         }
         public override object ParseValue(string strValue)
         {

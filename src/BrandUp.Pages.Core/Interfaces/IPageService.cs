@@ -15,6 +15,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination);
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page);
         Task<object> GetPageContentAsync(IPage page);
+        Task SetPageContentAsync(IPage page, object contentModel);
         Task PublishPageAsync(IPage page, string urlPathName);
         Task DeletePageAsync(IPage page);
     }

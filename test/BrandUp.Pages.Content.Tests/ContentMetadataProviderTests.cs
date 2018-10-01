@@ -67,15 +67,15 @@ namespace BrandUp.Pages.Content
         }
 
         [Fact]
-        public void GetViewName_ReturnIsNull()
+        public void GetViewName_ReturnDefault()
         {
             var viewName = contentMetadata.GetViewName(new TestPageContent());
 
-            Assert.Null(viewName);
+            Assert.Equal(contentMetadata.DefaultView.Name, viewName);
         }
 
         [Fact]
-        public void GetViewName_ReturnNotIsNull()
+        public void GetViewName_ReturnSpecify()
         {
             var viewNameValue = "TestPage.Default";
             var viewName = contentMetadata.GetViewName(new TestPageContent() { ViewName = viewNameValue });
@@ -90,6 +90,30 @@ namespace BrandUp.Pages.Content
 
             Assert.NotNull(model);
             Assert.IsType(contentMetadata.ModelType, model);
+        }
+
+        [Fact]
+        public void ConvertContentModelToDictionary()
+        {
+            var data = contentMetadata.ConvertContentModelToDictionary(new TestPageContent { ViewName = "test" });
+
+            Assert.NotNull(data);
+            Assert.True(data.Count > 0);
+            Assert.True(data.ContainsKey(ContentMetadataManager.ContentTypeNameDataKey));
+            Assert.True(data.ContainsKey("viewName"));
+        }
+
+        [Fact]
+        public void ConvertDictionaryToContentModel()
+        {
+            var sourceModel = new TestPageContent { ViewName = "test" };
+            var data = contentMetadata.ConvertContentModelToDictionary(sourceModel);
+
+            var model = contentMetadata.ConvertDictionaryToContentModel(data) as TestPageContent;
+
+            Assert.NotNull(model);
+            Assert.Equal(model.GetType(), sourceModel.GetType());
+            Assert.Equal(model.ViewName, sourceModel.ViewName);
         }
     }
 }
