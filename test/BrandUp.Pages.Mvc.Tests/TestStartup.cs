@@ -27,7 +27,6 @@ namespace BrandUp.Pages.Mvc
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UsePages();
         }
     }
 }

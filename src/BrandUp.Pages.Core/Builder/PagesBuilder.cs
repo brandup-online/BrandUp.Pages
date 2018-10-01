@@ -2,7 +2,6 @@
 using BrandUp.Pages.Files;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
-using BrandUp.Pages.Middlewares;
 using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -35,8 +34,6 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IPageEditingService, PageEditingService>();
-
-            services.AddTransient<PageMiddleware>();
         }
     }
 
