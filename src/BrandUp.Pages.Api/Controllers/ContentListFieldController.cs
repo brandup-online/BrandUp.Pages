@@ -17,12 +17,10 @@ namespace BrandUp.Pages.Api.Controllers
     {
         private readonly IPageEditingService editingService;
         private readonly IContentMetadataManager contentMetadataManager;
-        private readonly IContentViewManager contentViewManager;
 
-        public ContentListFieldController(IContentMetadataManager contentMetadataManager, IContentViewManager contentViewManager, IPageEditingService editingService)
+        public ContentListFieldController(IContentMetadataManager contentMetadataManager, IPageEditingService editingService)
         {
             this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
-            this.contentViewManager = contentViewManager ?? throw new ArgumentNullException(nameof(contentViewManager));
             this.editingService = editingService ?? throw new ArgumentNullException(nameof(editingService));
         }
 
@@ -34,7 +32,7 @@ namespace BrandUp.Pages.Api.Controllers
                 return BadRequest();
 
             var pageContentModel = await editingService.GetContentAsync(editSession);
-            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, contentViewManager, pageContentModel);
+            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContentModel);
 
             var contentExplorer = pageContentExplorer.Navigate(path ?? string.Empty);
 
@@ -72,7 +70,7 @@ namespace BrandUp.Pages.Api.Controllers
                 return BadRequest();
 
             var pageContentModel = await editingService.GetContentAsync(editSession);
-            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, contentViewManager, pageContentModel);
+            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContentModel);
 
             var contentExplorer = pageContentExplorer.Navigate(path ?? string.Empty);
 
@@ -102,7 +100,7 @@ namespace BrandUp.Pages.Api.Controllers
                 return BadRequest();
 
             var pageContentModel = await editingService.GetContentAsync(editSession);
-            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, contentViewManager, pageContentModel);
+            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContentModel);
 
             var contentExplorer = pageContentExplorer.Navigate(path ?? string.Empty);
 

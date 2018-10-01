@@ -1,4 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Mvc;
+using Microsoft.AspNetCore.Routing;
 using System;
 
 namespace Microsoft.AspNetCore.Mvc
@@ -34,14 +36,10 @@ namespace Microsoft.AspNetCore.Mvc
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            //var pageUrlManager = urlHelper.ActionContext.HttpContext.RequestServices.GetRequiredService<IPageUrlManager>();
-
-            return null;
-
-            //if (page.UrlPath != null)
-            //    return urlHelper.RouteUrl(RouteConstants.PublishedPageRouteName, new RouteValueDictionary(query) { { RouteConstants.PublishedPagePathRouteValueKey, page.UrlPath } });
-            //else
-            //    return urlHelper.RouteUrl(RouteConstants.DraftPageRouteName, new RouteValueDictionary(query) { { RouteConstants.DraftPagePathRouteValueKey, page.Id } });
+            if (page.UrlPath != null)
+                return urlHelper.RouteUrl(RouteConstants.PublishedPageRouteName, new RouteValueDictionary(query) { { RouteConstants.PublishedPagePathRouteValueKey, page.UrlPath } });
+            else
+                return urlHelper.RouteUrl(RouteConstants.DraftPageRouteName, new RouteValueDictionary(query) { { RouteConstants.DraftPagePathRouteValueKey, page.Id } });
         }
 
         public static string MainPage(this IUrlHelper urlHelper)

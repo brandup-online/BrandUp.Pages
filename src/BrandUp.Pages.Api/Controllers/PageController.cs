@@ -98,7 +98,7 @@ namespace BrandUp.Pages.Api
                 Collection = pageCollection.CreateDataModel(),
                 Status = page.UrlPath == null ? "Draft" : "Published",
                 Name = pageType.GetPageName(pageContent),
-                Url = Url.WebSitePage(page)
+                Url = page.UrlPath
             };
         }
     }

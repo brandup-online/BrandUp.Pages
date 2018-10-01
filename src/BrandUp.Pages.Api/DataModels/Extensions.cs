@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Views;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 
@@ -27,7 +28,7 @@ namespace BrandUp.Pages.Api.DataModels
             };
         }
 
-        public static DataModels.ContentViewModel CreateDataModel(this IContentView current)
+        public static DataModels.ContentViewModel CreateDataModel(this ContentView current)
         {
             return new DataModels.ContentViewModel
             {

@@ -25,14 +25,16 @@ namespace BrandUp.Pages.Mvc
             var service = Services.GetService<IContentMetadataManager>();
 
             Assert.NotNull(service);
+            Assert.NotEmpty(service.GetAllMetadata());
         }
 
         [Fact]
-        public void Resolve_PageTypeManager()
+        public void Resolve_PageMetadataManager()
         {
             var service = Services.GetService<IPageMetadataManager>();
 
             Assert.NotNull(service);
+            Assert.NotEmpty(service.GetAllMetadata());
         }
     }
 }

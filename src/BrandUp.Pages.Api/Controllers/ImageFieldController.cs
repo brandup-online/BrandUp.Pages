@@ -15,13 +15,11 @@ namespace BrandUp.Pages.Api.Controllers
 
         private readonly IPageEditingService editingService;
         private readonly IContentMetadataManager contentMetadataManager;
-        private readonly IContentViewManager contentViewManager;
         private readonly IFileService fileService;
 
-        public ImageFieldController(IContentMetadataManager contentMetadataManager, IContentViewManager contentViewManager, IPageEditingService editingService, IFileService fileService)
+        public ImageFieldController(IContentMetadataManager contentMetadataManager, IPageEditingService editingService, IFileService fileService)
         {
             this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
-            this.contentViewManager = contentViewManager ?? throw new ArgumentNullException(nameof(contentViewManager));
             this.editingService = editingService ?? throw new ArgumentNullException(nameof(editingService));
             this.fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         }
@@ -42,7 +40,7 @@ namespace BrandUp.Pages.Api.Controllers
                 return BadRequest();
 
             var pageContentModel = await editingService.GetContentAsync(editSession);
-            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, contentViewManager, pageContentModel);
+            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContentModel);
 
             var contentExplorer = pageContentExplorer.Navigate(path ?? string.Empty);
 

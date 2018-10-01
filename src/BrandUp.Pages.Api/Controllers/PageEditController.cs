@@ -8,8 +8,8 @@ namespace BrandUp.Pages.Api
     [ApiController, Route("api/page")]
     public class PageEditController : Controller
     {
-        readonly IPageService pageService;
-        readonly IPageEditingService pageEditingService;
+        private readonly IPageService pageService;
+        private readonly IPageEditingService pageEditingService;
 
         public PageEditController(IPageService pageService, IPageEditingService pageEditingService)
         {
@@ -26,7 +26,7 @@ namespace BrandUp.Pages.Api
 
             var editSession = await pageEditingService.BeginEditAsync(page);
 
-            var editUrl = Url.WebSitePage(page, new { es = editSession.Id });
+            var editUrl = ""; //Url.WebSitePage(page, new { es = editSession.Id });
 
             return Content(editUrl);
         }
@@ -43,9 +43,8 @@ namespace BrandUp.Pages.Api
             var page = await pageService.FindPageByIdAsync(editSession.PageId);
             if (page == null)
                 return BadRequest();
-            var viewUrl = Url.WebSitePage(page);
 
-            return Content(viewUrl);
+            return Content(page.UrlPath);
         }
 
         [Route("{pageId}/edit/{sessionId}"), HttpDelete]
@@ -60,9 +59,8 @@ namespace BrandUp.Pages.Api
             var page = await pageService.FindPageByIdAsync(editSession.PageId);
             if (page == null)
                 return BadRequest();
-            var viewUrl = Url.WebSitePage(page);
 
-            return Content(viewUrl);
+            return Content(page.UrlPath);
         }
     }
 }
