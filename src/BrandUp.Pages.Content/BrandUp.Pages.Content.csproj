@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Dmitry Kovyazin</Authors>
+    <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+    <Product>BrandUp.Pages</Product>
   </PropertyGroup>
 
   <ItemGroup>
