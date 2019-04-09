@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,11 +10,13 @@ namespace BrandUp.Pages.Services
     {
         private readonly IPageCollectionRepositiry repositiry;
         private readonly IPageRepositiry pageRepositiry;
+        private readonly IPageMetadataManager pageMetadataManager;
 
-        public PageCollectionService(IPageCollectionRepositiry repositiry, IPageRepositiry pageRepositiry)
+        public PageCollectionService(IPageCollectionRepositiry repositiry, IPageRepositiry pageRepositiry, IPageMetadataManager pageMetadataManager)
         {
             this.repositiry = repositiry ?? throw new ArgumentNullException(nameof(repositiry));
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
+            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
         public Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
@@ -29,6 +32,29 @@ namespace BrandUp.Pages.Services
         public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId)
         {
             return repositiry.GetCollectionsAsync(pageId);
+        }
+
+        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, bool includeDerivedTypes)
+        {
+            if (pageTypeName == null)
+                throw new ArgumentNullException(nameof(pageTypeName));
+
+            var pageMetadata = pageMetadataManager.FindPageMetadataByName(pageTypeName);
+            if (pageMetadata == null)
+                throw new ArgumentException($"Тип страницы {pageTypeName} не существует.");
+
+            var pageTypeNames = new List<string>
+            {
+                pageMetadata.Name
+            };
+
+            if (includeDerivedTypes)
+            {
+                foreach (var derivedPageMetadata in pageMetadata.GetDerivedMetadataWithHierarhy(false))
+                    pageTypeNames.Add(derivedPageMetadata.Name);
+            }
+
+            return repositiry.GetCollectionsAsync(pageTypeNames.ToArray());
         }
 
         public Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort)

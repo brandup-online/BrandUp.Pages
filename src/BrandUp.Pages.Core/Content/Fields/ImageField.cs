@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
@@ -51,20 +52,25 @@ namespace BrandUp.Pages.Content.Fields
             var temp = ((string)value).Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
             return new ImageValue(Guid.Parse(temp[1]));
         }
-        public override object GetFormValue(object modelValue)
+        public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
+            if (!HasValue(modelValue))
+                return null;
+
             var img = (ImageValue)modelValue;
-            return new ImageFieldFormValue
+            var formValue = new ImageFieldFormValue
             {
                 FileId = img.FileId,
                 PreviewUrl = "_file/" + img.FileId.ToString()
             };
+
+            return Task.FromResult<object>(formValue);
         }
 
         #endregion
     }
 
-    public struct ImageValue
+    public readonly struct ImageValue
     {
         public Guid FileId { get; }
 

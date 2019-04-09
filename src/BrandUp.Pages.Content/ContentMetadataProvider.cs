@@ -11,6 +11,7 @@ namespace BrandUp.Pages.Content
         #region Fields
 
         public const string ContentTypeNameDataKey = "_type";
+        public static readonly string[] ContentTypePrefixes = new string[] { "Content", "Model" };
         private static readonly object[] ModelConstructorParameters = new object[0];
         private readonly ConstructorInfo modelConstructor = null;
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
@@ -70,7 +71,13 @@ namespace BrandUp.Pages.Content
 
         private static string GetTypeName(Type type)
         {
-            return type.Name.Substring(0, type.Name.LastIndexOf(ContentMetadataManager.ContentTypePrefix));
+            var name = type.Name;
+            foreach (var namePrefix in ContentTypePrefixes)
+            {
+                if (name.EndsWith(namePrefix))
+                    return type.Name.Substring(0, type.Name.LastIndexOf(namePrefix));
+            }
+            return name;
         }
 
         internal void InitializeFields()
@@ -204,6 +211,20 @@ namespace BrandUp.Pages.Content
 
             return (string)viewName;
         }
+        public ContentView GetView(object model)
+        {
+            CheckSupportedViews();
+
+            string viewName;
+            if (!viewField.TryGetValue(model, out object viewNameValue))
+                viewName = defaultView.Name;
+            else
+                viewName = (string)viewNameValue;
+
+            if (!TryGetView(viewName, out ContentView view))
+                throw new InvalidOperationException();
+            return view;
+        }
         public void SetViewName(object model, string viewName)
         {
             CheckSupportedViews();
@@ -224,8 +245,17 @@ namespace BrandUp.Pages.Content
         {
             if (contentModel == null)
                 throw new ArgumentNullException(nameof(contentModel));
-            if (contentModel.GetType() != ModelType)
+
+            var contentModelType = contentModel.GetType();
+            var isSubClass = contentModelType.IsSubclassOf(ModelType);
+            if (contentModelType != ModelType && !isSubClass)
                 throw new ArgumentException("Is not valid content model type.", nameof(contentModel));
+
+            if (isSubClass)
+            {
+                var deriverMetadata = Manager.GetMetadata(contentModelType);
+                return deriverMetadata.ConvertContentModelToDictionary(contentModel);
+            }
 
             var result = new SortedDictionary<string, object>
             {
@@ -251,10 +281,19 @@ namespace BrandUp.Pages.Content
 
             if (!dictionary.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
                 throw new ArgumentException("Справочник данных не содержит названия типа контента.");
-            dictionary.Remove(ContentTypeNameDataKey);
 
-            if (string.Compare((string)contentTypeNameValue, Name, true) != 0)
-                throw new ArgumentException("Dictionary containt invalid type name.");
+            var contentTypeName = (string)contentTypeNameValue;
+            if (string.Compare(contentTypeName, Name, true) != 0)
+            {
+                if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider deriverMetadata))
+                    throw new InvalidOperationException();
+                if (!deriverMetadata.ModelType.IsSubclassOf(ModelType))
+                    throw new InvalidOperationException();
+
+                return deriverMetadata.ConvertDictionaryToContentModel(dictionary);
+            }
+
+            dictionary.Remove(ContentTypeNameDataKey);
 
             var contentModel = CreateModelInstance();
 

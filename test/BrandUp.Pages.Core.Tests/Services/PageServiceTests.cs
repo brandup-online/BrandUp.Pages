@@ -17,6 +17,7 @@ namespace BrandUp.Pages.Services
         private IServiceScope serviceScope;
         private readonly IPageService pageService;
         private readonly IPageCollectionService pageCollectionService;
+        private IPageMetadataManager pageMetadataManager;
 
         public PageServiceTests()
         {
@@ -45,7 +46,7 @@ namespace BrandUp.Pages.Services
         async Task IAsyncLifetime.InitializeAsync()
         {
             var contentMetadataManager = serviceScope.ServiceProvider.GetService<IContentMetadataManager>();
-            var pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
+            pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
             var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepositiry>();
             var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepositiry>();
 
@@ -131,8 +132,9 @@ namespace BrandUp.Pages.Services
         public async Task CreatePageAsync()
         {
             var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
-            var page = await pageService.CreatePageAsync(pageCollection);
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
             Assert.NotNull(page);
             Assert.Equal(page.OwnCollectionId, pageCollection.Id);
             Assert.Equal(page.TypeName, pageCollection.PageTypeName);

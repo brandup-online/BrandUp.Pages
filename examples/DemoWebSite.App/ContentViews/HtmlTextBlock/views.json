@@ -1,9 +1,0 @@
-{
-  "views": [
-    {
-      "name": "default",
-      "title": "По умолчанию"
-    }
-  ],
-  "defaultView": "default"
-}

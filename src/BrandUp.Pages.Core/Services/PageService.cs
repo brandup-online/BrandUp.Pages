@@ -22,12 +22,15 @@ namespace BrandUp.Pages.Services
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
-        public async Task<IPage> CreatePageAsync(IPageCollection collection)
+        public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            var pageMetadata = pageMetadataManager.FindPageMetadataByName(collection.PageTypeName);
+            if (pageType == null)
+                pageType = collection.PageTypeName;
+
+            var pageMetadata = pageMetadataManager.FindPageMetadataByName(pageType);
             if (pageMetadata == null)
                 throw new InvalidOperationException();
 

@@ -2,10 +2,10 @@
 
 namespace BrandUp.Pages
 {
-    public struct PageCollectionReference<TPageModel> : IPageCollectionReference
+    public readonly struct PageCollectionReference<TPageModel> : IPageCollectionReference
         where TPageModel : class
     {
-        public Guid CollectionId { get; set; }
+        public Guid CollectionId { get; }
 
         public PageCollectionReference(Guid collectionId)
         {

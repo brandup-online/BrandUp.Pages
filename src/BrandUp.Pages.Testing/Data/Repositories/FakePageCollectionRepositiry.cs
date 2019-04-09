@@ -8,9 +8,9 @@ namespace BrandUp.Pages.Data.Repositories
     public class FakePageCollectionRepositiry : IPageCollectionRepositiry
     {
         private int collectionIndex = 0;
-        readonly Dictionary<int, PageCollection> collections = new Dictionary<int, PageCollection>();
-        readonly Dictionary<Guid, int> collectionIds = new Dictionary<Guid, int>();
-        readonly FakePageHierarhyRepository pageHierarhy;
+        private readonly Dictionary<int, PageCollection> collections = new Dictionary<int, PageCollection>();
+        private readonly Dictionary<Guid, int> collectionIds = new Dictionary<Guid, int>();
+        private readonly FakePageHierarhyRepository pageHierarhy;
 
         public FakePageCollectionRepositiry(FakePageHierarhyRepository pageHierarhy)
         {
@@ -73,7 +73,12 @@ namespace BrandUp.Pages.Data.Repositories
             return Task.CompletedTask;
         }
 
-        class PageCollection : IPageCollection
+        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames)
+        {
+            throw new NotImplementedException();
+        }
+
+        private class PageCollection : IPageCollection
         {
             public Guid Id { get; }
             public DateTime CreatedDate { get; set; }

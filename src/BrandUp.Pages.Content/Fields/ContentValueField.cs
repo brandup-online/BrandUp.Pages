@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
@@ -46,9 +47,9 @@ namespace BrandUp.Pages.Content.Fields
         {
             throw new NotImplementedException();
         }
-        public override object GetFormValue(object modelValue)
+        public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
-            return modelValue != null;
+            return Task.FromResult<object>(modelValue != null);
         }
 
         #endregion

@@ -34,6 +34,7 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IPageEditingService, PageEditingService>();
+            services.AddTransient<IPageUrlManager, Url.PageUrlManager>();
         }
     }
 

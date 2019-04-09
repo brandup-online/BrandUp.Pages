@@ -7,8 +7,6 @@ namespace BrandUp.Pages.Content
 {
     public class ContentMetadataManager : IContentMetadataManager
     {
-        public const string ContentTypePrefix = "Content";
-        public const string ContentTypeNameDataKey = "_type";
         private readonly List<ContentMetadataProvider> metadatas = new List<ContentMetadataProvider>();
         private readonly Dictionary<Type, int> metadataTypes = new Dictionary<Type, int>();
         private readonly Dictionary<string, int> metadataNames = new Dictionary<string, int>();

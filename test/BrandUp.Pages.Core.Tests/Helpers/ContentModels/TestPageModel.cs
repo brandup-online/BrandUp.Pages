@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [PageModel(Title = ContentTypeTitle)]
+    [PageContentModel(Title = ContentTypeTitle)]
     [ViewDefinition("Default")]
     public class TestPageContent
     {

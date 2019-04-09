@@ -33,6 +33,7 @@ namespace BrandUp.Pages.Content.Views
         public string Title { get; set; }
         public string Description { get; set; }
         public bool IsDefault { get; set; }
+        public string CssClass { get; set; }
 
         public ViewDefinitionAttribute(string name)
         {

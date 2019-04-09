@@ -99,7 +99,7 @@ namespace BrandUp.Pages.Content
 
             Assert.NotNull(data);
             Assert.True(data.Count > 0);
-            Assert.True(data.ContainsKey(ContentMetadataManager.ContentTypeNameDataKey));
+            Assert.True(data.ContainsKey(ContentMetadataProvider.ContentTypeNameDataKey));
             Assert.True(data.ContainsKey("viewName"));
         }
 

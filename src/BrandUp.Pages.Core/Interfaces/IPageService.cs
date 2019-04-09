@@ -7,7 +7,7 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageService : IDisposable
     {
-        Task<IPage> CreatePageAsync(IPageCollection collection);
+        Task<IPage> CreatePageAsync(IPageCollection collection, string pageType);
         Task<IPage> FindPageByIdAsync(Guid id);
         Task<IPage> FindPageByPathAsync(string pagePath);
         Task<IPage> GetDefaultPageAsync();

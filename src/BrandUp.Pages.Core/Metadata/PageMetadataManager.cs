@@ -31,7 +31,7 @@ namespace BrandUp.Pages.Metadata
                 return false;
             }
 
-            var pageAttribute = contentMetadata.ModelType.GetCustomAttribute<PageModelAttribute>(false);
+            var pageAttribute = contentMetadata.ModelType.GetCustomAttribute<PageContentModelAttribute>(false);
             if (pageAttribute == null)
             {
                 pageMetadata = null;
@@ -52,7 +52,7 @@ namespace BrandUp.Pages.Metadata
             if (!contentMetadata.SupportViews)
                 throw new InvalidOperationException($"Тип контента страницы {contentMetadata.Name} не поддерживает представления.");
         }
-        private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadata, PageModelAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
+        private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadata, PageContentModelAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
         {
             var pageMetadata = new PageMetadataProvider(contentMetadata, parentPageMetadata);
 
@@ -113,7 +113,7 @@ namespace BrandUp.Pages.Metadata
                 return false;
             if (typeInfo.ContainsGenericParameters)
                 return false;
-            if (!typeInfo.IsDefined(typeof(PageModelAttribute), false))
+            if (!typeInfo.IsDefined(typeof(PageContentModelAttribute), false))
                 return false;
             return true;
         }

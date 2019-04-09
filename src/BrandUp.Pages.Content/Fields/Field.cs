@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
@@ -130,11 +131,11 @@ namespace BrandUp.Pages.Content.Fields
             return value;
         }
 
-        public virtual object GetFormValue(object modelValue)
+        public virtual Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
-            return modelValue;
+            return Task.FromResult(modelValue);
         }
-        public virtual object GetFormOptions()
+        public virtual object GetFormOptions(IServiceProvider services)
         {
             return null;
         }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
@@ -50,7 +51,9 @@ namespace BrandUp.Pages.Content.Fields
 
             var result = new List<IDictionary<string, object>>();
             foreach (var item in list)
+            {
                 result.Add(ValueContentMetadata.ConvertContentModelToDictionary(item));
+            }
 
             return result;
         }
@@ -72,7 +75,7 @@ namespace BrandUp.Pages.Content.Fields
             throw new NotImplementedException();
         }
 
-        public override object GetFormValue(object modelValue)
+        public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
             var list = (IList)modelValue;
 
@@ -98,9 +101,9 @@ namespace BrandUp.Pages.Content.Fields
                 }
             }
 
-            return formValue;
+            return Task.FromResult<object>(formValue);
         }
-        public override object GetFormOptions()
+        public override object GetFormOptions(IServiceProvider services)
         {
             var options = new ContentListFieldFormOptions
             {

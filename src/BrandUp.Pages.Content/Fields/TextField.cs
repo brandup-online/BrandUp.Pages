@@ -41,7 +41,7 @@ namespace BrandUp.Pages.Content.Fields
             return strValue;
         }
 
-        public override object GetFormOptions()
+        public override object GetFormOptions(IServiceProvider services)
         {
             return new TextFieldFormOptions
             {

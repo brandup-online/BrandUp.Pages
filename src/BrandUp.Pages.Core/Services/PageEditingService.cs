@@ -70,9 +70,9 @@ namespace BrandUp.Pages.Services
             var page = await pageRepositiry.FindPageByIdAsync(editSession.PageId);
             var pageMetadata = await pageRepositiry.GetPageTypeAsync(page);
             var newContent = await editSessionRepository.GetContentAsync(editSession.Id);
-            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(newContent.Data);
+            var pageContentModel = pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(newContent.Data);
 
-            await pageRepositiry.SetPageContentAsync(page, new PageContent(page.ContentVersion, pageContentData));
+            await pageRepositiry.SetPageContentAsync(page, pageContentModel);
 
             await editSessionRepository.DeleteEditSession(editSession.Id);
         }

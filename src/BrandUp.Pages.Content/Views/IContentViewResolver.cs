@@ -16,5 +16,6 @@ namespace BrandUp.Pages.Content.Views
         string Name { get; }
         string Title { get; }
         string Description { get; }
+        string CssClass { get; }
     }
 }

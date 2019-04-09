@@ -8,6 +8,7 @@ namespace BrandUp.Pages.Content.Views
         public string Name { get; }
         public string Title { get; }
         public string Description { get; }
+        public string CssClass { get; }
 
         public ContentView(ContentMetadataProvider contentMetadata, IContentViewDefinitiuon viewDefinitiuon)
         {
@@ -21,6 +22,7 @@ namespace BrandUp.Pages.Content.Views
             Name = string.Concat(contentMetadata.Name, ".", viewDefinitiuon.Name);
             Title = viewDefinitiuon.Title ?? Name;
             Description = viewDefinitiuon.Description;
+            CssClass = viewDefinitiuon.CssClass;
         }
     }
 }

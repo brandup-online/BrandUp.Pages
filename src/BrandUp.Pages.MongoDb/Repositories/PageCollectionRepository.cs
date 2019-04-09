@@ -1,8 +1,9 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Data.Documents;
+﻿using BrandUp.Pages.Data.Documents;
+using BrandUp.Pages.Interfaces;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Data.Repositories
@@ -38,6 +39,17 @@ namespace BrandUp.Pages.Data.Repositories
             var cursor = await mongoCollection
                 .Find(it => it.PageId == pageId)
                 .ToCursorAsync();
+            return cursor.ToEnumerable();
+        }
+
+        public async Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames)
+        {
+            var filterDefinition = Builders<PageCollectionDocument>.Filter.Or(pageTypeNames.Select(it => Builders<PageCollectionDocument>.Filter.Eq(d => d.PageTypeName, it)));
+
+            var cursor = await mongoCollection
+                .Find(filterDefinition)
+                .ToCursorAsync();
+
             return cursor.ToEnumerable();
         }
 
