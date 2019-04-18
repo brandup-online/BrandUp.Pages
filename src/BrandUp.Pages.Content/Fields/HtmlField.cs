@@ -38,7 +38,19 @@ namespace BrandUp.Pages.Content.Fields
                 return null;
             return strValue;
         }
+        public override object GetFormOptions(IServiceProvider services)
+        {
+            return new TextFieldFormOptions
+            {
+                Placeholder = Placeholder
+            };
+        }
 
         #endregion
+    }
+
+    public class HtmlFieldFormOptions
+    {
+        public string Placeholder { get; set; }
     }
 }

@@ -7,15 +7,13 @@ namespace BrandUp.Pages.Content.Serialization
     public class JsonContentDataSerializerTests
     {
         private readonly IContentMetadataManager metadataManager;
-        private readonly JsonContentDataSerializer serializer;
 
         public JsonContentDataSerializerTests()
         {
-            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
             var contentViewResolver = new Views.AttributesContentViewResolver();
 
             metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
-            serializer = new JsonContentDataSerializer();
         }
 
         [Fact]
@@ -30,7 +28,7 @@ namespace BrandUp.Pages.Content.Serialization
             var contentMetadata = metadataManager.GetMetadata(content.GetType());
             var contentData = contentMetadata.ConvertContentModelToDictionary(content);
 
-            var json = serializer.SerializeToString(contentData);
+            var json = JsonContentDataSerializer.SerializeToString(contentData);
             Assert.NotNull(json);
         }
 
@@ -45,9 +43,9 @@ namespace BrandUp.Pages.Content.Serialization
             };
             var contentMetadata = metadataManager.GetMetadata(content.GetType());
             var contentData = contentMetadata.ConvertContentModelToDictionary(content);
-            var json = serializer.SerializeToString(contentData);
+            var json = JsonContentDataSerializer.SerializeToString(contentData);
 
-            var deserializedContentData = serializer.DeserializeFromString(json);
+            var deserializedContentData = JsonContentDataSerializer.DeserializeFromString(json);
             var deserializedContent = (TestPageContent)contentMetadata.ConvertDictionaryToContentModel(deserializedContentData);
 
             Assert.NotNull(deserializedContent);

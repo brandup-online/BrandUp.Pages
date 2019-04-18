@@ -21,6 +21,7 @@ namespace BrandUp.Pages.Content
         private readonly List<ContentView> views = new List<ContentView>();
         private readonly Dictionary<string, int> viewNames = new Dictionary<string, int>();
         private ContentView defaultView;
+        private readonly ConstructorInfo contentConstructor;
 
         #endregion
 
@@ -39,6 +40,13 @@ namespace BrandUp.Pages.Content
                 modelConstructor = modelType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[0], null);
                 if (modelConstructor == null)
                     throw new InvalidOperationException($"Тип модели контента \"{modelType}\" не содержит публичный конструктор без параметров.");
+
+                var genericContentType = typeof(Content<>);
+                var contentType = genericContentType.MakeGenericType(ModelType);
+
+                contentConstructor = contentType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(IContentDocument), modelType, typeof(ContentMetadataProvider) }, null);
+                if (modelConstructor == null)
+                    throw new InvalidOperationException($"Для типа модели \"{modelType}\" не получилось найти конструктор контента.");
             }
 
             if (baseMetadata != null)
@@ -279,21 +287,19 @@ namespace BrandUp.Pages.Content
             if (dictionary == null)
                 throw new ArgumentNullException(nameof(dictionary));
 
-            if (!dictionary.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
-                throw new ArgumentException("Справочник данных не содержит названия типа контента.");
-
-            var contentTypeName = (string)contentTypeNameValue;
-            if (string.Compare(contentTypeName, Name, true) != 0)
+            if (dictionary.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
             {
-                if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider deriverMetadata))
-                    throw new InvalidOperationException();
-                if (!deriverMetadata.ModelType.IsSubclassOf(ModelType))
-                    throw new InvalidOperationException();
+                var contentTypeName = (string)contentTypeNameValue;
+                if (string.Compare(contentTypeName, Name, true) != 0)
+                {
+                    if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider deriverMetadata))
+                        throw new InvalidOperationException();
+                    if (!deriverMetadata.ModelType.IsSubclassOf(ModelType))
+                        throw new InvalidOperationException();
 
-                return deriverMetadata.ConvertDictionaryToContentModel(dictionary);
+                    return deriverMetadata.ConvertDictionaryToContentModel(dictionary);
+                }
             }
-
-            dictionary.Remove(ContentTypeNameDataKey);
 
             var contentModel = CreateModelInstance();
 
@@ -308,6 +314,14 @@ namespace BrandUp.Pages.Content
             }
 
             return contentModel;
+        }
+        public IContent ConvertDocumentToContent(IContentDocument document)
+        {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
+
+            var contentModel = ConvertDictionaryToContentModel(document.Data);
+            return (IContent)contentConstructor.Invoke(new object[] { document, contentModel, this });
         }
 
         #endregion

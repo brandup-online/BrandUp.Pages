@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Content
 
         public ContentMetadataProviderTests()
         {
-            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
             var contentViewResolver = new Views.AttributesContentViewResolver();
 
             metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);

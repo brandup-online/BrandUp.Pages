@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Content.Views;
+﻿using BrandUp.Pages.Content.Infrastructure;
+using BrandUp.Pages.Content.Views;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

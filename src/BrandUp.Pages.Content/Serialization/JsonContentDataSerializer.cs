@@ -5,9 +5,9 @@ using System.IO;
 
 namespace BrandUp.Pages.Content.Serialization
 {
-    public class JsonContentDataSerializer
+    public static class JsonContentDataSerializer
     {
-        public string SerializeToString(IDictionary<string, object> data)
+        public static string SerializeToString(IDictionary<string, object> data)
         {
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
@@ -24,7 +24,7 @@ namespace BrandUp.Pages.Content.Serialization
                 return stringWriter.ToString();
             }
         }
-        private void WriteDictionary(JsonTextWriter writer, IDictionary<string, object> data)
+        private static void WriteDictionary(JsonTextWriter writer, IDictionary<string, object> data)
         {
             writer.WriteStartObject();
 
@@ -43,7 +43,7 @@ namespace BrandUp.Pages.Content.Serialization
 
             writer.WriteEndObject();
         }
-        private void WriteList(JsonTextWriter writer, IList<IDictionary<string, object>> data)
+        private static void WriteList(JsonTextWriter writer, IList<IDictionary<string, object>> data)
         {
             writer.WriteStartArray();
 
@@ -55,7 +55,7 @@ namespace BrandUp.Pages.Content.Serialization
             writer.WriteEndArray();
         }
 
-        public IDictionary<string, object> DeserializeFromString(string jsonData)
+        public static IDictionary<string, object> DeserializeFromString(string jsonData)
         {
             if (jsonData == null)
                 throw new ArgumentNullException(nameof(jsonData));
@@ -71,7 +71,23 @@ namespace BrandUp.Pages.Content.Serialization
                 }
             }
         }
-        IDictionary<string, object> ReadDictionary(JsonTextReader reader)
+        public static IDictionary<string, object> DeserializeFromStream(Stream stream)
+        {
+            if (stream == null)
+                throw new ArgumentNullException(nameof(stream));
+
+            using (var stringReader = new StreamReader(stream))
+            {
+                using (var jsonReader = new JsonTextReader(stringReader))
+                {
+                    if (!jsonReader.Read())
+                        throw new InvalidOperationException();
+
+                    return ReadDictionary(jsonReader);
+                }
+            }
+        }
+        private static IDictionary<string, object> ReadDictionary(JsonTextReader reader)
         {
             if (reader.TokenType != JsonToken.StartObject)
                 throw new InvalidOperationException();
@@ -136,7 +152,7 @@ namespace BrandUp.Pages.Content.Serialization
 
             return dictionary;
         }
-        IList<IDictionary<string, object>> ReadList(JsonTextReader reader)
+        private static IList<IDictionary<string, object>> ReadList(JsonTextReader reader)
         {
             if (reader.TokenType != JsonToken.StartArray)
                 throw new InvalidOperationException();
