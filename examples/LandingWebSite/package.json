@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net",
+  "private": true,
+  "devDependencies": {
+    "aspnet-webpack": "^3.0.0",
+    "awesome-typescript-loader": "^5.2.1",
+    "css-loader": "^1.0.1",
+    "less": "^3.9.0",
+    "less-loader": "^4.1.0",
+    "mini-css-extract-plugin": "^0.4.5",
+    "style-loader": "^0.23.1",
+    "tslint": "^5.16.0",
+    "typescript": "^3.3.3333",
+    "url-loader": "^1.1.2",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-middleware": "^3.6.0",
+    "webpack-dev-server": "^3.2.1",
+    "webpack-hot-middleware": "^2.24.3"
+  },
+  "dependencies": {
+    "brandup-ui": "^1.0.18"
+  },
+  "scripts": {
+    "build": "webpack -p --progress --config webpack.config.js",
+    "dev-build": "webpack --progress -d --config webpack.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --progress -d --config webpack.config.js --watch"
+  }
+}
