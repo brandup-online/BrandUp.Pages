@@ -140,12 +140,21 @@ namespace BrandUp.Pages.Services
 
             await pageRepositiry.SetUrlPathAsync(page.Id, urlPath);
         }
-        public Task DeletePageAsync(IPage page)
+        public async Task<Result> DeletePageAsync(IPage page)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            return pageRepositiry.DeletePageAsync(page.Id);
+            try
+            {
+                await pageRepositiry.DeletePageAsync(page.Id);
+
+                return Result.Success;
+            }
+            catch (Exception ex)
+            {
+                return Result.Failed(ex);
+            }
         }
     }
 }

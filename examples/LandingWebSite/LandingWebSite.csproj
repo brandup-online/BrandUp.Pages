@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\pages\dialogs\dialog-delete.ts" />
     <None Remove="_client\pages\dialogs\dialog-form.ts" />
     <None Remove="_client\pages\dialogs\dialog-list.ts" />
     <None Remove="_client\pages\dialogs\dialog.ts" />
@@ -19,7 +20,9 @@
     <None Remove="_client\pages\dialogs\page-collection-list.ts" />
     <None Remove="_client\pages\dialogs\page-collection-update.ts" />
     <None Remove="_client\pages\dialogs\page-create.ts" />
+    <None Remove="_client\pages\dialogs\page-delete.ts" />
     <None Remove="_client\pages\dialogs\page-list.ts" />
+    <None Remove="_client\pages\manager.ts" />
     <None Remove="_client\pages\root.ts" />
     <None Remove="_client\pages\typings\models.d.ts" />
     <None Remove="_client\root.ts" />
@@ -46,6 +49,7 @@
 
 
   <ItemGroup>
+    <TypeScriptCompile Include="_client\pages\dialogs\dialog-delete.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-form.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-list.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog.ts" />
@@ -54,7 +58,9 @@
     <TypeScriptCompile Include="_client\pages\dialogs\page-collection-create.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\page-collection-list.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\page-create.ts" />
+    <TypeScriptCompile Include="_client\pages\dialogs\page-delete.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\page-list.ts" />
+    <TypeScriptCompile Include="_client\pages\manager.ts" />
     <TypeScriptCompile Include="_client\pages\root.ts" />
     <TypeScriptCompile Include="_client\pages\typings\models.d.ts" />
     <TypeScriptCompile Include="_client\root.ts" />

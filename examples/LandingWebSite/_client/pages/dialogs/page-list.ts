@@ -2,6 +2,7 @@
 import { ListDialog } from "./dialog-list";
 import { DOM } from "brandup-ui";
 import { createPage } from "./page-create";
+import { deletePage } from "./page-delete";
 
 export class PageListDialog extends ListDialog<PageModel> {
     readonly collectionId: string;
@@ -21,12 +22,16 @@ export class PageListDialog extends ListDialog<PageModel> {
         this.setNotes("Просмотр и управление страницами.");
 
         this.registerCommand("item-create", () => {
-            createPage(this.collectionId).then(() => {
+            createPage(this.collectionId).then((createdItem: PageModel) => {
                 this.loadItems();
             });
         });
-        this.registerItemCommand("item-update", () => { });
-        this.registerItemCommand("item-delete", () => { });
+        this.registerItemCommand("item-update", (itemId: string) => { });
+        this.registerItemCommand("item-delete", (itemId: string) => {
+            deletePage(itemId).then((deletedItem: PageModel) => {
+                this.loadItems();
+            });
+        });
 
         this.loadItems();
     }

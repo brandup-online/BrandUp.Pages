@@ -77,6 +77,17 @@ namespace LandingWebSite.Controllers
                 return BadRequest(ModelState);
             }
         }
+        [HttpDelete, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Delete")]
+        public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
+        {
+            var page = await pageService.FindPageByIdAsync(id);
+            if (page == null)
+                return WithResult(BrandUp.Pages.Result.Failed($"Not found page with id \"{id}\"."));
+
+            var deleteResult = await pageService.DeletePageAsync(page);
+
+            return WithResult(deleteResult);
+        }
 
         #endregion
 

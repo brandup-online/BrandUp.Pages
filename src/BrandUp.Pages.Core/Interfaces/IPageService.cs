@@ -17,7 +17,7 @@ namespace BrandUp.Pages.Interfaces
         Task<object> GetPageContentAsync(IPage page);
         Task SetPageContentAsync(IPage page, object contentModel);
         Task PublishPageAsync(IPage page, string urlPathName);
-        Task DeletePageAsync(IPage page);
+        Task<Result> DeletePageAsync(IPage page);
     }
 
     public interface IPage

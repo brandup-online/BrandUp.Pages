@@ -32,17 +32,17 @@ define(["require", "exports", "brandup-ui", "./page-collection-create", "./page-
             this.setNotes("Просмотр и управление коллекциями страниц.");
             _super.prototype._onRenderContent.call(this);
             this.registerCommand("item-create", function () {
-                page_collection_create_1.createPageCollection(_this.pageId).then(function (pageCollection) {
+                page_collection_create_1.createPageCollection(_this.pageId).then(function (createdItem) {
                     _this.loadItems();
                 });
             });
             this.registerItemCommand("item-update", function (itemId, el) {
-                page_collection_update_1.updatePageCollection(itemId).then(function (pageCollection) {
+                page_collection_update_1.updatePageCollection(itemId).then(function (updatedItem) {
                     _this.loadItems();
                 });
             });
             this.registerItemCommand("item-delete", function (itemId, el) {
-                page_collection_delete_1.deletePageCollection(itemId).then(function (id) {
+                page_collection_delete_1.deletePageCollection(itemId).then(function (deletedItem) {
                     _this.loadItems();
                 });
             });

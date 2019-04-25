@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./dialog-list", "brandup-ui", "./page-create"], function (require, exports, dialog_list_1, brandup_ui_1, page_create_1) {
+define(["require", "exports", "./dialog-list", "brandup-ui", "./page-create", "./page-delete"], function (require, exports, dialog_list_1, brandup_ui_1, page_create_1, page_delete_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PageListDialog = /** @class */ (function (_super) {
@@ -32,12 +32,16 @@ define(["require", "exports", "./dialog-list", "brandup-ui", "./page-create"], f
             this.setHeader("Страницы коллекции");
             this.setNotes("Просмотр и управление страницами.");
             this.registerCommand("item-create", function () {
-                page_create_1.createPage(_this.collectionId).then(function () {
+                page_create_1.createPage(_this.collectionId).then(function (createdItem) {
                     _this.loadItems();
                 });
             });
-            this.registerItemCommand("item-update", function () { });
-            this.registerItemCommand("item-delete", function () { });
+            this.registerItemCommand("item-update", function (itemId) { });
+            this.registerItemCommand("item-delete", function (itemId) {
+                page_delete_1.deletePage(itemId).then(function (deletedItem) {
+                    _this.loadItems();
+                });
+            });
             this.loadItems();
         };
         PageListDialog.prototype._getItemsUrl = function () {

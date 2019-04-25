@@ -154,9 +154,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 throw new InvalidOperationException();
             }
         }
-        public Task DeletePageAsync(Guid pageId)
+        public async Task DeletePageAsync(Guid pageId)
         {
-            throw new NotImplementedException();
+            var deleteResult = await mongoCollection.DeleteOneAsync(it => it.Id == pageId);
+            if (deleteResult.DeletedCount != 1)
+                throw new InvalidOperationException();
         }
     }
 }
