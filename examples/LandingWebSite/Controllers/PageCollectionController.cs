@@ -30,6 +30,25 @@ namespace LandingWebSite.Controllers
             return Ok(model);
         }
 
+        [HttpGet, Route("brandup.pages/collection/{id}/pageTypes", Name = "BrandUp.Pages.Collection.GetPageTypes")]
+        public async Task<IActionResult> GetPageTypesAsync([FromRoute]Guid id)
+        {
+            var pageCollection = await pageCollectionService.FindCollectiondByIdAsync(id);
+            if (pageCollection == null)
+                return NotFound();
+
+            var result = new List<Models.PageTypeModel>();
+            foreach (var pageType in await pageCollectionService.GetPageTypesAsync(pageCollection))
+            {
+                result.Add(new Models.PageTypeModel
+                {
+                    Name = pageType.Name,
+                    Title = pageType.Title
+                });
+            }
+            return Ok(result);
+        }
+
         [HttpGet, Route("brandup.pages/collection", Name = "BrandUp.Pages.Collection.List")]
         public async Task<IActionResult> ListAsync([FromQuery]Guid? pageId)
         {

@@ -41,7 +41,7 @@ define(["require", "exports", "./dialog-form"], function (require, exports, dial
         PageCreateDialog.prototype._buildForm = function () {
             this.setHeader("Параметры новой страницы");
             this.addTextBox("Title", "Название", { placeholder: "Введите название новой страницы" }, null);
-            this.addComboBox2("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, null, "/brandup.pages/pageType", function (item) { return { value: item.name, title: item.title }; });
+            this.addComboBox2("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, null, "/brandup.pages/collection/" + this.collectionId + "/pageTypes", function (item) { return { value: item.name, title: item.title }; });
         };
         return PageCreateDialog;
     }(dialog_form_1.FormDialog));

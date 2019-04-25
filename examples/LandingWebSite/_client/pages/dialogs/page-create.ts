@@ -28,7 +28,7 @@ export class PageCreateDialog extends FormDialog<PageModel> {
         this.setHeader("Параметры новой страницы");
 
         this.addTextBox("Title", "Название", { placeholder: "Введите название новой страницы" }, null);
-        this.addComboBox2<PageTypeModel>("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, null, "/brandup.pages/pageType", (item) => { return { value: item.name, title: item.title } });
+        this.addComboBox2<PageTypeModel>("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, null, `/brandup.pages/collection/${this.collectionId}/pageTypes`, (item: PageTypeModel) => { return { value: item.name, title: item.title } });
     }
 }
 

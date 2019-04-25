@@ -81,5 +81,25 @@ namespace BrandUp.Pages.Services
                 return Result.Failed(ex);
             }
         }
+
+        public Task<List<PageMetadataProvider>> GetPageTypesAsync(IPageCollection collection)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            var basePageType = pageMetadataManager.FindPageMetadataByName(collection.PageTypeName);
+            if (basePageType == null)
+                throw new InvalidOperationException();
+
+            var result = new List<PageMetadataProvider>();
+            foreach (var pageType in basePageType.GetDerivedMetadataWithHierarhy(true))
+            {
+                if (pageType.ContentType.IsAbstract)
+                    continue;
+
+                result.Add(pageType);
+            }
+            return Task.FromResult(result);
+        }
     }
 }

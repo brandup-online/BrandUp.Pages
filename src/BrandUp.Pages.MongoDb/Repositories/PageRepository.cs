@@ -33,13 +33,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
             this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
         }
 
-        public async Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, IDictionary<string, object> contentData)
+        public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, IDictionary<string, object> contentData)
         {
             var pageDocument = new PageDocument
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
-                OwnCollectionId = ownCollectionId,
+                OwnCollectionId = сollectionId,
                 PageType = typeName,
                 Content = new PageContentDocument { Version = 1, Data = new BsonDocument(contentData) }
             };
@@ -65,9 +65,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return await cursor.FirstOrDefaultAsync();
         }
-        public async Task<IEnumerable<IPage>> GetPagesAsync(Guid ownCollectionId, PageSortMode pageSort, PagePaginationOptions pagination)
+        public async Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination)
         {
-            var fintDefinition = mongoCollection.Find(it => it.OwnCollectionId == ownCollectionId);
+            var fintDefinition = mongoCollection.Find(it => it.OwnCollectionId == сollectionId);
 
             switch (pageSort)
             {
@@ -91,9 +91,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return cursor.ToEnumerable();
         }
-        public async Task<bool> HasPagesAsync(Guid ownCollectionId)
+        public async Task<bool> HasPagesAsync(Guid сollectionId)
         {
-            var count = await mongoCollection.CountDocumentsAsync(it => it.OwnCollectionId == ownCollectionId);
+            var count = await mongoCollection.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId);
             return count > 0;
         }
         public Task<IPage> GetDefaultPageAsync()
@@ -150,9 +150,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
 
             if (updateResult.ModifiedCount != 1)
-            {
                 throw new InvalidOperationException();
-            }
         }
         public async Task DeletePageAsync(Guid pageId)
         {

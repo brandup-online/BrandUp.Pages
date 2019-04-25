@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BrandUp.Pages.Metadata;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, bool includeDerivedTypes);
         Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort);
         Task<Result> DeleteCollectionAsync(IPageCollection collection);
+        Task<List<PageMetadataProvider>> GetPageTypesAsync(IPageCollection collection);
     }
 
     public interface IPageCollection
