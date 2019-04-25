@@ -1,3 +1,5 @@
+using BrandUp.MongoDB;
+using BrandUp.Pages.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Localization;
@@ -30,6 +32,8 @@ namespace LandingWebSite
                 .AddRazorPagesOptions(options =>
                 {
                     options.AllowAreas = false;
+
+                    options.Conventions.AddPageRoute("/Index", "{*url}");
                 });
 
             services.Configure<WebEncoderOptions>(options =>
@@ -54,12 +58,32 @@ namespace LandingWebSite
             });
 
             #endregion
+
+            services.AddPages(options =>
+            {
+            })
+            .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
+            .AddMongoDb(options =>
+            {
+                var config = Configuration.GetSection("MongoDb").Get<MongoDbOptions>();
+
+                options.ConnectionString = config.ConnectionString;
+                options.DatabaseName = config.DatabaseName;
+
+                options.UseCamelCaseElementName();
+                options.UseIgnoreIfNull(false);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                app.UseWebpackDevMiddleware(new Microsoft.AspNetCore.SpaServices.Webpack.WebpackDevMiddlewareOptions
+                {
+                    HotModuleReplacement = true
+                });
+
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -72,5 +96,11 @@ namespace LandingWebSite
 
             app.UseMvc();
         }
+    }
+
+    public class MongoDbOptions
+    {
+        public string ConnectionString { get; set; }
+        public string DatabaseName { get; set; }
     }
 }

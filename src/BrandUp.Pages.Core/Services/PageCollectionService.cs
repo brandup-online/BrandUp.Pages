@@ -62,15 +62,24 @@ namespace BrandUp.Pages.Services
             return repositiry.UpdateCollectionAsync(id, title, pageSort);
         }
 
-        public async Task DeleteCollectionAsync(IPageCollection collection)
+        public async Task<Result> DeleteCollectionAsync(IPageCollection collection)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
             if (await pageRepositiry.HasPagesAsync(collection.Id))
-                throw new InvalidOperationException("Нельзя удалить коллекцию страниц, которая содержит страницы.");
+                return Result.Failed("Нельзя удалить коллекцию страниц, которая содержит страницы.");
 
-            await repositiry.DeleteCollectionAsync(collection.Id);
+            try
+            {
+                await repositiry.DeleteCollectionAsync(collection.Id);
+
+                return Result.Success;
+            }
+            catch (Exception ex)
+            {
+                return Result.Failed(ex);
+            }
         }
     }
 }

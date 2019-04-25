@@ -21,7 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.MongoDb", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{DF8585F2-010E-476B-93FC-6AC22BF7BC02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandingWebSite", "examples\LandingWebSite\LandingWebSite.csproj", "{0748BC03-6689-40AA-A850-C869C711E637}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LandingWebSite", "examples\LandingWebSite\LandingWebSite.csproj", "{0748BC03-6689-40AA-A850-C869C711E637}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandUp.Pages", "src\BrandUp.Pages\BrandUp.Pages.csproj", "{18D51569-E320-40C9-8B76-AF9AFD9320DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{0748BC03-6689-40AA-A850-C869C711E637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0748BC03-6689-40AA-A850-C869C711E637}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0748BC03-6689-40AA-A850-C869C711E637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18D51569-E320-40C9-8B76-AF9AFD9320DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D51569-E320-40C9-8B76-AF9AFD9320DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D51569-E320-40C9-8B76-AF9AFD9320DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D51569-E320-40C9-8B76-AF9AFD9320DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -69,6 +75,7 @@ Global
 		{9B60FE35-F529-4B2B-9D86-E3BA762FE8EB} = {192B395D-1899-43CB-9EED-D2B18D5E3224}
 		{491FA2B9-8908-4E33-93FC-D53BD11ABC56} = {DC9CDAD6-6533-4A65-9D2B-63F0EC42BB27}
 		{0748BC03-6689-40AA-A850-C869C711E637} = {DF8585F2-010E-476B-93FC-6AC22BF7BC02}
+		{18D51569-E320-40C9-8B76-AF9AFD9320DB} = {DC9CDAD6-6533-4A65-9D2B-63F0EC42BB27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80009D74-CAF9-426B-B759-811F2D21C18A}

@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Content.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

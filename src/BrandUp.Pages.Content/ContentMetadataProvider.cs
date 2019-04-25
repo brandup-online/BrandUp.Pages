@@ -1,5 +1,4 @@
 ﻿using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Content.Views;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,10 +16,6 @@ namespace BrandUp.Pages.Content
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
         private readonly List<Field> fields = new List<Field>();
         private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
-        private ViewField viewField = null;
-        private readonly List<ContentView> views = new List<ContentView>();
-        private readonly Dictionary<string, int> viewNames = new Dictionary<string, int>();
-        private ContentView defaultView;
         private readonly ConstructorInfo contentConstructor;
 
         #endregion
@@ -66,12 +61,7 @@ namespace BrandUp.Pages.Content
         public string Description { get; }
         public ContentMetadataProvider BaseMetadata { get; }
         public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
-        public bool SupportViews => viewField != null;
         public IEnumerable<Field> Fields => fields;
-        public ViewField ViewField => viewField;
-        public IEnumerable<ContentView> Views => views;
-        public bool HasViews => views.Count > 0;
-        public ContentView DefaultView => defaultView;
 
         #endregion
 
@@ -137,14 +127,6 @@ namespace BrandUp.Pages.Content
 
             fieldNames.Add(field.Name.ToLower(), fIndex);
             fields.Add(field);
-
-            if (field is ViewField)
-            {
-                if (viewField != null)
-                    throw new InvalidOperationException();
-
-                viewField = (ViewField)field;
-            }
         }
         [System.Diagnostics.DebuggerStepThrough]
         public bool TryGetField(string fieldName, out Field field)
@@ -160,91 +142,6 @@ namespace BrandUp.Pages.Content
             field = fields[index];
             return true;
         }
-
-        internal void InitializeViews(IContentViewConfiguration viewConfiguration)
-        {
-            var baseModelMetadata = BaseMetadata;
-            if (baseModelMetadata != null)
-            {
-                foreach (var view in baseModelMetadata.views)
-                    AddView(view);
-
-                defaultView = baseModelMetadata.defaultView;
-            }
-
-            if (viewConfiguration != null)
-            {
-                foreach (var viewDefinition in viewConfiguration.Views)
-                    AddView(new ContentView(this, viewDefinition));
-
-                if (viewConfiguration.DefaultViewName != null)
-                {
-                    if (!TryGetView(viewConfiguration.DefaultViewName, out defaultView))
-                        throw new InvalidOperationException($"Не найдено представление {viewConfiguration.DefaultViewName}, которое предпологалось использовать по умолчанию для типа контента {Name}.");
-                }
-            }
-
-            if (defaultView == null && views.Count > 0)
-                defaultView = views[0];
-        }
-        private void AddView(ContentView view)
-        {
-            var index = views.Count;
-
-            views.Add(view);
-            viewNames.Add(view.Name.ToLower(), index);
-        }
-        [System.Diagnostics.DebuggerStepThrough]
-        public bool TryGetView(string viewName, out ContentView field)
-        {
-            CheckSupportedViews();
-
-            if (viewName == null)
-                throw new ArgumentNullException(nameof(viewName));
-
-            if (!viewNames.TryGetValue(viewName.ToLower(), out int index))
-            {
-                field = null;
-                return false;
-            }
-            field = views[index];
-            return true;
-        }
-        public string GetViewName(object model)
-        {
-            CheckSupportedViews();
-
-            if (!viewField.TryGetValue(model, out object viewName))
-                return defaultView.Name;
-
-            return (string)viewName;
-        }
-        public ContentView GetView(object model)
-        {
-            CheckSupportedViews();
-
-            string viewName;
-            if (!viewField.TryGetValue(model, out object viewNameValue))
-                viewName = defaultView.Name;
-            else
-                viewName = (string)viewNameValue;
-
-            if (!TryGetView(viewName, out ContentView view))
-                throw new InvalidOperationException();
-            return view;
-        }
-        public void SetViewName(object model, string viewName)
-        {
-            CheckSupportedViews();
-
-            viewField.SetModelValue(model, viewName);
-        }
-        private void CheckSupportedViews()
-        {
-            if (viewField == null)
-                throw new InvalidOperationException($"Content \"{Name}\" is not support views.");
-        }
-
         public object CreateModelInstance()
         {
             return modelConstructor.Invoke(new object[0]);

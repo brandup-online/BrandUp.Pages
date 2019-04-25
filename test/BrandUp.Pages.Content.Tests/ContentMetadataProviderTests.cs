@@ -11,11 +11,12 @@ namespace BrandUp.Pages.Content
         public ContentMetadataProviderTests()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
-            var contentViewResolver = new Views.AttributesContentViewResolver();
 
-            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
+            metadataManager = new ContentMetadataManager(contentTypeResolver);
             contentMetadata = metadataManager.GetMetadata(typeof(TestPageContent));
         }
+
+        #region Test methods
 
         [Fact]
         public void Properties()
@@ -28,9 +29,6 @@ namespace BrandUp.Pages.Content
             Assert.Null(contentMetadata.BaseMetadata);
             Assert.Empty(contentMetadata.DerivedContents);
             Assert.NotEmpty(contentMetadata.Fields);
-            Assert.True(contentMetadata.SupportViews);
-            Assert.True(contentMetadata.HasViews);
-            Assert.NotEmpty(contentMetadata.Views);
         }
 
         [Fact]
@@ -55,35 +53,6 @@ namespace BrandUp.Pages.Content
         }
 
         [Fact]
-        public void TryGetView()
-        {
-            var viewName = "TestPage.Default";
-            var result = contentMetadata.TryGetView(viewName, out Views.ContentView view);
-
-            Assert.True(result);
-            Assert.NotNull(view);
-            Assert.Equal(viewName, view.Name);
-            Assert.Equal(viewName, view.Title);
-        }
-
-        [Fact]
-        public void GetViewName_ReturnDefault()
-        {
-            var viewName = contentMetadata.GetViewName(new TestPageContent());
-
-            Assert.Equal(contentMetadata.DefaultView.Name, viewName);
-        }
-
-        [Fact]
-        public void GetViewName_ReturnSpecify()
-        {
-            var viewNameValue = "TestPage.Default";
-            var viewName = contentMetadata.GetViewName(new TestPageContent() { ViewName = viewNameValue });
-
-            Assert.Equal(viewNameValue, viewName);
-        }
-
-        [Fact]
         public void CreateModelInstance()
         {
             var model = contentMetadata.CreateModelInstance();
@@ -95,25 +64,27 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void ConvertContentModelToDictionary()
         {
-            var data = contentMetadata.ConvertContentModelToDictionary(new TestPageContent { ViewName = "test" });
+            var data = contentMetadata.ConvertContentModelToDictionary(new TestPageContent { Title = "test" });
 
             Assert.NotNull(data);
             Assert.True(data.Count > 0);
             Assert.True(data.ContainsKey(ContentMetadataProvider.ContentTypeNameDataKey));
-            Assert.True(data.ContainsKey("viewName"));
+            Assert.True(data.ContainsKey("title"));
         }
 
         [Fact]
         public void ConvertDictionaryToContentModel()
         {
-            var sourceModel = new TestPageContent { ViewName = "test" };
+            var sourceModel = new TestPageContent { Title = "test" };
             var data = contentMetadata.ConvertContentModelToDictionary(sourceModel);
 
             var model = contentMetadata.ConvertDictionaryToContentModel(data) as TestPageContent;
 
             Assert.NotNull(model);
             Assert.Equal(model.GetType(), sourceModel.GetType());
-            Assert.Equal(model.ViewName, sourceModel.ViewName);
+            Assert.Equal(model.Title, sourceModel.Title);
         }
+
+        #endregion
     }
 }

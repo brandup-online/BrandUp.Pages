@@ -1,5 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Data.Documents;
+using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageEditSessionRepository : MongoRepository<PageEditSessionDocument>, IPageEditSessionRepository
     {
@@ -25,7 +25,7 @@ namespace BrandUp.Pages.Data.Repositories
             };
         }
 
-        public PageEditSessionRepository(WebSiteContext dbContext) : base(dbContext, dbContext.GetPageEditSessionDocuments()) { }
+        public PageEditSessionRepository(IPagesDbContext dbContext) : base(dbContext.PageEditSessions) { }
 
         public async Task<IPageEditSession> CreateEditSessionAsync(Guid pageId, string contentManagerId, PageContent content)
         {

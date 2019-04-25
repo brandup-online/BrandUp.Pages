@@ -5,7 +5,7 @@ namespace BrandUp.Pages.Metadata
 {
     public interface IPageMetadataManager
     {
-        IEnumerable<PageMetadataProvider> GetAllMetadata();
+        IEnumerable<PageMetadataProvider> MetadataProviders { get; }
         PageMetadataProvider FindPageMetadataByContentType(Type contentType);
         PageMetadataProvider FindPageMetadataByName(string name);
     }

@@ -11,7 +11,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId);
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, bool includeDerivedTypes);
         Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort);
-        Task DeleteCollectionAsync(IPageCollection collection);
+        Task<Result> DeleteCollectionAsync(IPageCollection collection);
     }
 
     public interface IPageCollection

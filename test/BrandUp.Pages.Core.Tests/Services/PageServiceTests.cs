@@ -25,7 +25,6 @@ namespace BrandUp.Pages.Services
 
             services.AddPages()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .UseFakeViews()
                 .AddFakeRepositories();
 
             serviceProvider = services.BuildServiceProvider();

@@ -11,7 +11,8 @@ module.exports = (env) => {
 
     return [{
         entry: {
-            app: path.resolve(__dirname, '_client', 'root.ts')
+            app: path.resolve(__dirname, '_client', 'root.ts'),
+            pages: path.resolve(__dirname, '_client', 'pages', 'root.ts')
         },
         resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
         output: {
@@ -52,7 +53,10 @@ module.exports = (env) => {
         },
         optimization: {
             minimize: !isDevBuild,
-            namedModules: true
+            namedModules: true,
+            //splitChunks: {
+            //    chunks: "all"
+            //}
         },
         plugins: [
             new CheckerPlugin(),

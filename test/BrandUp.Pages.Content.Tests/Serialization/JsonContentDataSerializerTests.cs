@@ -11,10 +11,11 @@ namespace BrandUp.Pages.Content.Serialization
         public JsonContentDataSerializerTests()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
-            var contentViewResolver = new Views.AttributesContentViewResolver();
 
-            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
+            metadataManager = new ContentMetadataManager(contentTypeResolver);
         }
+
+        #region Test methods
 
         [Fact]
         public void SerializeToString()
@@ -53,5 +54,7 @@ namespace BrandUp.Pages.Content.Serialization
             Assert.Equal(deserializedContent.Header.Title, content.Header.Title);
             Assert.Equal(deserializedContent.Headers[0].Title, content.Headers[0].Title);
         }
+
+        #endregion
     }
 }

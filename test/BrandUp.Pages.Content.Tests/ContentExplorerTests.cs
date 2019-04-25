@@ -10,10 +10,11 @@ namespace BrandUp.Pages.Content
         public ContentExplorerTests()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
-            var contentViewResolver = new Views.AttributesContentViewResolver();
 
-            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
+            metadataManager = new ContentMetadataManager(contentTypeResolver);
         }
+
+        #region Test methods
 
         [Fact]
         public void Create_Root()
@@ -66,5 +67,7 @@ namespace BrandUp.Pages.Content
 
             Assert.Null(explorer);
         }
+
+        #endregion
     }
 }

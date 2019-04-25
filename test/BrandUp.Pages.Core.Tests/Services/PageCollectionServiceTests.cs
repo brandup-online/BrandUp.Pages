@@ -4,13 +4,12 @@ using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageCollectionServiceTests : IDisposable, IAsyncLifetime
+    public class PageCollectionServiceTests : IAsyncLifetime
     {
         private readonly ServiceProvider serviceProvider;
         private readonly IServiceScope serviceScope;
@@ -24,7 +23,6 @@ namespace BrandUp.Pages.Services
 
             services.AddPages()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .UseFakeViews()
                 .AddFakeRepositories();
 
             serviceProvider = services.BuildServiceProvider();
@@ -35,11 +33,7 @@ namespace BrandUp.Pages.Services
             pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
         }
 
-        void IDisposable.Dispose()
-        {
-            serviceScope.Dispose();
-            serviceProvider.Dispose();
-        }
+        #region IAsyncLifetime members
 
         async Task IAsyncLifetime.InitializeAsync()
         {
@@ -60,8 +54,15 @@ namespace BrandUp.Pages.Services
         }
         Task IAsyncLifetime.DisposeAsync()
         {
+            serviceScope.Dispose();
+            serviceProvider.Dispose();
+
             return Task.CompletedTask;
         }
+
+        #endregion
+
+        #region Test methods
 
         [Fact]
         public async Task CreateCollection_root()
@@ -121,5 +122,7 @@ namespace BrandUp.Pages.Services
 
             Assert.Null(await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id));
         }
+
+        #endregion
     }
 }

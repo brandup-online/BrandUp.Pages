@@ -1,5 +1,4 @@
 ﻿using BrandUp.Pages.Content.Infrastructure;
-using BrandUp.Pages.Content.Views;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -8,31 +7,20 @@ namespace BrandUp.Pages.Content
 {
     public class ContentMetadataManager : IContentMetadataManager
     {
-        private readonly List<ContentMetadataProvider> metadatas = new List<ContentMetadataProvider>();
-        private readonly Dictionary<Type, int> metadataTypes = new Dictionary<Type, int>();
-        private readonly Dictionary<string, int> metadataNames = new Dictionary<string, int>();
+        private readonly List<ContentMetadataProvider> metadataProviders = new List<ContentMetadataProvider>();
+        private readonly Dictionary<Type, int> contentTypes = new Dictionary<Type, int>();
+        private readonly Dictionary<string, int> contentNames = new Dictionary<string, int>();
 
-        public ContentMetadataManager(IContentTypeResolver contentTypeResolver, IContentViewResolver contentViewResolver)
+        public ContentMetadataManager(IContentTypeResolver contentTypeResolver)
         {
             if (contentTypeResolver == null)
                 throw new ArgumentNullException(nameof(contentTypeResolver));
-            if (contentViewResolver == null)
-                throw new ArgumentNullException(nameof(contentViewResolver));
 
             foreach (var contentModelType in contentTypeResolver.GetContentTypes())
                 TryRegisterType(contentModelType, out ContentMetadataProvider typeMetadata);
 
-            foreach (var metadata in metadatas)
+            foreach (var metadata in metadataProviders)
                 metadata.InitializeFields();
-
-            foreach (var metadata in metadatas)
-            {
-                if (!metadata.SupportViews)
-                    continue;
-
-                var viewConfiguration = contentViewResolver.GetViewsConfiguration(metadata);
-                metadata.InitializeViews(viewConfiguration);
-            }
         }
 
         private bool TryRegisterType(Type contentType, out ContentMetadataProvider contentMetadata)
@@ -49,10 +37,10 @@ namespace BrandUp.Pages.Content
 
             contentMetadata = new ContentMetadataProvider(this, contentType, baseMetadata);
 
-            var index = metadatas.Count;
-            metadatas.Add(contentMetadata);
-            metadataTypes.Add(contentType, index);
-            metadataNames.Add(contentMetadata.Name.ToLower(), index);
+            var index = metadataProviders.Count;
+            metadataProviders.Add(contentMetadata);
+            contentTypes.Add(contentType, index);
+            contentNames.Add(contentMetadata.Name.ToLower(), index);
 
             return true;
         }
@@ -66,12 +54,13 @@ namespace BrandUp.Pages.Content
 
         #region IContentMetadataManager members
 
+        public IEnumerable<ContentMetadataProvider> MetadataProviders => metadataProviders;
         public bool IsRegisterdContentType(Type contentType)
         {
             if (contentType == null)
                 throw new ArgumentNullException(nameof(contentType));
 
-            return metadataTypes.ContainsKey(contentType);
+            return contentTypes.ContainsKey(contentType);
         }
         public ContentMetadataProvider GetMetadata(Type contentType)
         {
@@ -84,13 +73,13 @@ namespace BrandUp.Pages.Content
             if (contentType == null)
                 throw new ArgumentNullException(nameof(contentType));
 
-            if (!metadataTypes.TryGetValue(contentType, out int index))
+            if (!contentTypes.TryGetValue(contentType, out int index))
             {
                 metadata = null;
                 return false;
             }
 
-            metadata = metadatas[index];
+            metadata = metadataProviders[index];
             return true;
         }
         public bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata)
@@ -98,30 +87,14 @@ namespace BrandUp.Pages.Content
             if (contentTypeName == null)
                 throw new ArgumentNullException(nameof(contentTypeName));
 
-            if (!metadataNames.TryGetValue(contentTypeName.ToLower(), out int index))
+            if (!contentNames.TryGetValue(contentTypeName.ToLower(), out int index))
             {
                 metadata = null;
                 return false;
             }
 
-            metadata = metadatas[index];
+            metadata = metadataProviders[index];
             return true;
-        }
-        public IEnumerable<ContentMetadataProvider> GetAllMetadata()
-        {
-            return metadatas;
-        }
-        public string GetContentViewName(object contentModel)
-        {
-            if (contentModel == null)
-                throw new ArgumentNullException(nameof(contentModel));
-            if (!TryGetMetadata(contentModel.GetType(), out ContentMetadataProvider contentMetadata))
-                throw new ArgumentException();
-
-            if (!contentMetadata.SupportViews)
-                throw new InvalidOperationException("Тип контента не поддерживает представления.");
-
-            return (string)contentMetadata.ViewField.GetModelValue(contentModel);
         }
 
         #endregion
@@ -129,11 +102,10 @@ namespace BrandUp.Pages.Content
 
     public interface IContentMetadataManager
     {
+        IEnumerable<ContentMetadataProvider> MetadataProviders { get; }
         bool IsRegisterdContentType(Type contentType);
         ContentMetadataProvider GetMetadata(Type contentType);
         bool TryGetMetadata(Type contentType, out ContentMetadataProvider metadata);
         bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata);
-        IEnumerable<ContentMetadataProvider> GetAllMetadata();
-        string GetContentViewName(object contentModel);
     }
 }

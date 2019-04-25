@@ -1,8 +1,9 @@
 ﻿using BrandUp.Pages.Interfaces;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
-namespace BrandUp.Pages.Data.Documents
+namespace BrandUp.Pages.MongoDb.Documents
 {
     public class PageEditSession : IPageEditSession
     {
@@ -13,13 +14,14 @@ namespace BrandUp.Pages.Data.Documents
         public int ContentVersion { get; set; }
     }
 
+    [BrandUp.MongoDB.Document]
     public class PageEditSessionDocument : Document
     {
-        [BsonRequired, BsonRepresentation(MongoDB.Bson.BsonType.String), CamelCase]
+        [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid PageId { get; set; }
-        [BsonRequired, CamelCase]
+        [BsonRequired]
         public string ContentManagerId { get; set; }
-        [BsonRequired, CamelCase]
+        [BsonRequired]
         public PageContentDocument Content { get; set; }
     }
 }

@@ -1,6 +1,6 @@
-﻿using BrandUp.Pages.Data;
-using BrandUp.Pages.Data.Repositories;
+﻿using BrandUp.MongoDB;
 using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.MongoDb.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -8,34 +8,29 @@ namespace BrandUp.Pages.Builder
 {
     public static class WebSiteBuilderExtensions
     {
-        public static void UseMongoDbStore(this IPagesBuilder builder, Action<MongoDbOptions> setupAction)
+        public static IPagesBuilder AddMongoDb(this IPagesBuilder builder, Action<IMongoDbContextBuilder> options)
         {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-            if (setupAction == null)
-                throw new ArgumentNullException(nameof(setupAction));
+            builder.Services.AddMongoDbContext<MongoDb.PagesDbContext>(options);
 
-            var services = builder.Services;
+            return AddMongoDb<MongoDb.PagesDbContext>(builder);
+        }
 
-            services.AddSingleton<WebSiteContext>();
+        public static IPagesBuilder AddMongoDb<TContext>(this IPagesBuilder builder)
+            where TContext : MongoDbContext, MongoDb.IPagesDbContext
+        {
+            builder.Services.AddMongoDbContextExension<TContext, MongoDb.IPagesDbContext>();
 
-            AddMongoDbRepositories(services);
+            AddMongoDbRepositories(builder.Services);
 
-            services.Configure(setupAction);
+            return builder;
         }
 
         public static void AddMongoDbRepositories(IServiceCollection services)
         {
             services.AddScoped<IPageCollectionRepositiry, PageCollectionRepository>();
             services.AddScoped<IPageRepositiry, PageRepository>();
-            services.AddScoped<IFileRepository, FileRepository>();
+            services.AddScoped<Content.IFileRepository, FileRepository>();
             services.AddScoped<IPageEditSessionRepository, PageEditSessionRepository>();
         }
-    }
-
-    public class MongoDbOptions
-    {
-        public string ConnectionString { get; set; }
-        public string DatabaseName { get; set; }
     }
 }

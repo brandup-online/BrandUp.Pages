@@ -58,7 +58,7 @@ namespace BrandUp.Pages.Services
         }
         public Task<IPage> GetDefaultPageAsync()
         {
-            return pageRepositiry.GetDefaultPageAsync();
+            return pageRepositiry.FindPageByPathAsync("index");
         }
         public Task SetDefaultPageAsync(IPage page)
         {
@@ -146,12 +146,6 @@ namespace BrandUp.Pages.Services
                 throw new ArgumentNullException(nameof(page));
 
             return pageRepositiry.DeletePageAsync(page.Id);
-        }
-
-        void IDisposable.Dispose()
-        {
-            if (pageRepositiry is IDisposable d)
-                d.Dispose();
         }
     }
 }

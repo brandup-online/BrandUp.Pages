@@ -1,21 +1,19 @@
-﻿using BrandUp.Pages.Data.Documents;
+﻿using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.MongoDb.Repositories
 {
     public abstract class MongoRepository<T>
         where T : Document
     {
-        protected readonly WebSiteContext dbContext;
         protected readonly IMongoCollection<T> mongoCollection;
 
-        public MongoRepository(WebSiteContext dbContext, IMongoCollection<T> mongoCollection)
+        public MongoRepository(IMongoCollection<T> mongoCollection)
         {
-            this.dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             this.mongoCollection = mongoCollection ?? throw new ArgumentNullException(nameof(mongoCollection));
         }
 

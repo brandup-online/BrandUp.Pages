@@ -1,16 +1,16 @@
-﻿using BrandUp.Pages.Data.Documents;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageCollectionRepository : MongoRepository<PageCollectionDocument>, IPageCollectionRepositiry
     {
-        public PageCollectionRepository(WebSiteContext dbContext) : base(dbContext, dbContext.GetPageCollectionDocuments()) { }
+        public PageCollectionRepository(IPagesDbContext dbContext) : base(dbContext.PageCollections) { }
 
         public async Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
         {
@@ -73,29 +73,9 @@ namespace BrandUp.Pages.Data.Repositories
 
         public async Task DeleteCollectionAsync(Guid id)
         {
-            var pages = dbContext.GetPageDocuments();
-
-            using (var session = await dbContext.Client.StartSessionAsync())
-            {
-                //session.StartTransaction();
-
-                try
-                {
-                    var countCollections = await pages.CountDocumentsAsync(session, it => it.OwnCollectionId == id);
-                    if (countCollections > 0)
-                        throw new InvalidOperationException("Удаляемая коллекция не должна содержать страницы.");
-
-                    await mongoCollection.FindOneAndDeleteAsync(session, it => it.Id == id);
-
-                    //await session.CommitTransactionAsync();
-                }
-                catch (Exception ex)
-                {
-                    //await session.AbortTransactionAsync();
-
-                    throw ex;
-                }
-            }
+            var deleteResult = await mongoCollection.DeleteOneAsync(it => it.Id == id);
+            if (deleteResult.DeletedCount != 1)
+                throw new InvalidOperationException();
         }
     }
 }

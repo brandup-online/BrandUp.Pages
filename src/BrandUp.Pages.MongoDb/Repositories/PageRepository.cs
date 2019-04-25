@@ -1,13 +1,14 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Data.Documents;
 using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.MongoDb.Documents;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageRepository : MongoRepository<PageDocument>, IPageRepositiry
     {
@@ -27,7 +28,7 @@ namespace BrandUp.Pages.Data.Repositories
             };
         }
 
-        public PageRepository(WebSiteContext dbContext, IContentMetadataManager contentMetadataManager) : base(dbContext, dbContext.GetPageDocuments())
+        public PageRepository(IPagesDbContext dbContext, IContentMetadataManager contentMetadataManager) : base(dbContext.Pages)
         {
             this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
         }
@@ -40,7 +41,7 @@ namespace BrandUp.Pages.Data.Repositories
                 CreatedDate = DateTime.UtcNow,
                 OwnCollectionId = ownCollectionId,
                 PageType = typeName,
-                Content = new PageContentDocument { Version = 1, Data = new MongoDB.Bson.BsonDocument(contentData) }
+                Content = new PageContentDocument { Version = 1, Data = new BsonDocument(contentData) }
             };
 
             await AddAsync(pageDocument);
@@ -153,33 +154,9 @@ namespace BrandUp.Pages.Data.Repositories
                 throw new InvalidOperationException();
             }
         }
-        public async Task DeletePageAsync(Guid pageId)
+        public Task DeletePageAsync(Guid pageId)
         {
-            var pageCollections = dbContext.GetPageCollectionDocuments();
-
-            using (var session = await dbContext.Client.StartSessionAsync())
-            {
-                //session.StartTransaction();
-
-                try
-                {
-                    var countCollections = await pageCollections.CountDocumentsAsync(session, it => it.PageId == pageId);
-                    if (countCollections > 0)
-                    {
-                        throw new InvalidOperationException("Удаляемая страница не должна содержать коллекции.");
-                    }
-
-                    await mongoCollection.FindOneAndDeleteAsync(session, it => it.Id == pageId);
-
-                    //await session.CommitTransactionAsync();
-                }
-                catch (Exception ex)
-                {
-                    //await session.AbortTransactionAsync();
-
-                    throw ex;
-                }
-            }
+            throw new NotImplementedException();
         }
     }
 }

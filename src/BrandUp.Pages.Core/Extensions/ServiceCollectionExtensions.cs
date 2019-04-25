@@ -7,17 +7,13 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IPagesBuilder AddPages(this IServiceCollection services)
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            return new PagesBuilder(services);
+            return AddPages(services, options => { });
         }
 
         public static IPagesBuilder AddPages(this IServiceCollection services, Action<PagesOptions> setupAction)
         {
-            var webSiteBuilder = services.AddPages();
-            webSiteBuilder.Services.Configure(setupAction);
-            return webSiteBuilder;
+            services.Configure(setupAction);
+            return new PagesBuilder(services);
         }
     }
 }

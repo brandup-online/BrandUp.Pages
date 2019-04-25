@@ -11,10 +11,11 @@ namespace BrandUp.Pages.Content
         public ContentMetadataManagerTests()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
-            var contentViewResolver = new Views.AttributesContentViewResolver();
 
-            metadataManager = new ContentMetadataManager(contentTypeResolver, contentViewResolver);
+            metadataManager = new ContentMetadataManager(contentTypeResolver);
         }
+
+        #region Test methods
 
         [Fact]
         public void IsRegisterdContentType()
@@ -50,7 +51,7 @@ namespace BrandUp.Pages.Content
             var contentType = typeof(TestPageContent);
             var contentMetadata = metadataManager.GetMetadata(contentType);
 
-            var metadatas = metadataManager.GetAllMetadata();
+            var metadatas = metadataManager.MetadataProviders;
 
             Assert.NotNull(metadatas);
             Assert.True(metadatas.Count() > 0);
@@ -68,20 +69,6 @@ namespace BrandUp.Pages.Content
             Assert.Contains(contentMetadata, contentMetadatas);
         }
 
-        [Fact]
-        public void GetContentViewName_HasValue()
-        {
-            var viewName = metadataManager.GetContentViewName(new TestPageContent { ViewName = "test" });
-
-            Assert.Equal("test", viewName);
-        }
-
-        [Fact]
-        public void GetContentViewName_NotValue()
-        {
-            var viewName = metadataManager.GetContentViewName(new TestPageContent { ViewName = null });
-
-            Assert.Null(viewName);
-        }
+        #endregion
     }
 }

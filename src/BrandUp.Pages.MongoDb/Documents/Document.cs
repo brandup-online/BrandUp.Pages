@@ -1,13 +1,14 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 
-namespace BrandUp.Pages.Data.Documents
+namespace BrandUp.Pages.MongoDb.Documents
 {
-    public class Document
+    public abstract class Document
     {
-        [BsonId, BsonRepresentation(MongoDB.Bson.BsonType.String), CamelCase]
+        [BsonId, BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
-        [BsonDateTimeOptions(DateOnly = false, Kind = DateTimeKind.Utc, Representation = MongoDB.Bson.BsonType.DateTime), CamelCase]
+        [BsonDateTimeOptions(Representation = BsonType.DateTime)]
         public DateTime CreatedDate { get; set; }
     }
 }

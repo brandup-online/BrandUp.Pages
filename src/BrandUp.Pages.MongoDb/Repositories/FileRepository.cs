@@ -1,69 +1,26 @@
-﻿using BrandUp.Pages.Interfaces;
-using MongoDB.Driver;
-using MongoDB.Driver.GridFS;
+﻿using BrandUp.Pages.Content;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class FileRepository : IFileRepository
     {
-        private readonly FileBucket gridFS;
-
-        public FileRepository(WebSiteContext dbContext)
+        public Task<IFileDocument> UploadFileAsync(string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
-            if (dbContext == null)
-                throw new ArgumentNullException(nameof(dbContext));
-
-            gridFS = dbContext.Files;
+            throw new NotImplementedException();
         }
 
-        public async Task<IPageFile> FindFileByIdAsync(Guid fileId)
+        public Task<IFileDocument> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
-            var filter = Builders<GridFSFileInfo<Guid>>.Filter.Eq(info => info.Id, fileId);
-            var cursor = await gridFS.FindAsync(filter);
-
-            var fileInfo = await cursor.SingleOrDefaultAsync();
-            if (fileInfo != null)
-            {
-                return new PageFile
-                {
-                    Id = fileInfo.Id,
-                    Name = fileInfo.Filename,
-                    Size = fileInfo.Length,
-                    UploadDateTime = fileInfo.UploadDateTime
-                };
-            }
-
-            return null;
+            throw new NotImplementedException();
         }
 
-        public async Task<Guid> UploadFileAsync(string fileName, Stream fileStream)
+        public Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
-            if (fileName == null)
-                throw new ArgumentNullException(nameof(fileName));
-            if (fileStream == null)
-                throw new ArgumentNullException(nameof(fileStream));
-
-            var fileId = Guid.NewGuid();
-
-            await gridFS.UploadFromStreamAsync(fileId, fileName, fileStream, new GridFSUploadOptions { DisableMD5 = false });
-
-            return fileId;
-        }
-        public async Task<Stream> GetFileStreamAsync(Guid fileId)
-        {
-            var stream = await gridFS.OpenDownloadStreamAsync(fileId);
-            return stream;
-        }
-
-        private class PageFile : IPageFile
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; }
-            public long Size { get; set; }
-            public DateTime UploadDateTime { get; set; }
+            throw new NotImplementedException();
         }
     }
 }

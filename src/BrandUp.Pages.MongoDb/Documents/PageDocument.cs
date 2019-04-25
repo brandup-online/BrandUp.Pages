@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 
-namespace BrandUp.Pages.Data.Documents
+namespace BrandUp.Pages.MongoDb.Documents
 {
     public class Page : IPage
     {
@@ -15,23 +15,24 @@ namespace BrandUp.Pages.Data.Documents
         public int ContentVersion { get; set; }
     }
 
+    [BrandUp.MongoDB.Document]
     public class PageDocument : Document
     {
-        [BsonRequired, CamelCase]
+        [BsonRequired]
         public string PageType { get; set; }
-        [BsonRequired, BsonRepresentation(BsonType.String), CamelCase]
+        [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid OwnCollectionId { get; set; }
-        [BsonIgnoreIfNull, CamelCase]
+        [BsonIgnoreIfNull]
         public string UrlPath { get; set; }
-        [BsonRequired, CamelCase]
+        [BsonRequired]
         public PageContentDocument Content { get; set; }
     }
 
     public class PageContentDocument
     {
-        [BsonRequired, CamelCase]
+        [BsonRequired]
         public int Version { get; set; }
-        [BsonRequired, CamelCase]
+        [BsonRequired]
         public BsonDocument Data { get; set; }
     }
 }

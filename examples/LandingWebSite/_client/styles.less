@@ -1,2 +1,102 @@
-﻿body {
+﻿@Primary-Color: #FFC700;
+@Accent-Color: #FFC700;
+@Main-Color: #F6F6F6;
+@Text-Color: #33333C;
+
+@Border-Radius: 5px;
+
+@Font-Size: 14px;
+@Font-Family: 'Segoe UI', sans-serif;
+@LineHeight: 120%;
+
+@Link-Color: @Accent-Color;
+@Link-Color-Hover: @Accent-Color;
+
+@Header-Font-Family: 'Segoe UI', sans-serif;
+
+@Content-MaxWidth: 1280px;
+@Content-MinWidth: 1000px;
+@Content-Padding: 30px;
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    font-size: @Font-Size;
+    font-family: @Font-Family;
+    line-height: @LineHeight;
+    background: #fff;
+    touch-action: manipulation;
+    color: @Text-Color;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: @Header-Font-Family;
+    font-weight: normal;
+    padding: 0;
+    margin: 0;
+    line-height: normal;
+}
+
+a {
+    color: @Link-Color;
+
+    &:hover {
+        color: @Link-Color-Hover;
+    }
+}
+
+.content-width {
+    max-width: @Content-MaxWidth;
+    min-width: @Content-MinWidth;
+    box-sizing: border-box;
+    padding: 0 @Content-Padding;
+    margin: 0 auto;
+}
+
+.app {
+    width: 100%;
+    min-height: 100%;
+    height: auto !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    min-width: @Content-MinWidth;
+    overflow: hidden;
+    position: relative;
+}
+
+nav.app-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #000;
+
+    & .content-width {
+        height: 80px;
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+    }
+
+    & a.logo {
+        color: #fff;
+        font-size: 32px;
+        line-height: 40px;
+        text-decoration: none;
+    }
+}
+
+main.app-content {
+    margin-top: 80px;
+    flex: 1 1 auto;
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }

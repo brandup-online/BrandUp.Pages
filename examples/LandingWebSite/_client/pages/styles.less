@@ -1,0 +1,51 @@
+﻿@import "vars.less";
+
+.brandup-pages-elem {
+    font-family: @Font-Family;
+    font-size: @Font-Size;
+    line-height: @LineHeight;
+    color: @Text-Color;
+
+    & a {
+        color: @Link-Color;
+
+        &:hover {
+            color: @Link-Color-Hover;
+        }
+    }
+}
+
+.brandup-pages-toolbar {
+    position: fixed;
+    left: 30px;
+    bottom: 30px;
+    background: @Primary-Color;
+    border-radius: @Border-Radius;
+    height: 50px;
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+button.brandup-pages-toolbar-button {
+    box-sizing: border-box;
+    background: none;
+    border: 0;
+    outline: none;
+    width: 50px;
+    height: 50px;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: 26px;
+    cursor: pointer;
+    opacity: 0.8;
+
+    &:hover,
+    &:focus, 
+    &:active {
+        opacity: 1;
+    }
+
+    &.list {
+        background-image: url(svg/toolbar-button-list.svg);
+    }
+}

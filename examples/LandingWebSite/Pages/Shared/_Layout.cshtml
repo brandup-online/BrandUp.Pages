@@ -1,16 +1,30 @@
-﻿<!DOCTYPE html>
+﻿@model AppPageModel
+
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - LandingWebSite</title>
-
-    <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
-    <link type="text/css" rel="stylesheet" href="~/dist/app.css" asp-append-version="true" />
+    <title>@Model.Title - LandingWebSite</title>
 </head>
 <body>
-    <main role="main" class="pb-3">
-        @RenderBody()
-    </main>
+    <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
+    <link type="text/css" rel="stylesheet" href="~/dist/app.css" asp-append-version="true" />
+
+    <script type="text/javascript" src="~/dist/pages.js" asp-append-version="true"></script>
+    <link type="text/css" rel="stylesheet" href="~/dist/pages.css" asp-append-version="true" />
+
+    @Html.AntiForgeryToken()
+
+    <div class="app">
+        <nav class="app-top">
+            <div class="content-width">
+                <a asp-page="/Index" class="logo">LandingWebSite</a>
+            </div>
+        </nav>
+        <main role="main" class="content-width app-content">
+            @RenderBody()
+        </main>
+    </div>
 </body>
 </html>
