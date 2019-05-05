@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BrandUp.MongoDB" Version="1.0.0.6" />
+    <PackageReference Include="BrandUp.MongoDB" Version="1.0.0.10" />
   </ItemGroup>
 
   <ItemGroup>
