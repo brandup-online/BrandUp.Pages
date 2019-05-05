@@ -36,6 +36,12 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
+    [PageContentModel(Title = "Article")]
+    public class ArticlePageContent : TestPageContent
+    {
+
+    }
+
     [ContentModel]
     public class PageHeaderContent
     {

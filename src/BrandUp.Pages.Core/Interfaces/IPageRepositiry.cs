@@ -11,8 +11,6 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> FindPageByPathAsync(string path);
         Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination);
         Task<bool> HasPagesAsync(Guid сollectionId);
-        Task<IPage> GetDefaultPageAsync();
-        Task SetDefaultPageAsync(IPage page);
         Task<PageContent> GetContentAsync(Guid pageId);
         Task SetContentAsync(Guid pageId, PageContent content);
         Task SetUrlPathAsync(Guid pageId, string urlPath);

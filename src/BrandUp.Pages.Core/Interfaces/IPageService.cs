@@ -7,11 +7,10 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageService
     {
-        Task<IPage> CreatePageAsync(IPageCollection collection, string pageType);
+        Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageTitle = null);
         Task<IPage> FindPageByIdAsync(Guid id);
         Task<IPage> FindPageByPathAsync(string pagePath);
         Task<IPage> GetDefaultPageAsync();
-        Task SetDefaultPageAsync(IPage page);
         Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination);
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page);
         Task<object> GetPageContentAsync(IPage page);

@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Services
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
-        public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType)
+        public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageTitle = null)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
@@ -30,11 +30,18 @@ namespace BrandUp.Pages.Services
             if (pageType == null)
                 pageType = collection.PageTypeName;
 
-            var pageMetadata = pageMetadataManager.FindPageMetadataByName(pageType);
-            if (pageMetadata == null)
+            var basePageMetadata = pageMetadataManager.FindPageMetadataByName(collection.PageTypeName);
+            if (basePageMetadata == null)
                 throw new InvalidOperationException();
 
-            var pageContentModel = pageMetadata.CreatePageModel();
+            var pageMetadata = pageMetadataManager.FindPageMetadataByName(pageType);
+            if (pageMetadata == null)
+                throw new ArgumentException();
+
+            if (pageMetadata != basePageMetadata && !pageMetadata.IsInheritedOf(basePageMetadata))
+                throw new ArgumentException();
+
+            var pageContentModel = pageMetadata.CreatePageModel(pageTitle);
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContentModel);
 
             return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageContentData);
@@ -59,13 +66,6 @@ namespace BrandUp.Pages.Services
         public Task<IPage> GetDefaultPageAsync()
         {
             return pageRepositiry.FindPageByPathAsync("index");
-        }
-        public Task SetDefaultPageAsync(IPage page)
-        {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-
-            return pageRepositiry.SetDefaultPageAsync(page);
         }
         public Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination)
         {

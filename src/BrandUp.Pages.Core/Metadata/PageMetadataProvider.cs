@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Metadata
     public class PageMetadataProvider
     {
         private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
-        private readonly Content.Fields.TextField titleTitle;
+        private readonly Content.Fields.TextField titleField;
 
         public ContentMetadataProvider ContentMetadata { get; }
         public string Name => ContentMetadata.Name;
@@ -36,29 +36,54 @@ namespace BrandUp.Pages.Metadata
                 if (!(field is Content.Fields.TextField title))
                     throw new InvalidOperationException();
 
-                titleTitle = title;
+                titleField = title;
             }
-            if (titleTitle == null)
+
+            if (titleField == null)
                 throw new InvalidOperationException();
         }
 
-        public object CreatePageModel()
+        public object CreatePageModel(string title = null)
         {
             var model = ContentMetadata.CreateModelInstance();
 
-            var title = GetPageName(model);
+            if (title == null)
+                title = GetPageName(model);
+
             if (string.IsNullOrEmpty(title))
             {
-                title = "Новая страница";
-                titleTitle.SetModelValue(model, title);
+                title = "New page";
+                titleField.SetModelValue(model, title);
             }
 
             return model;
         }
-
         public string GetPageName(object pageModel)
         {
-            return (string)titleTitle.GetModelValue(pageModel);
+            if (pageModel == null)
+                throw new ArgumentNullException(nameof(pageModel));
+
+            return (string)titleField.GetModelValue(pageModel);
         }
+        public bool IsInheritedOf(PageMetadataProvider baseMetadataProvider)
+        {
+            if (baseMetadataProvider == null)
+                throw new ArgumentNullException(nameof(baseMetadataProvider));
+
+            return ContentType.IsSubclassOf(baseMetadataProvider.ContentType);
+        }
+
+        #region Object members
+
+        public override string ToString()
+        {
+            return "Name";
+        }
+        public override int GetHashCode()
+        {
+            return ContentType.GetHashCode();
+        }
+
+        #endregion
     }
 }
