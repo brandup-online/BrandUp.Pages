@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 
-namespace LandingWebSite.Controllers
+namespace BrandUp.Pages.Controllers
 {
-    public class PageTypeController : Controller
+    public class PageTypeController : ControllerBase
     {
         private readonly IPageMetadataManager pageMetadataManager;
 

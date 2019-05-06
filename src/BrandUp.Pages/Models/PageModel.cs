@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace LandingWebSite.Models
+namespace BrandUp.Pages.Models
 {
     public class PageModel
     {

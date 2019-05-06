@@ -6,7 +6,7 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageRepositiry
     {
-        Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, IDictionary<string, object> contentData);
+        Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string title, IDictionary<string, object> contentData);
         Task<IPage> FindPageByIdAsync(Guid id);
         Task<IPage> FindPageByPathAsync(string path);
         Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination);

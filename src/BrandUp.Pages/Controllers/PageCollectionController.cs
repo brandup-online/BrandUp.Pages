@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LandingWebSite.Controllers
+namespace BrandUp.Pages.Controllers
 {
     [ApiController]
-    public class PageCollectionController : Controller
+    public class PageCollectionController : ControllerBase
     {
         private readonly IPageCollectionService pageCollectionService;
 

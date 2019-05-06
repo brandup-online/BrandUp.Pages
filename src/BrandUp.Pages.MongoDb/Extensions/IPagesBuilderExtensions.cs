@@ -6,7 +6,7 @@ using System;
 
 namespace BrandUp.Pages.Builder
 {
-    public static class WebSiteBuilderExtensions
+    public static class IPagesBuilderExtensions
     {
         public static IPagesBuilder AddMongoDb(this IPagesBuilder builder, Action<IMongoDbContextBuilder> options)
         {

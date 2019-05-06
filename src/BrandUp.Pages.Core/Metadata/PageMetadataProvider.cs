@@ -48,7 +48,7 @@ namespace BrandUp.Pages.Metadata
             var model = ContentMetadata.CreateModelInstance();
 
             if (title == null)
-                title = GetPageName(model);
+                title = GetPageTitle(model);
 
             if (string.IsNullOrEmpty(title))
             {
@@ -58,7 +58,7 @@ namespace BrandUp.Pages.Metadata
 
             return model;
         }
-        public string GetPageName(object pageModel)
+        public string GetPageTitle(object pageModel)
         {
             if (pageModel == null)
                 throw new ArgumentNullException(nameof(pageModel));

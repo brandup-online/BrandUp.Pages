@@ -24,6 +24,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 TypeName = it.PageType,
                 OwnCollectionId = it.OwnCollectionId,
                 UrlPath = it.UrlPath,
+                Title = it.Title,
                 ContentVersion = it.Content.Version
             };
         }
@@ -33,7 +34,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
         }
 
-        public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, IDictionary<string, object> contentData)
+        public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageTitle, IDictionary<string, object> contentData)
         {
             var pageDocument = new PageDocument
             {
@@ -41,6 +42,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 CreatedDate = DateTime.UtcNow,
                 OwnCollectionId = сollectionId,
                 PageType = typeName,
+                Title = pageTitle,
                 Content = new PageContentDocument { Version = 1, Data = new BsonDocument(contentData) }
             };
 

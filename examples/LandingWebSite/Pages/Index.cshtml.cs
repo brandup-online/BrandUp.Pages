@@ -8,6 +8,7 @@ namespace LandingWebSite.Pages
     public class IndexModel : AppPageModel
     {
         private readonly IPageService pageService;
+        private IPage page;
 
         public IndexModel(IPageService pageService)
         {
@@ -16,7 +17,7 @@ namespace LandingWebSite.Pages
 
         #region AppPageModel members
 
-        public override string Title => null;
+        public override string Title => page.Title;
         public override string Description => null;
         public override string Keywords => null;
 
@@ -31,7 +32,7 @@ namespace LandingWebSite.Pages
                 pagePath = (string)urlValue;
             pagePath = pagePath.Trim(new char[] { '/' });
 
-            var page = await pageService.FindPageByPathAsync(pagePath);
+            page = await pageService.FindPageByPathAsync(pagePath);
             if (page == null)
                 return NotFound();
 

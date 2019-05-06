@@ -1,4 +1,4 @@
-﻿namespace LandingWebSite.Models
+﻿namespace BrandUp.Pages.Models
 {
     public class PageTypeModel
     {

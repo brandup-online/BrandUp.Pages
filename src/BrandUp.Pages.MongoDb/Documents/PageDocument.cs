@@ -13,6 +13,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public Guid OwnCollectionId { get; set; }
         public string UrlPath { get; set; }
         public int ContentVersion { get; set; }
+        public string Title { get; set; }
     }
 
     [BrandUp.MongoDB.Document]
@@ -24,6 +25,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public Guid OwnCollectionId { get; set; }
         [BsonIgnoreIfNull]
         public string UrlPath { get; set; }
+        public string Title { get; set; }
         [BsonRequired]
         public PageContentDocument Content { get; set; }
     }

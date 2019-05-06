@@ -44,7 +44,9 @@ namespace BrandUp.Pages.Services
             var pageContentModel = pageMetadata.CreatePageModel(pageTitle);
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContentModel);
 
-            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageContentData);
+            pageTitle = pageMetadata.GetPageTitle(pageContentModel);
+
+            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageTitle, pageContentData);
         }
         public Task<IPage> FindPageByIdAsync(Guid id)
         {

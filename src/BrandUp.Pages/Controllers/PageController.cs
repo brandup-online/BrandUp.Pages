@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace LandingWebSite.Controllers
+namespace BrandUp.Pages.Controllers
 {
     [ApiController]
-    public class PageController : Controller
+    public class PageController : ControllerBase
     {
         private readonly IPageCollectionService pageCollectionService;
         private readonly IPageService pageService;
@@ -99,7 +99,7 @@ namespace LandingWebSite.Controllers
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
-                Title = "test"
+                Title = page.Title
             };
         }
         private IActionResult WithResult(BrandUp.Pages.Result result)
