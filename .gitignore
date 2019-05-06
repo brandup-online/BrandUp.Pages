@@ -330,3 +330,5 @@ ASALocalRun/
 .mfractor/
 /examples/LandingWebSite/wwwroot/dist
 /examples/LandingWebSite/package-lock.json
+/examples/LandingWebSite/_client/**/*.js
+/examples/LandingWebSite/_client/**/*.js.map

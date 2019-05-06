@@ -23,7 +23,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example", "example", "{DF85
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LandingWebSite", "examples\LandingWebSite\LandingWebSite.csproj", "{0748BC03-6689-40AA-A850-C869C711E637}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandUp.Pages", "src\BrandUp.Pages\BrandUp.Pages.csproj", "{18D51569-E320-40C9-8B76-AF9AFD9320DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages", "src\BrandUp.Pages\BrandUp.Pages.csproj", "{18D51569-E320-40C9-8B76-AF9AFD9320DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution", "_solution", "{1166ABB8-A311-499B-AF52-A8D0A2B77CD9}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
