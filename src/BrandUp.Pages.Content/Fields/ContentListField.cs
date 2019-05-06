@@ -155,8 +155,6 @@ namespace BrandUp.Pages.Content.Fields
 
     public class ContentListAttribute : FieldAttribute
     {
-        public ContentListAttribute(string title) : base(title) { }
-
         public override Field CreateField()
         {
             return new ContentListField();

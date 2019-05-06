@@ -4,19 +4,19 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [ContentModel(Title = ContentTypeTitle, Description = ContentTypeDescription)]
+    [Content(Title = ContentTypeTitle, Description = ContentTypeDescription)]
     public class TestPageContent
     {
         public const string ContentTypeTitle = "Test page";
         public const string ContentTypeDescription = "Test page description";
 
-        [Text(title: "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
-        [ContentValue(title: "Шапка страницы")]
+        [ContentValue(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
 
-        [ContentList(title: "Шапки страницы")]
+        [ContentList(Title = "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
 
         public static TestPageContent CreateWithOnlyTitle(string title)
@@ -34,10 +34,10 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
-    [ContentModel(Title = "Заголовок", Description = "Заголовок страницы")]
+    [Content(Title = "Заголовок", Description = "Заголовок страницы")]
     public class PageHeaderContent
     {
-        [Text(title: "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
     }
 }

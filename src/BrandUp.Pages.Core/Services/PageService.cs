@@ -112,7 +112,7 @@ namespace BrandUp.Pages.Services
 
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await pageRepositiry.SetContentAsync(page.Id, new PageContent(page.ContentVersion, pageData));
+            await pageRepositiry.SetContentAsync(page.Id, new PageContent(1, pageData));
         }
         public async Task PublishPageAsync(IPage page, string urlPathName)
         {

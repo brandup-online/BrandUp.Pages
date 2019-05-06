@@ -8,8 +8,6 @@ namespace BrandUp.Pages.Content.Fields
         public bool AllowMultiline { get; set; } = false;
         public string Placeholder { get; set; }
 
-        public TextAttribute(string title) : base(title) { }
-
         public override Field CreateField()
         {
             return new TextField();

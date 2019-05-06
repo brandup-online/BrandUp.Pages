@@ -11,6 +11,8 @@ interface PageModel {
     id: string;
     createdDate: string;
     title: string;
+    status: "Draft" | "Published";
+    url: string;
 }
 
 interface PageTypeModel {

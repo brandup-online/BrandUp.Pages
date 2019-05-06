@@ -36,6 +36,9 @@ define(["require", "exports", "./dialog-list", "brandup-ui", "./page-create", ".
                     _this.loadItems();
                 });
             });
+            this.registerItemCommand("item-open", function (itemId, model) {
+                location.href = model.url;
+            });
             this.registerItemCommand("item-update", function (itemId) { });
             this.registerItemCommand("item-delete", function (itemId) {
                 page_delete_1.deletePage(itemId).then(function (deletedItem) {
@@ -54,9 +57,12 @@ define(["require", "exports", "./dialog-list", "brandup-ui", "./page-create", ".
             return item.id;
         };
         PageListDialog.prototype._renderItemContent = function (item, contentElem) {
-            contentElem.appendChild(brandup_ui_1.DOM.tag("div", { class: "title" }, item.title));
+            contentElem.appendChild(brandup_ui_1.DOM.tag("div", { class: "title" }, brandup_ui_1.DOM.tag("a", { href: "", "data-command": "item-open" }, item.title)));
+            contentElem.appendChild(brandup_ui_1.DOM.tag("div", { class: "status " + item.status.toLowerCase() }, item.status));
         };
         PageListDialog.prototype._renderItemMenu = function (item, menuElem) {
+            menuElem.appendChild(brandup_ui_1.DOM.tag("li", null, [brandup_ui_1.DOM.tag("a", { href: "", "data-command": "item-open" }, "Open")]));
+            menuElem.appendChild(brandup_ui_1.DOM.tag("li", { class: "split" }));
             menuElem.appendChild(brandup_ui_1.DOM.tag("li", null, [brandup_ui_1.DOM.tag("a", { href: "", "data-command": "item-update" }, "Edit")]));
             menuElem.appendChild(brandup_ui_1.DOM.tag("li", null, [brandup_ui_1.DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
         };

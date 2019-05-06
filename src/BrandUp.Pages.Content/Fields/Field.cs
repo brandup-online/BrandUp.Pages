@@ -39,10 +39,12 @@ namespace BrandUp.Pages.Content.Fields
             }
 
             IsRequired = fieldAttribute.IsRequired;
-            Title = fieldAttribute.Title;
             Name = fieldAttribute.Name;
             if (Name == null)
                 Name = fieldDeclaration.Name;
+            Title = fieldAttribute.Title;
+            if (Title == null)
+                Title = Name;
 
             JsonPropertyName = Name.Substring(0, 1).ToLower() + Name.Substring(1);
 
@@ -218,13 +220,8 @@ namespace BrandUp.Pages.Content.Fields
     public abstract class FieldAttribute : Attribute
     {
         public string Name { get; set; }
-        public string Title { get; }
+        public string Title { get; set; }
         public bool IsRequired { get; set; } = false;
-
-        protected FieldAttribute(string title)
-        {
-            Title = title ?? throw new ArgumentNullException(nameof(title));
-        }
 
         public abstract Field CreateField();
     }

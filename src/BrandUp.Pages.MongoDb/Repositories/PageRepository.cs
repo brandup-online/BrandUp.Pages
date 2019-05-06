@@ -24,8 +24,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 TypeName = it.PageType,
                 OwnCollectionId = it.OwnCollectionId,
                 UrlPath = it.UrlPath,
-                Title = it.Title,
-                ContentVersion = it.Content.Version
+                Title = it.Title
             };
         }
 
@@ -43,7 +42,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 OwnCollectionId = сollectionId,
                 PageType = typeName,
                 Title = pageTitle,
-                Content = new PageContentDocument { Version = 1, Data = new BsonDocument(contentData) }
+                Content = new BsonDocument(contentData)
             };
 
             await AddAsync(pageDocument);
@@ -108,45 +107,30 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<PageContent> GetContentAsync(Guid pageId)
         {
-            var p = Builders<PageDocument>.Projection
-                .Include("content.version")
-                .Include("content.data");
+            var pageDocument = await (await mongoCollection.FindAsync(it => it.Id == pageId)).FirstOrDefaultAsync();
+            if (pageDocument == null)
+                return null;
 
-            var filterDefinition = Builders<PageDocument>.Filter.Eq("Id", pageId);
-            var cursor = await mongoCollection.Find(filterDefinition)
-                .Project(p).ToCursorAsync();
-
-            var document = await cursor.FirstOrDefaultAsync();
-            var version = document.GetElement("content").Value.AsBsonDocument.GetElement("version").Value.AsInt32;
-            var dataDoc = document.GetElement("content").Value.AsBsonDocument.GetElement("data").Value.AsBsonDocument;
-
-            return new PageContent(version, MongoDbHelper.BsonDocumentToDictionary(dataDoc));
+            return new PageContent(1, MongoDbHelper.BsonDocumentToDictionary(pageDocument.Content));
         }
         public async Task SetContentAsync(Guid pageId, PageContent content)
         {
             if (content == null)
-            {
                 throw new ArgumentNullException(nameof(content));
-            }
 
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
 
-            var filterDefinition = Builders<PageDocument>.Filter.Eq("Id", pageId);
-            var updateDefinition = Builders<PageDocument>.Update.Set("content.data", contentDataDocument);
+            var updateDefinition = Builders<PageDocument>.Update.Set(it => it.Content, contentDataDocument);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(filterDefinition, updateDefinition);
+            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
 
             if (updateResult.MatchedCount != 1)
-            {
                 throw new InvalidOperationException();
-            }
         }
         public async Task SetUrlPathAsync(Guid pageId, string urlPath)
         {
             if (urlPath == null)
-            {
                 throw new ArgumentNullException(nameof(urlPath));
-            }
 
             var updateDefinition = Builders<PageDocument>.Update.Set(it => it.UrlPath, urlPath);
             var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);

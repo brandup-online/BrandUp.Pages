@@ -26,6 +26,9 @@ export class PageListDialog extends ListDialog<PageModel> {
                 this.loadItems();
             });
         });
+        this.registerItemCommand("item-open", (itemId: string, model: PageModel) => {
+            location.href = model.url;
+        });
         this.registerItemCommand("item-update", (itemId: string) => { });
         this.registerItemCommand("item-delete", (itemId: string) => {
             deletePage(itemId).then((deletedItem: PageModel) => {
@@ -46,9 +49,12 @@ export class PageListDialog extends ListDialog<PageModel> {
         return item.id;
     }
     protected _renderItemContent(item: PageModel, contentElem: HTMLElement) {
-        contentElem.appendChild(DOM.tag("div", { class: "title" }, item.title));
+        contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("a", { href: "", "data-command": "item-open" }, item.title)));
+        contentElem.appendChild(DOM.tag("div", { class: `status ${item.status.toLowerCase()}` }, item.status));
     }
     protected _renderItemMenu(item: PageModel, menuElem: HTMLElement) {
+        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-open" }, "Open")]));
+        menuElem.appendChild(DOM.tag("li", { class: "split" }));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-update" }, "Edit")]));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
     }

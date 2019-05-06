@@ -7,8 +7,6 @@ namespace BrandUp.Pages.Content.Fields
     {
         public string Placeholder = null;
 
-        public HtmlAttribute(string title) : base(title) { }
-
         public override Field CreateField()
         {
             return new HtmlField();

@@ -9,8 +9,6 @@ namespace BrandUp.Pages.Content.Fields
     {
         public string Placeholder { get; set; }
 
-        public PageCollectionAttribute(string title) : base(title) { }
-
         public override Field CreateField()
         {
             return new PageCollectionField();

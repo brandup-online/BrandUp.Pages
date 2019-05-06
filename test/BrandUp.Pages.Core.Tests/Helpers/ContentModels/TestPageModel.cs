@@ -4,21 +4,21 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [PageContentModel(Title = ContentTypeTitle)]
+    [PageContent(Title = ContentTypeTitle)]
     public class TestPageContent
     {
         public const string ContentTypeTitle = "Test page";
 
-        [PageTitle, Text(title: "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [PageTitle, Text(Title = "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
-        [ContentValue(title: "Шапка страницы")]
+        [ContentValue(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
 
-        [ContentList(title: "Шапки страницы")]
+        [ContentList(Title = "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
 
-        [PageCollection("Pages")]
+        [PageCollection(Title = "Pages")]
         public PageCollectionReference<TestPageContent> Pages { get; set; }
 
         public static TestPageContent CreateWithOnlyTitle(string title)
@@ -36,19 +36,19 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
-    [PageContentModel(Title = "Article")]
+    [PageContent(Title = "Article")]
     public class ArticlePageContent : TestPageContent
     {
 
     }
 
-    [ContentModel]
+    [Content]
     public class PageHeaderContent
     {
-        [Text(title: "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
-        [ContentValue(title: "Шапка страницы")]
+        [ContentValue(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
     }
 }

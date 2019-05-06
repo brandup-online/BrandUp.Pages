@@ -43,7 +43,7 @@ namespace LandingWebSite.Controllers
         [HttpGet("init", Name = "ApiEnvironmentInitPages")]
         public async Task<IActionResult> InitPagesAsync()
         {
-            var pageContentMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.PageContentModel));
+            var pageContentMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.PageContent));
 
             var pageCollection = await pageCollectionService.CreateCollectionAsync("Main", pageContentMetadata.Name, PageSortMode.FirstOld, null);
 

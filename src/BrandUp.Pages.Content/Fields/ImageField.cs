@@ -6,8 +6,6 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ImageAttribute : FieldAttribute
     {
-        public ImageAttribute(string title) : base(title) { }
-
         public override Field CreateField()
         {
             return new ImageField();

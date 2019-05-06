@@ -1,42 +1,15 @@
-﻿using BrandUp.Pages.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
+﻿using BrandUp.Pages;
 
 namespace LandingWebSite.Pages
 {
-    public class IndexModel : AppPageModel
+    public class IndexModel : ContentPageModel, IAppPageModel
     {
-        private readonly IPageService pageService;
-        private IPage page;
+        #region IAppPageModel members
 
-        public IndexModel(IPageService pageService)
-        {
-            this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-        }
-
-        #region AppPageModel members
-
-        public override string Title => page.Title;
-        public override string Description => null;
-        public override string Keywords => null;
+        public string Title => PageEntry.Title;
+        public string Description => null;
+        public string Keywords => null;
 
         #endregion
-
-        public async Task<IActionResult> OnGetAsync()
-        {
-            var routeData = RouteData;
-
-            var pagePath = string.Empty;
-            if (routeData.Values.TryGetValue("url", out object urlValue))
-                pagePath = (string)urlValue;
-            pagePath = pagePath.Trim(new char[] { '/' });
-
-            page = await pageService.FindPageByPathAsync(pagePath);
-            if (page == null)
-                return NotFound();
-
-            return Page();
-        }
     }
 }

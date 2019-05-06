@@ -7,8 +7,6 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ContentValueAttribute : FieldAttribute
     {
-        public ContentValueAttribute(string title) : base(title) { }
-
         public override Field CreateField()
         {
             return new ContentValueField();

@@ -11,7 +11,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         public DateTime CreatedDate { get; set; }
         public Guid PageId { get; set; }
         public string ContentManagerId { get; set; }
-        public int ContentVersion { get; set; }
     }
 
     [BrandUp.MongoDB.Document]
@@ -22,6 +21,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         [BsonRequired]
         public string ContentManagerId { get; set; }
         [BsonRequired]
-        public PageContentDocument Content { get; set; }
+        public BsonDocument Content { get; set; }
     }
 }

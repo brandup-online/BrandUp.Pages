@@ -20,8 +20,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Id = it.Id,
                 CreatedDate = it.CreatedDate,
                 PageId = it.PageId,
-                ContentManagerId = it.ContentManagerId,
-                ContentVersion = it.Content.Version
+                ContentManagerId = it.ContentManagerId
             };
         }
 
@@ -29,18 +28,20 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<IPageEditSession> CreateEditSessionAsync(Guid pageId, string contentManagerId, PageContent content)
         {
+            var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
+
             var document = new PageEditSessionDocument
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
                 PageId = pageId,
                 ContentManagerId = contentManagerId,
-                Content = new PageContentDocument { Version = 1, Data = new BsonDocument(content.Data) }
+                Content = contentDataDocument
             };
 
             await AddAsync(document);
 
-            return new PageEditSession { Id = document.Id, PageId = document.PageId, ContentManagerId = document.ContentManagerId, ContentVersion = document.Content.Version };
+            return new PageEditSession { Id = document.Id, PageId = document.PageId, ContentManagerId = document.ContentManagerId };
         }
 
         public async Task<IPageEditSession> FindEditSessionByIdAsync(Guid id)
@@ -53,18 +54,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<PageContent> GetContentAsync(Guid sessionId)
         {
-            var p = Builders<PageEditSessionDocument>.Projection
-                .Include("content.version")
-                .Include("content.data");
+            var document = await (await mongoCollection.FindAsync(it => it.Id == sessionId)).FirstOrDefaultAsync();
+            if (document == null)
+                return null;
 
-            var c = await mongoCollection.Find(Builders<PageEditSessionDocument>.Filter.Eq("Id", sessionId))
-                .Project(p).ToCursorAsync();
-
-            var doc = c.FirstOrDefault();
-            var version = doc.GetElement("content").Value.AsBsonDocument.GetElement("version").Value.AsInt32;
-            var dataDoc = doc.GetElement("content").Value.AsBsonDocument.GetElement("data").Value.AsBsonDocument;
-
-            return new PageContent(version, MongoDbHelper.BsonDocumentToDictionary(dataDoc));
+            return new PageContent(1, MongoDbHelper.BsonDocumentToDictionary(document.Content));
         }
 
         public async Task SetContentAsync(Guid sessionId, PageContent content)
@@ -73,9 +67,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 throw new ArgumentNullException(nameof(content));
 
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
-            var updateDefinition = Builders<PageEditSessionDocument>.Update.Set("content.data", contentDataDocument);
+            var updateDefinition = Builders<PageEditSessionDocument>.Update.Set(it => it.Content, contentDataDocument);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(Builders<PageEditSessionDocument>.Filter.Eq("Id", sessionId), updateDefinition);
+            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == sessionId, updateDefinition);
 
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();

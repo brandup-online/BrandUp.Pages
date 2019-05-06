@@ -1,12 +1,9 @@
 ﻿namespace LandingWebSite.Pages
 {
-    public class SignInModel : AppPageModel
+    public class SignInModel : IAppPageModel
     {
-        public override string Title => "Sign in";
-
-        public void OnGet()
-        {
-
-        }
+        public string Title => "Sign in";
+        public string Description => null;
+        public string Keywords => null;
     }
 }

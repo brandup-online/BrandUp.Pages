@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Builder;
+﻿using BrandUp.Pages;
+using BrandUp.Pages.Builder;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection

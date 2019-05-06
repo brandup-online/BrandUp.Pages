@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,11 +12,13 @@ namespace BrandUp.Pages.Controllers
     {
         private readonly IPageCollectionService pageCollectionService;
         private readonly IPageService pageService;
+        private readonly LinkGenerator linkGenerator;
 
-        public PageController(IPageCollectionService pageCollectionService, IPageService pageService)
+        public PageController(IPageCollectionService pageCollectionService, IPageService pageService, LinkGenerator linkGenerator)
         {
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
         }
 
         #region Action methods
@@ -93,16 +96,33 @@ namespace BrandUp.Pages.Controllers
 
         #region Helper methods
 
-        private static Models.PageModel GetItemModel(IPage page)
+        private Models.PageModel GetItemModel(IPage page)
         {
+            string pageUrl;
+
+            if (page.UrlPath == null)
+                pageUrl = linkGenerator.GetUriByPage(HttpContext, "/Index", null, new { pageId = page.Id.ToString().ToLower() });
+            else
+            {
+                var urlPath = page.UrlPath.ToLower();
+                if (urlPath.EndsWith("index"))
+                    urlPath = urlPath.Substring(0, urlPath.Length - "index".Length);
+
+                urlPath = urlPath.Trim(new char[] { '/' });
+
+                pageUrl = linkGenerator.GetUriByPage(HttpContext, "/Index", null, new { url = urlPath });
+            }
+
             return new Models.PageModel
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
-                Title = page.Title
+                Title = page.Title,
+                Status = page.UrlPath != null ? Models.PageStatus.Published : Models.PageStatus.Draft,
+                Url = pageUrl
             };
         }
-        private IActionResult WithResult(BrandUp.Pages.Result result)
+        private IActionResult WithResult(Result result)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));

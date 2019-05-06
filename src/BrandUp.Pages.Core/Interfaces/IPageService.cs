@@ -27,7 +27,6 @@ namespace BrandUp.Pages.Interfaces
         Guid OwnCollectionId { get; }
         string Title { get; }
         string UrlPath { get; }
-        int ContentVersion { get; }
     }
 
     public enum PageSortMode

@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Services
             var pageMetadata = await pageRepositiry.GetPageTypeAsync(page);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentData);
 
-            return await editSessionRepository.CreateEditSessionAsync(page.Id, "test", new PageContent(page.ContentVersion, pageData));
+            return await editSessionRepository.CreateEditSessionAsync(page.Id, "test", new PageContent(1, pageData));
         }
 
         public Task<IPageEditSession> FindEditSessionById(Guid id)

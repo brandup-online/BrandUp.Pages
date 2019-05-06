@@ -19,7 +19,6 @@ namespace BrandUp.Pages.Interfaces
         DateTime CreatedDate { get; }
         Guid PageId { get; }
         string ContentManagerId { get; }
-        int ContentVersion { get; }
     }
 
     public interface IPageEditSessionRepository

@@ -36,9 +36,4 @@ namespace BrandUp.Pages.Builder
             services.AddTransient<IPageUrlManager, Url.PageUrlManager>();
         }
     }
-
-    public class PagesOptions
-    {
-
-    }
 }

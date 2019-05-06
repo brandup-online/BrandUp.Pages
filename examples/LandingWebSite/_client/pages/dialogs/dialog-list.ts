@@ -1,5 +1,6 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
 import { ajaxRequest, DOM } from "brandup-ui";
+import "./dialog-list.less";
 
 export abstract class ListDialog<TItem> extends Dialog<any> {
     private __itemsElem: HTMLElement;
@@ -50,30 +51,30 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
             }
         });
     }
-    protected registerItemCommand(name: string, execute: (itemId: string, commandElem: HTMLElement) => void, canExecute?: (itemId: string, commandElem: HTMLElement) => boolean) {
+    protected registerItemCommand(name: string, execute: (itemId: string, model: any, commandElem: HTMLElement) => void, canExecute?: (itemId: string, model: any, commandElem: HTMLElement) => boolean) {
         this.registerCommand(name, (elem: HTMLElement) => {
-            let itemId = this._findItemIdFromElement(elem);
-            if (itemId === null)
+            let item = this._findItemIdFromElement(elem);
+            if (item === null)
                 return;
 
-            execute(itemId, elem);
+            execute(item.id, item.model, elem);
         }, (elem: HTMLElement) => {
             if (!canExecute)
                 return true;
             
-            let itemId = this._findItemIdFromElement(elem);
-            if (itemId === null)
+            let item = this._findItemIdFromElement(elem);
+            if (item === null)
                 return false;
 
-            return canExecute(itemId, elem);
+            return canExecute(item.id, item.model, elem);
         });
     }
-    protected _findItemIdFromElement(elem: HTMLElement): string {
+    protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {
         let itemElem = elem.closest(".item[data-id]");
         if (!itemElem)
             return null;
 
-        return itemElem.getAttribute("data-id");
+        return { id: itemElem.getAttribute("data-id"), model: itemElem["_model_"] };
     }
     
     private __renderItems(items: Array<TItem>) {
@@ -84,6 +85,8 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
                 let item = items[i];
                 let itemId = this._getItemId(item);
                 let itemElem = DOM.tag("div", { class: "item", "data-id": itemId });
+
+                itemElem["_model_"] = item;
 
                 this.__renderItem(itemId, item, itemElem);
 

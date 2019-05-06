@@ -30,7 +30,9 @@ define(["require", "exports", "brandup-ui", "./dialogs/page-collection-list", ".
         };
         BrandUpPages.prototype.__renderToolbars = function () {
             var toolbarElem = brandup_ui_1.DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
-                brandup_ui_1.DOM.tag("button", { class: "brandup-pages-toolbar-button list", "data-command": "brandup-pages-collections" })
+                brandup_ui_1.DOM.tag("button", { class: "brandup-pages-toolbar-button list", "data-command": "brandup-pages-collections" }),
+                brandup_ui_1.DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }),
+                brandup_ui_1.DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" })
             ]);
             document.body.appendChild(toolbarElem);
             this.setElement(toolbarElem);

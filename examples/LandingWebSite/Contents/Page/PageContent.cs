@@ -3,10 +3,10 @@ using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents
 {
-    [PageContentModel(Name = "Page")]
-    public class PageContentModel
+    [PageContent]
+    public class PageContent
     {
-        [Text("Header"), PageTitle]
+        [Text, PageTitle]
         public string Header { get; set; }
     }
 }

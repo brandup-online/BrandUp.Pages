@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace LandingWebSite.Pages
+﻿namespace LandingWebSite.Pages
 {
-    public abstract class AppPageModel : PageModel
+    public interface IAppPageModel
     {
-        public abstract string Title { get; }
-        public virtual string Description { get; }
-        public virtual string Keywords { get; }
+        string Title { get; }
+        string Description { get; }
+        string Keywords { get; }
     }
 }

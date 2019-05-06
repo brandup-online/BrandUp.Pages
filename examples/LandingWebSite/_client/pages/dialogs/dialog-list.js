@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-define(["require", "exports", "./dialog", "brandup-ui"], function (require, exports, dialog_1, brandup_ui_1) {
+define(["require", "exports", "./dialog", "brandup-ui", "./dialog-list.less"], function (require, exports, dialog_1, brandup_ui_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListDialog = /** @class */ (function (_super) {
@@ -58,24 +58,24 @@ define(["require", "exports", "./dialog", "brandup-ui"], function (require, expo
         ListDialog.prototype.registerItemCommand = function (name, execute, canExecute) {
             var _this = this;
             this.registerCommand(name, function (elem) {
-                var itemId = _this._findItemIdFromElement(elem);
-                if (itemId === null)
+                var item = _this._findItemIdFromElement(elem);
+                if (item === null)
                     return;
-                execute(itemId, elem);
+                execute(item.id, item.model, elem);
             }, function (elem) {
                 if (!canExecute)
                     return true;
-                var itemId = _this._findItemIdFromElement(elem);
-                if (itemId === null)
+                var item = _this._findItemIdFromElement(elem);
+                if (item === null)
                     return false;
-                return canExecute(itemId, elem);
+                return canExecute(item.id, item.model, elem);
             });
         };
         ListDialog.prototype._findItemIdFromElement = function (elem) {
             var itemElem = elem.closest(".item[data-id]");
             if (!itemElem)
                 return null;
-            return itemElem.getAttribute("data-id");
+            return { id: itemElem.getAttribute("data-id"), model: itemElem["_model_"] };
         };
         ListDialog.prototype.__renderItems = function (items) {
             var fragment = document.createDocumentFragment();
@@ -84,6 +84,7 @@ define(["require", "exports", "./dialog", "brandup-ui"], function (require, expo
                     var item = items[i];
                     var itemId = this._getItemId(item);
                     var itemElem = brandup_ui_1.DOM.tag("div", { class: "item", "data-id": itemId });
+                    itemElem["_model_"] = item;
                     this.__renderItem(itemId, item, itemElem);
                     fragment.appendChild(itemElem);
                 }
