@@ -64,7 +64,7 @@ namespace BrandUp.Pages.Controllers
 
             try
             {
-                var page = await pageService.CreatePageAsync(collection, requestModel.PageType);
+                var page = await pageService.CreatePageAsync(collection, requestModel.PageType, requestModel.Title);
 
                 var model = GetItemModel(page);
 
@@ -82,7 +82,7 @@ namespace BrandUp.Pages.Controllers
         {
             var page = await pageService.FindPageByIdAsync(id);
             if (page == null)
-                return WithResult(BrandUp.Pages.Result.Failed($"Not found page with id \"{id}\"."));
+                return WithResult(Result.Failed($"Not found page with id \"{id}\"."));
 
             var deleteResult = await pageService.DeletePageAsync(page);
 

@@ -122,10 +122,12 @@ namespace BrandUp.Pages.Services
             var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
-            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name, "test");
             Assert.NotNull(page);
-            Assert.Equal(page.OwnCollectionId, pageCollection.Id);
-            Assert.Equal(page.TypeName, pageCollection.PageTypeName);
+            Assert.Equal(pageCollection.Id, page.OwnCollectionId);
+            Assert.Equal(pageCollection.PageTypeName, page.TypeName);
+            Assert.Equal("test", page.Title);
+            Assert.Null(page.UrlPath);
         }
     }
 }

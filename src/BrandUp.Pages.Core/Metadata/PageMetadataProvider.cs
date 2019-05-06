@@ -47,14 +47,17 @@ namespace BrandUp.Pages.Metadata
         {
             var model = ContentMetadata.CreateModelInstance();
 
-            if (title == null)
-                title = GetPageTitle(model);
-
             if (string.IsNullOrEmpty(title))
             {
-                title = "New page";
-                titleField.SetModelValue(model, title);
+                title = GetPageTitle(model);
+
+                if (string.IsNullOrEmpty(title))
+                    title = "New page";
+
+                SetPageTitle(model, title);
             }
+            else
+                SetPageTitle(model, title);
 
             return model;
         }
@@ -64,6 +67,15 @@ namespace BrandUp.Pages.Metadata
                 throw new ArgumentNullException(nameof(pageModel));
 
             return (string)titleField.GetModelValue(pageModel);
+        }
+        public void SetPageTitle(object pageModel, string title)
+        {
+            if (pageModel == null)
+                throw new ArgumentNullException(nameof(pageModel));
+            if (string.IsNullOrEmpty(title))
+                throw new ArgumentException();
+
+            titleField.SetModelValue(pageModel, title);
         }
         public bool IsInheritedOf(PageMetadataProvider baseMetadataProvider)
         {
