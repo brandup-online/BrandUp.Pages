@@ -24,9 +24,9 @@ namespace BrandUp.Pages.Data.Repositories
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
-        public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, IDictionary<string, object> contentData)
+        public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData)
         {
-            var page = new Page(Guid.NewGuid(), typeName, ownCollectionId);
+            var page = new Page(Guid.NewGuid(), typeName, ownCollectionId) { Title = title };
 
             pageIndex++;
             var index = pageIndex;
@@ -143,6 +143,7 @@ namespace BrandUp.Pages.Data.Repositories
             public string TypeName { get; }
             public Guid OwnCollectionId { get; }
             public string UrlPath { get; set; }
+            public string Title { get; set; }
             public int ContentVersion { get; set; } = 1;
 
             public Page(Guid id, string typeName, Guid collectionId)
