@@ -18,6 +18,7 @@ namespace BrandUp.Pages.Interfaces
         Task<Result> PublishPageAsync(IPage page, string urlPath);
         Task<Result> DeletePageAsync(IPage page);
         Task<bool> IsPublishedAsync(IPage page);
+        Task<Guid?> GetParentPageIdAsync(IPage page);
     }
 
     public interface IPage

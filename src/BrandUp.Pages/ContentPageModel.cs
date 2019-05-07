@@ -77,10 +77,10 @@ namespace BrandUp.Pages
         {
             var isPublished = await PageService.IsPublishedAsync(page);
 
-            var model = new Models.PageModel
+            var model = new Models.PageNavigationModel
             {
                 Id = page.Id,
-                CreatedDate = page.CreatedDate,
+                ParentPageId = await PageService.GetParentPageIdAsync(page),
                 Title = page.Title,
                 Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
                 Url = await pageLinkGenerator.GetPageUrl(page)

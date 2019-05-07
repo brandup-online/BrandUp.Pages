@@ -4,14 +4,14 @@ import { listPageCollection } from "./dialogs/page-collection-list";
 import { publishPage } from "./dialogs/page-publish";
 
 class BrandUpPages extends UIElement {
-    private __pageModel: PageModel;
+    private __pageModel: PageNavigationModel;
 
     get typeName(): string { return "BrandUpPages.Toolbar"; }
 
     load() {
         ajaxRequest({
             urlParams: { handler: "navigate" },
-            success: (data: PageModel, status: number) => {
+            success: (data: PageNavigationModel, status: number) => {
                 if (status !== 200)
                     throw "";
 
@@ -36,7 +36,7 @@ class BrandUpPages extends UIElement {
 
     private __registerCommands() {
         this.registerCommand("brandup-pages-collections", () => {
-            listPageCollection(null);
+            listPageCollection(this.__pageModel.parentPageId);
         });
 
         this.registerCommand("brandup-pages-publish", () => {

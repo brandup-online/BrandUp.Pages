@@ -172,5 +172,13 @@ namespace BrandUp.Pages.Services
 
             return Task.FromResult(page.UrlPath != null);
         }
+        public async Task<Guid?> GetParentPageIdAsync(IPage page)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
+            return pageCollection.PageId;
+        }
     }
 }

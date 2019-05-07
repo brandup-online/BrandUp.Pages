@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace BrandUp.Pages.Models
 {
@@ -20,11 +19,13 @@ namespace BrandUp.Pages.Models
         Published
     }
 
-    public class PageCreateModel
+    public class PageNavigationModel
     {
-        [Required]
-        public string PageType { get; set; }
-        [Required(AllowEmptyStrings = false), MaxLength(255)]
+        public Guid Id { get; set; }
+        public Guid? ParentPageId { get; set; }
         public string Title { get; set; }
+        [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public PageStatus Status { get; set; }
+        public string Url { get; set; }
     }
 }

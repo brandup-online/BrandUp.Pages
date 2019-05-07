@@ -24,3 +24,11 @@ interface Result {
     succeeded: boolean;
     errors: Array<string>;
 }
+
+interface PageNavigationModel {
+    id: string;
+    parentPageId: string;
+    title: string;
+    status: "Draft" | "Published";
+    url: string;
+}
