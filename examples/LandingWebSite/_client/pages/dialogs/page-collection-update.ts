@@ -1,8 +1,7 @@
 ﻿import { DialogOptions } from "./dialog";
-import { FormDialog } from "./dialog-form";
-import { AJAXMethod, ajaxRequest } from "brandup-ui";
+import { FormDialog, FormModel, ComboBoxItem } from "./dialog-form2";
 
-export class PageCollectionUpdateDialog extends FormDialog<any> {
+export class PageCollectionUpdateDialog extends FormDialog<PageCollectionUpdateForm, PageCollectionUpdateValues, PageCollectionModel> {
     readonly collectionId: string;
 
     constructor(collectionId: string, options?: DialogOptions) {
@@ -17,29 +16,24 @@ export class PageCollectionUpdateDialog extends FormDialog<any> {
         return "Сохранить";
     }
     protected _buildUrl(): string {
-        return `/brandup.pages/collection/${this.collectionId}`;
+        return `/brandup.pages/collection/${this.collectionId}/update`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
-    }
-    protected _getMethod(): AJAXMethod {
-        return "POST";
-    }
-    protected _buildForm() {
+    protected _buildForm(model: PageCollectionUpdateForm) {
         this.setHeader("Параметры коллекции страниц");
 
-        ajaxRequest({
-            url: `/brandup.pages/collection/${this.collectionId}`,
-            success: (data: PageCollectionModel, status: number) => {
-                if (status !== 200) {
-                    this.setError("Ошибка загрузки.");
-                    return;
-                }
-
-                this.addTextBox("Title", "Название", { placeholder: "Введите название коллекции" }, data.title);
-                this.addComboBox("Sort", "Сортировка страниц", { placeholder: "Выберите порядок сортировки" }, [{ value: "FirstOld", title: "Сначало старые" }, { value: "FirstNew", title: "Сначало новые" }], data.sort);
-            }
-        });
+        this.addTextBox("Title", "Название", { placeholder: "Введите название коллекции" });
+        this.addComboBox("Sort", "Сортировка страниц", { placeholder: "Выберите порядок сортировки" }, model.sorts);
     }
+}
+
+interface PageCollectionUpdateForm extends FormModel<PageCollectionUpdateValues> {
+    page: PageModel;
+    sorts: Array<ComboBoxItem>;
+}
+
+interface PageCollectionUpdateValues {
+    title: string;
+    sort: string;
 }
 
 export var updatePageCollection = (collectionId: string) => {

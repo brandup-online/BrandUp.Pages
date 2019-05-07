@@ -39,7 +39,8 @@ interface PageCollectionCreateForm extends FormModel<PageCollectionCreateValues>
 
 interface PageCollectionCreateValues {
     title: string;
-    urlPath: string;
+    pageType: string;
+    sort: string;
 }
 
 export var createPageCollection = (pageId: string) => {

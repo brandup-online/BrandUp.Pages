@@ -64,7 +64,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 .Set(it => it.Title, title)
                 .Set(it => it.SortMode, pageSort);
             var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == id, updateDefinition);
-
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
 
