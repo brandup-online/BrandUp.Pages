@@ -1,4 +1,3 @@
-using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -28,13 +27,7 @@ namespace LandingWebSite
 
             services
                 .AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Latest)
-                .AddRazorPagesOptions(options =>
-                {
-                    options.AllowAreas = false;
-
-                    options.Conventions.AddPageRoute("/Index", "{*url}");
-                });
+                .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             services.Configure<WebEncoderOptions>(options =>
             {
@@ -62,17 +55,9 @@ namespace LandingWebSite
             services.AddPages(options =>
             {
             })
+            .AddRazorContentPage()
             .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-            .AddMongoDb(options =>
-            {
-                var config = Configuration.GetSection("MongoDb").Get<MongoDbOptions>();
-
-                options.ConnectionString = config.ConnectionString;
-                options.DatabaseName = config.DatabaseName;
-
-                options.UseCamelCaseElementName();
-                options.UseIgnoreIfNull(false);
-            });
+            .AddMongoDb(Configuration.GetSection("MongoDb"));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -96,11 +81,5 @@ namespace LandingWebSite
 
             app.UseMvc();
         }
-    }
-
-    public class MongoDbOptions
-    {
-        public string ConnectionString { get; set; }
-        public string DatabaseName { get; set; }
     }
 }

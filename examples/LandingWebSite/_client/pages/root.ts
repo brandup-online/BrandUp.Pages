@@ -1,13 +1,26 @@
 ﻿import "./styles.less";
-import { DOM, UIElement } from "brandup-ui";
+import { DOM, UIElement, ajaxRequest } from "brandup-ui";
 import { listPageCollection } from "./dialogs/page-collection-list";
+import { publishPage } from "./dialogs/page-publish";
 
 class BrandUpPages extends UIElement {
+    private __pageModel: PageModel;
+
     get typeName(): string { return "BrandUpPages.Toolbar"; }
 
     load() {
-        this.__renderToolbars();
-        this.__registerCommands();
+        ajaxRequest({
+            urlParams: { handler: "navigate" },
+            success: (data: PageModel, status: number) => {
+                if (status !== 200)
+                    throw "";
+
+                this.__pageModel = data;
+
+                this.__renderToolbars();
+                this.__registerCommands();
+            }
+        });
     }
 
     private __renderToolbars() {
@@ -24,6 +37,12 @@ class BrandUpPages extends UIElement {
     private __registerCommands() {
         this.registerCommand("brandup-pages-collections", () => {
             listPageCollection(null);
+        });
+
+        this.registerCommand("brandup-pages-publish", () => {
+            publishPage(this.__pageModel.id).then(result => {
+                location.href = result.url;
+            });
         });
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -12,13 +13,13 @@ namespace BrandUp.Pages.Controllers
     {
         private readonly IPageCollectionService pageCollectionService;
         private readonly IPageService pageService;
-        private readonly LinkGenerator linkGenerator;
+        private readonly IPageLinkGenerator pageLinkGenerator;
 
-        public PageController(IPageCollectionService pageCollectionService, IPageService pageService, LinkGenerator linkGenerator)
+        public PageController(IPageCollectionService pageCollectionService, IPageService pageService, IPageLinkGenerator pageLinkGenerator)
         {
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
+            this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
         }
 
         #region Action methods
@@ -30,7 +31,7 @@ namespace BrandUp.Pages.Controllers
             if (page == null)
                 return NotFound();
 
-            var model = GetItemModel(page);
+            var model = await GetItemModelAsync(page);
 
             return Ok(model);
         }
@@ -46,11 +47,7 @@ namespace BrandUp.Pages.Controllers
 
             var pages = await pageService.GetPagesAsync(collection, new PagePaginationOptions(0, 20));
             foreach (var page in pages)
-            {
-                var model = GetItemModel(page);
-
-                result.Add(model);
-            }
+                result.Add(await GetItemModelAsync(page));
 
             return Ok(result);
         }
@@ -58,18 +55,18 @@ namespace BrandUp.Pages.Controllers
         [HttpPut, Route("brandup.pages/page", Name = "BrandUp.Pages.Page.Create")]
         public async Task<IActionResult> CreateAsync([FromQuery]Guid collectionId, [FromBody]Models.PageCreateModel requestModel)
         {
+            if (!TryValidateModel(requestModel))
+                return BadRequest(ModelState);
+
             var collection = await pageCollectionService.FindCollectiondByIdAsync(collectionId);
             if (collection == null)
                 return BadRequest();
-
-            if (!TryValidateModel(requestModel))
-                return BadRequest(ModelState);
 
             try
             {
                 var page = await pageService.CreatePageAsync(collection, requestModel.PageType, requestModel.Title);
 
-                var model = GetItemModel(page);
+                var model = await GetItemModelAsync(page);
 
                 return Created(string.Empty, model);
             }
@@ -80,6 +77,7 @@ namespace BrandUp.Pages.Controllers
                 return BadRequest(ModelState);
             }
         }
+
         [HttpDelete, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Delete")]
         public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
         {
@@ -96,30 +94,17 @@ namespace BrandUp.Pages.Controllers
 
         #region Helper methods
 
-        private Models.PageModel GetItemModel(IPage page)
+        private async Task<Models.PageModel> GetItemModelAsync(IPage page)
         {
-            string pageUrl;
-
-            if (page.UrlPath == null)
-                pageUrl = linkGenerator.GetUriByPage(HttpContext, "/Index", null, new { pageId = page.Id.ToString().ToLower() });
-            else
-            {
-                var urlPath = page.UrlPath.ToLower();
-                if (urlPath.EndsWith("index"))
-                    urlPath = urlPath.Substring(0, urlPath.Length - "index".Length);
-
-                urlPath = urlPath.Trim(new char[] { '/' });
-
-                pageUrl = linkGenerator.GetUriByPage(HttpContext, "/Index", null, new { url = urlPath });
-            }
+            var isPublished = await pageService.IsPublishedAsync(page);
 
             return new Models.PageModel
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
                 Title = page.Title,
-                Status = page.UrlPath != null ? Models.PageStatus.Published : Models.PageStatus.Draft,
-                Url = pageUrl
+                Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
+                Url = await pageLinkGenerator.GetPageUrl(page)
             };
         }
         private IActionResult WithResult(Result result)

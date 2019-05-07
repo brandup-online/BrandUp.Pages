@@ -11,15 +11,18 @@ namespace BrandUp.Pages.Services
         private readonly IPageRepositiry pageRepositiry;
         private readonly IPageCollectionRepositiry pageCollectionRepositiry;
         private readonly IPageMetadataManager pageMetadataManager;
+        private readonly Url.IPageUrlHelper pageUrlHelper;
 
         public PageService(
             IPageRepositiry pageRepositiry,
             IPageCollectionRepositiry pageCollectionRepositiry,
-            IPageMetadataManager pageMetadataManager)
+            IPageMetadataManager pageMetadataManager,
+            Url.IPageUrlHelper pageUrlHelper)
         {
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
             this.pageCollectionRepositiry = pageCollectionRepositiry ?? throw new ArgumentNullException(nameof(pageCollectionRepositiry));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
+            this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
         }
 
         public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageTitle = null)
@@ -67,7 +70,7 @@ namespace BrandUp.Pages.Services
         }
         public Task<IPage> GetDefaultPageAsync()
         {
-            return pageRepositiry.FindPageByPathAsync("index");
+            return pageRepositiry.FindPageByPathAsync(pageUrlHelper.GetDefaultPagePath());
         }
         public Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination)
         {
@@ -114,33 +117,37 @@ namespace BrandUp.Pages.Services
 
             await pageRepositiry.SetContentAsync(page.Id, new PageContent(1, pageData));
         }
-        public async Task PublishPageAsync(IPage page, string urlPathName)
+        public async Task<Result> PublishPageAsync(IPage page, string urlPath)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
-            if (urlPathName == null)
-                throw new ArgumentNullException(nameof(urlPathName));
-            if (string.IsNullOrWhiteSpace(urlPathName))
-                throw new ArgumentException();
+            if (urlPath == null)
+                throw new ArgumentNullException(nameof(urlPath));
 
-            if (page.UrlPath != null)
-                throw new InvalidOperationException("Страница уже опубликована.");
+            if (await IsPublishedAsync(page))
+                return Result.Failed("Страница уже опубликована.");
+
+            var urlPathValidationResult = pageUrlHelper.ValidateUrlPath(urlPath);
+            if (!urlPathValidationResult.Succeeded)
+                return urlPathValidationResult;
 
             var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
-
-            string urlPath = urlPathName;
             if (collection.PageId.HasValue)
             {
                 var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value);
-                if (parentPage.UrlPath == null)
-                    throw new InvalidOperationException("Нельзя опубликовать страницу, если родительская страница не опубликована.");
-                urlPath = parentPage.UrlPath + "/" + urlPath;
+                if (await IsPublishedAsync(parentPage))
+                    return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
+                urlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);
             }
+            else
+                urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
 
             if (await pageRepositiry.FindPageByPathAsync(urlPath) != null)
-                throw new InvalidOperationException("Страница с таким url уже существует.");
+                return Result.Failed("Страница с таким url уже существует.");
 
             await pageRepositiry.SetUrlPathAsync(page.Id, urlPath);
+
+            return Result.Success;
         }
         public async Task<Result> DeletePageAsync(IPage page)
         {
@@ -157,6 +164,13 @@ namespace BrandUp.Pages.Services
             {
                 return Result.Failed(ex);
             }
+        }
+        public Task<bool> IsPublishedAsync(IPage page)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            return Task.FromResult(page.UrlPath != null);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BrandUp.MongoDB;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Repositories;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -11,6 +12,13 @@ namespace BrandUp.Pages.Builder
         public static IPagesBuilder AddMongoDb(this IPagesBuilder builder, Action<IMongoDbContextBuilder> options)
         {
             builder.Services.AddMongoDbContext<MongoDb.PagesDbContext>(options);
+
+            return AddMongoDb<MongoDb.PagesDbContext>(builder);
+        }
+
+        public static IPagesBuilder AddMongoDb(this IPagesBuilder builder, IConfiguration configuration)
+        {
+            builder.Services.AddMongoDbContext<MongoDb.PagesDbContext>(configuration);
 
             return AddMongoDb<MongoDb.PagesDbContext>(builder);
         }

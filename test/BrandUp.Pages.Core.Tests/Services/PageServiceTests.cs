@@ -4,14 +4,13 @@ using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageServiceTests : IDisposable, IAsyncLifetime
+    public class PageServiceTests : IAsyncLifetime
     {
         private ServiceProvider serviceProvider;
         private IServiceScope serviceScope;
@@ -32,12 +31,6 @@ namespace BrandUp.Pages.Services
 
             pageService = serviceScope.ServiceProvider.GetService<IPageService>();
             pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
-        }
-
-        void IDisposable.Dispose()
-        {
-            serviceScope.Dispose();
-            serviceProvider.Dispose();
         }
 
         #region IAsyncLifetime members
@@ -61,13 +54,18 @@ namespace BrandUp.Pages.Services
         }
         Task IAsyncLifetime.DisposeAsync()
         {
+            serviceScope.Dispose();
+            serviceProvider.Dispose();
+
             return Task.CompletedTask;
         }
 
         #endregion
 
+        #region Test methods
+
         [Fact]
-        public async Task FindPageByPath_RootPath()
+        public async Task FindPageByPath_EmptyPath()
         {
             var page = await pageService.FindPageByPathAsync(string.Empty);
 
@@ -117,7 +115,7 @@ namespace BrandUp.Pages.Services
             Assert.Equal(newContent.Title, pageModel.Title);
         }
         [Fact]
-        public async Task CreatePageAsync()
+        public async Task CreatePage()
         {
             var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
@@ -129,5 +127,38 @@ namespace BrandUp.Pages.Services
             Assert.Equal("test", page.Title);
             Assert.Null(page.UrlPath);
         }
+        [Fact]
+        public async Task IsPublished_True()
+        {
+            var page = await pageService.FindPageByPathAsync(string.Empty);
+
+            var result = await pageService.IsPublishedAsync(page);
+
+            Assert.True(result);
+        }
+        [Fact]
+        public async Task IsPublished_False()
+        {
+            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
+
+            var result = await pageService.IsPublishedAsync(page);
+
+            Assert.False(result);
+        }
+        [Fact]
+        public async Task PublishPage()
+        {
+            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
+
+            var publishResult = await pageService.PublishPageAsync(page, "test2");
+
+            Assert.Equal("test2", page.UrlPath);
+        }
+
+        #endregion
     }
 }

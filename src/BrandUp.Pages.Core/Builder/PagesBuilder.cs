@@ -29,11 +29,12 @@ namespace BrandUp.Pages.Builder
 
             services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
 
+            services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
+            services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<FileService>();
             services.AddScoped<IPageEditingService, PageEditingService>();
-            services.AddTransient<IPageUrlManager, Url.PageUrlManager>();
+            services.AddScoped<FileService>();
         }
     }
 }
