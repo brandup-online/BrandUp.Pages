@@ -24,14 +24,18 @@ class BrandUpPages extends UIElement {
     }
 
     private __renderToolbars() {
-        var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
-            DOM.tag("button", { class: "brandup-pages-toolbar-button list", "data-command": "brandup-pages-collections" }),
-            DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }),
-            DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" })
-        ]);
-        document.body.appendChild(toolbarElem);
+        if (this.__pageModel.editId) {
 
-        this.setElement(toolbarElem);
+        }
+        else {
+            var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
+                DOM.tag("button", { class: "brandup-pages-toolbar-button list", "data-command": "brandup-pages-collections" }),
+                DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }),
+                DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" })
+            ]);
+            document.body.appendChild(toolbarElem);
+            this.setElement(toolbarElem);
+        }
     }
 
     private __registerCommands() {
@@ -42,6 +46,16 @@ class BrandUpPages extends UIElement {
         this.registerCommand("brandup-pages-publish", () => {
             publishPage(this.__pageModel.id).then(result => {
                 location.href = result.url;
+            });
+        });
+
+        this.registerCommand("brandup-pages-edit", () => {
+            ajaxRequest({
+                url: `/brandup.pages/page/${this.__pageModel.id}/edit`,
+                method: "POST",
+                success: (data: string, status: number) => {
+                    location.href = data;
+                }
             });
         });
     }

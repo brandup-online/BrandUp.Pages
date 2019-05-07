@@ -5,6 +5,7 @@ namespace BrandUp.Pages.Url
 {
     public interface IPageLinkGenerator
     {
-        Task<string> GetPageUrl(IPage page);
+        Task<string> GetUrlAsync(IPage page);
+        Task<string> GetUrlAsync(IPageEditSession pageEditSession);
     }
 }

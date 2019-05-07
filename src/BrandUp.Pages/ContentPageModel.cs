@@ -12,6 +12,7 @@ namespace BrandUp.Pages
     public class ContentPageModel : PageModel
     {
         private IPage page;
+        private IPageEditSession editSession;
 
         public IPageService PageService { get; private set; }
         public IPage PageEntry => page;
@@ -40,7 +41,31 @@ namespace BrandUp.Pages
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 
-                    context.Result = RedirectPermanent(await pageLinkGenerator.GetPageUrl(page));
+                    context.Result = RedirectPermanent(await pageLinkGenerator.GetUrlAsync(page));
+                    return;
+                }
+            }
+            else if (Request.Query.TryGetValue("editId", out string editIdValue))
+            {
+                if (!Guid.TryParse(editIdValue, out Guid editId))
+                {
+                    context.Result = BadRequest();
+                    return;
+                }
+
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
+
+                editSession = await pageEditingService.FindEditSessionById(editId);
+                if (editSession == null)
+                {
+                    context.Result = NotFound();
+                    return;
+                }
+
+                page = await PageService.FindPageByIdAsync(editSession.PageId);
+                if (page == null)
+                {
+                    context.Result = NotFound();
                     return;
                 }
             }
@@ -66,7 +91,13 @@ namespace BrandUp.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            PageContent = await PageService.GetPageContentAsync(page);
+            if (editSession != null)
+            {
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
+                PageContent = await pageEditingService.GetContentAsync(editSession);
+            }
+            else
+                PageContent = await PageService.GetPageContentAsync(page);
             if (PageContent == null)
                 throw new InvalidOperationException();
 
@@ -83,7 +114,8 @@ namespace BrandUp.Pages
                 ParentPageId = await PageService.GetParentPageIdAsync(page),
                 Title = page.Title,
                 Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
-                Url = await pageLinkGenerator.GetPageUrl(page)
+                Url = await pageLinkGenerator.GetUrlAsync(page),
+                EditId = editSession?.Id
             };
 
             return new OkObjectResult(model);

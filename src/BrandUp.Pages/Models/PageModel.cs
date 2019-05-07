@@ -27,5 +27,6 @@ namespace BrandUp.Pages.Models
         [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public PageStatus Status { get; set; }
         public string Url { get; set; }
+        public Guid? EditId { get; set; }
     }
 }

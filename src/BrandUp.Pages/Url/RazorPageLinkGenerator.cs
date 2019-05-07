@@ -22,8 +22,11 @@ namespace BrandUp.Pages.Url
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
         }
 
-        public Task<string> GetPageUrl(IPage page)
+        public Task<string> GetUrlAsync(IPage page)
         {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
             string pageUrl;
             var httpContext = httpContextAccessor.HttpContext;
 
@@ -41,6 +44,16 @@ namespace BrandUp.Pages.Url
             }
 
             return Task.FromResult(pageUrl);
+        }
+
+        public Task<string> GetUrlAsync(IPageEditSession pageEditSession)
+        {
+            if (pageEditSession == null)
+                throw new ArgumentNullException(nameof(pageEditSession));
+
+            var url = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, options.RazorPagePath, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+
+            return Task.FromResult(url);
         }
     }
 }

@@ -95,7 +95,7 @@ namespace BrandUp.Pages.Controllers
                 CreatedDate = page.CreatedDate,
                 Title = page.Title,
                 Status = isPublished ? PageStatus.Published : PageStatus.Draft,
-                Url = await pageLinkGenerator.GetPageUrl(page)
+                Url = await pageLinkGenerator.GetUrlAsync(page)
             };
         }
         private PageCollectionModel GetPageCollectionModel(IPageCollection pageCollection)

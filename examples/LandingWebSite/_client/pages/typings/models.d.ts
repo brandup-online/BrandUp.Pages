@@ -31,4 +31,5 @@ interface PageNavigationModel {
     title: string;
     status: "Draft" | "Published";
     url: string;
+    editId: string;
 }

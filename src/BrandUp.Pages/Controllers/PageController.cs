@@ -64,6 +64,18 @@ namespace BrandUp.Pages.Controllers
             return WithResult(deleteResult);
         }
 
+        [HttpPost, Route("brandup.pages/page/{id}/edit", Name = "BrandUp.Pages.Page.Edit")]
+        public async Task<IActionResult> EditAsync([FromRoute]Guid id, [FromServices]IPageEditingService pageEditingService)
+        {
+            var page = await pageService.FindPageByIdAsync(id);
+            if (page == null)
+                return WithResult(Result.Failed($"Not found page with id \"{id}\"."));
+
+            var editSession = await pageEditingService.BeginEditAsync(page);
+
+            return Ok(await pageLinkGenerator.GetUrlAsync(editSession));
+        }
+
         #endregion
 
         #region Helper methods
@@ -78,7 +90,7 @@ namespace BrandUp.Pages.Controllers
                 CreatedDate = page.CreatedDate,
                 Title = page.Title,
                 Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
-                Url = await pageLinkGenerator.GetPageUrl(page)
+                Url = await pageLinkGenerator.GetUrlAsync(page)
             };
         }
         private IActionResult WithResult(Result result)
