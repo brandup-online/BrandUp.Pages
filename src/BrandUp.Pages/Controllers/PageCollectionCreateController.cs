@@ -35,9 +35,9 @@ namespace BrandUp.Pages.Controllers
 
         protected override async Task OnInitializeAsync()
         {
-            if (RouteData.Values.TryGetValue("pageId", out object pageIdValue))
+            if (Request.Query.TryGetValue("pageId", out string pageIdValue))
             {
-                if (!Guid.TryParse(pageIdValue.ToString(), out Guid pageId))
+                if (!Guid.TryParse(pageIdValue, out Guid pageId))
                 {
                     AddErrors("Not valid id.");
                     return;

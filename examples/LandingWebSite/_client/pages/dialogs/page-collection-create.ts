@@ -1,4 +1,4 @@
-﻿import { FormModel, FormDialog, ComboBoxItem } from "./dialog-form2";
+﻿import { FormModel, FormDialog, ComboBoxItem } from "./dialog-form";
 import { DialogOptions } from "./dialog";
 
 export class PageCollectionCreateDialog extends FormDialog<PageCollectionCreateForm, PageCollectionCreateValues, PageCollectionModel> {

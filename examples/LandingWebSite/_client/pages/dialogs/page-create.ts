@@ -1,8 +1,7 @@
-﻿import { FormDialog } from "./dialog-form";
-import { AJAXMethod } from "brandup-ui";
-import { DialogOptions } from "./dialog";
+﻿import { DialogOptions } from "./dialog";
+import { FormDialog, FormModel, ComboBoxItem } from "./dialog-form";
 
-export class PageCreateDialog extends FormDialog<PageModel> {
+export class PageCreateDialog extends FormDialog<PageCreateForm, PageCreateValues, PageModel> {
     readonly collectionId: string;
 
     constructor(collectionId: string, options?: DialogOptions) {
@@ -16,20 +15,27 @@ export class PageCreateDialog extends FormDialog<PageModel> {
         return "Создать";
     }
     protected _buildUrl(): string {
-        return `/brandup.pages/page`;
+        return `/brandup.pages/page/create`;
     }
     protected _buildUrlParams(urlParams: { [key: string]: string; }) {
         urlParams["collectionId"] = this.collectionId;
     }
-    protected _getMethod(): AJAXMethod {
-        return "PUT";
-    }
-    protected _buildForm() {
+    protected _buildForm(model: PageCreateForm) {
         this.setHeader("Параметры новой страницы");
 
-        this.addTextBox("Title", "Название", { placeholder: "Введите название новой страницы" }, null);
-        this.addComboBox2<PageTypeModel>("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, null, `/brandup.pages/collection/${this.collectionId}/pageTypes`, (item: PageTypeModel) => { return { value: item.name, title: item.title } });
+        this.addTextBox("Title", "Название", { placeholder: "Введите название новой страницы" });
+        this.addComboBox("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, model.pageTypes);
     }
+}
+
+interface PageCreateForm extends FormModel<PageCreateValues> {
+    page: PageModel;
+    pageTypes: Array<ComboBoxItem>;
+}
+
+interface PageCreateValues {
+    title: string;
+    urlPath: string;
 }
 
 export var createPage = (collectionId: string) => {

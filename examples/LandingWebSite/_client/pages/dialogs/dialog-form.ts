@@ -1,18 +1,24 @@
-﻿import { Dialog } from "./dialog";
-import { UIControl, DOM, ajaxRequest, AJAXMethod } from "brandup-ui";
+﻿import { Dialog, DialogOptions } from "./dialog";
+import { UIControl, DOM, ajaxRequest, AjaxQueue } from "brandup-ui";
 
-export abstract class FormDialog<TResult> extends Dialog<TResult> {
+export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
     private __formElem: HTMLFormElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: FormField<any, any> } = {};
-    private __defaultValues: { [key: string]: any } = null;
+    private __model: TForm = null;
+    readonly queue: AjaxQueue;
+
+    constructor(options?: DialogOptions) {
+        super(options);
+
+        this.queue = new AjaxQueue();
+    }
+
+    get model(): TForm { return this.__model; }
 
     protected _onRenderContent() {
         this.element.classList.add("website-dialog-form");
-
-        this.addAction("close", "Отмена", false);
-        this.addAction("save", this._getSaveButtonTitle(), true);
-
+        
         this.content.appendChild(this.__formElem = <HTMLFormElement>DOM.tag("form", { method: "POST" }));
         this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));
 
@@ -23,16 +29,80 @@ export abstract class FormDialog<TResult> extends Dialog<TResult> {
 
             return false;
         });
+        this.__formElem.addEventListener("changed", (e: CustomEvent) => {
+            this.__changeValue(e.detail.field);
+        });
 
         this.registerCommand("save", () => { this.__save(); });
 
-        this._buildForm();
-
-        this._onSetDefaultValues();
+        this.__loadForm();
     }
 
+    private __loadForm() {
+        var urlParams: { [key: string]: string; } = {};
+
+        this._buildUrlParams(urlParams);
+
+        this.setLoading(true);
+
+        this.queue.request({
+            url: this._buildUrl(),
+            urlParams: urlParams,
+            method: "GET",
+            success: (data: any, status: number) => {
+                this.setLoading(false);
+
+                switch (status) {
+                    case 400: {
+                        this.__applyModelState(<ValidationProblemDetails>data);
+                        break;
+                    }
+                    case 200: {
+                        this.__model = <TForm>data;
+                        this._buildForm(this.__model);
+                        this.setValues(this.__model.values);
+
+                        this.addAction("close", "Отмена", false);
+                        this.addAction("save", this._getSaveButtonTitle(), true);
+
+                        break;
+                    }
+                    default:
+                        throw "";
+                }
+            }
+        });
+    }
+    private __changeValue(field: FormField<any, any>) {
+        //var urlParams: { [key: string]: string; } = {
+        //    field: field.name
+        //};
+
+        //this._buildUrlParams(urlParams);
+        
+        //this.queue.request({
+        //    url: this._buildUrl(),
+        //    urlParams: urlParams,
+        //    method: "PUT",
+        //    type: "JSON",
+        //    data: this.getValues(),
+        //    success: (data: any, status: number) => {
+        //        switch (status) {
+        //            case 400: {
+        //                this.__applyModelState(<ValidationProblemDetails>data);
+        //                break;
+        //            }
+        //            case 200: {
+        //                break;
+        //            }
+        //            default:
+        //                throw "";
+        //        }
+        //    }
+        //});
+    }
     private __save() {
-        if (!this.validate() || !this.__defaultValues)
+        if (!this.__model || !this.validate())
             return;
 
         var urlParams: { [key: string]: string; } = {};
@@ -41,10 +111,10 @@ export abstract class FormDialog<TResult> extends Dialog<TResult> {
 
         this.setLoading(true);
 
-        ajaxRequest({
+        this.queue.request({
             url: this._buildUrl(),
             urlParams: urlParams,
-            method: this._getMethod(),
+            method: "POST",
             type: "JSON",
             data: this.getValues(),
             success: (data: any, status: number) => {
@@ -66,21 +136,27 @@ export abstract class FormDialog<TResult> extends Dialog<TResult> {
             }
         });
     }
-
-    private __applyModelState(state: FormModelState) {
-        for (var key in this.__fields) {
-            var field = this.__fields[key];
-            if (state && state.errors && state.errors.hasOwnProperty(key)) {
-                field.setErrors(state.errors[key]);
-            }
-            else
-                field.setErrors(null);
+    private __applyModelState(state: ValidationProblemDetails) {
+        for (let key in this.__fields) {
+            let field = this.__fields[key];
+            field.setErrors(null);
         }
 
+        if (state && state.errors) {
+            for (let key in state.errors) {
+                if (key === "")
+                    continue;
+
+                let field = this.getField(key);
+                field.setErrors(state.errors[key]);
+            }
+        }
+        
         if (state && state.errors && state.errors.hasOwnProperty("")) {
             alert(state.errors[""]);
         }
     }
+
     validate(): boolean {
         return true;
     }
@@ -95,13 +171,7 @@ export abstract class FormDialog<TResult> extends Dialog<TResult> {
 
         return values;
     }
-
-    protected _onSetDefaultValues() {
-        this.setValues({});
-    }
-    protected setValues(values: { [key: string]: any }) {
-        this.__defaultValues = values;
-
+    setValues(values: TValues) {
         for (var key in values) {
             var field = this.getField(key);
             field.setValue(values[key]);
@@ -109,12 +179,12 @@ export abstract class FormDialog<TResult> extends Dialog<TResult> {
     }
 
     protected getField(name: string): FormField<any, any> {
-        if (!this.__fields.hasOwnProperty(name))
+        if (!this.__fields.hasOwnProperty(name.toLowerCase()))
             throw `Field "${name}" not exists.`;
-        return this.__fields[name];
+        return this.__fields[name.toLowerCase()];
     }
     protected addField(title: string, field: FormField<any, any>) {
-        if (this.__fields.hasOwnProperty(field.name))
+        if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
         var containerElem = DOM.tag("div", { class: "form-field" });
@@ -126,52 +196,43 @@ export abstract class FormDialog<TResult> extends Dialog<TResult> {
 
         this.__fieldsElem.appendChild(containerElem);
 
-        this.__fields[field.name] = field;
+        this.__fields[field.name.toLowerCase()] = field;
     }
-    protected addTextBox(name: string, title: string, options: TextFieldOptions, value: any) {
+    protected addTextBox(name: string, title: string, options: TextFieldOptions) {
         var field = new TextField(name, options);
         this.addField(title, field);
-        
-        field.setValue(value);
     }
-    protected addComboBox(name: string, title: string, options: ComboBoxFieldOptions, items: Array<ComboBoxItem>, value: any) {
+    protected addComboBox(name: string, title: string, options: ComboBoxFieldOptions, items: Array<ComboBoxItem>) {
         var field = new ComboBoxField(name, options);
         this.addField(title, field);
 
         field.addItems(items);
-
-        field.setValue(value);
-    }
-    protected addComboBox2<TItem>(name: string, title: string, options: ComboBoxFieldOptions, value: any, url: string, map: (item: TItem) => ComboBoxItem) {
-        var field = new ComboBoxField(name, options);
-        this.addField(title, field);
-
-        ajaxRequest({
-            url: url,
-            success: (data: Array<TItem>, status: number) => {
-                if (status != 200)
-                    throw "";
-
-                for (let i = 0; i < data.length; i++)
-                    field.addItem(map(data[i]));
-
-                field.setValue(value);
-            }
-        });
     }
 
     protected abstract _getSaveButtonTitle(): string;
     protected abstract _buildUrl(): string;
-    protected abstract _buildUrlParams(urlParams: { [key: string]: string; });
-    protected abstract _getMethod(): AJAXMethod;
-    protected abstract _buildForm();
+    protected _buildUrlParams(urlParams: { [key: string]: string; }) { }
+    protected abstract _buildForm(model: TForm);
+
+    destroy() {
+        this.queue.destroy();
+
+        super.destroy();
+    }
 }
 
-interface FormModelState {
-    errors: { [key: string]: Array<string> };
+export interface FormModel<TValues> {
+    values: TValues;
+}
+
+interface ValidationProblemDetails {
+    type: string;
     title: string;
     status: number;
+    detail: string;
     traceId: string;
+    instance: string;
+    errors: { [key: string]: Array<string> };
 }
 
 abstract class FormField<TValue, TOptions> extends UIControl<TOptions> {
@@ -186,6 +247,15 @@ abstract class FormField<TValue, TOptions> extends UIControl<TOptions> {
 
     protected _onRender() {
         this.element.classList.add("field");
+
+        this.__createEvent("changed", { bubbles: true, cancelable: false });
+    }
+
+    protected raiseChanged() {
+        this.__raiseEvent("changed", {
+            field: this,
+            value: this.getValue()
+        });
     }
 
     abstract getValue(): TValue;
@@ -239,11 +309,7 @@ class TextField extends FormField<string, TextFieldOptions> {
             var text = e.clipboardData.getData("text/plain");
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
-
         this.__valueElem.addEventListener("cut", () => {
-            this.__isChanged = true;
-        });
-        this.__valueElem.addEventListener("keyup", (e: KeyboardEvent) => {
             this.__isChanged = true;
         });
         this.__valueElem.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -252,6 +318,9 @@ class TextField extends FormField<string, TextFieldOptions> {
                 return false;
             }
         });
+        this.__valueElem.addEventListener("keyup", (e: KeyboardEvent) => {
+            this.__isChanged = true;
+        });
         this.__valueElem.addEventListener("focus", () => {
             this.__isChanged = false;
             this.element.classList.add("focused");
@@ -259,7 +328,7 @@ class TextField extends FormField<string, TextFieldOptions> {
         this.__valueElem.addEventListener("blur", () => {
             this.element.classList.remove("focused");
             if (this.__isChanged)
-                this.__onChanged(this.__valueElem.innerText);
+                this.__onChanged();
         });
     }
 
@@ -270,10 +339,10 @@ class TextField extends FormField<string, TextFieldOptions> {
         else
             this.element.classList.remove("has-value");
     }
-    private __onChanged(value: string) {
-        value = this.normalizeValue(value);
-
+    private __onChanged() {
         this.__refreshUI();
+
+        this.raiseChanged();
     }
 
     getValue(): string {
@@ -363,6 +432,8 @@ class ComboBoxField extends FormField<string, ComboBoxFieldOptions> {
             this.__refreshUI();
 
             this.element.blur();
+
+            this.raiseChanged();
         });
     }
 
@@ -378,8 +449,10 @@ class ComboBoxField extends FormField<string, ComboBoxFieldOptions> {
         this.__itemsElem.appendChild(DOM.tag("li", { "data-value": item.value, "data-command": "select" }, item.title));
     }
     addItems(items: Array<ComboBoxItem>) {
-        for (var i = 0; i < items.length; i++)
-            this.addItem(items[i]);
+        if (items) {
+            for (var i = 0; i < items.length; i++)
+                this.addItem(items[i]);
+        }
     }
     clearItems() {
         DOM.empty(this.__valueElem);
@@ -418,7 +491,7 @@ interface ComboBoxFieldOptions {
     placeholder?: string;
     emptyText?: string;
 }
-interface ComboBoxItem {
+export interface ComboBoxItem {
     value: string;
     title: string;
 }

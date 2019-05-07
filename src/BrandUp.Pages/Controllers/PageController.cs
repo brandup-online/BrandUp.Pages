@@ -52,32 +52,6 @@ namespace BrandUp.Pages.Controllers
             return Ok(result);
         }
 
-        [HttpPut, Route("brandup.pages/page", Name = "BrandUp.Pages.Page.Create")]
-        public async Task<IActionResult> CreateAsync([FromQuery]Guid collectionId, [FromBody]Models.PageCreateModel requestModel)
-        {
-            if (!TryValidateModel(requestModel))
-                return BadRequest(ModelState);
-
-            var collection = await pageCollectionService.FindCollectiondByIdAsync(collectionId);
-            if (collection == null)
-                return BadRequest();
-
-            try
-            {
-                var page = await pageService.CreatePageAsync(collection, requestModel.PageType, requestModel.Title);
-
-                var model = await GetItemModelAsync(page);
-
-                return Created(string.Empty, model);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-
-                return BadRequest(ModelState);
-            }
-        }
-
         [HttpDelete, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Delete")]
         public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
         {
