@@ -65,28 +65,6 @@ namespace BrandUp.Pages.Controllers
             return Ok(result);
         }
 
-        [HttpPut, Route("brandup.pages/collection", Name = "BrandUp.Pages.Collection.Create")]
-        public async Task<IActionResult> CreateAsync([FromBody]Models.PageCollectionCreateModel requestModel, [FromQuery]Guid? pageId = null)
-        {
-            if (!TryValidateModel(requestModel))
-                return BadRequest(ModelState);
-
-            try
-            {
-                var pageCollection = await pageCollectionService.CreateCollectionAsync(requestModel.Title, requestModel.PageType, requestModel.Sort, pageId);
-
-                var model = GetItemModel(pageCollection);
-
-                return Created(string.Empty, model);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError(string.Empty, ex.Message);
-
-                return BadRequest(ModelState);
-            }
-        }
-
         [HttpPost, Route("brandup.pages/collection/{id}", Name = "BrandUp.Pages.Collection.Update")]
         public async Task<IActionResult> UpdateAsync([FromRoute]Guid id, [FromBody]Models.PageCollectionUpdateModel requestModel)
         {

@@ -74,36 +74,32 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         });
     }
     private __changeValue(field: FormField<any, any>) {
-        var urlParams: { [key: string]: string; } = {
-            field: field.name
-        };
+        //var urlParams: { [key: string]: string; } = {
+        //    field: field.name
+        //};
 
-        this._buildUrlParams(urlParams);
-
-        this.setLoading(true);
-
-        this.queue.request({
-            url: this._buildUrl(),
-            urlParams: urlParams,
-            method: "PUT",
-            type: "JSON",
-            data: this.getValues(),
-            success: (data: any, status: number) => {
-                this.setLoading(false);
-
-                switch (status) {
-                    case 400: {
-                        this.__applyModelState(<ValidationProblemDetails>data);
-                        break;
-                    }
-                    case 200: {
-                        break;
-                    }
-                    default:
-                        throw "";
-                }
-            }
-        });
+        //this._buildUrlParams(urlParams);
+        
+        //this.queue.request({
+        //    url: this._buildUrl(),
+        //    urlParams: urlParams,
+        //    method: "PUT",
+        //    type: "JSON",
+        //    data: this.getValues(),
+        //    success: (data: any, status: number) => {
+        //        switch (status) {
+        //            case 400: {
+        //                this.__applyModelState(<ValidationProblemDetails>data);
+        //                break;
+        //            }
+        //            case 200: {
+        //                break;
+        //            }
+        //            default:
+        //                throw "";
+        //        }
+        //    }
+        //});
     }
     private __save() {
         if (!this.__model || !this.validate())
@@ -141,14 +137,21 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         });
     }
     private __applyModelState(state: ValidationProblemDetails) {
-        for (var key in this.__fields) {
-            var field = this.__fields[key];
-            if (state && state.errors && state.errors.hasOwnProperty(key))
-                field.setErrors(state.errors[key]);
-            else
-                field.setErrors(null);
+        for (let key in this.__fields) {
+            let field = this.__fields[key];
+            field.setErrors(null);
         }
 
+        if (state && state.errors) {
+            for (let key in state.errors) {
+                if (key === "")
+                    continue;
+
+                let field = this.getField(key);
+                field.setErrors(state.errors[key]);
+            }
+        }
+        
         if (state && state.errors && state.errors.hasOwnProperty("")) {
             alert(state.errors[""]);
         }
@@ -446,8 +449,10 @@ class ComboBoxField extends FormField<string, ComboBoxFieldOptions> {
         this.__itemsElem.appendChild(DOM.tag("li", { "data-value": item.value, "data-command": "select" }, item.title));
     }
     addItems(items: Array<ComboBoxItem>) {
-        for (var i = 0; i < items.length; i++)
-            this.addItem(items[i]);
+        if (items) {
+            for (var i = 0; i < items.length; i++)
+                this.addItem(items[i]);
+        }
     }
     clearItems() {
         DOM.empty(this.__valueElem);
@@ -486,7 +491,7 @@ interface ComboBoxFieldOptions {
     placeholder?: string;
     emptyText?: string;
 }
-interface ComboBoxItem {
+export interface ComboBoxItem {
     value: string;
     title: string;
 }

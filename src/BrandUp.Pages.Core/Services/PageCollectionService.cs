@@ -19,9 +19,16 @@ namespace BrandUp.Pages.Services
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
-        public Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
+        public async Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
         {
-            return repositiry.CreateCollectionAsync(title, pageTypeName, sortMode, pageId);
+            if (pageId.HasValue)
+            {
+                var page = await pageRepositiry.FindPageByIdAsync(pageId.Value);
+                if (page == null)
+                    throw new ArgumentException();
+            }
+
+            return await repositiry.CreateCollectionAsync(title, pageTypeName, sortMode, pageId);
         }
 
         public Task<IPageCollection> FindCollectiondByIdAsync(Guid id)

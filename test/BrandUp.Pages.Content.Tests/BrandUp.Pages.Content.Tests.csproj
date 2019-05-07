@@ -7,7 +7,7 @@
 
     <RootNamespace>BrandUp.Pages.Content</RootNamespace>
 
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

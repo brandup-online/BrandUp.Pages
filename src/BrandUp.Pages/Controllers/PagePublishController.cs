@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [ApiController]
     [Route("brandup.pages/page/{id}/publish", Name = "BrandUp.Pages.Page.Publish")]
     public class PagePublishController : FormController<PagePublishForm, PagePublishValues, PagePublishResult>
     {
@@ -26,9 +25,15 @@ namespace BrandUp.Pages.Controllers
 
         #region Action methods
 
-        protected override async Task OnInitializeAsync(string id)
+        protected override async Task OnInitializeAsync()
         {
-            if (!Guid.TryParse(id, out Guid pageId))
+            if (!RouteData.Values.TryGetValue("id", out object pageIdValue))
+            {
+                AddErrors("Not valid id.");
+                return;
+            }
+
+            if (!Guid.TryParse(pageIdValue.ToString(), out Guid pageId))
             {
                 AddErrors("Not valid id.");
                 return;

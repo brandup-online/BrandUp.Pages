@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [ApiController]
+    [ApiController, FormController]
     public abstract class FormController<TForm, TValues, TResult> : ControllerBase
         where TForm : Models.FormModel<TValues>, new()
         where TValues : class, new()
         where TResult : class, new()
     {
         [HttpGet]
-        public async Task<IActionResult> GetFormAsync([FromRoute]string id)
+        public async Task<IActionResult> GetFormAsync()
         {
-            await OnInitializeAsync(id);
+            await OnInitializeAsync();
 
             if (!ModelState.IsValid)
                 return ValidationProblem();
@@ -26,9 +27,9 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> ChangeValueAsync([FromRoute]string id, [FromQuery]string field, [FromBody]TValues values)
+        public async Task<IActionResult> ChangeValueAsync([FromQuery]string field, [FromBody]TValues values)
         {
-            await OnInitializeAsync(id);
+            await OnInitializeAsync();
 
             await OnChangeValueAsync(field, values);
 
@@ -39,9 +40,9 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CommitAsync([FromRoute]string id, [FromBody]TValues values)
+        public async Task<IActionResult> CommitAsync([FromBody]TValues values)
         {
-            await OnInitializeAsync(id);
+            await OnInitializeAsync();
 
             if (!TryValidateModel(values))
                 return ValidationProblem();
@@ -54,7 +55,7 @@ namespace BrandUp.Pages.Controllers
             return Ok(resultModel);
         }
 
-        protected abstract Task OnInitializeAsync(string id);
+        protected abstract Task OnInitializeAsync();
         protected abstract Task OnBuildFormAsync(TForm formModel);
         protected abstract Task OnChangeValueAsync(string field, TValues values);
         protected abstract Task<TResult> OnCommitAsync(TValues values);
@@ -71,6 +72,23 @@ namespace BrandUp.Pages.Controllers
         {
             foreach (var error in errors)
                 ModelState.AddModelError(string.Empty, error);
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    internal class FormControllerAttribute : ActionFilterAttribute
+    {
+        public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        {
+            try
+            {
+                await next();
+            }
+            catch (Exception ex)
+            {
+                context.ModelState.AddModelError(string.Empty, ex.Message);
+                context.Result = ((ControllerBase)context.Controller).ValidationProblem();
+            }
         }
     }
 
