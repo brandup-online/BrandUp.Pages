@@ -5,15 +5,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class ContentValueAttribute : FieldAttribute
-    {
-        public override FieldProvider CreateFieldProvider()
-        {
-            return new ContentValueField();
-        }
-    }
-
-    public class ContentValueField : FieldProvider<ContentValueAttribute>, IFieldNavigationSupported
+    public class ContentValueAttribute : FieldProviderAttribute, IFieldNavigationSupported
     {
         private ContentMetadataManager metadataProvider;
 
@@ -21,7 +13,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #region Field members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, ContentValueAttribute attr)
+        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
         {
             this.metadataProvider = metadataProvider;
 

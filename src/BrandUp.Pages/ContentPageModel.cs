@@ -184,12 +184,12 @@ namespace BrandUp.Pages
             if (contentContext == null)
                 return BadRequest();
 
-            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out FieldProvider field))
+            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out FieldProviderAttribute field))
                 return BadRequest();
 
             object newValue;
 
-            if (field is TextField)
+            if (field is ITextField)
             {
                 using (var streamReader = new System.IO.StreamReader(Request.Body))
                 {
@@ -200,7 +200,7 @@ namespace BrandUp.Pages
                     }
                 }
             }
-            else if (field is HtmlField)
+            else if (field is HtmlAttribute)
             {
                 using (var streamReader = new System.IO.StreamReader(Request.Body))
                 {

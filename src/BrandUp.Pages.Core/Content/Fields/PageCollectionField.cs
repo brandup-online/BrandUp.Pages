@@ -5,31 +5,17 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class PageCollectionAttribute : FieldAttribute
-    {
-        public string Placeholder { get; set; }
-
-        public override FieldProvider CreateFieldProvider()
-        {
-            return new PageCollectionField();
-        }
-    }
-
-    public class PageCollectionField : FieldProvider<PageCollectionAttribute>
+    public class PageCollectionAttribute : FieldProviderAttribute
     {
         private Type pageModelType;
         private ConstructorInfo valueConstructor;
 
-        public string Placeholder { get; private set; }
-
-        internal PageCollectionField() : base() { }
+        public string Placeholder { get; set; }
 
         #region ModelField members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, PageCollectionAttribute attr)
+        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
         {
-            Placeholder = attr.Placeholder;
-
             var valueType = ValueType;
             if (!valueType.IsGenericType || valueType.GetGenericTypeDefinition() != typeof(PageCollectionReference<>))
                 throw new InvalidOperationException();

@@ -8,7 +8,9 @@ namespace BrandUp.Pages.Metadata
     public class PageMetadataProvider
     {
         private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
-        private readonly Content.Fields.TextField titleField;
+        private readonly Content.Fields.ITextField titleField;
+
+        #region Properties
 
         public ContentMetadataProvider ContentMetadata { get; }
         public string Name => ContentMetadata.Name;
@@ -17,6 +19,8 @@ namespace BrandUp.Pages.Metadata
         public Type ContentType => ContentMetadata.ModelType;
         public PageMetadataProvider ParentMetadata { get; }
         public IEnumerable<PageMetadataProvider> DerivedTypes => derivedTypes;
+
+        #endregion
 
         internal PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
         {
@@ -33,7 +37,7 @@ namespace BrandUp.Pages.Metadata
                 if (titleAttribute == null)
                     continue;
 
-                if (!(field is Content.Fields.TextField title))
+                if (!(field is Content.Fields.ITextField title))
                     throw new InvalidOperationException();
 
                 titleField = title;
@@ -42,6 +46,8 @@ namespace BrandUp.Pages.Metadata
             if (titleField == null)
                 throw new InvalidOperationException();
         }
+
+        #region Methods
 
         public object CreatePageModel(string title = null)
         {
@@ -77,13 +83,15 @@ namespace BrandUp.Pages.Metadata
 
             titleField.SetModelValue(pageModel, title);
         }
-        public bool IsInheritedOf(PageMetadataProvider baseMetadataProvider)
+        public bool IsInherited(PageMetadataProvider baseMetadataProvider)
         {
             if (baseMetadataProvider == null)
                 throw new ArgumentNullException(nameof(baseMetadataProvider));
 
-            return ContentType.IsSubclassOf(baseMetadataProvider.ContentType);
+            return ContentMetadata.IsInherited(baseMetadataProvider.ContentMetadata);
         }
+
+        #endregion
 
         #region Object members
 

@@ -3,20 +3,15 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class TextField : FieldProvider<TextAttribute>
+    public class TextAttribute : FieldProviderAttribute, ITextField
     {
-        public bool AllowMultiline { get; private set; }
-        public string Placeholder { get; private set; }
-
-        internal TextField() : base() { }
+        public bool AllowMultiline { get; set; }
+        public string Placeholder { get; set; }
 
         #region ModelField members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, TextAttribute attr)
+        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
         {
-            AllowMultiline = attr.AllowMultiline;
-            Placeholder = attr.Placeholder;
-
             var valueType = ValueType;
             if (valueType != typeof(string))
                 throw new InvalidOperationException();
@@ -45,14 +40,8 @@ namespace BrandUp.Pages.Content.Fields
         public string Placeholder { get; set; }
     }
 
-    public class TextAttribute : FieldAttribute
+    public interface ITextField : IFieldProvider
     {
-        public bool AllowMultiline { get; set; } = false;
-        public string Placeholder { get; set; }
 
-        public override FieldProvider CreateFieldProvider()
-        {
-            return new TextField();
-        }
     }
 }

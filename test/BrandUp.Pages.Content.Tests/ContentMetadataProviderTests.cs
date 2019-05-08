@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Content
         {
             var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var fieldName = "Title";
-            var result = contentMetadata.TryGetField(fieldName, out Fields.FieldProvider field);
+            var result = contentMetadata.TryGetField(fieldName, out Fields.FieldProviderAttribute field);
 
             Assert.True(result);
             Assert.NotNull(field);
@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Content
         public void TryGetField_name_is_lowercase()
         {
             var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-            var result = contentMetadata.TryGetField("title", out Fields.FieldProvider field);
+            var result = contentMetadata.TryGetField("title", out Fields.FieldProviderAttribute field);
 
             Assert.True(result);
             Assert.NotNull(field);

@@ -4,23 +4,13 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class ImageAttribute : FieldAttribute
-    {
-        public override FieldProvider CreateFieldProvider()
-        {
-            return new ImageField();
-        }
-    }
-
-    public class ImageField : FieldProvider<ImageAttribute>
+    public class ImageAttribute : FieldProviderAttribute
     {
         private static readonly Type ImageValueType = typeof(ImageValue);
 
-        internal ImageField() : base() { }
-
         #region ModelField members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, ImageAttribute attr)
+        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
         {
             var valueType = ValueType;
             if (valueType != ImageValueType)

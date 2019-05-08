@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Content
         private static readonly object[] ModelConstructorParameters = new object[0];
         private readonly ConstructorInfo modelConstructor = null;
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
-        private readonly List<FieldProvider> fields = new List<FieldProvider>();
+        private readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
         private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
         private readonly ConstructorInfo contentConstructor;
 
@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Content
         public string Description { get; }
         public ContentMetadataProvider BaseMetadata { get; }
         public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
-        public IEnumerable<FieldProvider> Fields => fields;
+        public IEnumerable<FieldProviderAttribute> Fields => fields;
 
         #endregion
 
@@ -89,37 +89,29 @@ namespace BrandUp.Pages.Content
 
             foreach (var fieldInfo in ModelType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
-                var attr = fieldInfo.GetCustomAttribute<FieldAttribute>(false);
-                if (attr == null)
+                var field = fieldInfo.GetCustomAttribute<FieldProviderAttribute>(false);
+                if (field == null)
                     continue;
 
-                var field = attr.CreateFieldProvider();
-                if (field == null)
-                    throw new InvalidOperationException();
-
-                InitializeField(field, fieldInfo, attr);
+                InitializeField(field, fieldInfo);
             }
 
             foreach (var propertyInfo in ModelType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.GetProperty | BindingFlags.SetProperty))
             {
-                var attr = propertyInfo.GetCustomAttribute<FieldAttribute>(false);
-                if (attr == null)
+                var field = propertyInfo.GetCustomAttribute<FieldProviderAttribute>(false);
+                if (field == null)
                     continue;
 
-                var field = attr.CreateFieldProvider();
-                if (field == null)
-                    throw new InvalidOperationException();
-
-                InitializeField(field, propertyInfo, attr);
+                InitializeField(field, propertyInfo);
             }
         }
-        private void InitializeField(FieldProvider field, MemberInfo typeMember, FieldAttribute attr)
+        private void InitializeField(FieldProviderAttribute field, MemberInfo typeMember)
         {
-            field.Initialize(Manager, typeMember, attr);
+            field.Initialize(Manager, typeMember);
 
             AddField(field);
         }
-        private void AddField(FieldProvider field)
+        private void AddField(FieldProviderAttribute field)
         {
             var fIndex = fields.Count;
 
@@ -127,7 +119,7 @@ namespace BrandUp.Pages.Content
             fields.Add(field);
         }
         [System.Diagnostics.DebuggerStepThrough]
-        public bool TryGetField(string fieldName, out FieldProvider field)
+        public bool TryGetField(string fieldName, out FieldProviderAttribute field)
         {
             if (fieldName == null)
                 throw new ArgumentNullException(nameof(fieldName));
@@ -201,7 +193,7 @@ namespace BrandUp.Pages.Content
 
             foreach (var kv in dictionary)
             {
-                if (!TryGetField(kv.Key, out FieldProvider field))
+                if (!TryGetField(kv.Key, out FieldProviderAttribute field))
                     continue;
 
                 var dataValue = kv.Value;

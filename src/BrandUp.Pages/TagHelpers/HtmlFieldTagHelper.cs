@@ -18,10 +18,10 @@ namespace BrandUp.Pages.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var contentContext = ViewContext.ViewData["_ContentContext_"] as ContentContext;
-            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out FieldProvider field) || !(field is HtmlField))
+            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out FieldProviderAttribute field) || !(field is HtmlAttribute))
                 throw new Exception();
 
-            var htmlField = (HtmlField)field;
+            var htmlField = (HtmlAttribute)field;
             var value = htmlField.GetModelValue(contentContext.Content) as string;
 
             output.Attributes.Add("content-path", contentContext.Explorer.Path);

@@ -19,9 +19,9 @@ namespace BrandUp.Pages.Content
             }
         }
         public static bool TryGetField<TField>(this ContentMetadataProvider contentMetadata, string fieldName, out TField field)
-            where TField : Fields.FieldProvider
+            where TField : Fields.FieldProviderAttribute
         {
-            if (!contentMetadata.TryGetField(fieldName, out Fields.FieldProvider f))
+            if (!contentMetadata.TryGetField(fieldName, out Fields.FieldProviderAttribute f))
             {
                 field = null;
                 return false;

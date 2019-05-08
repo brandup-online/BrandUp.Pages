@@ -23,7 +23,7 @@ namespace BrandUp.Pages.Metadata
             var basePageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(ArticlePageContent));
 
-            Assert.True(pageType.IsInheritedOf(basePageType));
+            Assert.True(pageType.IsInherited(basePageType));
         }
     }
 }

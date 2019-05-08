@@ -41,7 +41,7 @@ namespace BrandUp.Pages.Services
             if (pageMetadata == null)
                 throw new ArgumentException();
 
-            if (pageMetadata != basePageMetadata && !pageMetadata.IsInheritedOf(basePageMetadata))
+            if (pageMetadata != basePageMetadata && !pageMetadata.IsInherited(basePageMetadata))
                 throw new ArgumentException();
 
             var pageContentModel = pageMetadata.CreatePageModel(pageTitle);

@@ -4,51 +4,54 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public abstract class FieldProvider
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
+    public abstract class FieldProviderAttribute : Attribute, IFieldProvider
     {
         private static readonly Type IEquatableType = typeof(IEquatable<>);
         private MethodInfo equalMethodInfo = null;
-        private IFieldMember fieldDeclaration;
+        private IFieldModelMember fieldModelMember;
 
         #region Properties
 
-        public IFieldMember Member => fieldDeclaration;
-        public string Name { get; private set; }
         internal string JsonPropertyName { get; private set; }
-        public string Title { get; private set; }
-        public bool IsRequired { get; private set; }
+
+        #endregion
+
+        protected internal FieldProviderAttribute() { }
+
+        #region IFieldProvider members
+
+        public IFieldModelMember Member => fieldModelMember;
+        public string Name { get; set; }
+        public string Title { get; set; }
+        public bool IsRequired { get; set; } = false;
         public Type ValueType { get; private set; }
         public bool AllowNull { get; private set; }
 
         #endregion
 
-        protected internal FieldProvider() { }
-
-        internal virtual void Initialize(ContentMetadataManager metadataProvider, MemberInfo fieldMember, FieldAttribute fieldAttribute)
+        internal virtual void Initialize(ContentMetadataManager metadataProvider, MemberInfo fieldMember)
         {
             switch (fieldMember.MemberType)
             {
                 case MemberTypes.Field:
-                    fieldDeclaration = new ModelFieldDeclarationAsField((FieldInfo)fieldMember);
+                    fieldModelMember = new ModelFieldDeclarationAsField((FieldInfo)fieldMember);
                     break;
                 case MemberTypes.Property:
-                    fieldDeclaration = new ModelFieldDeclarationAsProperty((PropertyInfo)fieldMember);
+                    fieldModelMember = new ModelFieldDeclarationAsProperty((PropertyInfo)fieldMember);
                     break;
                 default:
                     throw new InvalidOperationException();
             }
 
-            IsRequired = fieldAttribute.IsRequired;
-            Name = fieldAttribute.Name;
             if (Name == null)
-                Name = fieldDeclaration.Name;
-            Title = fieldAttribute.Title;
+                Name = fieldModelMember.Name;
             if (Title == null)
                 Title = Name;
 
             JsonPropertyName = Name.Substring(0, 1).ToLower() + Name.Substring(1);
 
-            var valueType = fieldDeclaration.ValueType;
+            var valueType = fieldModelMember.ValueType;
 
             if (IsNullable(valueType))
             {
@@ -61,7 +64,10 @@ namespace BrandUp.Pages.Content.Fields
                 AllowNull = true;
 
             ValueType = valueType;
+
+            OnInitialize(metadataProvider, fieldMember);
         }
+        protected abstract void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember);
 
         private static bool IsNullable(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 
@@ -75,11 +81,11 @@ namespace BrandUp.Pages.Content.Fields
         [System.Diagnostics.DebuggerStepThrough]
         public object GetModelValue(object model)
         {
-            return fieldDeclaration.GetValue(model);
+            return fieldModelMember.GetValue(model);
         }
         public bool TryGetValue(object model, out object value)
         {
-            var val = fieldDeclaration.GetValue(model);
+            var val = fieldModelMember.GetValue(model);
             if (!HasValue(val))
             {
                 value = null;
@@ -92,7 +98,7 @@ namespace BrandUp.Pages.Content.Fields
         [System.Diagnostics.DebuggerStepThrough]
         public void SetModelValue(object model, object value)
         {
-            fieldDeclaration.SetValue(model, value);
+            fieldModelMember.SetValue(model, value);
         }
         [System.Diagnostics.DebuggerStepThrough]
         public virtual bool CompareValues(object left, object right)
@@ -144,7 +150,7 @@ namespace BrandUp.Pages.Content.Fields
 
         public abstract object ParseValue(string strValue);
 
-        private class ModelFieldDeclarationAsField : IFieldMember
+        private class ModelFieldDeclarationAsField : IFieldModelMember
         {
             private readonly FieldInfo field;
 
@@ -165,7 +171,7 @@ namespace BrandUp.Pages.Content.Fields
                 field.SetValue(obj, value);
             }
         }
-        private class ModelFieldDeclarationAsProperty : IFieldMember
+        private class ModelFieldDeclarationAsProperty : IFieldModelMember
         {
             private readonly PropertyInfo property;
 
@@ -188,42 +194,33 @@ namespace BrandUp.Pages.Content.Fields
         }
     }
 
-    public abstract class FieldProvider<TAttribute> : FieldProvider
-        where TAttribute : FieldAttribute
+    public interface IFieldProvider
     {
-        protected FieldProvider() { }
-
-        #region ViewModelField members
-
-        internal override void Initialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, FieldAttribute fieldAttribute)
-        {
-            base.Initialize(metadataProvider, typeMember, fieldAttribute);
-
-            OnInitialize(metadataProvider, typeMember, (TAttribute)fieldAttribute);
-        }
-
-        #endregion
-
-        protected abstract void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, TAttribute attr);
+        IFieldModelMember Member { get; }
+        string Name { get; }
+        string Title { get; }
+        bool IsRequired { get; }
+        Type ValueType { get; }
+        bool AllowNull { get; }
+        bool HasValue(object value);
+        object GetModelValue(object model);
+        bool TryGetValue(object model, out object value);
+        void SetModelValue(object model, object value);
+        bool CompareValues(object left, object right);
+        object ConvetValueToData(object value);
+        object ConvetValueFromData(object value);
+        Task<object> GetFormValueAsync(object modelValue, IServiceProvider services);
+        object GetFormOptions(IServiceProvider services);
+        object ParseValue(string strValue);
     }
 
-    public interface IFieldMember
+    public interface IFieldModelMember
     {
         MemberInfo Member { get; }
         string Name { get; }
         Type ValueType { get; }
         object GetValue(object obj);
         void SetValue(object obj, object value);
-    }
-
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
-    public abstract class FieldAttribute : Attribute
-    {
-        public string Name { get; set; }
-        public string Title { get; set; }
-        public bool IsRequired { get; set; } = false;
-
-        public abstract FieldProvider CreateFieldProvider();
     }
 
     public interface IFieldNavigationSupported

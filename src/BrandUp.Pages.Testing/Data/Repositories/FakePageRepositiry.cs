@@ -89,7 +89,7 @@ namespace BrandUp.Pages.Data.Repositories
 
             return Task.FromResult(content);
         }
-        public Task SetContentAsync(Guid pageId, PageContent data)
+        public Task SetContentAsync(Guid pageId, string title, PageContent data)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
                 throw new InvalidOperationException();
@@ -98,6 +98,7 @@ namespace BrandUp.Pages.Data.Repositories
             if (page.ContentVersion != data.Version)
                 throw new InvalidOperationException();
 
+            page.Title = title;
             page.ContentVersion = data.Version + 1;
             pageContents[index] = data;
 

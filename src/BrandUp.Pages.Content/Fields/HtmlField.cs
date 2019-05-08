@@ -3,28 +3,14 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class HtmlAttribute : FieldAttribute
+    public class HtmlAttribute : FieldProviderAttribute
     {
-        public string Placeholder = null;
-
-        public override FieldProvider CreateFieldProvider()
-        {
-            return new HtmlField();
-        }
-    }
-
-    public class HtmlField : FieldProvider<HtmlAttribute>
-    {
-        public string Placeholder { get; private set; }
-
-        internal HtmlField() : base() { }
+        public string Placeholder { get; set; }
 
         #region ModelField members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember, HtmlAttribute attr)
+        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
         {
-            Placeholder = attr.Placeholder;
-
             var valueType = ValueType;
             if (valueType != typeof(string))
                 throw new InvalidOperationException();

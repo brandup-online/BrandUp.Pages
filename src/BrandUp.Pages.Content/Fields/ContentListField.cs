@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class ContentListField : FieldProvider<ContentListAttribute>, IFieldNavigationSupported
+    public class ContentListAttribute : FieldProviderAttribute, IFieldNavigationSupported
     {
         private ContentMetadataManager metadataManager;
         private ConstructorInfo _valueConstructor;
@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #region Field members
 
-        protected override void OnInitialize(ContentMetadataManager metadataManager, MemberInfo typeMember, ContentListAttribute attr)
+        protected override void OnInitialize(ContentMetadataManager metadataManager, MemberInfo typeMember)
         {
             this.metadataManager = metadataManager;
 
@@ -151,14 +151,6 @@ namespace BrandUp.Pages.Content.Fields
         }
 
         #endregion
-    }
-
-    public class ContentListAttribute : FieldAttribute
-    {
-        public override FieldProvider CreateFieldProvider()
-        {
-            return new ContentListField();
-        }
     }
 
     public class ContentListFieldFormOptions
