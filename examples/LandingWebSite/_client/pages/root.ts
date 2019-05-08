@@ -3,10 +3,10 @@ import { DOM, UIElement, ajaxRequest } from "brandup-ui";
 import { listPageCollection } from "./dialogs/page-collection-list";
 import { publishPage } from "./dialogs/page-publish";
 
-class BrandUpPages extends UIElement {
+class BrandUpPages {
     private __pageModel: PageNavigationModel;
 
-    get typeName(): string { return "BrandUpPages.Toolbar"; }
+    get page(): PageNavigationModel { return this.__pageModel; }
 
     load() {
         ajaxRequest({
@@ -25,33 +25,79 @@ class BrandUpPages extends UIElement {
 
     private __renderToolbars() {
         if (this.__pageModel.editId) {
-
+            new PageToolbar(this);
         }
         else {
-            var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
-                DOM.tag("button", { class: "brandup-pages-toolbar-button list", "data-command": "brandup-pages-collections" }),
-                DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }),
-                DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" })
-            ]);
-            document.body.appendChild(toolbarElem);
-            this.setElement(toolbarElem);
+            new WebSiteToolbar(this);
         }
     }
 
     private __registerCommands() {
+    }
+}
+
+class WebSiteToolbar extends UIElement {
+    get typeName(): string { return "BrandUpPages.WebSiteToolbar"; }
+
+    constructor(p: BrandUpPages) {
+        super();
+
+        var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
+            DOM.tag("button", { class: "brandup-pages-toolbar-button list", "data-command": "brandup-pages-collections" }),
+            DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }),
+            DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" })
+        ]);
+        document.body.appendChild(toolbarElem);
+        this.setElement(toolbarElem);
+
         this.registerCommand("brandup-pages-collections", () => {
-            listPageCollection(this.__pageModel.parentPageId);
+            listPageCollection(p.page.parentPageId);
         });
 
         this.registerCommand("brandup-pages-publish", () => {
-            publishPage(this.__pageModel.id).then(result => {
+            publishPage(p.page.id).then(result => {
                 location.href = result.url;
             });
         });
 
         this.registerCommand("brandup-pages-edit", () => {
             ajaxRequest({
-                url: `/brandup.pages/page/${this.__pageModel.id}/edit`,
+                urlParams: { handler: "BeginEdit" },
+                method: "POST",
+                success: (data: string, status: number) => {
+                    location.href = data;
+                }
+            });
+        });
+    }
+}
+
+class PageToolbar extends UIElement {
+    get typeName(): string { return "BrandUpPages.PageToolbar"; }
+
+    constructor(p: BrandUpPages) {
+        super();
+
+        var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
+            DOM.tag("button", { class: "brandup-pages-toolbar-button save", "data-command": "brandup-pages-commit" }),
+            DOM.tag("button", { class: "brandup-pages-toolbar-button discard", "data-command": "brandup-pages-discard" })
+        ]);
+        document.body.appendChild(toolbarElem);
+        this.setElement(toolbarElem);
+
+        this.registerCommand("brandup-pages-commit", () => {
+            ajaxRequest({
+                urlParams: { handler: "CommitEdit" },
+                method: "POST",
+                success: (data: string, status: number) => {
+                    location.href = data;
+                }
+            });
+        });
+
+        this.registerCommand("brandup-pages-discard", () => {
+            ajaxRequest({
+                urlParams: { handler: "DiscardEdit" },
                 method: "POST",
                 success: (data: string, status: number) => {
                     location.href = data;

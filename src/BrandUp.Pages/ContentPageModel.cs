@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
+    [IgnoreAntiforgeryToken]
     public class ContentPageModel : PageModel
     {
         private IPage page;
@@ -120,11 +121,37 @@ namespace BrandUp.Pages
 
             return new OkObjectResult(model);
         }
-    }
 
-    public enum ContentPageRequestMode
-    {
-        Page,
-        Navigate
+        public async Task<IActionResult> OnPostBeginEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        {
+            if (editSession != null)
+                return BadRequest();
+
+            editSession = await pageEditingService.BeginEditAsync(page);
+
+            return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(editSession));
+        }
+
+        public async Task<IActionResult> OnPostCommitEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        {
+            if (editSession == null)
+                return BadRequest();
+
+            await pageEditingService.CommitEditSessionAsync(editSession);
+            editSession = null;
+
+            return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(page));
+        }
+
+        public async Task<IActionResult> OnPostDiscardEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        {
+            if (editSession == null)
+                return BadRequest();
+
+            await pageEditingService.DiscardEditSession(editSession);
+            editSession = null;
+
+            return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(page));
+        }
     }
 }
