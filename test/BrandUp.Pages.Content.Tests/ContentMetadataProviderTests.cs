@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.ContentModels;
+using System.Linq;
 using Xunit;
 
 namespace BrandUp.Pages.Content
@@ -6,14 +7,12 @@ namespace BrandUp.Pages.Content
     public class ContentMetadataProviderTests
     {
         private readonly IContentMetadataManager metadataManager;
-        private readonly ContentMetadataProvider contentMetadata;
 
         public ContentMetadataProviderTests()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
 
             metadataManager = new ContentMetadataManager(contentTypeResolver);
-            contentMetadata = metadataManager.GetMetadata(typeof(TestPageContent));
         }
 
         #region Test methods
@@ -21,19 +20,23 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void Properties()
         {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+
             Assert.Equal(metadataManager, contentMetadata.Manager);
             Assert.Equal(typeof(TestPageContent), contentMetadata.ModelType);
             Assert.Equal("TestPage", contentMetadata.Name);
+            Assert.Equal(contentMetadata.Name, contentMetadata.ToString());
             Assert.Equal(TestPageContent.ContentTypeTitle, contentMetadata.Title);
             Assert.Equal(TestPageContent.ContentTypeDescription, contentMetadata.Description);
             Assert.Null(contentMetadata.BaseMetadata);
-            Assert.Empty(contentMetadata.DerivedContents);
+            Assert.NotEmpty(contentMetadata.DerivedContents);
             Assert.NotEmpty(contentMetadata.Fields);
         }
 
         [Fact]
         public void TryGetField_name_is_original()
         {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var fieldName = "Title";
             var result = contentMetadata.TryGetField(fieldName, out Fields.FieldProvider field);
 
@@ -46,6 +49,7 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void TryGetField_name_is_lowercase()
         {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var result = contentMetadata.TryGetField("title", out Fields.FieldProvider field);
 
             Assert.True(result);
@@ -55,6 +59,7 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void CreateModelInstance()
         {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var model = contentMetadata.CreateModelInstance();
 
             Assert.NotNull(model);
@@ -64,6 +69,7 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void ConvertContentModelToDictionary()
         {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var data = contentMetadata.ConvertContentModelToDictionary(new TestPageContent { Title = "test" });
 
             Assert.NotNull(data);
@@ -75,6 +81,7 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void ConvertDictionaryToContentModel()
         {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var sourceModel = new TestPageContent { Title = "test" };
             var data = contentMetadata.ConvertContentModelToDictionary(sourceModel);
 
@@ -83,6 +90,28 @@ namespace BrandUp.Pages.Content
             Assert.NotNull(model);
             Assert.Equal(model.GetType(), sourceModel.GetType());
             Assert.Equal(model.Title, sourceModel.Title);
+        }
+
+        [Fact]
+        public void GetDerivedMetadataWithHierarhy()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+            var derivedMetadata = contentMetadata.GetDerivedMetadataWithHierarhy(false);
+
+            Assert.Single(derivedMetadata);
+            Assert.Equal(derivedMetadata.First(), metadataManager.GetMetadata<NewsPage>());
+        }
+
+        [Fact]
+        public void GetDerivedMetadataWithHierarhy_IncludeCurrent()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var derivedMetadata = contentMetadata.GetDerivedMetadataWithHierarhy(true).ToList();
+
+            Assert.Equal(3, derivedMetadata.Count);
+            Assert.Equal(derivedMetadata[0], metadataManager.GetMetadata<TestPageContent>());
+            Assert.Equal(derivedMetadata[1], metadataManager.GetMetadata<ArticlePage>());
+            Assert.Equal(derivedMetadata[2], metadataManager.GetMetadata<NewsPage>());
         }
 
         #endregion

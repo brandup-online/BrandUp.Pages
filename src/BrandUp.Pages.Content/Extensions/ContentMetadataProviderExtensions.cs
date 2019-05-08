@@ -18,7 +18,6 @@ namespace BrandUp.Pages.Content
                     yield return childDerivedContentMetadata;
             }
         }
-
         public static bool TryGetField<TField>(this ContentMetadataProvider contentMetadata, string fieldName, out TField field)
             where TField : Fields.FieldProvider
         {

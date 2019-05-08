@@ -36,6 +36,17 @@ namespace BrandUp.Pages.Content
         }
 
         [Fact]
+        public void GetMetadata_Generic()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+
+            Assert.NotNull(contentMetadata);
+            Assert.Equal(typeof(TestPageContent), contentMetadata.ModelType);
+            Assert.Equal("TestPage", contentMetadata.Name);
+            Assert.Equal(TestPageContent.ContentTypeTitle, contentMetadata.Title);
+        }
+
+        [Fact]
         public void TryGetMetadata()
         {
             var contentType = typeof(TestPageContent);

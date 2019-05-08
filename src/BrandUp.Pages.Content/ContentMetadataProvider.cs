@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentMetadataProvider
+    public class ContentMetadataProvider : IEquatable<ContentMetadataProvider>
     {
         #region Fields
 
@@ -87,8 +87,6 @@ namespace BrandUp.Pages.Content
                     AddField(field);
             }
 
-            var metadataManager = Manager;
-
             foreach (var fieldInfo in ModelType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly))
             {
                 var attr = fieldInfo.GetCustomAttribute<FieldAttribute>(false);
@@ -99,7 +97,7 @@ namespace BrandUp.Pages.Content
                 if (field == null)
                     throw new InvalidOperationException();
 
-                InitializeField(metadataManager, field, fieldInfo, attr);
+                InitializeField(field, fieldInfo, attr);
             }
 
             foreach (var propertyInfo in ModelType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.GetProperty | BindingFlags.SetProperty))
@@ -112,12 +110,12 @@ namespace BrandUp.Pages.Content
                 if (field == null)
                     throw new InvalidOperationException();
 
-                InitializeField(metadataManager, field, propertyInfo, attr);
+                InitializeField(field, propertyInfo, attr);
             }
         }
-        private void InitializeField(ContentMetadataManager metadataManager, FieldProvider field, MemberInfo typeMember, FieldAttribute attr)
+        private void InitializeField(FieldProvider field, MemberInfo typeMember, FieldAttribute attr)
         {
-            field.Initialize(metadataManager, typeMember, attr);
+            field.Initialize(Manager, typeMember, attr);
 
             AddField(field);
         }
@@ -142,6 +140,7 @@ namespace BrandUp.Pages.Content
             field = fields[index];
             return true;
         }
+        [System.Diagnostics.DebuggerStepThrough]
         public object CreateModelInstance()
         {
             return modelConstructor.Invoke(new object[0]);
@@ -220,18 +219,68 @@ namespace BrandUp.Pages.Content
             var contentModel = ConvertDictionaryToContentModel(document.Data);
             return (IContent)contentConstructor.Invoke(new object[] { document, contentModel, this });
         }
+        public bool IsInherited(ContentMetadataProvider baseMetadataProvider)
+        {
+            if (baseMetadataProvider == null)
+                throw new ArgumentNullException(nameof(baseMetadataProvider));
+
+            return ModelType.IsSubclassOf(baseMetadataProvider.ModelType);
+        }
+        public bool IsInheritedOrEqual(ContentMetadataProvider baseMetadataProvider)
+        {
+            return this == baseMetadataProvider || IsInherited(baseMetadataProvider);
+        }
+
+        #endregion
+
+        #region IEquatable members
+
+        public bool Equals(ContentMetadataProvider other)
+        {
+            if (other == null || !(other is ContentMetadataProvider))
+                return false;
+
+            return ModelType == other.ModelType;
+        }
 
         #endregion
 
         #region Object members
 
+        public override int GetHashCode()
+        {
+            return ModelType.GetHashCode();
+        }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ContentMetadataProvider);
+        }
         public override string ToString()
         {
             return Name;
         }
-        public override int GetHashCode()
+
+        #endregion
+
+        #region Operators
+
+        public static bool operator ==(ContentMetadataProvider x, ContentMetadataProvider y)
         {
-            return ModelType.GetHashCode();
+            var xIsNull = Equals(x, null);
+            var yIsNull = Equals(y, null);
+
+            if (yIsNull && xIsNull)
+                return true;
+
+            if (xIsNull || yIsNull)
+                return false;
+
+            return x.Equals(y);
+        }
+
+        public static bool operator !=(ContentMetadataProvider x, ContentMetadataProvider y)
+        {
+            return !(x == y);
         }
 
         #endregion

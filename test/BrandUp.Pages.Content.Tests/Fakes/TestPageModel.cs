@@ -34,6 +34,18 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
+    [Content(Title = "Article")]
+    public class ArticlePage : TestPageContent
+    {
+
+    }
+
+    [Content(Title = "News")]
+    public class NewsPage : ArticlePage
+    {
+
+    }
+
     [Content(Title = "Заголовок", Description = "Заголовок страницы")]
     public class PageHeaderContent
     {
