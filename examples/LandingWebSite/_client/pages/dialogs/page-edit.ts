@@ -52,6 +52,10 @@ export class PageEditDialog extends Dialog<any> {
                             this.addField(fieldModel.title, new TextField(fieldModel.name, fieldModel.options));
                             break;
                         }
+                        case "HtmlField": {
+                            this.addField(fieldModel.title, new TextField(fieldModel.name, fieldModel.options));
+                            break;
+                        }
                         default: {
                             throw "";
                         }

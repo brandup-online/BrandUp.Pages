@@ -200,6 +200,17 @@ namespace BrandUp.Pages
                     }
                 }
             }
+            else if (field is HtmlField)
+            {
+                using (var streamReader = new System.IO.StreamReader(Request.Body))
+                {
+                    using (var jsonReader = new Newtonsoft.Json.JsonTextReader(streamReader))
+                    {
+                        var serializer = new Newtonsoft.Json.JsonSerializer();
+                        newValue = serializer.Deserialize(jsonReader, field.ValueType);
+                    }
+                }
+            }
             else
                 throw new Exception();
 

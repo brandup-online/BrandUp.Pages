@@ -8,5 +8,8 @@ namespace LandingWebSite.Contents
     {
         [Text(Placeholder = "Input page header"), PageTitle]
         public string Header { get; set; }
+
+        [Html]
+        public string Text { get; set; }
     }
 }
