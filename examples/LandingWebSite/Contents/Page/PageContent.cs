@@ -6,7 +6,7 @@ namespace LandingWebSite.Contents
     [PageContent]
     public class PageContent
     {
-        [Text, PageTitle]
+        [Text(Placeholder = "Input page header"), PageTitle]
         public string Header { get; set; }
     }
 }

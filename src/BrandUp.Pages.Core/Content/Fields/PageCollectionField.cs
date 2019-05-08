@@ -9,13 +9,13 @@ namespace BrandUp.Pages.Content.Fields
     {
         public string Placeholder { get; set; }
 
-        public override Field CreateField()
+        public override FieldProvider CreateFieldProvider()
         {
             return new PageCollectionField();
         }
     }
 
-    public class PageCollectionField : Field<PageCollectionAttribute>
+    public class PageCollectionField : FieldProvider<PageCollectionAttribute>
     {
         private Type pageModelType;
         private ConstructorInfo valueConstructor;

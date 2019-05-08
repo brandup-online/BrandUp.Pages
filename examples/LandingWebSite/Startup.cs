@@ -26,7 +26,9 @@ namespace LandingWebSite
             #region Web
 
             services
-                .AddMvc()
+                .AddMvc(options => { })
+                .AddRazorOptions(options => { })
+                .AddViewOptions(options => { })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             services.Configure<WebEncoderOptions>(options =>

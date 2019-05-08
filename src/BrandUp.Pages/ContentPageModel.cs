@@ -1,4 +1,6 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,7 +19,10 @@ namespace BrandUp.Pages
 
         public IPageService PageService { get; private set; }
         public IPage PageEntry => page;
+        public PageMetadataProvider PageMetadata { get; private set; }
         public object PageContent { get; private set; }
+        public ContentContext ContentContext { get; private set; }
+        public string Title => PageMetadata.GetPageTitle(PageContent);
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
@@ -87,11 +92,8 @@ namespace BrandUp.Pages
                 }
             }
 
-            await base.OnPageHandlerExecutionAsync(context, next);
-        }
+            PageMetadata = await PageService.GetPageTypeAsync(page);
 
-        public async Task<IActionResult> OnGetAsync()
-        {
             if (editSession != null)
             {
                 var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
@@ -102,6 +104,13 @@ namespace BrandUp.Pages
             if (PageContent == null)
                 throw new InvalidOperationException();
 
+            ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices);
+
+            await base.OnPageHandlerExecutionAsync(context, next);
+        }
+
+        public IActionResult OnGetAsync()
+        {
             return Page();
         }
 
@@ -130,6 +139,80 @@ namespace BrandUp.Pages
             editSession = await pageEditingService.BeginEditAsync(page);
 
             return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(editSession));
+        }
+
+        public async Task<IActionResult> OnGetFormModelAsync([FromQuery]string contentPath)
+        {
+            if (editSession == null)
+                return BadRequest();
+            if (contentPath == null)
+                contentPath = string.Empty;
+
+            var contentContext = ContentContext.Navigate(contentPath);
+            if (contentContext == null)
+                return BadRequest();
+
+            var formModel = new Models.PageContentForm
+            {
+                Path = contentContext.Explorer.Path
+            };
+
+            foreach (var field in contentContext.Explorer.Metadata.Fields)
+            {
+                formModel.Fields.Add(new Models.ContentFieldModel
+                {
+                    Type = field.GetType().Name,
+                    Name = field.Name,
+                    Title = field.Title,
+                    Options = field.GetFormOptions(contentContext.Services)
+                });
+
+                formModel.Values.Add(field.Name, await field.GetFormValueAsync(field.GetModelValue(contentContext.Content), contentContext.Services));
+            }
+
+            return new OkObjectResult(formModel);
+        }
+
+        public async Task<IActionResult> OnPostChangeValueAsync([FromQuery]string contentPath, [FromQuery] string fieldName, [FromServices]IPageEditingService pageEditingService)
+        {
+            if (editSession == null)
+                return BadRequest();
+            if (contentPath == null)
+                contentPath = string.Empty;
+
+            var contentContext = ContentContext.Navigate(contentPath);
+            if (contentContext == null)
+                return BadRequest();
+
+            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out FieldProvider field))
+                return BadRequest();
+
+            object newValue;
+
+            if (field is TextField)
+            {
+                using (var streamReader = new System.IO.StreamReader(Request.Body))
+                {
+                    using (var jsonReader = new Newtonsoft.Json.JsonTextReader(streamReader))
+                    {
+                        var serializer = new Newtonsoft.Json.JsonSerializer();
+                        newValue = serializer.Deserialize(jsonReader, field.ValueType);
+                    }
+                }
+            }
+            else
+                throw new Exception();
+
+            field.SetModelValue(contentContext.Content, newValue);
+
+            await pageEditingService.SetContentAsync(editSession, ContentContext.Content);
+
+            var result = new Models.ContentFieldChangeResult
+            {
+                Value = await field.GetFormValueAsync(field.GetModelValue(contentContext.Content), contentContext.Services)
+            };
+
+            return new OkObjectResult(result);
         }
 
         public async Task<IActionResult> OnPostCommitEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)

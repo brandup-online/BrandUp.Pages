@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public abstract class Field
+    public abstract class FieldProvider
     {
         private static readonly Type IEquatableType = typeof(IEquatable<>);
         private MethodInfo equalMethodInfo = null;
@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #endregion
 
-        protected internal Field() { }
+        protected internal FieldProvider() { }
 
         internal virtual void Initialize(ContentMetadataManager metadataProvider, MemberInfo fieldMember, FieldAttribute fieldAttribute)
         {
@@ -188,10 +188,10 @@ namespace BrandUp.Pages.Content.Fields
         }
     }
 
-    public abstract class Field<TAttribute> : Field
+    public abstract class FieldProvider<TAttribute> : FieldProvider
         where TAttribute : FieldAttribute
     {
-        protected Field() { }
+        protected FieldProvider() { }
 
         #region ViewModelField members
 
@@ -223,7 +223,7 @@ namespace BrandUp.Pages.Content.Fields
         public string Title { get; set; }
         public bool IsRequired { get; set; } = false;
 
-        public abstract Field CreateField();
+        public abstract FieldProvider CreateFieldProvider();
     }
 
     public interface IFieldNavigationSupported

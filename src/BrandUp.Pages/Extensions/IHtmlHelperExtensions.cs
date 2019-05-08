@@ -1,17 +1,30 @@
 ﻿using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
     public static class IHtmlHelperExtensions
     {
-        public static Task<IHtmlContent> RenderPageAsync<TPageModel>(this IHtmlHelper<TPageModel> htmlHelper)
+        public static async Task<IHtmlContent> RenderPageAsync<TPageModel>(this IHtmlHelper<TPageModel> htmlHelper)
             where TPageModel : ContentPageModel
         {
             var pageModel = htmlHelper.ViewData.Model;
 
-            return htmlHelper.PartialAsync("~/Contents/Page/Default.cshtml", pageModel.PageContent);
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+            {
+                Model = pageModel.ContentContext.Content
+            };
+
+            viewData.Add("_ContentContext_", pageModel.ContentContext);
+
+            var tag = new TagBuilder("div");
+
+            tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~/Contents/Page/Default.cshtml", pageModel.ContentContext.Content, viewData));
+
+            return tag;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Content
         #region Properties
 
         public ContentMetadataProvider Metadata { get; }
-        public Field Field { get; }
+        public FieldProvider Field { get; }
         public object Content { get; }
         public string FieldPath { get; }
         public string Path { get; }
@@ -41,7 +41,7 @@ namespace BrandUp.Pages.Content
             rootExplorer = null;
             name = contentMetadata.Name;
         }
-        private ContentExplorer(ContentExplorer parent, Field field, int index, object content, ContentMetadataProvider contentMetadata)
+        private ContentExplorer(ContentExplorer parent, FieldProvider field, int index, object content, ContentMetadataProvider contentMetadata)
         {
             Field = field;
             Content = content;
@@ -105,7 +105,7 @@ namespace BrandUp.Pages.Content
 
             var parentModel = parentExplorer.Content;
 
-            if (!parentExplorer.Metadata.TryGetField(fieldName, out Field field))
+            if (!parentExplorer.Metadata.TryGetField(fieldName, out FieldProvider field))
                 throw new InvalidOperationException(string.Format("Не найдено поле {0}.", fieldName));
 
             if (!(field is IFieldNavigationSupported fieldNavigation))

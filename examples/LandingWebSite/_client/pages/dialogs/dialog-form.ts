@@ -1,10 +1,13 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { UIControl, DOM, ajaxRequest, AjaxQueue } from "brandup-ui";
+import { DOM, AjaxQueue } from "brandup-ui";
+import { Field } from "../form/field";
+import { TextFieldOptions, TextField } from "../form/textbox";
+import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
     private __formElem: HTMLFormElement;
     private __fieldsElem: HTMLElement;
-    private __fields: { [key: string]: FormField<any, any> } = {};
+    private __fields: { [key: string]: Field<any, any> } = {};
     private __model: TForm = null;
     readonly queue: AjaxQueue;
 
@@ -73,7 +76,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
             }
         });
     }
-    private __changeValue(field: FormField<any, any>) {
+    private __changeValue(field: Field<any, any>) {
         //var urlParams: { [key: string]: string; } = {
         //    field: field.name
         //};
@@ -178,12 +181,12 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         }
     }
 
-    protected getField(name: string): FormField<any, any> {
+    protected getField(name: string): Field<any, any> {
         if (!this.__fields.hasOwnProperty(name.toLowerCase()))
             throw `Field "${name}" not exists.`;
         return this.__fields[name.toLowerCase()];
     }
-    protected addField(title: string, field: FormField<any, any>) {
+    protected addField(title: string, field: Field<any, any>) {
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
@@ -223,275 +226,4 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
 export interface FormModel<TValues> {
     values: TValues;
-}
-
-interface ValidationProblemDetails {
-    type: string;
-    title: string;
-    status: number;
-    detail: string;
-    traceId: string;
-    instance: string;
-    errors: { [key: string]: Array<string> };
-}
-
-abstract class FormField<TValue, TOptions> extends UIControl<TOptions> {
-    readonly name: string;
-    private __errorsElem: HTMLElement;
-
-    constructor(name: string, options: TOptions) {
-        super(options);
-
-        this.name = name;
-    }
-
-    protected _onRender() {
-        this.element.classList.add("field");
-
-        this.__createEvent("changed", { bubbles: true, cancelable: false });
-    }
-
-    protected raiseChanged() {
-        this.__raiseEvent("changed", {
-            field: this,
-            value: this.getValue()
-        });
-    }
-
-    abstract getValue(): TValue;
-    abstract setValue(value: TValue);
-    abstract hasValue(): boolean;
-
-    setErrors(errors: Array<string>) {
-        this.element.classList.remove("has-errors");
-        if (this.__errorsElem) {
-            this.__errorsElem.remove();
-            this.__errorsElem = null;
-        }
-
-        if (!errors || errors.length === 0) {
-            return;
-        }
-
-        this.element.classList.add("has-errors");
-        this.__errorsElem = DOM.tag("ul", { class: "field-errors" });
-        for (var i = 0; i < errors.length; i++)
-            this.__errorsElem.appendChild(DOM.tag("li", null, errors[i]));
-        this.element.insertAdjacentElement("afterend", this.__errorsElem);
-    }
-}
-
-class TextField extends FormField<string, TextFieldOptions> {
-    private __valueElem: HTMLElement;
-    private __isChanged: boolean;
-
-    get typeName(): string { return "BrandUpPages.Form.TextField"; }
-
-    protected _onRender() {
-        super._onRender();
-
-        this.element.classList.add("text");
-
-        this.__valueElem = <HTMLInputElement>DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true });
-        this.element.appendChild(this.__valueElem);
-
-        let placeholderElem = DOM.tag("div", { class: "placeholder" }, this.options.placeholder);
-        placeholderElem.addEventListener("click", () => {
-            this.__valueElem.focus();
-        });
-        this.element.appendChild(placeholderElem);
-
-        this.__valueElem.addEventListener("paste", (e: ClipboardEvent) => {
-            this.__isChanged = true;
-
-            e.preventDefault();
-
-            var text = e.clipboardData.getData("text/plain");
-            document.execCommand("insertText", false, this.normalizeValue(text));
-        });
-        this.__valueElem.addEventListener("cut", () => {
-            this.__isChanged = true;
-        });
-        this.__valueElem.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (!this.options.allowMultiline && e.keyCode == 13) {
-                e.preventDefault();
-                return false;
-            }
-        });
-        this.__valueElem.addEventListener("keyup", (e: KeyboardEvent) => {
-            this.__isChanged = true;
-        });
-        this.__valueElem.addEventListener("focus", () => {
-            this.__isChanged = false;
-            this.element.classList.add("focused");
-        });
-        this.__valueElem.addEventListener("blur", () => {
-            this.element.classList.remove("focused");
-            if (this.__isChanged)
-                this.__onChanged();
-        });
-    }
-
-    private __refreshUI() {
-        let hasVal = this.hasValue();
-        if (hasVal)
-            this.element.classList.add("has-value");
-        else
-            this.element.classList.remove("has-value");
-    }
-    private __onChanged() {
-        this.__refreshUI();
-
-        this.raiseChanged();
-    }
-
-    getValue(): string {
-        var val = this.normalizeValue(this.__valueElem.innerText);
-        return val ? val : null;
-    }
-    setValue(value: string) {
-        value = this.normalizeValue(value);
-        if (value && this.options.allowMultiline) {
-            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
-        }
-        this.__valueElem.innerHTML = value ? value : "";
-
-        this.__refreshUI();
-    }
-    hasValue(): boolean {
-        var val = this.normalizeValue(this.__valueElem.innerText);
-        return val ? true : false;
-    }
-
-    normalizeValue(value: string): string {
-        if (!value)
-            return "";
-
-        value = value.trim();
-
-        if (!this.options.allowMultiline)
-            value = value.replace("\n\r", " ");
-
-        return value;
-    }
-}
-interface TextFieldOptions {
-    placeholder?: string;
-    allowMultiline?: boolean;
-}
-
-class ComboBoxField extends FormField<string, ComboBoxFieldOptions> {
-    private __valueElem: HTMLElement;
-    private __itemsElem: HTMLElement;
-    private __value: string = null;
-    private __isChanged: boolean;
-
-    get typeName(): string { return "BrandUpPages.Form.ComboBoxField"; }
-
-    protected _onRender() {
-        super._onRender();
-
-        this.element.classList.add("combobox");
-        this.element.setAttribute("tabindex", "0");
-
-        this.__valueElem = <HTMLInputElement>DOM.tag("div", { class: "value" });
-        this.element.appendChild(this.__valueElem);
-
-        let placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "toggle" }, this.options.placeholder);
-        this.element.appendChild(placeholderElem);
-
-        this.__itemsElem = <HTMLInputElement>DOM.tag("ul");
-        this.element.appendChild(this.__itemsElem);
-
-        var isFocused = false;
-        var md = false;
-        this.addEventListener("focus", () => {
-            isFocused = true;
-        });
-        this.addEventListener("blur", () => {
-            isFocused = false;
-        });
-
-        placeholderElem.addEventListener("mousedown", () => {
-            md = isFocused;
-        });
-
-        placeholderElem.addEventListener("mouseup", () => {
-            if (md && isFocused)
-                this.element.blur();
-        });
-
-        this.registerCommand("select", (elem: HTMLElement) => {
-            DOM.removeClass(this.__itemsElem, ".selected", "selected");
-
-            elem.classList.add("selected");
-
-            this.__value = elem.getAttribute("data-value");
-            this.__valueElem.innerText = elem.innerText;
-
-            this.__refreshUI();
-
-            this.element.blur();
-
-            this.raiseChanged();
-        });
-    }
-
-    private __refreshUI() {
-        let hasVal = this.hasValue();
-        if (hasVal)
-            this.element.classList.add("has-value");
-        else
-            this.element.classList.remove("has-value");
-    }
-
-    addItem(item: ComboBoxItem) {
-        this.__itemsElem.appendChild(DOM.tag("li", { "data-value": item.value, "data-command": "select" }, item.title));
-    }
-    addItems(items: Array<ComboBoxItem>) {
-        if (items) {
-            for (var i = 0; i < items.length; i++)
-                this.addItem(items[i]);
-        }
-    }
-    clearItems() {
-        DOM.empty(this.__valueElem);
-
-        this.__value = null;
-    }
-
-    getValue(): string {
-        return this.__value;
-    }
-    setValue(value: string) {
-        var text: string = "";
-        if (value !== null) {
-            var itemElem = DOM.queryElement(this.__itemsElem, `li[data-value="${value}"]`);
-            if (!itemElem) {
-                this.setValue(null);
-                return;
-            }
-            text = itemElem.innerText;
-            itemElem.classList.add("selected");
-        }
-        else
-            DOM.removeClass(this.__itemsElem, ".selected", "selected");
-
-        this.__value = value;
-        this.__valueElem.innerText = text;
-
-        this.__refreshUI();
-    }
-    hasValue(): boolean {
-        var val = this.__value;
-        return val ? true : false;
-    }
-}
-interface ComboBoxFieldOptions {
-    placeholder?: string;
-    emptyText?: string;
-}
-export interface ComboBoxItem {
-    value: string;
-    title: string;
 }

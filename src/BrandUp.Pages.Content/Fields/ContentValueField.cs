@@ -7,13 +7,13 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ContentValueAttribute : FieldAttribute
     {
-        public override Field CreateField()
+        public override FieldProvider CreateFieldProvider()
         {
             return new ContentValueField();
         }
     }
 
-    public class ContentValueField : Field<ContentValueAttribute>, IFieldNavigationSupported
+    public class ContentValueField : FieldProvider<ContentValueAttribute>, IFieldNavigationSupported
     {
         private ContentMetadataManager metadataProvider;
 

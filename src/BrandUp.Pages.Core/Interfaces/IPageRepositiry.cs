@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination);
         Task<bool> HasPagesAsync(Guid сollectionId);
         Task<PageContent> GetContentAsync(Guid pageId);
-        Task SetContentAsync(Guid pageId, PageContent content);
+        Task SetContentAsync(Guid pageId, string title, PageContent content);
         Task SetUrlPathAsync(Guid pageId, string urlPath);
         Task DeletePageAsync(Guid pageId);
     }

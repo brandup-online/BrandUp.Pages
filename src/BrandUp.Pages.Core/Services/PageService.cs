@@ -113,9 +113,10 @@ namespace BrandUp.Pages.Services
             if (contentModel.GetType() != pageMetadata.ContentType)
                 throw new ArgumentException();
 
+            var pageTitle = pageMetadata.GetPageTitle(contentModel);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await pageRepositiry.SetContentAsync(page.Id, new PageContent(1, pageData));
+            await pageRepositiry.SetContentAsync(page.Id, pageTitle, new PageContent(1, pageData));
         }
         public async Task<Result> PublishPageAsync(IPage page, string urlPath)
         {

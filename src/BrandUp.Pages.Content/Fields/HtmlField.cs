@@ -7,13 +7,13 @@ namespace BrandUp.Pages.Content.Fields
     {
         public string Placeholder = null;
 
-        public override Field CreateField()
+        public override FieldProvider CreateFieldProvider()
         {
             return new HtmlField();
         }
     }
 
-    public class HtmlField : Field<HtmlAttribute>
+    public class HtmlField : FieldProvider<HtmlAttribute>
     {
         public string Placeholder { get; private set; }
 

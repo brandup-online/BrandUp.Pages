@@ -6,7 +6,6 @@ namespace LandingWebSite.Pages
     {
         #region IAppPageModel members
 
-        public string Title => PageEntry.Title;
         public string Description => null;
         public string Keywords => null;
 

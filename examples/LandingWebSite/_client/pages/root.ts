@@ -2,6 +2,7 @@
 import { DOM, UIElement, ajaxRequest } from "brandup-ui";
 import { listPageCollection } from "./dialogs/page-collection-list";
 import { publishPage } from "./dialogs/page-publish";
+import { editPage } from "./dialogs/page-edit";
 
 class BrandUpPages {
     private __pageModel: PageNavigationModel;
@@ -79,11 +80,18 @@ class PageToolbar extends UIElement {
         super();
 
         var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, [
+            DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" }),
             DOM.tag("button", { class: "brandup-pages-toolbar-button save", "data-command": "brandup-pages-commit" }),
             DOM.tag("button", { class: "brandup-pages-toolbar-button discard", "data-command": "brandup-pages-discard" })
         ]);
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
+
+        this.registerCommand("brandup-pages-edit", () => {
+            editPage().then(() => {
+                location.reload();
+            });
+        });
 
         this.registerCommand("brandup-pages-commit", () => {
             ajaxRequest({

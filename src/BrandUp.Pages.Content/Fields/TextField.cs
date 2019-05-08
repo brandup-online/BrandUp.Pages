@@ -3,18 +3,7 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class TextAttribute : FieldAttribute
-    {
-        public bool AllowMultiline { get; set; } = false;
-        public string Placeholder { get; set; }
-
-        public override Field CreateField()
-        {
-            return new TextField();
-        }
-    }
-
-    public class TextField : Field<TextAttribute>
+    public class TextField : FieldProvider<TextAttribute>
     {
         public bool AllowMultiline { get; private set; }
         public string Placeholder { get; private set; }
@@ -54,5 +43,16 @@ namespace BrandUp.Pages.Content.Fields
     {
         public bool AllowMultiline { get; set; }
         public string Placeholder { get; set; }
+    }
+
+    public class TextAttribute : FieldAttribute
+    {
+        public bool AllowMultiline { get; set; } = false;
+        public string Placeholder { get; set; }
+
+        public override FieldProvider CreateFieldProvider()
+        {
+            return new TextField();
+        }
     }
 }

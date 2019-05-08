@@ -6,13 +6,13 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ImageAttribute : FieldAttribute
     {
-        public override Field CreateField()
+        public override FieldProvider CreateFieldProvider()
         {
             return new ImageField();
         }
     }
 
-    public class ImageField : Field<ImageAttribute>
+    public class ImageField : FieldProvider<ImageAttribute>
     {
         private static readonly Type ImageValueType = typeof(ImageValue);
 

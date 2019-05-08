@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Content
         private static readonly object[] ModelConstructorParameters = new object[0];
         private readonly ConstructorInfo modelConstructor = null;
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
-        private readonly List<Field> fields = new List<Field>();
+        private readonly List<FieldProvider> fields = new List<FieldProvider>();
         private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
         private readonly ConstructorInfo contentConstructor;
 
@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Content
         public string Description { get; }
         public ContentMetadataProvider BaseMetadata { get; }
         public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
-        public IEnumerable<Field> Fields => fields;
+        public IEnumerable<FieldProvider> Fields => fields;
 
         #endregion
 
@@ -95,7 +95,7 @@ namespace BrandUp.Pages.Content
                 if (attr == null)
                     continue;
 
-                var field = attr.CreateField();
+                var field = attr.CreateFieldProvider();
                 if (field == null)
                     throw new InvalidOperationException();
 
@@ -108,20 +108,20 @@ namespace BrandUp.Pages.Content
                 if (attr == null)
                     continue;
 
-                var field = attr.CreateField();
+                var field = attr.CreateFieldProvider();
                 if (field == null)
                     throw new InvalidOperationException();
 
                 InitializeField(metadataManager, field, propertyInfo, attr);
             }
         }
-        private void InitializeField(ContentMetadataManager metadataManager, Field field, MemberInfo typeMember, FieldAttribute attr)
+        private void InitializeField(ContentMetadataManager metadataManager, FieldProvider field, MemberInfo typeMember, FieldAttribute attr)
         {
             field.Initialize(metadataManager, typeMember, attr);
 
             AddField(field);
         }
-        private void AddField(Field field)
+        private void AddField(FieldProvider field)
         {
             var fIndex = fields.Count;
 
@@ -129,7 +129,7 @@ namespace BrandUp.Pages.Content
             fields.Add(field);
         }
         [System.Diagnostics.DebuggerStepThrough]
-        public bool TryGetField(string fieldName, out Field field)
+        public bool TryGetField(string fieldName, out FieldProvider field)
         {
             if (fieldName == null)
                 throw new ArgumentNullException(nameof(fieldName));
@@ -202,7 +202,7 @@ namespace BrandUp.Pages.Content
 
             foreach (var kv in dictionary)
             {
-                if (!TryGetField(kv.Key, out Field field))
+                if (!TryGetField(kv.Key, out FieldProvider field))
                     continue;
 
                 var dataValue = kv.Value;

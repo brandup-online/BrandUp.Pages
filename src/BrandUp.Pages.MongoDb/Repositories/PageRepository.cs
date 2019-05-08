@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -12,7 +11,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageRepository : MongoRepository<PageDocument>, IPageRepositiry
     {
-        private readonly IContentMetadataManager contentMetadataManager;
         private static readonly Expression<Func<PageDocument, Page>> PageProjectionExpression;
 
         static PageRepository()
@@ -28,10 +26,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
         }
 
-        public PageRepository(IPagesDbContext dbContext, IContentMetadataManager contentMetadataManager) : base(dbContext.Pages)
-        {
-            this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
-        }
+        public PageRepository(IPagesDbContext dbContext) : base(dbContext.Pages) { }
 
         public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageTitle, IDictionary<string, object> contentData)
         {
@@ -113,14 +108,18 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return new PageContent(1, MongoDbHelper.BsonDocumentToDictionary(pageDocument.Content));
         }
-        public async Task SetContentAsync(Guid pageId, PageContent content)
+        public async Task SetContentAsync(Guid pageId, string title, PageContent content)
         {
+            if (title == null)
+                throw new ArgumentNullException(nameof(title));
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
 
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
 
-            var updateDefinition = Builders<PageDocument>.Update.Set(it => it.Content, contentDataDocument);
+            var updateDefinition = Builders<PageDocument>.Update
+                .Set(it => it.Content, contentDataDocument)
+                .Set(it => it.Title, title);
 
             var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
 
