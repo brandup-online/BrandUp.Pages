@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.ContentModels;
+using System;
 using System.Linq;
 using Xunit;
 
@@ -112,6 +113,47 @@ namespace BrandUp.Pages.Content
             Assert.Equal(derivedMetadata[0], metadataManager.GetMetadata<TestPageContent>());
             Assert.Equal(derivedMetadata[1], metadataManager.GetMetadata<ArticlePage>());
             Assert.Equal(derivedMetadata[2], metadataManager.GetMetadata<NewsPage>());
+        }
+
+        [Fact]
+        public void IsInherited()
+        {
+            var contentMetadata1 = metadataManager.GetMetadata<ArticlePage>();
+            var contentMetadata2 = metadataManager.GetMetadata<NewsPage>();
+
+            Assert.False(contentMetadata1.IsInherited(contentMetadata1));
+            Assert.False(contentMetadata1.IsInherited(contentMetadata2));
+            Assert.True(contentMetadata2.IsInherited(contentMetadata1));
+        }
+
+        [Fact]
+        public void IsInheritedOrEqual()
+        {
+            var contentMetadata1 = metadataManager.GetMetadata<ArticlePage>();
+            var contentMetadata2 = metadataManager.GetMetadata<NewsPage>();
+
+            Assert.True(contentMetadata1.IsInheritedOrEqual(contentMetadata1));
+            Assert.False(contentMetadata1.IsInheritedOrEqual(contentMetadata2));
+            Assert.True(contentMetadata2.IsInheritedOrEqual(contentMetadata1));
+        }
+
+        [Fact]
+        public void Implicit_Type()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+            var type = (Type)contentMetadata;
+
+            Assert.True(contentMetadata == typeof(ArticlePage));
+            Assert.Equal(typeof(ArticlePage), type);
+        }
+
+        [Fact]
+        public void Implicit_Null_Type()
+        {
+            ContentMetadataProvider contentMetadata = null;
+            var type = (Type)contentMetadata;
+
+            Assert.Null(type);
         }
 
         #endregion

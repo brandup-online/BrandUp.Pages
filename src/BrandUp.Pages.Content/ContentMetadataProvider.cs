@@ -283,6 +283,14 @@ namespace BrandUp.Pages.Content
             return !(x == y);
         }
 
+        public static implicit operator Type(ContentMetadataProvider metadataProvider)
+        {
+            if (metadataProvider == null)
+                return null;
+
+            return metadataProvider.ModelType;
+        }
+
         #endregion
     }
 }
