@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents
@@ -11,5 +12,8 @@ namespace LandingWebSite.Contents
 
         [Html]
         public string Text { get; set; }
+
+        [Image]
+        public ImageValue Image { get; set; }
     }
 }

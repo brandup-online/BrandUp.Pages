@@ -2,6 +2,7 @@
 import { DOM, AjaxQueue } from "brandup-ui";
 import { Field } from "../form/field";
 import { TextField } from "../form/textbox";
+import { ImageField } from "../form/image";
 
 export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
@@ -48,12 +49,16 @@ export class PageEditDialog extends Dialog<any> {
                     var fieldModel = data.fields[i];
 
                     switch (fieldModel.type) {
-                        case "TextField": {
+                        case "Text": {
                             this.addField(fieldModel.title, new TextField(fieldModel.name, fieldModel.options));
                             break;
                         }
-                        case "HtmlField": {
+                        case "Html": {
                             this.addField(fieldModel.title, new TextField(fieldModel.name, fieldModel.options));
+                            break;
+                        }
+                        case "Image": {
+                            this.addField(fieldModel.title, new ImageField(fieldModel.name, fieldModel.options));
                             break;
                         }
                         default: {
@@ -134,7 +139,7 @@ export class PageEditDialog extends Dialog<any> {
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
-        var containerElem = DOM.tag("div", { class: "form-field" });
+        var containerElem = DOM.tag("div", { class: "field" });
 
         if (title)
             containerElem.appendChild(DOM.tag("label", { for: field.name }, title));

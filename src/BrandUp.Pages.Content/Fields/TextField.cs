@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
 {
     public class TextAttribute : FieldProviderAttribute, ITextField
     {
+        #region ITextField members
+
         public bool AllowMultiline { get; set; }
         public string Placeholder { get; set; }
 
+        #endregion
+
         #region ModelField members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
+        protected override void OnInitialize()
         {
             var valueType = ValueType;
             if (valueType != typeof(string))
@@ -42,6 +45,7 @@ namespace BrandUp.Pages.Content.Fields
 
     public interface ITextField : IFieldProvider
     {
-
+        bool AllowMultiline { get; }
+        string Placeholder { get; }
     }
 }

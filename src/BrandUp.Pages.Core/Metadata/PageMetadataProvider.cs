@@ -33,7 +33,7 @@ namespace BrandUp.Pages.Metadata
             PageTitleAttribute titleAttribute = null;
             foreach (var field in contentMetadata.Fields)
             {
-                titleAttribute = field.Member.Member.GetCustomAttribute<PageTitleAttribute>(true);
+                titleAttribute = field.Binding.Member.GetCustomAttribute<PageTitleAttribute>(true);
                 if (titleAttribute == null)
                     continue;
 

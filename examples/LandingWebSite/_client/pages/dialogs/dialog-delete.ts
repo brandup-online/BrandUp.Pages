@@ -1,5 +1,6 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
 import { DOM, ajaxRequest } from "brandup-ui";
+import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     private __textElem: HTMLElement;

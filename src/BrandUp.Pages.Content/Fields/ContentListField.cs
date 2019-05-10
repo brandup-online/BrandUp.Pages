@@ -8,17 +8,14 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ContentListAttribute : FieldProviderAttribute, IFieldNavigationSupported
     {
-        private ContentMetadataManager metadataManager;
         private ConstructorInfo _valueConstructor;
 
         public ContentMetadataProvider ValueContentMetadata { get; private set; }
 
-        #region Field members
+        #region FieldProviderAttribute members
 
-        protected override void OnInitialize(ContentMetadataManager metadataManager, MemberInfo typeMember)
+        protected override void OnInitialize()
         {
-            this.metadataManager = metadataManager;
-
             var valueType = ValueType;
 
             if (!valueType.IsGenericType || valueType.GetGenericTypeDefinition() != typeof(List<>))
@@ -33,7 +30,7 @@ namespace BrandUp.Pages.Content.Fields
             if (!ContentMetadataManager.IsContent(listItemType.GetTypeInfo()))
                 throw new InvalidOperationException();
 
-            if (!metadataManager.TryGetMetadata(listItemType, out ContentMetadataProvider contentMetadata))
+            if (!ContentMetadata.Manager.TryGetMetadata(listItemType, out ContentMetadataProvider contentMetadata))
                 throw new InvalidOperationException();
             ValueContentMetadata = contentMetadata;
         }
@@ -88,7 +85,7 @@ namespace BrandUp.Pages.Content.Fields
             {
                 foreach (var item in list)
                 {
-                    var itemMetadata = metadataManager.GetMetadata(item.GetType());
+                    var itemMetadata = ContentMetadata.Manager.GetMetadata(item.GetType());
 
                     formValue.Items.Add(new ContentListItem
                     {

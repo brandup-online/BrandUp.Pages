@@ -1,15 +1,18 @@
 ﻿using System;
-using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class HtmlAttribute : FieldProviderAttribute
+    public class HtmlAttribute : FieldProviderAttribute, IHtmlField
     {
+        #region IHtmlField members
+
         public string Placeholder { get; set; }
+
+        #endregion
 
         #region ModelField members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
+        protected override void OnInitialize()
         {
             var valueType = ValueType;
             if (valueType != typeof(string))
@@ -24,7 +27,7 @@ namespace BrandUp.Pages.Content.Fields
         }
         public override object GetFormOptions(IServiceProvider services)
         {
-            return new TextFieldFormOptions
+            return new HtmlFieldFormOptions
             {
                 Placeholder = Placeholder
             };
@@ -36,5 +39,10 @@ namespace BrandUp.Pages.Content.Fields
     public class HtmlFieldFormOptions
     {
         public string Placeholder { get; set; }
+    }
+
+    public interface IHtmlField : IFieldProvider
+    {
+        string Placeholder { get; }
     }
 }

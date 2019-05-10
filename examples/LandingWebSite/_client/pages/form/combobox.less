@@ -1,0 +1,99 @@
+﻿@import "../vars.less";
+
+.website-form-field.combobox {
+    position: relative;
+    line-height: 20px;
+    outline: none;
+    border-bottom: solid 1px #eee;
+
+    &::before {
+        content: '';
+        position: absolute;
+        right: 3px;
+        top: 14px;
+        height: 10px;
+        width: 10px;
+        background: url(../svg/combobox-arrow.svg) no-repeat 100% 50%;
+        background-size: 10px;
+        opacity: 0.7;
+        transition: ease transform 150ms;
+    }
+
+    &:focus,
+    &:hover {
+        border-bottom-color: #ddd;
+
+        &::before {
+            opacity: 0.9;
+        }
+    }
+
+    & .value {
+        font-weight: 500;
+        padding: 7px 0 5px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    & .placeholder {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        color: #D4D4D4;
+        cursor: pointer;
+        padding: 7px 0 5px;
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    & ul {
+        display: none;
+        list-style: none;
+        padding: 10px 0;
+        margin: 0;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #FFFFFF;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        border: solid 1px #ddd;
+        z-index: 100;
+
+        & li {
+            padding: 4px 20px;
+            margin: 0;
+            opacity: 0.8;
+            cursor: pointer;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            &.selected {
+                opacity: 1;
+            }
+        }
+    }
+
+    &.has-value {
+        & .placeholder {
+            visibility: hidden;
+        }
+    }
+
+    &.expanded,
+    &:focus {
+        border-bottom-color: transparent;
+
+        &::before {
+            transform: rotate(180deg);
+        }
+
+        & ul {
+            display: block;
+        }
+    }
+}

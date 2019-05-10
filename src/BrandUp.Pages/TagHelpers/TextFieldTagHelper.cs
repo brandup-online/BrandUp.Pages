@@ -18,7 +18,7 @@ namespace BrandUp.Pages.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             var contentContext = ViewContext.ViewData["_ContentContext_"] as ContentContext;
-            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out FieldProviderAttribute field) || !(field is ITextField))
+            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || !(field is ITextField))
                 throw new Exception();
 
             var textField = (ITextField)field;

@@ -3,6 +3,7 @@ import { DOM, AjaxQueue } from "brandup-ui";
 import { Field } from "../form/field";
 import { TextFieldOptions, TextField } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
+import "./dialog-form.less";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
     private __formElem: HTMLFormElement;
@@ -190,7 +191,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
-        var containerElem = DOM.tag("div", { class: "form-field" });
+        var containerElem = DOM.tag("div", { class: "field" });
 
         if (title)
             containerElem.appendChild(DOM.tag("label", { for: field.name }, title));

@@ -105,9 +105,23 @@ namespace BrandUp.Pages.Content
                 InitializeField(field, propertyInfo);
             }
         }
-        private void InitializeField(FieldProviderAttribute field, MemberInfo typeMember)
+        private void InitializeField(FieldProviderAttribute field, MemberInfo fieldMember)
         {
-            field.Initialize(Manager, typeMember);
+            IModelBinding modelBinding;
+
+            switch (fieldMember.MemberType)
+            {
+                case MemberTypes.Field:
+                    modelBinding = new FieldModelBinding((FieldInfo)fieldMember);
+                    break;
+                case MemberTypes.Property:
+                    modelBinding = new PropertyModelBinding((PropertyInfo)fieldMember);
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+
+            field.Initialize(this, modelBinding);
 
             AddField(field);
         }
@@ -119,7 +133,7 @@ namespace BrandUp.Pages.Content
             fields.Add(field);
         }
         [System.Diagnostics.DebuggerStepThrough]
-        public bool TryGetField(string fieldName, out FieldProviderAttribute field)
+        public bool TryGetField(string fieldName, out IFieldProvider field)
         {
             if (fieldName == null)
                 throw new ArgumentNullException(nameof(fieldName));
@@ -193,7 +207,7 @@ namespace BrandUp.Pages.Content
 
             foreach (var kv in dictionary)
             {
-                if (!TryGetField(kv.Key, out FieldProviderAttribute field))
+                if (!TryGetField(kv.Key, out IFieldProvider field))
                     continue;
 
                 var dataValue = kv.Value;

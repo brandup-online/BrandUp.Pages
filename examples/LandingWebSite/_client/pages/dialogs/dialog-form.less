@@ -1,0 +1,36 @@
+﻿@import "../vars.less";
+
+.website-dialog-form {
+    & form {
+        display: block;
+        padding: 20px 35px;
+    }
+
+    & .fields {
+        padding: 10px 0;
+    }
+
+    & .field {
+        padding-bottom: 25px;
+
+        & label {
+            font-size: 12px;
+            font-weight: normal;
+            padding-bottom: 4px;
+            color: #8b8b8b;
+        }
+
+        & ul.field-errors {
+            list-style: none;
+            padding: 3px 0 0;
+            margin: 0;
+            color: red;
+            font-size: 12px;
+
+            & li {
+                padding: 2px 0;
+                margin: 0;
+            }
+        }
+    }
+}

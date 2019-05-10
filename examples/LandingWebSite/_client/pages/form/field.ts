@@ -1,4 +1,5 @@
 ﻿import { UIControl, DOM } from "brandup-ui";
+import "./field.less";
 
 export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     readonly name: string;
@@ -11,7 +12,7 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     }
 
     protected _onRender() {
-        this.element.classList.add("field");
+        this.element.classList.add("website-form-field");
 
         this.__createEvent("changed", { bubbles: true, cancelable: false });
     }

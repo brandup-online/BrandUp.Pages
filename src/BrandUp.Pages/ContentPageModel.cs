@@ -109,6 +109,8 @@ namespace BrandUp.Pages
             await base.OnPageHandlerExecutionAsync(context, next);
         }
 
+        #region Handler methods
+
         public IActionResult OnGetAsync()
         {
             return Page();
@@ -161,13 +163,16 @@ namespace BrandUp.Pages
             {
                 formModel.Fields.Add(new Models.ContentFieldModel
                 {
-                    Type = field.GetType().Name,
+                    Type = field.Type,
                     Name = field.Name,
                     Title = field.Title,
                     Options = field.GetFormOptions(contentContext.Services)
                 });
 
-                formModel.Values.Add(field.Name, await field.GetFormValueAsync(field.GetModelValue(contentContext.Content), contentContext.Services));
+                var modelValue = field.GetModelValue(contentContext.Content);
+                var formValue = await field.GetFormValueAsync(modelValue, contentContext.Services);
+
+                formModel.Values.Add(field.Name, formValue);
             }
 
             return new OkObjectResult(formModel);
@@ -184,7 +189,7 @@ namespace BrandUp.Pages
             if (contentContext == null)
                 return BadRequest();
 
-            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out FieldProviderAttribute field))
+            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out IFieldProvider field))
                 return BadRequest();
 
             object newValue;
@@ -200,7 +205,7 @@ namespace BrandUp.Pages
                     }
                 }
             }
-            else if (field is HtmlAttribute)
+            else if (field is IHtmlField)
             {
                 using (var streamReader = new System.IO.StreamReader(Request.Body))
                 {
@@ -247,5 +252,7 @@ namespace BrandUp.Pages
 
             return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(page));
         }
+
+        #endregion
     }
 }

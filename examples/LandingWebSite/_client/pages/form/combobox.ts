@@ -1,5 +1,6 @@
 ﻿import { Field } from "./field";
 import { DOM } from "brandup-ui";
+import "./combobox.less";
 
 export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     private __valueElem: HTMLElement;

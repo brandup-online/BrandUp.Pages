@@ -27,6 +27,7 @@
     <None Remove="_client\pages\dialogs\page-publish.ts" />
     <None Remove="_client\pages\form\combobox.ts" />
     <None Remove="_client\pages\form\field.ts" />
+    <None Remove="_client\pages\form\image.ts" />
     <None Remove="_client\pages\form\textbox.ts" />
     <None Remove="_client\pages\root.ts" />
     <None Remove="_client\pages\typings\models.d.ts" />
@@ -69,6 +70,7 @@
     <TypeScriptCompile Include="_client\pages\dialogs\page-publish.ts" />
     <TypeScriptCompile Include="_client\pages\form\combobox.ts" />
     <TypeScriptCompile Include="_client\pages\form\field.ts" />
+    <TypeScriptCompile Include="_client\pages\form\image.ts" />
     <TypeScriptCompile Include="_client\pages\form\textbox.ts" />
     <TypeScriptCompile Include="_client\pages\root.ts" />
     <TypeScriptCompile Include="_client\pages\typings\models.d.ts" />

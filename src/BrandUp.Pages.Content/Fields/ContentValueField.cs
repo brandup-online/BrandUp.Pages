@@ -7,21 +7,17 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ContentValueAttribute : FieldProviderAttribute, IFieldNavigationSupported
     {
-        private ContentMetadataManager metadataProvider;
-
         public ContentMetadataProvider ValueContentMetadata { get; private set; }
 
         #region Field members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
+        protected override void OnInitialize()
         {
-            this.metadataProvider = metadataProvider;
-
             var valueType = ValueType;
             if (!ContentMetadataManager.IsContent(valueType.GetTypeInfo()))
                 throw new InvalidOperationException();
 
-            if (!metadataProvider.TryGetMetadata(valueType, out ContentMetadataProvider contentMetadata))
+            if (!ContentMetadata.Manager.TryGetMetadata(valueType, out ContentMetadataProvider contentMetadata))
                 throw new InvalidOperationException();
             ValueContentMetadata = contentMetadata;
         }

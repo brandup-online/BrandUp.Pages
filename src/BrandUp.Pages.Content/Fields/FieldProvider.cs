@@ -7,9 +7,10 @@ namespace BrandUp.Pages.Content.Fields
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public abstract class FieldProviderAttribute : Attribute, IFieldProvider
     {
+        private const string TypeValueSuffiks = "Attribute";
         private static readonly Type IEquatableType = typeof(IEquatable<>);
         private MethodInfo equalMethodInfo = null;
-        private IFieldModelMember fieldModelMember;
+        private IModelBinding modelBinding;
 
         #region Properties
 
@@ -19,41 +20,25 @@ namespace BrandUp.Pages.Content.Fields
 
         protected internal FieldProviderAttribute() { }
 
-        #region IFieldProvider members
-
-        public IFieldModelMember Member => fieldModelMember;
-        public string Name { get; set; }
-        public string Title { get; set; }
-        public bool IsRequired { get; set; } = false;
-        public Type ValueType { get; private set; }
-        public bool AllowNull { get; private set; }
-
-        #endregion
-
-        internal virtual void Initialize(ContentMetadataManager metadataProvider, MemberInfo fieldMember)
+        internal virtual void Initialize(ContentMetadataProvider contentMetadata, IModelBinding modelBinding)
         {
-            switch (fieldMember.MemberType)
-            {
-                case MemberTypes.Field:
-                    fieldModelMember = new ModelFieldDeclarationAsField((FieldInfo)fieldMember);
-                    break;
-                case MemberTypes.Property:
-                    fieldModelMember = new ModelFieldDeclarationAsProperty((PropertyInfo)fieldMember);
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
+            ContentMetadata = contentMetadata;
+            this.modelBinding = modelBinding;
+
+            Type = GetType().Name;
+            if (Type.EndsWith(TypeValueSuffiks))
+                Type = Type.Substring(0, Type.Length - TypeValueSuffiks.Length);
 
             if (Name == null)
-                Name = fieldModelMember.Name;
+                Name = this.modelBinding.Name;
             if (Title == null)
                 Title = Name;
 
             JsonPropertyName = Name.Substring(0, 1).ToLower() + Name.Substring(1);
 
-            var valueType = fieldModelMember.ValueType;
+            var valueType = this.modelBinding.ValueType;
 
-            if (IsNullable(valueType))
+            if (valueType.IsNullable())
             {
                 AllowNull = true;
                 valueType = valueType.GenericTypeArguments[0];
@@ -65,13 +50,20 @@ namespace BrandUp.Pages.Content.Fields
 
             ValueType = valueType;
 
-            OnInitialize(metadataProvider, fieldMember);
+            OnInitialize();
         }
-        protected abstract void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember);
+        protected abstract void OnInitialize();
 
-        private static bool IsNullable(Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        #region IFieldProvider members
 
-        #region Value methods
+        public ContentMetadataProvider ContentMetadata { get; private set; }
+        public IModelBinding Binding => modelBinding;
+        public string Type { get; private set; }
+        public string Name { get; private set; }
+        public string Title { get; set; }
+        public bool IsRequired { get; set; } = false;
+        public Type ValueType { get; private set; }
+        public bool AllowNull { get; private set; }
 
         [System.Diagnostics.DebuggerStepThrough]
         public virtual bool HasValue(object value)
@@ -81,11 +73,14 @@ namespace BrandUp.Pages.Content.Fields
         [System.Diagnostics.DebuggerStepThrough]
         public object GetModelValue(object model)
         {
-            return fieldModelMember.GetValue(model);
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            return modelBinding.GetValue(model);
         }
-        public bool TryGetValue(object model, out object value)
+        public bool TryGetModelValue(object model, out object value)
         {
-            var val = fieldModelMember.GetValue(model);
+            var val = GetModelValue(model);
             if (!HasValue(val))
             {
                 value = null;
@@ -98,7 +93,10 @@ namespace BrandUp.Pages.Content.Fields
         [System.Diagnostics.DebuggerStepThrough]
         public void SetModelValue(object model, object value)
         {
-            fieldModelMember.SetValue(model, value);
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            modelBinding.SetValue(model, value);
         }
         [System.Diagnostics.DebuggerStepThrough]
         public virtual bool CompareValues(object left, object right)
@@ -127,9 +125,6 @@ namespace BrandUp.Pages.Content.Fields
 
             return left.Equals(right);
         }
-
-        #endregion
-
         public virtual object ConvetValueToData(object value)
         {
             return value;
@@ -138,7 +133,6 @@ namespace BrandUp.Pages.Content.Fields
         {
             return value;
         }
-
         public virtual Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
             return Task.FromResult(modelValue);
@@ -147,85 +141,8 @@ namespace BrandUp.Pages.Content.Fields
         {
             return null;
         }
-
         public abstract object ParseValue(string strValue);
 
-        private class ModelFieldDeclarationAsField : IFieldModelMember
-        {
-            private readonly FieldInfo field;
-
-            public ModelFieldDeclarationAsField(FieldInfo field)
-            {
-                this.field = field;
-            }
-
-            public MemberInfo Member => field;
-            public string Name => field.Name;
-            public Type ValueType => field.FieldType;
-            public object GetValue(object obj)
-            {
-                return field.GetValue(obj);
-            }
-            public void SetValue(object obj, object value)
-            {
-                field.SetValue(obj, value);
-            }
-        }
-        private class ModelFieldDeclarationAsProperty : IFieldModelMember
-        {
-            private readonly PropertyInfo property;
-
-            public ModelFieldDeclarationAsProperty(PropertyInfo property)
-            {
-                this.property = property;
-            }
-
-            public MemberInfo Member => property;
-            public string Name => property.Name;
-            public Type ValueType => property.PropertyType;
-            public object GetValue(object obj)
-            {
-                return property.GetValue(obj);
-            }
-            public void SetValue(object obj, object value)
-            {
-                property.SetValue(obj, value);
-            }
-        }
-    }
-
-    public interface IFieldProvider
-    {
-        IFieldModelMember Member { get; }
-        string Name { get; }
-        string Title { get; }
-        bool IsRequired { get; }
-        Type ValueType { get; }
-        bool AllowNull { get; }
-        bool HasValue(object value);
-        object GetModelValue(object model);
-        bool TryGetValue(object model, out object value);
-        void SetModelValue(object model, object value);
-        bool CompareValues(object left, object right);
-        object ConvetValueToData(object value);
-        object ConvetValueFromData(object value);
-        Task<object> GetFormValueAsync(object modelValue, IServiceProvider services);
-        object GetFormOptions(IServiceProvider services);
-        object ParseValue(string strValue);
-    }
-
-    public interface IFieldModelMember
-    {
-        MemberInfo Member { get; }
-        string Name { get; }
-        Type ValueType { get; }
-        object GetValue(object obj);
-        void SetValue(object obj, object value);
-    }
-
-    public interface IFieldNavigationSupported
-    {
-        bool IsList { get; }
-        object Navigate(object value, int index);
+        #endregion
     }
 }

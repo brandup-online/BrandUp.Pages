@@ -1,5 +1,6 @@
 ﻿import { Field } from "./field";
 import { DOM } from "brandup-ui";
+import "./textbox.less";
 
 export class TextField extends Field<string, TextFieldOptions> {
     private __valueElem: HTMLElement;

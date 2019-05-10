@@ -12,9 +12,9 @@ namespace BrandUp.Pages.Content.Fields
 
         public string Placeholder { get; set; }
 
-        #region ModelField members
+        #region FieldProviderAttribute members
 
-        protected override void OnInitialize(ContentMetadataManager metadataProvider, MemberInfo typeMember)
+        protected override void OnInitialize()
         {
             var valueType = ValueType;
             if (!valueType.IsGenericType || valueType.GetGenericTypeDefinition() != typeof(PageCollectionReference<>))
