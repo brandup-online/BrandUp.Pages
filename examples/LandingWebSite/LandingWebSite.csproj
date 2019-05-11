@@ -12,6 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\pages\content\html.ts" />
+    <None Remove="_client\pages\content\image.ts" />
+    <None Remove="_client\pages\content\text.ts" />
     <None Remove="_client\pages\dialogs\dialog-delete.ts" />
     <None Remove="_client\pages\dialogs\dialog-form.ts" />
     <None Remove="_client\pages\dialogs\dialog-list.ts" />
@@ -27,9 +30,9 @@
     <None Remove="_client\pages\dialogs\page-publish.ts" />
     <None Remove="_client\pages\form\combobox.ts" />
     <None Remove="_client\pages\form\field.ts" />
-    <None Remove="_client\pages\form\image.ts" />
     <None Remove="_client\pages\form\textbox.ts" />
     <None Remove="_client\pages\root.ts" />
+    <None Remove="_client\pages\typings\content.d.ts" />
     <None Remove="_client\pages\typings\models.d.ts" />
     <None Remove="_client\root.ts" />
   </ItemGroup>
@@ -55,6 +58,9 @@
 
 
   <ItemGroup>
+    <TypeScriptCompile Include="_client\pages\content\image.ts" />
+    <TypeScriptCompile Include="_client\pages\content\html.ts" />
+    <TypeScriptCompile Include="_client\pages\content\text.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-delete.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-form.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-list.ts" />
@@ -70,9 +76,9 @@
     <TypeScriptCompile Include="_client\pages\dialogs\page-publish.ts" />
     <TypeScriptCompile Include="_client\pages\form\combobox.ts" />
     <TypeScriptCompile Include="_client\pages\form\field.ts" />
-    <TypeScriptCompile Include="_client\pages\form\image.ts" />
     <TypeScriptCompile Include="_client\pages\form\textbox.ts" />
     <TypeScriptCompile Include="_client\pages\root.ts" />
+    <TypeScriptCompile Include="_client\pages\typings\content.d.ts" />
     <TypeScriptCompile Include="_client\pages\typings\models.d.ts" />
     <TypeScriptCompile Include="_client\root.ts" />
   </ItemGroup>
@@ -86,6 +92,15 @@
 
 
   <ItemGroup>
+    <None Update="_client\pages\content\image.js">
+      <DependentUpon>image.ts</DependentUpon>
+    </None>
+    <None Update="_client\pages\content\image.js.map">
+      <DependentUpon>image.js</DependentUpon>
+    </None>
+    <None Update="_client\pages\content\html.js">
+      <DependentUpon>html.ts</DependentUpon>
+    </None>
     <None Update="_client\pages\dialogs\page-collection-update.js">
       <DependentUpon>page-collection-update.ts</DependentUpon>
     </None>

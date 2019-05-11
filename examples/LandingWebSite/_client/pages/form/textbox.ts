@@ -2,7 +2,7 @@
 import { DOM } from "brandup-ui";
 import "./textbox.less";
 
-export class TextField extends Field<string, TextFieldOptions> {
+export class Textbox extends Field<string, TextboxOptions> {
     private __valueElem: HTMLElement;
     private __isChanged: boolean;
 
@@ -49,7 +49,7 @@ export class TextField extends Field<string, TextFieldOptions> {
         this.__valueElem.addEventListener("blur", () => {
             this.element.classList.remove("focused");
             if (this.__isChanged)
-                this.__onChanged();
+                this._onChanged();
         });
     }
 
@@ -60,7 +60,7 @@ export class TextField extends Field<string, TextFieldOptions> {
         else
             this.element.classList.remove("has-value");
     }
-    private __onChanged() {
+    protected _onChanged() {
         this.__refreshUI();
 
         this.raiseChanged();
@@ -96,7 +96,7 @@ export class TextField extends Field<string, TextFieldOptions> {
         return value;
     }
 }
-export interface TextFieldOptions {
+export interface TextboxOptions {
     placeholder?: string;
     allowMultiline?: boolean;
 }

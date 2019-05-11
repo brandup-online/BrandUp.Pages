@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc;
@@ -176,59 +175,6 @@ namespace BrandUp.Pages
             }
 
             return new OkObjectResult(formModel);
-        }
-
-        public async Task<IActionResult> OnPostChangeValueAsync([FromQuery]string contentPath, [FromQuery] string fieldName, [FromServices]IPageEditingService pageEditingService)
-        {
-            if (editSession == null)
-                return BadRequest();
-            if (contentPath == null)
-                contentPath = string.Empty;
-
-            var contentContext = ContentContext.Navigate(contentPath);
-            if (contentContext == null)
-                return BadRequest();
-
-            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out IFieldProvider field))
-                return BadRequest();
-
-            object newValue;
-
-            if (field is ITextField)
-            {
-                using (var streamReader = new System.IO.StreamReader(Request.Body))
-                {
-                    using (var jsonReader = new Newtonsoft.Json.JsonTextReader(streamReader))
-                    {
-                        var serializer = new Newtonsoft.Json.JsonSerializer();
-                        newValue = serializer.Deserialize(jsonReader, field.ValueType);
-                    }
-                }
-            }
-            else if (field is IHtmlField)
-            {
-                using (var streamReader = new System.IO.StreamReader(Request.Body))
-                {
-                    using (var jsonReader = new Newtonsoft.Json.JsonTextReader(streamReader))
-                    {
-                        var serializer = new Newtonsoft.Json.JsonSerializer();
-                        newValue = serializer.Deserialize(jsonReader, field.ValueType);
-                    }
-                }
-            }
-            else
-                throw new Exception();
-
-            field.SetModelValue(contentContext.Content, newValue);
-
-            await pageEditingService.SetContentAsync(editSession, ContentContext.Content);
-
-            var result = new Models.ContentFieldChangeResult
-            {
-                Value = await field.GetFormValueAsync(field.GetModelValue(contentContext.Content), contentContext.Services)
-            };
-
-            return new OkObjectResult(result);
         }
 
         public async Task<IActionResult> OnPostCommitEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)

@@ -44,12 +44,12 @@ namespace BrandUp.Pages.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<IFileDocument> UploadFileAsync(string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> UploadFileAsync(string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }
 
-        public Task<IFileDocument> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }

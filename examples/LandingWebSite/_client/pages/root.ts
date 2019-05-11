@@ -88,7 +88,7 @@ class PageToolbar extends UIElement {
         this.setElement(toolbarElem);
 
         this.registerCommand("brandup-pages-edit", () => {
-            editPage().then(() => {
+            editPage(p.page.editId).then(() => {
                 location.reload();
             });
         });

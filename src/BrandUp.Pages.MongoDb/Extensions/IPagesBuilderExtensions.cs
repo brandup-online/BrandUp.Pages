@@ -35,10 +35,10 @@ namespace BrandUp.Pages.Builder
 
         public static void AddMongoDbRepositories(IServiceCollection services)
         {
-            services.AddScoped<IPageCollectionRepositiry, PageCollectionRepository>();
-            services.AddScoped<IPageRepositiry, PageRepository>();
-            services.AddScoped<Content.IFileRepository, FileRepository>();
-            services.AddScoped<IPageEditSessionRepository, PageEditSessionRepository>();
+            services.AddSingleton<IPageCollectionRepositiry, PageCollectionRepository>();
+            services.AddSingleton<IPageRepositiry, PageRepository>();
+            services.AddSingleton<Content.IFileRepository, FileRepository>();
+            services.AddSingleton<IPageEditSessionRepository, PageEditSessionRepository>();
         }
     }
 }

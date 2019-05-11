@@ -1,12 +1,20 @@
-﻿import { Field } from "./field";
+﻿import { IContentField, IContentForm } from "../typings/content";
+import { Field } from "../form/field";
 import { DOM } from "brandup-ui";
 import "./image.less";
 
-export class ImageField extends Field<ImageFieldValue, ImageFieldOptions> {
+export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> implements IContentField {
+    readonly form: IContentForm;
     private valueElem: HTMLElement;
     private __isChanged: boolean = false;
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
+
+    constructor(form: IContentForm, name: string, options: ImageFieldOptions) {
+        super(name, options);
+
+        this.form = form;
+    }
 
     get typeName(): string { return "BrandUpPages.Form.Field.Image"; }
 
@@ -90,29 +98,29 @@ export class ImageField extends Field<ImageFieldValue, ImageFieldOptions> {
         if (file instanceof File) {
             let fileObject = <File>file;
 
-            //this.form.queue.request({
-            //    url: window.app.uri(`api/content/image`),
-            //    urlParams: {
-            //        editId: this.form.editId,
-            //        path: this.form.modelPath,
-            //        field: this.name,
-            //        fileName: file.name
-            //    },
-            //    method: "POST",
-            //    data: fileObject,
-            //    success: (data: ImageFieldValue, status: number) => {
-            //        switch (status) {
-            //            case 200:
-            //                this.setValue(data);
+            this.form.queue.request({
+                url: `/brandup.pages/content/image`,
+                urlParams: {
+                    editId: this.form.editId,
+                    path: this.form.contentPath,
+                    field: this.name,
+                    fileName: file.name
+                },
+                method: "POST",
+                data: fileObject,
+                success: (data: ImageFieldValue, status: number) => {
+                    switch (status) {
+                        case 200:
+                            this.setValue(data);
 
-            //                this.valueElem.classList.remove("uploading");
+                            this.valueElem.classList.remove("uploading");
 
-            //                break;
-            //            default:
-            //                throw "";
-            //        }
-            //    }
-            //});
+                            break;
+                        default:
+                            throw "";
+                    }
+                }
+            });
 
             return;
         }
@@ -127,6 +135,11 @@ export class ImageField extends Field<ImageFieldValue, ImageFieldOptions> {
 
     private __refreshValueUI() {
         this.valueElem.style.backgroundImage = this.__value ? "url(" + this.__value.previewUrl + ")" : "none";
+
+        if (this.__value)
+            this.element.classList.add("has-value");
+        else
+            this.element.classList.remove("has-value");
     }
 
     getValue(): ImageFieldValue {

@@ -1,19 +1,22 @@
 ﻿import { DialogOptions, Dialog } from "./dialog";
 import { DOM, AjaxQueue } from "brandup-ui";
-import { Field } from "../form/field";
-import { TextField } from "../form/textbox";
-import { ImageField } from "../form/image";
+import { IContentForm, IContentField } from "../typings/content";
+import { TextContent } from "../content/text";
+import { HtmlContent } from "../content/html";
+import { ImageContent } from "../content/image";
 
-export class PageEditDialog extends Dialog<any> {
+export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
     private __fieldsElem: HTMLElement;
-    private __fields: { [key: string]: Field<any, any> } = {};
+    private __fields: { [key: string]: IContentField } = {};
     readonly queue: AjaxQueue;
+    readonly editId: string;
     readonly contentPath: string;
 
-    constructor(contentPath?: string, options?: DialogOptions) {
+    constructor(editId: string, contentPath?: string, options?: DialogOptions) {
         super(options);
 
+        this.editId = editId;
         this.contentPath = contentPath ? contentPath : "";
         this.queue = new AjaxQueue();
     }
@@ -30,12 +33,15 @@ export class PageEditDialog extends Dialog<any> {
             e.preventDefault();
             return false;
         });
-        this.__formElem.addEventListener("changed", (e: CustomEvent) => {
-            this.__onChangeField(e.detail.field);
-        });
+        //this.__formElem.addEventListener("changed", (e: CustomEvent) => {
+        //    this.__onChangeField(e.detail.field);
+        //});
 
         this.setHeader("Контент страницы");
 
+        this.__loadForm();
+    }
+    private __loadForm() {
         this.queue.request({
             urlParams: { handler: "FormModel", contentPath: this.contentPath },
             method: "GET",
@@ -45,48 +51,53 @@ export class PageEditDialog extends Dialog<any> {
                     return;
                 }
 
-                for (let i = 0; i < data.fields.length; i++) {
-                    var fieldModel = data.fields[i];
+                this.__renderForm(data);
 
-                    switch (fieldModel.type) {
-                        case "Text": {
-                            this.addField(fieldModel.title, new TextField(fieldModel.name, fieldModel.options));
-                            break;
-                        }
-                        case "Html": {
-                            this.addField(fieldModel.title, new TextField(fieldModel.name, fieldModel.options));
-                            break;
-                        }
-                        case "Image": {
-                            this.addField(fieldModel.title, new ImageField(fieldModel.name, fieldModel.options));
-                            break;
-                        }
-                        default: {
-                            throw "";
-                        }
-                    }
-                }
-
-                this.setValues(data.values);
+                
             }
         });
     }
-    private __onChangeField(field: Field<any, any>) {
-        this.queue.request({
-            urlParams: { handler: "ChangeValue", contentPath: this.contentPath, fieldName: field.name },
-            method: "POST",
-            type: "JSON",
-            data: field.getValue(),
-            success: (data: ContentFieldChangeResult, status: number) => {
-                if (status !== 200) {
-                    this.setError("Не удалось изменить значение поля.");
-                    return;
-                }
+    private __renderForm(model: PageContentForm) {
+        for (let i = 0; i < model.fields.length; i++) {
+            var fieldModel = model.fields[i];
 
-                field.setValue(data.value);
+            switch (fieldModel.type) {
+                case "Text": {
+                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, fieldModel.options));
+                    break;
+                }
+                case "Html": {
+                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, fieldModel.options));
+                    break;
+                }
+                case "Image": {
+                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, fieldModel.options));
+                    break;
+                }
+                default: {
+                    throw "";
+                }
             }
-        });
+        }
+
+        this.setValues(model.values);
     }
+    //private __onChangeField(field: Field<any, any>) {
+    //    this.queue.request({
+    //        urlParams: { handler: "ChangeValue", contentPath: this.contentPath, fieldName: field.name },
+    //        method: "POST",
+    //        type: "JSON",
+    //        data: field.getValue(),
+    //        success: (data: ContentFieldChangeResult, status: number) => {
+    //            if (status !== 200) {
+    //                this.setError("Не удалось изменить значение поля.");
+    //                return;
+    //            }
+
+    //            field.setValue(data.value);
+    //        }
+    //    });
+    //}
 
     private __applyModelState(state: ValidationProblemDetails) {
         for (let key in this.__fields) {
@@ -130,12 +141,12 @@ export class PageEditDialog extends Dialog<any> {
         }
     }
 
-    protected getField(name: string): Field<any, any> {
+    getField(name: string): IContentField {
         if (!this.__fields.hasOwnProperty(name.toLowerCase()))
             throw `Field "${name}" not exists.`;
         return this.__fields[name.toLowerCase()];
     }
-    protected addField(title: string, field: Field<any, any>) {
+    protected addField(title: string, field: IContentField) {
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
@@ -181,7 +192,7 @@ interface ContentFieldChangeResult {
     value: any;
 }
 
-export var editPage = (contentPath?: string) => {
-    let dialog = new PageEditDialog(contentPath);
+export var editPage = (editId: string, contentPath?: string) => {
+    let dialog = new PageEditDialog(editId, contentPath);
     return dialog.open();
 };

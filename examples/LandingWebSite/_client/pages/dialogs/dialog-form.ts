@@ -1,7 +1,7 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
 import { DOM, AjaxQueue } from "brandup-ui";
 import { Field } from "../form/field";
-import { TextFieldOptions, TextField } from "../form/textbox";
+import { TextboxOptions, Textbox } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
 import "./dialog-form.less";
 
@@ -202,8 +202,8 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.__fields[field.name.toLowerCase()] = field;
     }
-    protected addTextBox(name: string, title: string, options: TextFieldOptions) {
-        var field = new TextField(name, options);
+    protected addTextBox(name: string, title: string, options: TextboxOptions) {
+        var field = new Textbox(name, options);
         this.addField(title, field);
     }
     protected addComboBox(name: string, title: string, options: ComboBoxFieldOptions, items: Array<ComboBoxItem>) {
