@@ -1,5 +1,5 @@
-﻿using BrandUp.Pages.Data.Repositories;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Builder

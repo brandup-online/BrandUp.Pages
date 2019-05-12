@@ -1,9 +1,10 @@
 ﻿using BrandUp.Pages.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.Repositories
 {
     public class FakePageCollectionRepositiry : IPageCollectionRepositiry
     {
@@ -72,10 +73,17 @@ namespace BrandUp.Pages.Data.Repositories
 
             return Task.CompletedTask;
         }
-
         public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames)
         {
-            throw new NotImplementedException();
+            var result = new List<IPageCollection>();
+
+            foreach (var collection in collections.Values)
+            {
+                if (pageTypeNames.Any(it => it.ToLower() == collection.PageTypeName.ToLower()))
+                    result.Add(collection);
+            }
+
+            return Task.FromResult<IEnumerable<IPageCollection>>(result);
         }
 
         private class PageCollection : IPageCollection

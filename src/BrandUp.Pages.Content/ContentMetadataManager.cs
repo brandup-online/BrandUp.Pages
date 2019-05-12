@@ -11,12 +11,12 @@ namespace BrandUp.Pages.Content
         private readonly Dictionary<Type, int> contentTypes = new Dictionary<Type, int>();
         private readonly Dictionary<string, int> contentNames = new Dictionary<string, int>();
 
-        public ContentMetadataManager(IContentTypeResolver contentTypeResolver)
+        public ContentMetadataManager(IContentLocator contentLocator)
         {
-            if (contentTypeResolver == null)
-                throw new ArgumentNullException(nameof(contentTypeResolver));
+            if (contentLocator == null)
+                throw new ArgumentNullException(nameof(contentLocator));
 
-            foreach (var contentModelType in contentTypeResolver.GetContentTypes())
+            foreach (var contentModelType in contentLocator.ContentTypes)
                 TryRegisterType(contentModelType, out ContentMetadataProvider typeMetadata);
 
             foreach (var metadata in metadataProviders)

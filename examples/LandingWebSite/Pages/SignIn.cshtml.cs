@@ -1,6 +1,8 @@
-﻿namespace LandingWebSite.Pages
+﻿using BrandUp.Pages;
+
+namespace LandingWebSite.Pages
 {
-    public class SignInModel : IAppPageModel
+    public class SignInModel : IContentPageModel
     {
         public string Title => "Sign in";
         public string Description => null;

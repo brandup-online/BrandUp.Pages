@@ -1,6 +1,6 @@
-﻿namespace LandingWebSite.Pages
+﻿namespace BrandUp.Pages
 {
-    public interface IAppPageModel
+    public interface IContentPageModel
     {
         string Title { get; }
         string Description { get; }

@@ -1,19 +1,18 @@
 ﻿using BrandUp.Pages;
-using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 
-namespace LandingWebSite.Contents
+namespace LandingWebSite.Contents.Page
 {
     [PageContent]
-    public class PageContent
+    public abstract class PageContent
     {
-        [Text(Placeholder = "Input page header"), PageTitle]
-        public string Header { get; set; }
+        [Text(Placeholder = "Input page title"), PageTitle]
+        public string Title { get; set; }
 
-        [Html]
-        public string Text { get; set; }
+        [Text(Placeholder = "Input page description")]
+        public string Description { get; set; }
 
-        [Image]
-        public ImageValue Image { get; set; }
+        [Text(Placeholder = "Input page keywords")]
+        public string Keywords { get; set; }
     }
 }

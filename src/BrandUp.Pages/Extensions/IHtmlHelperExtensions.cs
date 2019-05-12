@@ -22,7 +22,7 @@ namespace BrandUp.Pages
 
             var tag = new TagBuilder("div");
 
-            tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~/Contents/Page/Default.cshtml", pageModel.ContentContext.Content, viewData));
+            tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~/Contents/Page/Article.cshtml", pageModel.ContentContext.Content, viewData));
 
             return tag;
         }

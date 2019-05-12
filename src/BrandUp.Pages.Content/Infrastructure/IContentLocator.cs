@@ -3,8 +3,8 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content.Infrastructure
 {
-    public interface IContentTypeResolver
+    public interface IContentLocator
     {
-        IList<TypeInfo> GetContentTypes();
+        IEnumerable<TypeInfo> ContentTypes { get; }
     }
 }

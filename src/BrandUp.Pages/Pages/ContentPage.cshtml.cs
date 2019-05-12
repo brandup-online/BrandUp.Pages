@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages
 {
     [IgnoreAntiforgeryToken]
-    public class ContentPageModel : PageModel
+    public class ContentPageModel : PageModel, IContentPageModel
     {
         private IPage page;
         private IPageEditSession editSession;
@@ -22,6 +22,8 @@ namespace BrandUp.Pages
         public object PageContent { get; private set; }
         public ContentContext ContentContext { get; private set; }
         public string Title => PageMetadata.GetPageTitle(PageContent);
+        public string Description => null;
+        public string Keywords => null;
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
@@ -79,7 +81,7 @@ namespace BrandUp.Pages
                 var routeData = RouteData;
 
                 var pagePath = string.Empty;
-                if (routeData.Values.TryGetValue("url", out object urlValue))
+                if (routeData.Values.TryGetValue("url", out object urlValue) && urlValue != null)
                     pagePath = (string)urlValue;
                 pagePath = pagePath.Trim(new char[] { '/' });
 

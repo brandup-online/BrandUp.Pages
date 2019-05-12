@@ -4,6 +4,7 @@ import { IContentForm, IContentField } from "../typings/content";
 import { TextContent } from "../content/text";
 import { HtmlContent } from "../content/html";
 import { ImageContent } from "../content/image";
+import { ListContent } from "../content/list";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -74,6 +75,10 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                     this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, fieldModel.options));
                     break;
                 }
+                case "ContentList": {
+                    this.addField(fieldModel.title, new ListContent(this, fieldModel.name, fieldModel.options));
+                    break;
+                }
                 default: {
                     throw "";
                 }
@@ -82,22 +87,6 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         this.setValues(model.values);
     }
-    //private __onChangeField(field: Field<any, any>) {
-    //    this.queue.request({
-    //        urlParams: { handler: "ChangeValue", contentPath: this.contentPath, fieldName: field.name },
-    //        method: "POST",
-    //        type: "JSON",
-    //        data: field.getValue(),
-    //        success: (data: ContentFieldChangeResult, status: number) => {
-    //            if (status !== 200) {
-    //                this.setError("Не удалось изменить значение поля.");
-    //                return;
-    //            }
-
-    //            field.setValue(data.value);
-    //        }
-    //    });
-    //}
 
     private __applyModelState(state: ValidationProblemDetails) {
         for (let key in this.__fields) {
@@ -185,10 +174,6 @@ interface ContentFieldModel {
     name: string;
     title: string;
     options: any;
-    value: any;
-}
-
-interface ContentFieldChangeResult {
     value: any;
 }
 

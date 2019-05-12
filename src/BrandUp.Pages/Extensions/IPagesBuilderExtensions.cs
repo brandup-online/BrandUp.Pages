@@ -15,10 +15,12 @@ namespace BrandUp.Pages.Builder
         {
             builder.Services.Configure<RazorPagesOptions>(options =>
             {
-                options.Conventions.AddPageRoute("/Index", "{*url}");
+                options.Conventions.AddPageRoute(Url.RazorPageLinkGenerator.RazorPagePath, "{*url}");
             });
 
             builder.Services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
+
+            builder.Services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
 
             builder.Services.AddHttpContextAccessor();
 

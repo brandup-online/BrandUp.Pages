@@ -2,12 +2,12 @@
 using System;
 using System.Collections.Generic;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.Repositories
 {
     public class FakePageHierarhyRepository
     {
-        readonly Dictionary<Guid, IList<IPageCollection>> collectionsByPages = new Dictionary<Guid, IList<IPageCollection>>();
-        readonly Dictionary<Guid, IList<IPage>> pagesByCollections = new Dictionary<Guid, IList<IPage>>();
+        private readonly Dictionary<Guid, IList<IPageCollection>> collectionsByPages = new Dictionary<Guid, IList<IPageCollection>>();
+        private readonly Dictionary<Guid, IList<IPage>> pagesByCollections = new Dictionary<Guid, IList<IPage>>();
 
         public FakePageHierarhyRepository()
         {

@@ -43,11 +43,22 @@ namespace LandingWebSite.Controllers
         [HttpGet("init", Name = "ApiEnvironmentInitPages")]
         public async Task<IActionResult> InitPagesAsync()
         {
-            var pageContentMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.PageContent));
+            var pageContentMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.ArticlePageContent));
 
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Main", pageContentMetadata.Name, PageSortMode.FirstOld, null);
+            var pageCollection = await pageCollectionService.CreateCollectionAsync("Main pages", pageContentMetadata.Name, PageSortMode.FirstOld, null);
 
             var page = await pageService.CreatePageAsync(pageCollection, pageContentMetadata.Name);
+
+            await pageService.SetPageContentAsync(page, new Contents.Page.ArticlePageContent
+            {
+                Title = "New article",
+                Header = "New article",
+                SubHeader = "New article",
+                Blocks = new List<Contents.PageBlockContent>
+                {
+                    new Contents.TextBlock.TB1 { Text = "New article" }
+                }
+            });
 
             await pageService.PublishPageAsync(page, "index");
 

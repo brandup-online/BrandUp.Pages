@@ -100,6 +100,7 @@ namespace BrandUp.Pages.Content.Fields
 
             return Task.FromResult<object>(formValue);
         }
+
         public override object GetFormOptions(IServiceProvider services)
         {
             var options = new ContentListFieldFormOptions

@@ -29,7 +29,6 @@ export class PageListDialog extends ListDialog<PageModel> {
         this.registerItemCommand("item-open", (itemId: string, model: PageModel) => {
             location.href = model.url;
         });
-        this.registerItemCommand("item-update", (itemId: string) => { });
         this.registerItemCommand("item-delete", (itemId: string) => {
             deletePage(itemId).then((deletedItem: PageModel) => {
                 this.loadItems();
@@ -55,7 +54,6 @@ export class PageListDialog extends ListDialog<PageModel> {
     protected _renderItemMenu(item: PageModel, menuElem: HTMLElement) {
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-open" }, "Open")]));
         menuElem.appendChild(DOM.tag("li", { class: "split" }));
-        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-update" }, "Edit")]));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
     }
     protected _renderEmpty(container: HTMLElement) {

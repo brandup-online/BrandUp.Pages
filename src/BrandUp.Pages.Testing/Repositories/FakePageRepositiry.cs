@@ -1,14 +1,12 @@
 ﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Data.Repositories
+namespace BrandUp.Pages.Repositories
 {
     public class FakePageRepositiry : IPageRepositiry
     {
-        private readonly IPageMetadataManager pageMetadataManager;
         private readonly FakePageHierarhyRepository pageHierarhy;
 
         private int pageIndex = 0;
@@ -16,12 +14,10 @@ namespace BrandUp.Pages.Data.Repositories
         private readonly Dictionary<Guid, int> pageIds = new Dictionary<Guid, int>();
         private readonly Dictionary<string, int> pagePaths = new Dictionary<string, int>();
         private readonly Dictionary<int, PageContent> pageContents = new Dictionary<int, PageContent>();
-        private Guid defaultPageId = Guid.Empty;
 
-        public FakePageRepositiry(FakePageHierarhyRepository pageHierarhy, IPageMetadataManager pageMetadataManager)
+        public FakePageRepositiry(FakePageHierarhyRepository pageHierarhy)
         {
             this.pageHierarhy = pageHierarhy ?? throw new ArgumentNullException(nameof(pageHierarhy));
-            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
         }
 
         public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData)
@@ -57,27 +53,10 @@ namespace BrandUp.Pages.Data.Repositories
 
             return Task.FromResult<IPage>(page);
         }
-        public async Task<IPage> GetDefaultPageAsync()
-        {
-            if (defaultPageId == Guid.Empty)
-                return null;
-
-            var defualtPage = await FindPageByIdAsync(defaultPageId);
-            if (defualtPage == null)
-                throw new InvalidOperationException();
-
-            return defualtPage;
-        }
         public Task<IEnumerable<IPage>> GetPagesAsync(Guid ownCollectionId, PageSortMode sortMode, PagePaginationOptions pagination)
         {
             var pages = pageHierarhy.OnGetPages(ownCollectionId);
             return Task.FromResult(pages);
-        }
-        public Task SetDefaultPageAsync(IPage page)
-        {
-            defaultPageId = page.Id;
-
-            return Task.CompletedTask;
         }
         public Task<PageContent> GetContentAsync(Guid pageId)
         {
@@ -131,7 +110,6 @@ namespace BrandUp.Pages.Data.Repositories
 
             return Task.CompletedTask;
         }
-
         public Task<bool> HasPagesAsync(Guid ownCollectionId)
         {
             return Task.FromResult(pageHierarhy.HasPages(ownCollectionId));

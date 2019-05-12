@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Builder
     {
         public static IPagesBuilder AddContentTypesFromAssemblies(this IPagesBuilder builder, params Assembly[] assemblies)
         {
-            builder.Services.AddSingleton<IContentTypeResolver>(new AssemblyContentTypeResolver(assemblies));
+            builder.Services.AddSingleton<IContentLocator>(new AssemblyContentTypeResolver(assemblies));
             return builder;
         }
     }

@@ -35,6 +35,7 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPageEditingService, PageEditingService>();
             services.AddScoped<FileService>();
+            services.AddSingleton<Views.ViewManager>();
         }
     }
 }
