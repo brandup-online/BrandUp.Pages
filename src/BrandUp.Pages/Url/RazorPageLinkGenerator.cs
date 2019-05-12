@@ -29,7 +29,7 @@ namespace BrandUp.Pages.Url
             var httpContext = httpContextAccessor.HttpContext;
 
             if (page.UrlPath == null)
-                pageUrl = linkGenerator.GetUriByPage(httpContext, RazorPagePath, null, new { pageId = page.Id.ToString().ToLower() });
+                pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { pageId = page.Id.ToString().ToLower() });
             else
             {
                 string urlPath;
@@ -38,20 +38,34 @@ namespace BrandUp.Pages.Url
                 else
                     urlPath = pageUrlHelper.NormalizeUrlPath(page.UrlPath);
 
-                pageUrl = linkGenerator.GetUriByPage(httpContext, RazorPagePath, null, new { url = urlPath });
+                pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { url = urlPath });
             }
 
             return Task.FromResult(pageUrl);
         }
-
         public Task<string> GetUrlAsync(IPageEditSession pageEditSession)
         {
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));
 
-            var url = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+            var url = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { editId = pageEditSession.Id.ToString().ToLower() });
 
             return Task.FromResult(url);
+        }
+        public Task<string> GetUrlAsync(string pagePath)
+        {
+            if (pagePath == null)
+                pagePath = string.Empty;
+
+            string urlPath;
+            if (pageUrlHelper.IsDefaultUrlPath(pagePath))
+                urlPath = string.Empty;
+            else
+                urlPath = pageUrlHelper.NormalizeUrlPath(pagePath);
+
+            var pageUrl = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { url = urlPath });
+
+            return Task.FromResult(pageUrl);
         }
     }
 }

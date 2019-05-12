@@ -7,5 +7,6 @@ namespace BrandUp.Pages.Url
     {
         Task<string> GetUrlAsync(IPage page);
         Task<string> GetUrlAsync(IPageEditSession pageEditSession);
+        Task<string> GetUrlAsync(string pagePath);
     }
 }
