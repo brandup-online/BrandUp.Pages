@@ -23,13 +23,25 @@ namespace BrandUp.Pages
             {
                 Model = pageModel.ContentContext.Content
             };
-
             viewData.Add("_ContentContext_", pageModel.ContentContext);
 
-            var tag = new TagBuilder("div");
+            var itemRenderingContext = new TagHelpers.ContentRenderingContext();
+            viewData.Add("_ContentRenderingContext_", itemRenderingContext);
+
+            var pageHtml = await htmlHelper.PartialAsync("~" + view.Name, pageModel.ContentContext.Content, viewData);
+
+            string tagName = "div";
+
+            if (!string.IsNullOrEmpty(itemRenderingContext.HtmlTag))
+                tagName = itemRenderingContext.HtmlTag;
+
+            var tag = new TagBuilder(tagName);
+            if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
+                tag.AddCssClass(itemRenderingContext.CssClass);
+
             tag.Attributes.Add("content-path", pageModel.ContentContext.Explorer.Path);
 
-            tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~" + view.Name, pageModel.ContentContext.Content, viewData));
+            tag.InnerHtml.AppendHtml(pageHtml);
 
             return tag;
         }
