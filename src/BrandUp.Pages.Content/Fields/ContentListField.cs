@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class ContentListAttribute : FieldProviderAttribute, IFieldNavigationSupported
+    public class ContentListAttribute : FieldProviderAttribute, IListField
     {
         private ConstructorInfo _valueConstructor;
 
@@ -149,6 +149,11 @@ namespace BrandUp.Pages.Content.Fields
         }
 
         #endregion
+    }
+
+    public interface IListField : IFieldProvider, IFieldNavigationSupported
+    {
+
     }
 
     public class ContentListFieldFormOptions

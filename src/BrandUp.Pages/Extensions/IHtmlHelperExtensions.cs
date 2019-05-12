@@ -27,6 +27,7 @@ namespace BrandUp.Pages
             viewData.Add("_ContentContext_", pageModel.ContentContext);
 
             var tag = new TagBuilder("div");
+            tag.Attributes.Add("content-path", pageModel.ContentContext.Explorer.Path);
 
             tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~" + view.Name, pageModel.ContentContext.Content, viewData));
 

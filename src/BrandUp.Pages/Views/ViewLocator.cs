@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BrandUp.Pages.Views
 {
@@ -11,13 +10,23 @@ namespace BrandUp.Pages.Views
 
         public ViewLocator(ApplicationPartManager applicationPartManager)
         {
-            applicationPartManager.FeatureProviders.Add(new ContentViewFeatureProvider());
+            var viewsFeature = new Microsoft.AspNetCore.Mvc.Razor.Compilation.ViewsFeature();
+            applicationPartManager.PopulateFeature(viewsFeature);
 
-            var feature = new ContentViewFeature();
-            applicationPartManager.PopulateFeature(feature);
+            foreach (var viewDescriptor in viewsFeature.ViewDescriptors)
+            {
+                if (!viewDescriptor.Type.BaseType.IsGenericType)
+                    continue;
 
-            foreach (var view in feature.Views)
-                views.Add(view.ContentType, view);
+                var d = viewDescriptor.Type.BaseType.GetGenericTypeDefinition();
+                if (d == typeof(ContentPage<>))
+                {
+                    var contentType = viewDescriptor.Type.BaseType.GenericTypeArguments[0];
+                    var item = new ContentView(viewDescriptor.RelativePath, contentType);
+
+                    views.Add(item.ContentType, item);
+                }
+            }
         }
 
         public ContentView FindView(Type contentType)
@@ -32,36 +41,6 @@ namespace BrandUp.Pages.Views
     public interface IViewLocator
     {
         ContentView FindView(Type contentType);
-    }
-
-    public class ContentViewFeatureProvider : IApplicationFeatureProvider<ContentViewFeature>
-    {
-        public void PopulateFeature(IEnumerable<ApplicationPart> parts, ContentViewFeature feature)
-        {
-            foreach (var part in parts.OfType<IRazorCompiledItemProvider>())
-            {
-                foreach (var razorCompiledItem in part.CompiledItems)
-                {
-                    if (!razorCompiledItem.Type.BaseType.IsGenericType)
-                        continue;
-
-                    var d = razorCompiledItem.Type.BaseType.GetGenericTypeDefinition();
-                    if (d == typeof(ContentPage<>))
-                    {
-                        var contentType = razorCompiledItem.Type.BaseType.GenericTypeArguments[0];
-
-                        var item = new ContentView(razorCompiledItem.Identifier, contentType);
-
-                        feature.Views.Add(item);
-                    }
-                }
-            }
-        }
-    }
-
-    public class ContentViewFeature
-    {
-        public List<ContentView> Views { get; } = new List<ContentView>();
     }
 
     public class ContentView
