@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
@@ -11,7 +12,12 @@ namespace BrandUp.Pages
         public static async Task<IHtmlContent> RenderPageAsync<TPageModel>(this IHtmlHelper<TPageModel> htmlHelper)
             where TPageModel : ContentPageModel
         {
+            var viewLocator = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<Views.IViewLocator>();
             var pageModel = htmlHelper.ViewData.Model;
+
+            var view = viewLocator.FindView(pageModel.ContentContext.Explorer.Metadata.ModelType);
+            if (view == null)
+                throw new System.Exception();
 
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
             {
@@ -22,7 +28,7 @@ namespace BrandUp.Pages
 
             var tag = new TagBuilder("div");
 
-            tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~/Contents/Page/Article.cshtml", pageModel.ContentContext.Content, viewData));
+            tag.InnerHtml.AppendHtml(await htmlHelper.PartialAsync("~" + view.Name, pageModel.ContentContext.Content, viewData));
 
             return tag;
         }

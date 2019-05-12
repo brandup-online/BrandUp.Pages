@@ -35,7 +35,7 @@ namespace BrandUp.Pages.Tests
             {
                 using (var scope = factory.Server.Host.Services.CreateScope())
                 {
-                    var viewManager = scope.ServiceProvider.GetRequiredService<Views.ViewManager>();
+                    var viewLocator = scope.ServiceProvider.GetRequiredService<Views.IViewLocator>();
                 }
             }
         }

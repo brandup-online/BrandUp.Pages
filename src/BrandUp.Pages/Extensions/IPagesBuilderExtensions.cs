@@ -20,7 +20,7 @@ namespace BrandUp.Pages.Builder
 
             builder.Services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
 
-            builder.Services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
+            builder.Services.AddSingleton<Views.IViewLocator, Views.ViewLocator>();
 
             builder.Services.AddHttpContextAccessor();
 
