@@ -19,3 +19,33 @@ export interface IContentField {
     setErrors(errors: Array<string>);
     render(containr: HTMLElement);
 }
+
+export interface IPageDesigner {
+    editId: string;
+    queue: AjaxQueue;
+}
+
+export interface IContentFieldDesigner {
+    page: IPageDesigner;
+    path: string;
+    name: string;
+    fullPath: string;
+
+    getValue(): any;
+    setValue(value: any);
+    hasValue(): boolean;
+}
+
+interface PageContentForm {
+    path: string;
+    fields: Array<ContentFieldModel>;
+    values: { [key: string]: any };
+}
+
+interface ContentFieldModel {
+    type: string;
+    name: string;
+    title: string;
+    options: any;
+    value: any;
+}

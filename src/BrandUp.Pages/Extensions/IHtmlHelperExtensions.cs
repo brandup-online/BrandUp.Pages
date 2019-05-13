@@ -39,6 +39,7 @@ namespace BrandUp.Pages
             if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
                 tag.AddCssClass(itemRenderingContext.CssClass);
 
+            tag.Attributes.Add("content-page", "");
             tag.Attributes.Add("content-path", pageModel.ContentContext.Explorer.Path);
 
             tag.InnerHtml.AppendHtml(pageHtml);

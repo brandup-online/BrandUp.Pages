@@ -3,6 +3,7 @@ import { DOM, UIElement, ajaxRequest } from "brandup-ui";
 import { listPageCollection } from "./dialogs/page-collection-list";
 import { publishPage } from "./dialogs/page-publish";
 import { editPage } from "./dialogs/page-edit";
+import { PageDesigner } from "./designer/page";
 
 class BrandUpPages {
     private __pageModel: PageNavigationModel;
@@ -27,6 +28,7 @@ class BrandUpPages {
     private __renderToolbars() {
         if (this.__pageModel.editId) {
             new PageToolbar(this);
+            new PageDesigner(this.__pageModel.editId);
         }
         else {
             new WebSiteToolbar(this);

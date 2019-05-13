@@ -1,6 +1,6 @@
 ﻿import { DialogOptions, Dialog } from "./dialog";
 import { DOM, AjaxQueue } from "brandup-ui";
-import { IContentForm, IContentField } from "../typings/content";
+import { IContentForm, IContentField, PageContentForm, ContentFieldModel } from "../typings/content";
 import { TextContent } from "../content/text";
 import { HtmlContent } from "../content/html";
 import { ImageContent } from "../content/image";
@@ -163,19 +163,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 }
 
-interface PageContentForm {
-    path: string;
-    fields: Array<ContentFieldModel>;
-    values: { [key: string]: any };
-}
 
-interface ContentFieldModel {
-    type: string;
-    name: string;
-    title: string;
-    options: any;
-    value: any;
-}
 
 export var editPage = (editId: string, contentPath?: string) => {
     let dialog = new PageEditDialog(editId, contentPath);
