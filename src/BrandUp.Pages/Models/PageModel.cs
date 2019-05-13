@@ -18,15 +18,4 @@ namespace BrandUp.Pages.Models
         Draft,
         Published
     }
-
-    public class PageNavigationModel
-    {
-        public Guid Id { get; set; }
-        public Guid? ParentPageId { get; set; }
-        public string Title { get; set; }
-        [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public PageStatus Status { get; set; }
-        public string Url { get; set; }
-        public Guid? EditId { get; set; }
-    }
 }

@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Primitives;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace BrandUp.Pages.Models
@@ -7,7 +7,14 @@ namespace BrandUp.Pages.Models
     public class AppClientModel
     {
         public string BaseUrl { get; set; }
+        public AntiforgeryModel Antiforgery { get; set; }
         public NavigationClientModel Nav { get; set; }
+    }
+
+    public class AntiforgeryModel
+    {
+        public string HeaderName { get; set; }
+        public string FormFieldName { get; set; }
     }
 
     public class NavigationClientModel
@@ -21,9 +28,10 @@ namespace BrandUp.Pages.Models
 
     public class PageClientModel
     {
-        public Guid Id { get; set; }
         public string Title { get; set; }
         public string CssClass { get; set; }
         public string ScriptName { get; set; }
+        [JsonExtensionData]
+        public Dictionary<string, object> Data { get; set; }
     }
 }

@@ -9,8 +9,7 @@ namespace BrandUp.Pages
 {
     public static class IHtmlHelperExtensions
     {
-        public static async Task<IHtmlContent> RenderPageAsync<TPageModel>(this IHtmlHelper<TPageModel> htmlHelper)
-            where TPageModel : ContentPageModel
+        public static async Task<IHtmlContent> RenderPageAsync(this IHtmlHelper<ContentPageModel> htmlHelper)
         {
             var viewLocator = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<Views.IViewLocator>();
             var pageModel = htmlHelper.ViewData.Model;

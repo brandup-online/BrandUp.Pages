@@ -4,38 +4,29 @@ import { listPageCollection } from "./dialogs/page-collection-list";
 import { publishPage } from "./dialogs/page-publish";
 import { editPage } from "./dialogs/page-edit";
 import { PageDesigner } from "./designer/page";
+import ContentPage from "./pages/content";
 
 class BrandUpPages {
-    private __pageModel: PageNavigationModel;
+    readonly page: ContentPage;
 
-    get page(): PageNavigationModel { return this.__pageModel; }
+    constructor(page: ContentPage) {
+        this.page = page;
 
-    load() {
-        ajaxRequest({
-            urlParams: { handler: "navigate" },
-            success: (data: PageNavigationModel, status: number) => {
-                if (status !== 200)
-                    throw "";
-
-                this.__pageModel = data;
-
-                this.__renderToolbars();
-                this.__registerCommands();
-            }
-        });
+        this.__renderToolbars();
+    }
+    
+    static load(page: ContentPage) {
+        new BrandUpPages(page);
     }
 
     private __renderToolbars() {
-        if (this.__pageModel.editId) {
+        if (this.page.model.editId) {
             new PageToolbar(this);
-            new PageDesigner(this.__pageModel.editId);
+            new PageDesigner(this.page.model.editId);
         }
         else {
             new WebSiteToolbar(this);
         }
-    }
-
-    private __registerCommands() {
     }
 }
 
@@ -54,21 +45,24 @@ class WebSiteToolbar extends UIElement {
         this.setElement(toolbarElem);
 
         this.registerCommand("brandup-pages-collections", () => {
-            listPageCollection(p.page.parentPageId);
+            listPageCollection(p.page.model.parentPageId);
         });
 
         this.registerCommand("brandup-pages-publish", () => {
-            publishPage(p.page.id).then(result => {
+            publishPage(p.page.model.id).then(result => {
                 location.href = result.url;
             });
         });
 
         this.registerCommand("brandup-pages-edit", () => {
-            ajaxRequest({
+            p.page.app.request({
                 urlParams: { handler: "BeginEdit" },
                 method: "POST",
                 success: (data: string, status: number) => {
-                    location.href = data;
+                    if (status === 200)
+                        p.page.app.nav({ url: data, pushState: false });
+                    else
+                        throw "";
                 }
             });
         });
@@ -90,43 +84,31 @@ class PageToolbar extends UIElement {
         this.setElement(toolbarElem);
 
         this.registerCommand("brandup-pages-edit", () => {
-            editPage(p.page.editId).then(() => {
+            editPage(p.page.model.editId).then(() => {
                 location.reload();
             });
         });
 
         this.registerCommand("brandup-pages-commit", () => {
-            ajaxRequest({
+            p.page.app.request({
                 urlParams: { handler: "CommitEdit" },
                 method: "POST",
                 success: (data: string, status: number) => {
-                    location.href = data;
+                    p.page.app.nav({ url: data, pushState: false });
                 }
             });
         });
 
         this.registerCommand("brandup-pages-discard", () => {
-            ajaxRequest({
+            p.page.app.request({
                 urlParams: { handler: "DiscardEdit" },
                 method: "POST",
                 success: (data: string, status: number) => {
-                    location.href = data;
+                    p.page.app.nav({ url: data, pushState: false });
                 }
             });
         });
     }
 }
 
-var current: BrandUpPages = null;
-const initialize = () => {
-    if (!current && document.readyState === "complete") {
-        current = new BrandUpPages();
-    }
-}
-
-document.addEventListener("readystatechange", initialize);
-initialize();
-
-window.addEventListener("load", () => {
-    current.load();
-});
+export default BrandUpPages;

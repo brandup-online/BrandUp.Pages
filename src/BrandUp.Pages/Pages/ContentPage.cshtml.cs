@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
-    public class ContentPageModel : AppPageModel
+    public sealed class ContentPageModel : AppPageModel
     {
         private IPage page;
         private IPageEditSession editSession;
@@ -19,10 +19,19 @@ namespace BrandUp.Pages
         public PageMetadataProvider PageMetadata { get; private set; }
         public object PageContent { get; private set; }
         public ContentContext ContentContext { get; private set; }
+        [ClientModel]
+        public Guid Id => page.Id;
+        [ClientModel]
+        public Guid? EditId => editSession?.Id;
+        [ClientModel]
+        public Models.PageStatus Status { get; private set; }
+        [ClientModel]
+        public Guid? ParentPageId { get; private set; }
 
         #region AppPageModel members
 
         public override string Title => PageMetadata.GetPageTitle(PageContent);
+        public override string ScriptName => "content";
 
         #endregion
 
@@ -108,27 +117,14 @@ namespace BrandUp.Pages
 
             ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices);
 
+            var isPublished = await PageService.IsPublishedAsync(page);
+            Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
+            ParentPageId = await PageService.GetParentPageIdAsync(page);
+
             await base.OnPageHandlerExecutionAsync(context, next);
         }
 
         #region Handler methods
-
-        //public async Task<IActionResult> OnGetNavigateAsync([FromServices]IPageLinkGenerator pageLinkGenerator)
-        //{
-        //    var isPublished = await PageService.IsPublishedAsync(page);
-
-        //    var model = new Models.PageNavigationModel
-        //    {
-        //        Id = page.Id,
-        //        ParentPageId = await PageService.GetParentPageIdAsync(page),
-        //        Title = page.Title,
-        //        Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
-        //        Url = await pageLinkGenerator.GetUrlAsync(page),
-        //        EditId = editSession?.Id
-        //    };
-
-        //    return new OkObjectResult(model);
-        //}
 
         public async Task<IActionResult> OnPostBeginEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
         {

@@ -25,15 +25,6 @@ interface Result {
     errors: Array<string>;
 }
 
-interface PageNavigationModel {
-    id: string;
-    parentPageId: string;
-    title: string;
-    status: "Draft" | "Published";
-    url: string;
-    editId: string;
-}
-
 interface ValidationProblemDetails {
     type: string;
     title: string;

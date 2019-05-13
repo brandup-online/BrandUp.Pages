@@ -1,6 +1,6 @@
-﻿import { AppClientModel, NavigationModel, PageClientModel, AppSetupOptions, PageNavState } from "./typings/website";
-import { Page } from "./page";
-import { UIElement, DOM, Utility, ajaxRequest } from "brandup-ui";
+﻿import { AppClientModel, NavigationModel, PageClientModel, PageNavState, IApplication, NavigationOptions } from "./typings/website";
+import Page from "./pages/page";
+import { UIElement, DOM, Utility, ajaxRequest, AjaxRequestOptions } from "brandup-ui";
 
 export class Application<TModel extends AppClientModel> extends UIElement implements IApplication {
     private __navCounter: number = 0;
@@ -10,12 +10,24 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     private options: AppSetupOptions;
     page: Page<PageClientModel> = null;
     private linkClickFunc: () => void;
+    private __builder: ApplicationBuilder;
+    private __requestVerificationToken: HTMLInputElement;
 
     protected constructor(model: TModel, options: AppSetupOptions) {
         super();
 
         this.model = model;
-        this.options = options ? options : { onCreatePage: null };
+        this.options = options ? options : { defaultPageScript: "page" };
+
+        if (!this.options.defaultPageScript)
+            this.options.defaultPageScript = "page";
+
+        this.__builder = new ApplicationBuilder();
+        this.__builder.addPageType("page", () => import("./pages/page"));
+        this.__builder.addPageType("content", () => import("./pages/content"));
+
+        if (options.configure)
+            options.configure(this.__builder);
 
         this.setElement(document.body);
 
@@ -28,6 +40,10 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.__contentBodyElem = document.getElementById("page-content");
         if (!this.__contentBodyElem)
             throw "Не найден элемент контента страницы.";
+
+        this.__requestVerificationToken = <HTMLInputElement>DOM.getElementByName("__RequestVerificationToken");
+        if (this.__requestVerificationToken == null)
+            throw `Не найден элемент с именем __RequestVerificationToken.`;
 
         var initNav = this.model.nav;
         var pageState: PageNavState = {
@@ -55,6 +71,15 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         document.body.removeEventListener("click", this.linkClickFunc, false);
     }
 
+    request(options: AjaxRequestOptions) {
+        if (!options.headers)
+            options.headers = {};
+
+        if (this.model.antiforgery && options.method !== "GET")
+            options.headers[this.model.antiforgery.headerName] = this.__navigation.validationToken;
+
+        ajaxRequest(options);
+    }
     uri(path?: string, queryParams?: { [key: string]: string; }): string {
         var url = this.model.baseUrl;
         if (path)
@@ -120,23 +145,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     nav(options: NavigationOptions) {
         this.__refreshNavigation(options);
     }
-
-    reRenderPage(content: string) {
-        if (!this.page)
-            throw "";
-
-        var pageModel = this.page.model;
-        var navState = this.page.nav;
-
-        this.page.destroy();
-        this.page = null;
-
-        DOM.empty(this.__contentBodyElem);
-        this.__contentBodyElem.insertAdjacentHTML("afterbegin", content);
-
-        this.__renderPage(navState, pageModel, false);
-    }
-
+    
     private __refreshNavigation(options: NavigationOptions) {
         let { url, pushState } = options;
 
@@ -148,7 +157,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.element.dispatchEvent(new CustomEvent("cmsnavigateing", { cancelable: false, bubbles: false, detail: options }));
 
-        ajaxRequest({
+        this.request({
             url: url,
             urlParams: { handler: "navigation" },
             type: "JSON",
@@ -207,9 +216,6 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     }
     private __renderPage(pageState: PageNavState, pageModel: PageClientModel, needLoadContent: boolean) {
         if (this.page) {
-            if (this.page.model.cssClass)
-                document.body.classList.remove(this.page.model.cssClass);
-
             this.page.destroy();
             this.page = null;
         }
@@ -222,7 +228,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     private __loadContent(pageState: PageNavState, pageModel: PageClientModel) {
         var navSequence = this.__navCounter;
 
-        ajaxRequest({
+        this.request({
             url: pageState.url,
             urlParams: { handler: "content" },
             success: (data: string, status: number) => {
@@ -254,26 +260,16 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         });
     }
     private __loadPageScript(pageState: PageNavState, pageModel: PageClientModel) {
-        if (pageModel.cssClass)
-            document.body.classList.add(pageModel.cssClass);
+        var pageScript = pageModel.scriptName;
+        if (!pageScript)
+            pageScript = this.options.defaultPageScript;
 
-        var pageType: any = Page;
-
-        if (pageModel.scriptName) {
-            if (this.options.onCreatePage) {
-                this.options.onCreatePage(pageModel.scriptName).then((pageType) => {
-                    this.__createPage(pageType.default, pageState, pageModel);
-                });
-                return;
-            }
-            else
-                throw "";
-        }
-
-        this.__createPage(pageType, pageState, pageModel);
+        this.__builder.getPageType(pageScript).then((pageType) => {
+            this.__createPage(pageType.default, pageState, pageModel);
+        });
     }
     private __createPage(pageType: any, pageState: PageNavState, pageModel: PageClientModel) {
-        this.page = new pageType(pageState, pageModel, this.__contentBodyElem);
+        this.page = new pageType(this, pageState, pageModel, this.__contentBodyElem);
 
         document.body.classList.remove("app-state-loading");
         document.body.classList.add("app-state-loaded");
@@ -371,5 +367,22 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         }
 
         return null;
+    }
+}
+
+export interface AppSetupOptions {
+    defaultPageScript?: string;
+    configure?: (builder: ApplicationBuilder) => void;
+}
+
+export class ApplicationBuilder {
+    private __pageTypes: { [key: string]: () => Promise<any> } = {};
+
+    addPageType(name: string, importFunc: () => Promise<any>) {
+        this.__pageTypes[name] = importFunc;
+    }
+    getPageType(name: string): Promise<{ default: any }> {
+        var f = this.__pageTypes[name];
+        return f();
     }
 }
