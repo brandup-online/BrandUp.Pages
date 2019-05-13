@@ -3,15 +3,13 @@ using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
-    [IgnoreAntiforgeryToken]
-    public class ContentPageModel : PageModel, IContentPageModel
+    public class ContentPageModel : AppPageModel
     {
         private IPage page;
         private IPageEditSession editSession;
@@ -21,9 +19,12 @@ namespace BrandUp.Pages
         public PageMetadataProvider PageMetadata { get; private set; }
         public object PageContent { get; private set; }
         public ContentContext ContentContext { get; private set; }
-        public string Title => PageMetadata.GetPageTitle(PageContent);
-        public string Description => null;
-        public string Keywords => null;
+
+        #region AppPageModel members
+
+        public override string Title => PageMetadata.GetPageTitle(PageContent);
+
+        #endregion
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
@@ -112,27 +113,22 @@ namespace BrandUp.Pages
 
         #region Handler methods
 
-        public IActionResult OnGetAsync()
-        {
-            return Page();
-        }
+        //public async Task<IActionResult> OnGetNavigateAsync([FromServices]IPageLinkGenerator pageLinkGenerator)
+        //{
+        //    var isPublished = await PageService.IsPublishedAsync(page);
 
-        public async Task<IActionResult> OnGetNavigateAsync([FromServices]IPageLinkGenerator pageLinkGenerator)
-        {
-            var isPublished = await PageService.IsPublishedAsync(page);
+        //    var model = new Models.PageNavigationModel
+        //    {
+        //        Id = page.Id,
+        //        ParentPageId = await PageService.GetParentPageIdAsync(page),
+        //        Title = page.Title,
+        //        Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
+        //        Url = await pageLinkGenerator.GetUrlAsync(page),
+        //        EditId = editSession?.Id
+        //    };
 
-            var model = new Models.PageNavigationModel
-            {
-                Id = page.Id,
-                ParentPageId = await PageService.GetParentPageIdAsync(page),
-                Title = page.Title,
-                Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
-                Url = await pageLinkGenerator.GetUrlAsync(page),
-                EditId = editSession?.Id
-            };
-
-            return new OkObjectResult(model);
-        }
+        //    return new OkObjectResult(model);
+        //}
 
         public async Task<IActionResult> OnPostBeginEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
         {

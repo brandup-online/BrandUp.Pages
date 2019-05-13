@@ -27,10 +27,6 @@ module.exports = (env) => {
                 {
                     test: /\.(le|c)ss$/,
                     use: [
-                        //{
-                        //    loader: 'style-loader',
-                        //    options: { }
-                        //},
                         {
                             loader: MiniCssExtractPlugin.loader
                         },
@@ -39,7 +35,8 @@ module.exports = (env) => {
                             options: {
                                 minimize: !isDevBuild
                             }
-                        }, {
+                        },
+                        {
                             loader: 'less-loader', options: {
                                 strictMath: false,
                                 noIeCompat: true,
@@ -53,19 +50,15 @@ module.exports = (env) => {
         },
         optimization: {
             minimize: !isDevBuild,
-            namedModules: true,
-            //splitChunks: {
-            //    chunks: "all"
-            //}
+            namedModules: true
         },
         plugins: [
             new CheckerPlugin(),
             new MiniCssExtractPlugin()
         ].concat(isDevBuild ? [
-            // Plugins that apply in development builds only
             new webpack.SourceMapDevToolPlugin({
-                filename: '[file].map', // Remove this line if you prefer inline source maps
-                moduleFilenameTemplate: path.relative(bundleOutputDir, '[resourcePath]') // Point sourcemap entries to the original file locations on disk
+                filename: '[file].map',
+                moduleFilenameTemplate: path.relative(bundleOutputDir, '[resourcePath]')
             })
         ] : [])
     }];

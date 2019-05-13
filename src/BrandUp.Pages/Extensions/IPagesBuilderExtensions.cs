@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -13,18 +14,20 @@ namespace BrandUp.Pages.Builder
 
         public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<RazorContentPageOptions> optionAction)
         {
-            builder.Services.Configure<RazorPagesOptions>(options =>
+            var services = builder.Services;
+
+            services.Configure<RazorPagesOptions>(options =>
             {
                 options.Conventions.AddPageRoute(Url.RazorPageLinkGenerator.RazorPagePath, "{*url}");
             });
 
-            builder.Services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
+            services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
+            services.AddSingleton<Views.IViewLocator, Views.ViewLocator>();
+            services.AddHttpContextAccessor();
 
-            builder.Services.AddSingleton<Views.IViewLocator, Views.ViewLocator>();
+            services.Configure(optionAction);
 
-            builder.Services.AddHttpContextAccessor();
-
-            builder.Services.Configure(optionAction);
+            builder.Services.AddTransient<ITagHelperComponent, TagHelpers.EmbeddingTagHelperComponent>();
 
             return builder;
         }

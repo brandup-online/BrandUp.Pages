@@ -1,4 +1,6 @@
 ﻿@page
 @model BrandUp.Pages.ContentPageModel
 
+@{ Model.RenderPage(this); }
+
 @await Html.RenderPageAsync()

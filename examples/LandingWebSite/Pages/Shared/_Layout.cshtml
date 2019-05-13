@@ -1,4 +1,4 @@
-﻿@model IContentPageModel
+﻿@model AppPageModel
 
 <!DOCTYPE html>
 <html>
@@ -11,21 +11,18 @@
     <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
     <link type="text/css" rel="stylesheet" href="~/dist/app.css" asp-append-version="true" />
 
-    <script type="text/javascript" src="~/dist/pages.js" asp-append-version="true"></script>
-    <link type="text/css" rel="stylesheet" href="~/dist/pages.css" asp-append-version="true" />
-
     @Html.AntiForgeryToken()
 
     <div class="app">
         <nav class="app-top">
             <div class="content-width">
-                <a content-page="" class="logo">LandingWebSite</a>
+                <a content-page="/" class="logo applink">LandingWebSite</a>
                 <ul>
-                    <li><a asp-page="/SignIn">Sign in</a></li>
+                    <li><a asp-page="/SignIn" class="applink">Sign in</a></li>
                 </ul>
             </div>
         </nav>
-        <main role="main" class="content-width app-content">
+        <main id="page-content" role="main" class="content-width app-content">
             @RenderBody()
         </main>
     </div>
