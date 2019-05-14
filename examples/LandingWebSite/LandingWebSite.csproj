@@ -12,6 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\pages\admin\page.ts" />
+    <None Remove="_client\pages\admin\website.ts" />
     <None Remove="_client\pages\content\html.ts" />
     <None Remove="_client\pages\content\image.ts" />
     <None Remove="_client\pages\content\list.ts" />
@@ -36,7 +38,6 @@
     <None Remove="_client\pages\form\field.ts" />
     <None Remove="_client\pages\form\textbox.ts" />
     <None Remove="_client\pages\pages\content.ts" />
-    <None Remove="_client\pages\root.ts" />
     <None Remove="_client\pages\typings\content.d.ts" />
     <None Remove="_client\pages\typings\models.d.ts" />
     <None Remove="_client\root.ts" />
@@ -63,6 +64,8 @@
 
 
   <ItemGroup>
+    <TypeScriptCompile Include="_client\pages\admin\page.ts" />
+    <TypeScriptCompile Include="_client\pages\admin\website.ts" />
     <TypeScriptCompile Include="_client\pages\content\image.ts" />
     <TypeScriptCompile Include="_client\pages\content\html.ts" />
     <TypeScriptCompile Include="_client\pages\content\list.ts" />
@@ -87,7 +90,6 @@
     <TypeScriptCompile Include="_client\pages\form\field.ts" />
     <TypeScriptCompile Include="_client\pages\form\textbox.ts" />
     <TypeScriptCompile Include="_client\pages\pages\content.ts" />
-    <TypeScriptCompile Include="_client\pages\root.ts" />
     <TypeScriptCompile Include="_client\pages\typings\content.d.ts" />
     <TypeScriptCompile Include="_client\pages\typings\models.d.ts" />
     <TypeScriptCompile Include="_client\root.ts" />

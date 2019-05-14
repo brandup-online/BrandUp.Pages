@@ -28,6 +28,7 @@ namespace BrandUp.Pages.Builder
             services.Configure(optionAction);
 
             builder.Services.AddTransient<ITagHelperComponent, TagHelpers.EmbeddingTagHelperComponent>();
+            builder.Services.AddTransient<Administration.IAdministrationManager, Administration.DefaultAdministrationManager>();
 
             return builder;
         }

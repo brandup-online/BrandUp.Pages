@@ -17,6 +17,7 @@ export interface AntiforgeryModel {
 }
 
 export interface NavigationModel {
+    enableAdministration: boolean;
     isAuthenticated: boolean,
     url: string;
     validationToken: string;
@@ -31,6 +32,7 @@ export interface PageClientModel {
 
 export interface IApplication {
     model: any;
+    navigation: NavigationModel;
     request(options: AjaxRequestOptions)
     uri(path?: string, queryParams?: { [key: string]: string; }): string;
     reload();

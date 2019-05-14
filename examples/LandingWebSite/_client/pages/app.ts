@@ -1,6 +1,7 @@
 ﻿import { AppClientModel, NavigationModel, PageClientModel, PageNavState, IApplication, NavigationOptions } from "./typings/website";
 import Page from "./pages/page";
 import { UIElement, DOM, Utility, ajaxRequest, AjaxRequestOptions } from "brandup-ui";
+import "./styles.less";
 
 export class Application<TModel extends AppClientModel> extends UIElement implements IApplication {
     private __navCounter: number = 0;
@@ -31,10 +32,17 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.setElement(document.body);
 
+        this.__createEvent("pageNavigating", { cancelable: false, bubbles: false, scoped: false });
+        this.__createEvent("pageNavigated", { cancelable: false, bubbles: false, scoped: false });
+        this.__createEvent("pageLoading", { cancelable: false, bubbles: false, scoped: false });
+        this.__createEvent("pageLoaded", { cancelable: false, bubbles: false, scoped: false });
+        this.__createEvent("pageContentLoaded", { cancelable: false, bubbles: false, scoped: false });
+
         this.linkClickFunc = Utility.createDelegate(this, this.__onClickAppLink);
     }
 
     get typeName(): string { return "Application" }
+    get navigation(): NavigationModel { return this.__navigation; }
 
     init() {
         this.__contentBodyElem = document.getElementById("page-content");
@@ -155,7 +163,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.element.classList.remove("app-state-loaded");
         this.element.classList.add("app-state-loading");
 
-        this.element.dispatchEvent(new CustomEvent("cmsnavigateing", { cancelable: false, bubbles: false, detail: options }));
+        this.__raiseEvent("pageNavigating", options);
 
         this.request({
             url: url,
@@ -193,7 +201,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
                         document.title = pageModel.title ? pageModel.title : "";
 
-                        this.element.dispatchEvent(new CustomEvent("cmsnavigated", { cancelable: false, bubbles: false, detail: pageState }));
+                        this.__raiseEvent("pageNavigated", pageState);
 
                         this.__renderPage(pageState, pageModel, true);
 
@@ -220,6 +228,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             this.page = null;
         }
 
+        this.__raiseEvent("pageLoading");
+
         if (needLoadContent)
             this.__loadContent(pageState, pageModel);
         else
@@ -244,6 +254,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                         Application.nodeScriptReplace(this.__contentBodyElem);
 
                         this.__loadPageScript(pageState, pageModel);
+
+                        this.__raiseEvent("pageContentLoaded");
 
                         break;
                     }
@@ -270,9 +282,11 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     }
     private __createPage(pageType: any, pageState: PageNavState, pageModel: PageClientModel) {
         this.page = new pageType(this, pageState, pageModel, this.__contentBodyElem);
-
+        
         document.body.classList.remove("app-state-loading");
         document.body.classList.add("app-state-loaded");
+
+        this.__raiseEvent("pageLoaded");
     }
 
     private __onPopState(event: PopStateEvent) {

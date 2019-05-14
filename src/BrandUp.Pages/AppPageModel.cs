@@ -8,6 +8,7 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
@@ -49,7 +50,7 @@ namespace BrandUp.Pages
             if (rendenOnlyContent)
                 page.Layout = null;
         }
-        internal async Task<Models.NavigationClientModel> GetNavigationModelAsync()
+        internal async Task<Models.NavigationClientModel> GetNavigationModelAsync(CancellationToken cancellationToken = default)
         {
             var httpContext = HttpContext;
             var httpRequest = httpContext.Request;
@@ -74,12 +75,14 @@ namespace BrandUp.Pages
                 IsAuthenticated = httpContext.User.Identity.IsAuthenticated,
                 Url = requestUrl,
                 Query = new Dictionary<string, StringValues>(httpRequest.Query),
-                Page = await GetClientModelAsync()
+                Page = await GetClientModelAsync(cancellationToken)
             };
-
             navModel.Query.Remove("handler");
 
-            var antiforgery = httpContext.RequestServices.GetRequiredService<IAntiforgery>();
+            var administrationManager = httpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
+            navModel.EnableAdministration = await administrationManager.CheckAsync(cancellationToken);
+
+            var antiforgery = httpContext.RequestServices.GetService<IAntiforgery>();
             if (antiforgery != null)
             {
                 var antiforgeryTokenSet = antiforgery.GetTokens(httpContext);
@@ -88,7 +91,8 @@ namespace BrandUp.Pages
 
             return navModel;
         }
-        internal async Task<Models.PageClientModel> GetClientModelAsync()
+
+        internal async Task<Models.PageClientModel> GetClientModelAsync(CancellationToken cancellationToken = default)
         {
             var model = new Models.PageClientModel
             {
@@ -118,12 +122,12 @@ namespace BrandUp.Pages
                 model.Data.Add(name, value);
             }
 
-            await OnBuildClientData(model.Data);
+            await OnBuildClientData(model.Data, cancellationToken);
 
             return model;
         }
 
-        protected virtual Task OnBuildClientData(IDictionary<string, object> data)
+        protected virtual Task OnBuildClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

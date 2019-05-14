@@ -60,6 +60,16 @@ namespace LandingWebSite
             .AddRazorContentPage()
             .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
             .AddMongoDb(Configuration.GetSection("MongoDb"));
+
+            services
+                .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "LandingWebSite.Identity";
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/signin");
+                    options.SlidingExpiration = true;
+                    options.ReturnUrlParameter = "returnUrl";
+                });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -79,6 +89,7 @@ namespace LandingWebSite
             }
 
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseStaticFiles();
 
             app.UseMvc();

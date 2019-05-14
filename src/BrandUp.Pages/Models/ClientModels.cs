@@ -19,6 +19,7 @@ namespace BrandUp.Pages.Models
 
     public class NavigationClientModel
     {
+        public bool EnableAdministration { get; set; }
         public bool IsAuthenticated { get; set; }
         public string Url { get; set; }
         public IDictionary<string, StringValues> Query { get; set; }
