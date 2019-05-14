@@ -5,7 +5,7 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
     readonly app: IApplication;
     readonly nav: PageNavState;
     readonly model: TModel;
-    private __webSiteToolbar: UIElement;
+    private __destroyCallbacks: Array<() => void> = [];
 
     constructor(app: IApplication, nav: PageNavState, model: TModel, element: HTMLElement) {
         super();
@@ -15,8 +15,10 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         this.model = model;
         this.setElement(element);
 
-        if (this.model.cssClass)
+        if (this.model.cssClass) {
             document.body.classList.add(this.model.cssClass);
+            this.attachDestroyFunc(() => { document.body.classList.remove(this.model.cssClass); });
+        }
         
         this.renderWebsiteToolbar();
 
@@ -28,21 +30,24 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
     protected renderWebsiteToolbar() {
         if (this.app.navigation.enableAdministration) {
             import("../admin/website").then(d => {
-                this.__webSiteToolbar = new d.WebSiteToolbar(this);
+                this.attachDestroyElement(new d.WebSiteToolbar(this));
             });
         }
     }
     protected onRenderContent() { }
 
+    attachDestroyFunc(f: () => void) {
+        this.__destroyCallbacks.push(f);
+    }
+    attachDestroyElement(elem: UIElement) {
+        this.__destroyCallbacks.push(() => { elem.destroy(); });
+    }
+
     destroy() {
-        if (this.__webSiteToolbar) {
-            this.__webSiteToolbar.destroy();
-            this.__webSiteToolbar = null;
-        }
-
-        if (this.model.cssClass)
-            document.body.classList.remove(this.model.cssClass);
-
+        this.__destroyCallbacks.map((f) => {
+            f();
+        });
+        
         super.destroy();
     }
 }

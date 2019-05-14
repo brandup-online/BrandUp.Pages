@@ -35,4 +35,10 @@ export class PageDesigner implements IPageDesigner {
             this.__fields[fieldDesigner.fullPath] = fieldDesigner;
         }
     }
+
+    destroy() {
+        for (let key in this.__fields) {
+            this.__fields[key].destroy();
+        }
+    }
 }

@@ -126,12 +126,11 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     }
 
     reload() {
-        location.reload();
+        this.nav({ url: null, pushState: false });
     }
     navigate(target: any) {
-        if (!target) {
+        if (!target)
             throw new Error("target not set");
-        }
 
         var url: string = null;
         var targetElem: HTMLElement = null;

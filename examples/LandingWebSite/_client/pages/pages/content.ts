@@ -1,11 +1,8 @@
 ﻿import Page from "./page";
 import { PageClientModel } from "../typings/website";
-import { UIElement } from "brandup-ui";
 
 class ContentPage extends Page<ContentPageModel>
 {
-    private __pageToolbar: UIElement;
-
     get typeName(): string { return "BrandUpPages.ContentPage" }
 
     protected renderWebsiteToolbar() {
@@ -15,18 +12,16 @@ class ContentPage extends Page<ContentPageModel>
     protected onRenderContent() {
         if (this.app.navigation.enableAdministration) {
             import("../admin/page").then(d => {
-                this.__pageToolbar = new d.PageToolbar(this);
+                this.attachDestroyElement(new d.PageToolbar(this));
             });
-        }
-    }
 
-    destroy() {
-        if (this.__pageToolbar) {
-            this.__pageToolbar.destroy();
-            this.__pageToolbar = null;
+            if (this.model.editId) {
+                import("../designer/page").then(d => {
+                    let designer = new d.PageDesigner(this.model.editId);
+                    this.attachDestroyFunc(() => { designer.destroy(); }); 
+                });
+            }
         }
-
-        super.destroy();
     }
 }
 

@@ -18,7 +18,7 @@ export class PageToolbar extends UIElement {
 
             this.registerCommand("brandup-pages-content", () => {
                 editPage(page.model.editId).then(() => {
-                    location.reload();
+                    page.app.reload();
                 });
             });
             this.registerCommand("brandup-pages-commit", () => {

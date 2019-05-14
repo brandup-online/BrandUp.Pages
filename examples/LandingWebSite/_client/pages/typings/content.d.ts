@@ -23,6 +23,7 @@ export interface IContentField {
 export interface IPageDesigner {
     editId: string;
     queue: AjaxQueue;
+    destroy();
 }
 
 export interface IContentFieldDesigner {
@@ -34,6 +35,7 @@ export interface IContentFieldDesigner {
     getValue(): any;
     setValue(value: any);
     hasValue(): boolean;
+    destroy();
 }
 
 interface PageContentForm {

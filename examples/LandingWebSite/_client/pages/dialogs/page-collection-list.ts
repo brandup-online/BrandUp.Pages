@@ -28,18 +28,18 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionModel> {
                 this.loadItems();
             });
         });
-        this.registerItemCommand("item-update", (itemId: string, el: HTMLElement) => {
-            updatePageCollection(itemId).then((updatedItem: PageCollectionModel) => {
+        this.registerItemCommand("item-update", (pageCollectionId: string, el: HTMLElement) => {
+            updatePageCollection(pageCollectionId).then((updatedItem: PageCollectionModel) => {
                 this.loadItems();
             });
         });
-        this.registerItemCommand("item-delete", (itemId: string, el: HTMLElement) => {
-            deletePageCollection(itemId).then((deletedItem: PageCollectionModel) => {
+        this.registerItemCommand("item-delete", (pageCollectionId: string, el: HTMLElement) => {
+            deletePageCollection(pageCollectionId).then((deletedItem: PageCollectionModel) => {
                 this.loadItems();
             });
         });
-        this.registerItemCommand("page-list", (itemId: string) => {
-            listPage(itemId);
+        this.registerItemCommand("page-list", (pageCollectionId: string) => {
+            listPage(pageCollectionId);
         });
         
         this.loadItems();
