@@ -19,6 +19,7 @@
     <None Remove="_client\pages\content\list.ts" />
     <None Remove="_client\pages\content\text.ts" />
     <None Remove="_client\pages\designer\field.ts" />
+    <None Remove="_client\pages\designer\html.ts" />
     <None Remove="_client\pages\designer\page.ts" />
     <None Remove="_client\pages\designer\text.ts" />
     <None Remove="_client\pages\dialogs\dialog-delete.ts" />
@@ -72,6 +73,7 @@
     <TypeScriptCompile Include="_client\pages\content\text.ts" />
     <TypeScriptCompile Include="_client\pages\designer\field.ts" />
     <TypeScriptCompile Include="_client\pages\designer\page.ts" />
+    <TypeScriptCompile Include="_client\pages\designer\html.ts" />
     <TypeScriptCompile Include="_client\pages\designer\text.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-delete.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-form.ts" />

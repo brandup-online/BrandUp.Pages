@@ -1,0 +1,28 @@
+{
+  "name": "brandup-pages-ckeditor",
+  "description": "brandup-pages-ckeditor",
+  "author": {
+    "name": "Dmitry Kovyazin",
+    "email": "it@brandup.online"
+  },
+  "main": "editor.js",
+  "types": "index.d.ts",
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "dependencies": {
+    "@ckeditor/ckeditor5-editor-balloon": "^12.1.0",
+    "@ckeditor/ckeditor5-essentials": "^11.0.1",
+    "@ckeditor/ckeditor5-paragraph": "^11.0.1",
+    "@ckeditor/ckeditor5-basic-styles": "^11.1.0",
+    "@ckeditor/ckeditor5-autoformat": "^11.0.1",
+    "@ckeditor/ckeditor5-heading": "^11.0.1",
+    "@ckeditor/ckeditor5-link": "^11.0.1",
+    "@ckeditor/ckeditor5-list": "^12.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^3.4.5"
+  },
+  "scripts": {
+    "build": "tsc"
+  }
+}

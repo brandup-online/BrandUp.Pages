@@ -1,0 +1,44 @@
+﻿@import "../vars.less";
+
+.website-form-field.text {
+    position: relative;
+    line-height: 20px;
+
+    &:hover .value {
+        border-bottom-color: #ddd;
+    }
+
+    & .value {
+        border-bottom: solid 1px #eee;
+        outline: none;
+        font-weight: 500;
+        padding: 7px 0 5px;
+        box-sizing: border-box;
+
+        &:focus {
+            border-bottom-color: #ddd;
+
+            & ~ .placeholder {
+                display: none;
+            }
+        }
+    }
+
+    & .placeholder {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        color: #D4D4D4;
+        cursor: text;
+        padding: 7px 0 5px;
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    &.has-value {
+        & .placeholder {
+            display: none;
+        }
+    }
+}

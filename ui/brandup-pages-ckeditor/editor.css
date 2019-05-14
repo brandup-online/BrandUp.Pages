@@ -1,0 +1,9 @@
+﻿:root {
+    --ck-border-radius: 0;
+    --ck-spacing-large: 0;
+    --ck-spacing-standard: 0;
+    --ck-font-size-tiny: 0;
+    --ck-z-default: 100;
+    --ck-z-modal: calc( var(--ck-z-default) + 999 );
+    --ck-inner-shadow: none;
+}

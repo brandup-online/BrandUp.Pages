@@ -1,0 +1,33 @@
+﻿@import "../vars.less";
+
+.website-dialog-delete {
+    & .confirm-text {
+        padding: 30px 35px;
+    }
+
+    & .errors {
+        padding: 0 35px 30px;
+        color: #ff4848;
+
+        & ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            & li {
+                padding: 3px 0;
+                margin: 0;
+            }
+        }
+    }
+
+    & button.button.accent {
+        background: #ff4848;
+        border-color: red;
+
+        &:hover,
+        &:focus {
+            background: darken(#ff4848, 6%);
+        }
+    }
+}

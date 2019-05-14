@@ -328,7 +328,18 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+
 /examples/LandingWebSite/wwwroot/dist
-/examples/LandingWebSite/package-lock.json
 /examples/LandingWebSite/_client/**/*.js
 /examples/LandingWebSite/_client/**/*.js.map
+package-lock.json
+.rpt2_cache
+/ui/brandup-pages-ckeditor/index.js
+/ui/brandup-pages-ckeditor/index.d.ts
+/ui/brandup-pages-ckeditor/index.js.map
+/ui/brandup-pages-ui/dist
+/ui/brandup-pages-ui/src/**/*.js.map
+/ui/brandup-pages-ui/src/**/*.d.ts
+/ui/brandup-pages-ui/src/**/*.js
+!/ui/brandup-pages-ui/src/typings/*.d.ts

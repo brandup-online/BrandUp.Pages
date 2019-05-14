@@ -163,6 +163,8 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 }
 
+
+
 export var editPage = (editId: string, contentPath?: string) => {
     let dialog = new PageEditDialog(editId, contentPath);
     return dialog.open();

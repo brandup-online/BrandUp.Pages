@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es5",
+    "sourceMap": true,
+    "strict": false,
+    "lib": [ "es5", "es6", "dom", "es2015.promise", "dom.iterable", "es2015.iterable", "es2015.collection", "es2015", "es2015.core" ],
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "baseUrl": "./",
+    "declaration": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".vs",
+    ".vscode",
+    "test"
+  ],
+  "compileOnSave": true,
+  "typeAcquisition": {
+    "enable": true
+  }
+}

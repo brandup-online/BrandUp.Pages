@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
-using System.Text.Encodings.Web;
 
 namespace BrandUp.Pages.TagHelpers
 {
@@ -11,7 +10,6 @@ namespace BrandUp.Pages.TagHelpers
     public class TextFieldTagHelper : TagHelper
     {
         private readonly IJsonHelper jsonHelper;
-        private readonly JavaScriptEncoder javaScriptEncoder;
 
         [HtmlAttributeName("content-text")]
         public ModelExpression FieldName { get; set; }
@@ -19,10 +17,9 @@ namespace BrandUp.Pages.TagHelpers
         [HtmlAttributeNotBound, ViewContext]
         public ViewContext ViewContext { get; set; }
 
-        public TextFieldTagHelper(IJsonHelper jsonHelper, JavaScriptEncoder javaScriptEncoder)
+        public TextFieldTagHelper(IJsonHelper jsonHelper)
         {
             this.jsonHelper = jsonHelper ?? throw new ArgumentNullException(nameof(jsonHelper));
-            this.javaScriptEncoder = javaScriptEncoder ?? throw new ArgumentNullException(nameof(javaScriptEncoder));
         }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)

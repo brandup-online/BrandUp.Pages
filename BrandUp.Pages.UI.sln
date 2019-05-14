@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "brandup-pages-ui", "ui\brandup-pages-ui\brandup-pages-ui.njsproj", "{F0E2B27A-C2A7-484A-B138-B28740DDE984}"
+EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "brandup-pages-ckeditor", "ui\brandup-pages-ckeditor\brandup-pages-ckeditor.njsproj", "{E7D7B55B-00B2-430A-9862-1213B2E628B3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0E2B27A-C2A7-484A-B138-B28740DDE984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0E2B27A-C2A7-484A-B138-B28740DDE984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0E2B27A-C2A7-484A-B138-B28740DDE984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0E2B27A-C2A7-484A-B138-B28740DDE984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7D7B55B-00B2-430A-9862-1213B2E628B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7D7B55B-00B2-430A-9862-1213B2E628B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7D7B55B-00B2-430A-9862-1213B2E628B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7D7B55B-00B2-430A-9862-1213B2E628B3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BE7B3624-B9D3-4D4E-B437-A8F728801387}
+	EndGlobalSection
+EndGlobal

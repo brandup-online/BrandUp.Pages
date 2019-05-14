@@ -1,7 +1,6 @@
 ﻿import { DOM, AjaxQueue } from "brandup-ui";
 import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../typings/content";
 import { TextDesigner } from "./text";
-import { HtmlDesigner } from "./html";
 
 export class PageDesigner implements IPageDesigner {
     readonly editId: string;
@@ -27,10 +26,6 @@ export class PageDesigner implements IPageDesigner {
             switch (fieldModel.type) {
                 case "Text": {
                     fieldDesigner = new TextDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "Html": {
-                    fieldDesigner = new HtmlDesigner(this, fieldElem, fieldModel.options);
                     break;
                 }
                 default:
