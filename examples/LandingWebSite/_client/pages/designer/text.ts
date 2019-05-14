@@ -2,7 +2,7 @@
 import { TextboxOptions } from "../form/textbox";
 import "./text.less";
 
-export class TextDesigner extends FieldDesigner<TextboxOptions, string> {
+export class TextDesigner extends FieldDesigner<TextboxOptions> {
     private __isChanged: boolean;
 
     get typeName(): string { return "BrandUpPages.TextDesigner"; }

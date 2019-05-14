@@ -1,6 +1,6 @@
-﻿import "./styles.less";
-import { AppClientModel } from "./pages/typings/website";
+﻿import { AppClientModel } from "./pages/typings/website";
 import { Application } from "./pages/app";
+import "./styles.less";
 
 export interface LandingWebSiteModel extends AppClientModel {
 }

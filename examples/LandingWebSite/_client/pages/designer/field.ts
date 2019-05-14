@@ -2,7 +2,7 @@
 import { IContentFieldDesigner, IPageDesigner } from "../typings/content";
 import "./field.less";
 
-export abstract class FieldDesigner<TOptions, TValue> extends UIElement implements IContentFieldDesigner {
+export abstract class FieldDesigner<TOptions> extends UIElement implements IContentFieldDesigner {
     readonly page: IPageDesigner;
     readonly options: TOptions;
     readonly path: string;
@@ -28,8 +28,6 @@ export abstract class FieldDesigner<TOptions, TValue> extends UIElement implemen
     }
 
     protected abstract onRender(elem: HTMLElement);
-
-    abstract getValue(): TValue;
-    abstract setValue(value: TValue);
+    
     abstract hasValue(): boolean;
 }

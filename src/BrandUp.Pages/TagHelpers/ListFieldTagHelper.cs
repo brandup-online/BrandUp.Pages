@@ -14,6 +14,7 @@ namespace BrandUp.Pages.TagHelpers
     [HtmlTargetElement(Attributes = "content-list")]
     public class ListFieldTagHelper : TagHelper
     {
+        private readonly IJsonHelper jsonHelper;
         private readonly IHtmlHelper htmlHelper;
 
         [HtmlAttributeName("content-list")]
@@ -22,8 +23,9 @@ namespace BrandUp.Pages.TagHelpers
         [HtmlAttributeNotBound, ViewContext]
         public ViewContext ViewContext { get; set; }
 
-        public ListFieldTagHelper(IHtmlHelper htmlHelper)
+        public ListFieldTagHelper(IJsonHelper jsonHelper, IHtmlHelper htmlHelper)
         {
+            this.jsonHelper = jsonHelper ?? throw new ArgumentNullException(nameof(jsonHelper));
             this.htmlHelper = htmlHelper ?? throw new ArgumentNullException(nameof(htmlHelper));
         }
 
@@ -36,10 +38,21 @@ namespace BrandUp.Pages.TagHelpers
 
             (htmlHelper as IViewContextAware).Contextualize(ViewContext);
 
+            var fieldModel = new Models.ContentFieldModel
+            {
+                Type = field.Type,
+                Name = field.Name,
+                Title = field.Title,
+                Options = field.GetFormOptions(contentContext.Services)
+            };
+
             var viewLocator = ViewContext.HttpContext.RequestServices.GetRequiredService<Views.IViewLocator>();
 
             output.Attributes.Add("content-path", contentContext.Explorer.Path);
             output.Attributes.Add("content-field", listField.Name);
+            output.Attributes.Add("content-field-type", listField.Type);
+            output.Attributes.Add(new TagHelperAttribute("content-field-model", jsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
+
             output.TagMode = TagMode.StartTagAndEndTag;
 
             if (listField.GetModelValue(contentContext.Content) is IList value && value.Count > 0)
@@ -73,6 +86,7 @@ namespace BrandUp.Pages.TagHelpers
                         tag.AddCssClass(itemRenderingContext.CssClass);
 
                     tag.Attributes.Add("content-path", itemContentContext.Explorer.Path);
+                    tag.Attributes.Add("content-path-index", i.ToString());
 
                     tag.InnerHtml.AppendHtml(itemHtml);
 

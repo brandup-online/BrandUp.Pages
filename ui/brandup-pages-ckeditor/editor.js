@@ -23,7 +23,7 @@ var createEditor = function (elem, config) {
         ],
 
         toolbar: [
-            //'heading',
+            'heading',
             'bold',
             'italic',
             'link',

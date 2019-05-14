@@ -1,54 +1,63 @@
 ﻿import { FieldDesigner } from "./field";
 import { TextboxOptions } from "../form/textbox";
-import createEditor, { EditorInstance } from "brandup-pages-ckeditor";
 import "./html.less";
 
-export class HtmlDesigner extends FieldDesigner<TextboxOptions, string> {
+export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
     private __isChanged: boolean;
-    private __editor: EditorInstance;
 
-    get typeName(): string { return "BrandUpPages.TextDesigner"; }
+    get typeName(): string { return "BrandUpPages.HtmlDesigner"; }
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("html-designer");
+        elem.setAttribute("tabindex", "0");
+        elem.contentEditable = "true";
 
-        createEditor(elem, {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList']
-        }).then(editor => {
-            this.__editor = editor;
+        elem.addEventListener("paste", (e: ClipboardEvent) => {
+            this.__isChanged = true;
 
-            editor.model.document.on('change', () => {
-                if (editor.model.document.differ.hasDataChanges()) {
-                    this.__isChanged = true;
-                }
-            });
+            e.preventDefault();
 
-            this.__refreshUI();
+            var text = e.clipboardData.getData("text/plain");
+            document.execCommand("insertText", false, this.normalizeValue(text));
         });
-
-        this.element.addEventListener("focus", () => {
-            this.__isChanged = false;
+        elem.addEventListener("cut", () => {
+            this.__isChanged = true;
         });
-        this.element.addEventListener("blur", () => {
-            if (this.__isChanged) {
-                this.__editor.model.document.differ.reset();
-                
-                this._onChanged();
+        elem.addEventListener("keydown", (e: KeyboardEvent) => {
+            if (!this.options.allowMultiline && e.keyCode == 13) {
+                e.preventDefault();
+                return false;
             }
         });
+        elem.addEventListener("keyup", (e: KeyboardEvent) => {
+            this.__isChanged = true;
+        });
+        elem.addEventListener("focus", () => {
+            this.__isChanged = false;
+        });
+        elem.addEventListener("blur", () => {
+            if (this.__isChanged)
+                this._onChanged();
+        });
+
+        this.__refreshUI();
     }
 
     getValue(): string {
-        var data = this.__editor.data.get();
-        return data ? data : null;
+        var val = this.normalizeValue(this.element.innerText);
+        return val ? val : null;
     }
     setValue(value: string) {
-        this.__editor.data.set(value ? value : "");
+        value = this.normalizeValue(value);
+        if (value && this.options.allowMultiline) {
+            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
+        }
+        this.element.innerHTML = value ? value : "";
 
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
+        var val = this.normalizeValue(this.element.innerText);
         return val ? true : false;
     }
 
@@ -56,7 +65,7 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions, string> {
         this.__refreshUI();
 
         this.page.queue.request({
-            url: '/brandup.pages/content/html',
+            url: '/brandup.pages/content/text',
             urlParams: {
                 editId: this.page.editId,
                 path: this.path,
@@ -72,6 +81,7 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions, string> {
             }
         });
     }
+
     private __refreshUI() {
         if (this.hasValue())
             this.element.classList.remove("has-value");
@@ -79,9 +89,15 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions, string> {
             this.element.classList.add("empty-value");
     }
 
-    destroy() {
-        this.__editor.destroy().then(() => {
-            super.destroy();
-        });
+    normalizeValue(value: string): string {
+        if (!value)
+            return "";
+
+        value = value.trim();
+
+        if (!this.options.allowMultiline)
+            value = value.replace("\n\r", " ");
+
+        return value;
     }
 }

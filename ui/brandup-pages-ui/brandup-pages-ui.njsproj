@@ -26,6 +26,7 @@
     <Content Include="package.json" />
     <Content Include="src\content\image.less" />
     <Content Include="src\designer\field.less" />
+    <Content Include="src\designer\html.less" />
     <Content Include="src\designer\text.less" />
     <Content Include="src\dialogs\dialog-delete.less" />
     <Content Include="src\dialogs\dialog-form.less" />
@@ -71,6 +72,7 @@
     <TypeScriptCompile Include="src\content\list.ts" />
     <TypeScriptCompile Include="src\content\text.ts" />
     <TypeScriptCompile Include="src\designer\field.ts" />
+    <TypeScriptCompile Include="src\designer\html.ts" />
     <TypeScriptCompile Include="src\designer\page.ts" />
     <TypeScriptCompile Include="src\designer\text.ts" />
     <TypeScriptCompile Include="src\dialogs\dialog-delete.ts" />

@@ -31,9 +31,7 @@ export interface IContentFieldDesigner {
     path: string;
     name: string;
     fullPath: string;
-
-    getValue(): any;
-    setValue(value: any);
+    
     hasValue(): boolean;
     destroy();
 }

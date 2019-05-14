@@ -1,6 +1,4 @@
-﻿import { fail } from "assert";
-
-export interface IEditorConfig {
+﻿export interface IEditorConfig {
     language?: string;
     toolbar?: Array<string>;
 }
