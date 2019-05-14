@@ -71,7 +71,6 @@ namespace BrandUp.Pages
                 }
 
                 var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
-
                 editSession = await pageEditingService.FindEditSessionById(editId);
                 if (editSession == null)
                 {
@@ -83,6 +82,16 @@ namespace BrandUp.Pages
                 if (page == null)
                 {
                     context.Result = NotFound();
+                    return;
+                }
+
+                var administrationManager = HttpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
+
+                if (!await administrationManager.CheckAsync())
+                {
+                    var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
+
+                    context.Result = RedirectPermanent(await pageLinkGenerator.GetUrlAsync(page));
                     return;
                 }
             }

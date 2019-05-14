@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/page/{id}/publish", Name = "BrandUp.Pages.Page.Publish")]
+    [Route("brandup.pages/page/{id}/publish", Name = "BrandUp.Pages.Page.Publish"), Administration.Administration]
     public class PagePublishController : FormController<PagePublishForm, PagePublishValues, PagePublishResult>
     {
         private readonly IPageService pageService;

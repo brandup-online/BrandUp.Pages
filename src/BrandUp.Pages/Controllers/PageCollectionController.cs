@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [ApiController]
+    [ApiController, Administration.Administration]
     public class PageCollectionController : ControllerBase
     {
         private readonly IPageCollectionService pageCollectionService;

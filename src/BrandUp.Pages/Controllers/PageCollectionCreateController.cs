@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/collection/create", Name = "BrandUp.Pages.Collection.Create")]
+    [Route("brandup.pages/collection/create", Name = "BrandUp.Pages.Collection.Create"), Administration.Administration]
     public class PageCollectionCreateController : FormController<PageCollectionCreateForm, PageCollectionCreateValues, PageCollectionModel>
     {
         #region Fields
