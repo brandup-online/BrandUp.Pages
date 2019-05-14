@@ -41,14 +41,17 @@ export class PageToolbar extends UIElement {
             });
         }
         else {
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }));
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" }));
+            if (page.model.status !== "Published") {
+                toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }));
 
-            this.registerCommand("brandup-pages-publish", () => {
-                publishPage(page.model.id).then(result => {
-                    location.href = result.url;
+                this.registerCommand("brandup-pages-publish", () => {
+                    publishPage(page.model.id).then(result => {
+                        location.href = result.url;
+                    });
                 });
-            });
+            }
+
+            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" }));
             this.registerCommand("brandup-pages-edit", () => {
                 page.app.request({
                     urlParams: { handler: "BeginEdit" },
