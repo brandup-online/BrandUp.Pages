@@ -117,6 +117,8 @@ namespace BrandUp.Pages.Services
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
             await pageRepositiry.SetContentAsync(page.Id, pageTitle, new PageContent(1, pageData));
+
+            page.Title = pageTitle;
         }
         public async Task<Result> PublishPageAsync(IPage page, string urlPath)
         {
@@ -147,6 +149,8 @@ namespace BrandUp.Pages.Services
                 return Result.Failed("Страница с таким url уже существует.");
 
             await pageRepositiry.SetUrlPathAsync(page.Id, urlPath);
+
+            page.UrlPath = urlPath;
 
             return Result.Success;
         }

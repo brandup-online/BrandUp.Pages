@@ -27,8 +27,8 @@ namespace BrandUp.Pages.Interfaces
         DateTime CreatedDate { get; }
         string TypeName { get; }
         Guid OwnCollectionId { get; }
-        string Title { get; }
-        string UrlPath { get; }
+        string Title { get; set; }
+        string UrlPath { get; set; }
     }
 
     public enum PageSortMode

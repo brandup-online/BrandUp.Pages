@@ -46,7 +46,7 @@ export class PageToolbar extends UIElement {
 
                 this.registerCommand("brandup-pages-publish", () => {
                     publishPage(page.model.id).then(result => {
-                        location.href = result.url;
+                        page.app.nav({ url: result.url, pushState: false });
                     });
                 });
             }
