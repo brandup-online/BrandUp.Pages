@@ -23,6 +23,7 @@ namespace BrandUp.Pages.Content.Fields
 
             services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
             services.AddSingleton<Infrastructure.IContentTypeLocator>(contentTypeResolver);
+            services.AddSingleton<Files.IFileUrlGenerator, Files.FakeFileUrlGenerator>();
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
