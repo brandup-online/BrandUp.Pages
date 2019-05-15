@@ -47,7 +47,7 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
             document.body.classList.add("");
 
         if (this.__parentDialog) {
-            this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button", "data-command": "close" }, iconBack));
+            this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
         }
         else {
             this.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }, iconClose));
@@ -148,6 +148,8 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
     protected reject(reason: any) {
         if (this.__reject)
             this.__reject(reason);
+
+        this.destroy();
     }
     
     destroy() {
@@ -155,7 +157,7 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
             this.__childDialog.destroy();
             this.__childDialog = null;
         }
-
+        
         if (!this.__parentDialog) {
             currentDialog = null;
 

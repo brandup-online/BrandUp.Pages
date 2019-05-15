@@ -65,7 +65,7 @@ namespace BrandUp.Pages.Content.Fields
                 };
             }
 
-            return Task.FromResult<object>(formValue);
+            return formValue;
         }
 
         #endregion

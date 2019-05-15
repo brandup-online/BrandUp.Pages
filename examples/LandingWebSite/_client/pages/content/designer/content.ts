@@ -36,6 +36,8 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
             editPage(this.page.editId, contentPath).then(() => {
                 this.__refreshItem(itemElem);
+            }).catch(() => {
+                this.__refreshItem(itemElem);
             });
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
@@ -143,6 +145,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
                     elem.remove();
 
                     this._renderBlock(newElem);
+                    this.page.render();
                 }
             }
         });

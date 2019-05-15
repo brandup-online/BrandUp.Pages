@@ -26,6 +26,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
+            transition: background ease 120ms;
         }
 
         & span {
@@ -73,30 +74,10 @@
     }
 
     &.has-value .value {
-        &:before {
-            display: none;
-        }
-
-        & span {
-            display: none;
-        }
-
-        & button {
-            display: none;
-        }
-
         &:focus,
         &:hover {
             &:before {
-                display: block;
-            }
-
-            & span {
-                display: block;
-            }
-
-            & button {
-                display: block;
+                background: rgba(0,0,0,0.2);
             }
         }
     }

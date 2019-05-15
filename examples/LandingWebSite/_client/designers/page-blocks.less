@@ -142,6 +142,8 @@
     display: flex;
     flex-flow: row nowrap;
     z-index: 110;
+    opacity: 0.5;
+    transition: opacity ease 120ms;
 
     & ul {
         padding: 0;
@@ -208,6 +210,7 @@
 
     &:hover {
         border-color: rgba(0,0,0,1);
+        opacity: 1;
 
         & svg {
             fill: rgba(0,0,0,1);

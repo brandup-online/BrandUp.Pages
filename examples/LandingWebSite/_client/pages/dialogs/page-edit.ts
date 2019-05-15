@@ -151,11 +151,10 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         this.__fields[field.name.toLowerCase()] = field;
     }
 
-    _onClose() {
+    protected _onClose() {
         this.resolve(null);
-
-        super._onClose();
     }
+
     destroy() {
         this.queue.destroy();
 

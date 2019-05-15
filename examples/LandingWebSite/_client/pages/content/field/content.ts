@@ -2,6 +2,9 @@
 import { Field } from "../../form/field";
 import { DOM } from "brandup-ui";
 import "./content.less";
+import iconEdit from "../../svg/toolbar-button-edit.svg";
+import iconDelete from "../../svg/toolbar-button-discard.svg";
+import { editPage } from "../../dialogs/page-edit";
 
 export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOptions> implements IContentField {
     readonly form: IContentForm;
@@ -23,6 +26,16 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
 
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.element.appendChild(this.__itemsElem);
+
+        this.registerCommand("item-settings", (elem: HTMLElement) => {
+            let itemElem = elem.closest("[data-content-index]");
+            let itemIndex = itemElem.getAttribute("data-content-index");
+            let contentPath = `${this.form.contentPath}.${this.name}[${itemIndex}]`;
+
+            editPage(this.form.editId, contentPath).then(() => {
+                //this.__refreshItem(itemElem);
+            });
+        });
     }
 
     getValue(): ContentFieldFormValue {
@@ -43,12 +56,12 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
         for (let i = 0; i < this.__value.items.length; i++) {
             let item = this.__value.items[i];
 
-            let itemElem = DOM.tag("div", { class: "item" }, [
+            let itemElem = DOM.tag("div", { class: "item", "data-content-index": i.toString() }, [
                 DOM.tag("div", { class: "index" }, `#${i + 1}`),
-                DOM.tag("a", { href: "", class: "title" }, item.type.title),
+                DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.type.title),
                 DOM.tag("ul", null, [
-                    DOM.tag("li", null, DOM.tag("a", { href: "", class: "open", "data-command": "item-settings" })),
-                    DOM.tag("li", null, DOM.tag("a", { href: "", class: "delete", "data-command": "item-delete" }))
+                    DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-settings" }, iconEdit)),
+                    DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-delete" }, iconDelete))
                 ])
             ]);
             this.__itemsElem.appendChild(itemElem);
