@@ -31,7 +31,7 @@ namespace BrandUp.Pages.TagHelpers
             if (Field.IsListValue)
             {
                 var list = Field.GetModelValue(Content) as IList;
-                if (list.Count > 0)
+                if (Field.HasValue(list))
                 {
                     for (var i = 0; i < list.Count; i++)
                     {

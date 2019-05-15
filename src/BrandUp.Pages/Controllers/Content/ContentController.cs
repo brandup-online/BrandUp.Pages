@@ -12,6 +12,34 @@ namespace BrandUp.Pages.Controllers
 {
     public class ContentController : FieldController<IContentField>
     {
+        [HttpGet("data")]
+        public IActionResult GetData([FromQuery]int itemIndex = -1)
+        {
+            var contentPath = Field.Name;
+            if (Field.IsListValue)
+            {
+                if (itemIndex < 0)
+                    return BadRequest();
+
+                contentPath += $"[{itemIndex}]";
+            }
+
+            var contentContext = ContentContext.Navigate(contentPath);
+            if (contentContext == null)
+                return NotFound();
+
+            var result = new ContentItem
+            {
+                Type = new ContentItemType
+                {
+                    Name = contentContext.Explorer.Metadata.Name,
+                    Title = contentContext.Explorer.Metadata.Title
+                }
+            };
+
+            return Json(result);
+        }
+
         [HttpGet("view")]
         public async Task<IActionResult> ViewAsync([FromServices]IViewRenderService viewRenderService, [FromQuery]int itemIndex = -1)
         {

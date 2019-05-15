@@ -16,9 +16,4 @@ namespace BrandUp.Pages.Models
         public string Title { get; set; }
         public object Options { get; set; }
     }
-
-    public class ContentFieldChangeResult
-    {
-        public object Value { get; set; }
-    }
 }
