@@ -24,11 +24,14 @@ export interface IPageDesigner {
     editId: string;
     queue: AjaxQueue;
     render();
+    accentField(field: IContentFieldDesigner);
+    clearAccent();
     destroy();
 }
 
 export interface IContentFieldDesigner {
     page: IPageDesigner;
+    element: HTMLElement;
     path: string;
     name: string;
     fullPath: string;

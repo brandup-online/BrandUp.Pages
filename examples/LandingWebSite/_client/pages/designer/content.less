@@ -1,6 +1,17 @@
 ﻿@import "../vars.less";
 
 .content-designer {
+    &.hide-ui {
+        & .content-designer-item {
+            & a.content-designer-item-add {
+                display: none;
+            }
+
+            & .content-designer-item-tools {
+                visibility: hidden;
+            }
+        }
+    }
 }
 
 .content-designer-new-item {

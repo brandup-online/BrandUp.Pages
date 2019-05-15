@@ -34,10 +34,14 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
         });
         elem.addEventListener("focus", () => {
             this.__isChanged = false;
+
+            this.page.accentField(this);
         });
         elem.addEventListener("blur", () => {
             if (this.__isChanged)
                 this._onChanged();
+
+            this.page.clearAccent();
         });
 
         this.__refreshUI();

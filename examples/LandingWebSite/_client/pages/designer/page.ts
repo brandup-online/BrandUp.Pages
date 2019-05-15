@@ -3,24 +3,55 @@ import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../typi
 import { TextDesigner } from "./text";
 import { HtmlDesigner } from "./html";
 import { ContentDesigner } from "./content";
+import "./page.less";
 
 export class PageDesigner implements IPageDesigner {
     readonly editId: string;
     readonly queue: AjaxQueue;
     private __fields: { [key: string]: IContentFieldDesigner } = {};
+    private __rootElem: HTMLElement;
+    private __accentedField: IContentFieldDesigner = null;
 
     constructor(editId: string) {
         this.editId = editId;
 
         this.queue = new AjaxQueue();
+        this.__rootElem = DOM.queryElement(document.body, "[content-root]");
+        this.__rootElem.classList.add("page-designer");
 
         this.render();
     }
 
-    render() {
-        var rootElem = DOM.queryElement(document.body, "[content-root]");
+    accentField(field: IContentFieldDesigner) {
+        if (this.__accentedField)
+            throw "";
 
-        var fieldElements = DOM.queryElements(rootElem, "[content-field]");
+        this.__rootElem.classList.add("accented");
+
+        for (let key in this.__fields) {
+            let f = this.__fields[key];
+            if (f === field)
+                continue;
+            f.element.classList.add("hide-ui");
+        }
+
+        this.__accentedField = field;
+    }
+    clearAccent() {
+        if (this.__accentedField) {
+            this.__rootElem.classList.remove("accented");
+
+            for (let key in this.__fields) {
+                let f = this.__fields[key];
+                f.element.classList.remove("hide-ui");
+            }
+
+            this.__accentedField = null;
+        }
+    }
+
+    render() {
+        var fieldElements = DOM.queryElements(this.__rootElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
             let fieldElem = fieldElements.item(i);
             if (!fieldElem.hasAttribute("content-field-model") || fieldElem.classList.contains("field-designer"))

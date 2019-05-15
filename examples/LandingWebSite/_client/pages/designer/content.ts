@@ -12,17 +12,17 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
         if (this.options.isListValue) {
             elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "content-designer-new-item brandup-pages-elem" }, '<div><ol>' +
-                '   <li><a href="#" data-command="item-add" class="accent">Все блоки</a></li>' +
-                '   <li>' +
-                '       <ul>' +
-                '           <li><a href="#" data-command="item-add" data-item-type="Content.Text">Текст</a></li>' +
-                '           <li class="split"></li>' +
-                '           <li><a href="#" data-command="item-add" data-item-type="Content.Image">Изображение</a></li>' +
-                '           <li class="split"></li>' +
-                '           <li><a href="#" data-command="item-add" data-item-type="GTR.ImagesBlock">Галерея</a></li>' +
-                '       </ul>' +
-                '   </li>' +
-                '   <li><a href="#" data-command="item-add">Автоподбор</a></li>' +
+                '   <li><a href="#" data-command="item-add" class="accent">Добавить блок</a></li>' +
+                //'   <li>' +
+                //'       <ul>' +
+                //'           <li><a href="#" data-command="item-add" data-item-type="Content.Text">Текст</a></li>' +
+                //'           <li class="split"></li>' +
+                //'           <li><a href="#" data-command="item-add" data-item-type="Content.Image">Изображение</a></li>' +
+                //'           <li class="split"></li>' +
+                //'           <li><a href="#" data-command="item-add" data-item-type="GTR.ImagesBlock">Галерея</a></li>' +
+                //'       </ul>' +
+                //'   </li>' +
+                //'   <li><a href="#" data-command="item-add">Автоподбор</a></li>' +
                 '</ol></div>'));
         }
 
