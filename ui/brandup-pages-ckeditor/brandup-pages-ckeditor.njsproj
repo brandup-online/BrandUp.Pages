@@ -35,6 +35,7 @@
     <Compile Include="editor.js">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="index.ts" />

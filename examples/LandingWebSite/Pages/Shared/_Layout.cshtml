@@ -18,7 +18,8 @@
             <div class="content-width">
                 <a content-page="/" class="logo applink">LandingWebSite</a>
                 <ul>
-                    <li><a asp-page="/About" class="applink">About</a></li>
+                    <li><a asp-page-path="/test" class="applink">Test</a></li>
+                    <li><a asp-page="/about" class="applink">About</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li><a href="#" data-command="signout">Sign out</a></li>
