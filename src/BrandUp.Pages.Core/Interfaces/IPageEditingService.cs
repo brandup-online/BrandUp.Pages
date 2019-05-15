@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Interfaces
 {
     public interface IPageEditingService
     {
-        Task<IPageEditSession> BeginEditAsync(IPage page);
-        Task<IPageEditSession> FindEditSessionById(Guid id);
-        Task<object> GetContentAsync(IPageEditSession editSession);
-        Task SetContentAsync(IPageEditSession editSession, object content);
-        Task DiscardEditSession(IPageEditSession editSession);
-        Task CommitEditSessionAsync(IPageEditSession editSession);
+        Task<IPageEditSession> BeginEditAsync(IPage page, CancellationToken cancellationToken = default);
+        Task<IPageEditSession> FindEditSessionById(Guid id, CancellationToken cancellationToken = default);
+        Task<object> GetContentAsync(IPageEditSession editSession, CancellationToken cancellationToken = default);
+        Task SetContentAsync(IPageEditSession editSession, object content, CancellationToken cancellationToken = default);
+        Task DiscardEditSession(IPageEditSession editSession, CancellationToken cancellationToken = default);
+        Task CommitEditSessionAsync(IPageEditSession editSession, CancellationToken cancellationToken = default);
     }
 
     public interface IPageEditSession

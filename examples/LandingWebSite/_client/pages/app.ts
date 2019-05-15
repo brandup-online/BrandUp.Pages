@@ -239,7 +239,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.request({
             url: pageState.url,
-            urlParams: { handler: "content" },
+            urlParams: { _content: "" },
             success: (data: string, status: number) => {
                 if (navSequence !== this.__navCounter)
                     return;

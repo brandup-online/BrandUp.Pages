@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +16,7 @@ namespace BrandUp.Pages
 {
     public abstract class AppPageModel : PageModel, IContentPageModel
     {
-        private bool rendenOnlyContent = false;
+        private bool renderOnlyContent = false;
         private readonly IDictionary<string, object> clientModel = new Dictionary<string, object>();
 
         #region IContentPageModel members
@@ -28,6 +29,16 @@ namespace BrandUp.Pages
 
         #endregion
 
+        public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+        {
+            await OnInitializeAsync(context);
+
+            if (Request.Query.ContainsKey("_content"))
+                renderOnlyContent = true;
+
+            await base.OnPageHandlerExecutionAsync(context, next);
+        }
+
         #region Handler methods
 
         public async Task<IActionResult> OnGetNavigationAsync()
@@ -38,16 +49,20 @@ namespace BrandUp.Pages
         }
         public IActionResult OnGetContent()
         {
-            rendenOnlyContent = true;
+            renderOnlyContent = true;
 
             return Page();
         }
 
         #endregion
 
+        protected virtual Task OnInitializeAsync(PageHandlerExecutingContext context)
+        {
+            return Task.CompletedTask;
+        }
         public void RenderPage(Microsoft.AspNetCore.Mvc.Razor.IRazorPage page)
         {
-            if (rendenOnlyContent)
+            if (renderOnlyContent)
                 page.Layout = null;
         }
         internal async Task<Models.NavigationClientModel> GetNavigationModelAsync(CancellationToken cancellationToken = default)
@@ -91,7 +106,6 @@ namespace BrandUp.Pages
 
             return navModel;
         }
-
         internal async Task<Models.PageClientModel> GetClientModelAsync(CancellationToken cancellationToken = default)
         {
             var model = new Models.PageClientModel
@@ -126,7 +140,6 @@ namespace BrandUp.Pages
 
             return model;
         }
-
         protected virtual Task OnBuildClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;

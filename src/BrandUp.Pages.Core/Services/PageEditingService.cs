@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Services
@@ -8,31 +9,37 @@ namespace BrandUp.Pages.Services
     {
         private readonly IPageEditSessionRepository editSessionRepository;
         private readonly IPageService pageService;
+        private readonly Administration.IAdministrationManager administrationManager;
 
         public PageEditingService(IPageEditSessionRepository editSessionRepository,
-            IPageService pageRepositiry,
-            Content.IContentMetadataManager contentMetadataManager)
+            IPageService pageService,
+            Content.IContentMetadataManager contentMetadataManager,
+            Administration.IAdministrationManager administrationManager)
         {
             this.editSessionRepository = editSessionRepository ?? throw new ArgumentNullException(nameof(editSessionRepository));
-            pageService = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
+            this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            this.administrationManager = administrationManager ?? throw new ArgumentNullException(nameof(administrationManager));
         }
 
-        public async Task<IPageEditSession> BeginEditAsync(IPage page)
+        public async Task<IPageEditSession> BeginEditAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
+            var userId = await administrationManager.GetUserIdAsync(cancellationToken);
+            if (string.IsNullOrEmpty(userId))
+                throw new InvalidOperationException();
             var contentData = await pageService.GetPageContentAsync(page);
             var pageMetadata = await pageService.GetPageTypeAsync(page);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentData);
 
-            return await editSessionRepository.CreateEditSessionAsync(page.Id, "test", new PageContent(1, pageData));
+            return await editSessionRepository.CreateEditSessionAsync(page.Id, userId, new PageContent(1, pageData));
         }
-        public Task<IPageEditSession> FindEditSessionById(Guid id)
+        public Task<IPageEditSession> FindEditSessionById(Guid id, CancellationToken cancellationToken = default)
         {
             return editSessionRepository.FindEditSessionByIdAsync(id);
         }
-        public async Task<object> GetContentAsync(IPageEditSession editSession)
+        public async Task<object> GetContentAsync(IPageEditSession editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
@@ -43,7 +50,7 @@ namespace BrandUp.Pages.Services
 
             return pageMetadataProvider.ContentMetadata.ConvertDictionaryToContentModel(pageContent.Data);
         }
-        public async Task SetContentAsync(IPageEditSession editSession, object content)
+        public async Task SetContentAsync(IPageEditSession editSession, object content, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
@@ -55,7 +62,7 @@ namespace BrandUp.Pages.Services
 
             await editSessionRepository.SetContentAsync(editSession.Id, new PageContent(1, contentData));
         }
-        public async Task CommitEditSessionAsync(IPageEditSession editSession)
+        public async Task CommitEditSessionAsync(IPageEditSession editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
@@ -69,7 +76,7 @@ namespace BrandUp.Pages.Services
 
             await editSessionRepository.DeleteEditSession(editSession.Id);
         }
-        public Task DiscardEditSession(IPageEditSession editSession)
+        public Task DiscardEditSession(IPageEditSession editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));

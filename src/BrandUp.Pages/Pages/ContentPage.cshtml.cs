@@ -35,7 +35,9 @@ namespace BrandUp.Pages
 
         #endregion
 
-        public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+        #region AppPageModel members
+
+        protected override async Task OnInitializeAsync(PageHandlerExecutingContext context)
         {
             PageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
 
@@ -87,7 +89,7 @@ namespace BrandUp.Pages
 
                 var administrationManager = HttpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
 
-                if (!await administrationManager.CheckAsync())
+                if (!await administrationManager.CheckAsync() || await administrationManager.GetUserIdAsync() != editSession.ContentManagerId)
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 
@@ -129,9 +131,9 @@ namespace BrandUp.Pages
             var isPublished = await PageService.IsPublishedAsync(page);
             Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
             ParentPageId = await PageService.GetParentPageIdAsync(page);
-
-            await base.OnPageHandlerExecutionAsync(context, next);
         }
+
+        #endregion
 
         #region Handler methods
 
