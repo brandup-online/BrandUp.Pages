@@ -14,12 +14,16 @@ export class PageDesigner implements IPageDesigner {
 
         this.queue = new AjaxQueue();
 
-        var contentElem = DOM.queryElement(document.body, "[content-page]");
+        this.render();
+    }
 
-        var fieldElements = DOM.queryElements(contentElem, "[content-field]");
+    render() {
+        var rootElem = DOM.queryElement(document.body, "[content-root]");
+
+        var fieldElements = DOM.queryElements(rootElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
             let fieldElem = fieldElements.item(i);
-            if (!fieldElem.hasAttribute("content-field-model"))
+            if (!fieldElem.hasAttribute("content-field-model") || fieldElem.classList.contains("field-designer"))
                 continue;
 
             let fieldModel = <ContentFieldModel>JSON.parse(fieldElem.getAttribute("content-field-model"));
@@ -41,7 +45,7 @@ export class PageDesigner implements IPageDesigner {
                 default:
                     throw "";
             }
-            
+
             this.__fields[fieldDesigner.fullPath] = fieldDesigner;
         }
     }

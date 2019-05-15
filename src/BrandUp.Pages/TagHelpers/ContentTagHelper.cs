@@ -62,12 +62,10 @@ namespace BrandUp.Pages.TagHelpers
                 {
                     for (var i = 0; i < list.Count; i++)
                     {
-                        var itemContentContext = contentContext.Navigate(FieldName.Name + "[" + i + "]");
+                        var itemContentContext = contentContext.Navigate($"{FieldName.Name}[{i}]");
                         var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
 
                         output.Content.AppendHtmlLine(itemHtml);
-
-                        i++;
                     }
                 }
             }

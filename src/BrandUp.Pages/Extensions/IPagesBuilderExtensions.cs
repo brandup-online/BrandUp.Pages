@@ -25,7 +25,7 @@ namespace BrandUp.Pages.Builder
 
             services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
             services.AddSingleton<Views.IViewLocator, Views.ViewLocator>();
-            services.AddSingleton<Views.IViewRenderService, Views.ViewRenderService>();
+            services.AddScoped<Views.IViewRenderService, Views.ViewRenderService>();
 
             services.Configure(optionAction);
 

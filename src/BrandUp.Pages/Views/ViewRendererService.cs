@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Text.Encodings.Web;
@@ -55,11 +57,14 @@ namespace BrandUp.Pages.Views
 
             using (var contentOutput = new StringWriter())
             {
+                var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
+
                 var viewContext = new ViewContext
                 {
                     HttpContext = httpContextAccessor.HttpContext,
                     ViewData = viewData,
-                    Writer = contentOutput
+                    Writer = contentOutput,
+                    RouteData = new RouteData()
                 };
 
                 await view.RenderAsync(viewContext);
@@ -73,7 +78,7 @@ namespace BrandUp.Pages.Views
                     tag.AddCssClass(itemRenderingContext.CssClass);
 
                 if (contentContext.Explorer.IsRoot)
-                    tag.Attributes.Add("content-page", string.Empty);
+                    tag.Attributes.Add("content-root", string.Empty);
                 tag.Attributes.Add("content-path", contentContext.Explorer.Path);
                 tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
 

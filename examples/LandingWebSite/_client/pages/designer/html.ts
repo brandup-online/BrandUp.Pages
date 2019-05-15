@@ -23,12 +23,6 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
         elem.addEventListener("cut", () => {
             this.__isChanged = true;
         });
-        elem.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (!this.options.allowMultiline && e.keyCode == 13) {
-                e.preventDefault();
-                return false;
-            }
-        });
         elem.addEventListener("keyup", (e: KeyboardEvent) => {
             this.__isChanged = true;
         });
@@ -44,20 +38,18 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
     }
 
     getValue(): string {
-        var val = this.normalizeValue(this.element.innerText);
+        var val = this.normalizeValue(this.element.innerHTML);
         return val ? val : null;
     }
     setValue(value: string) {
         value = this.normalizeValue(value);
-        if (value && this.options.allowMultiline) {
-            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
-        }
+
         this.element.innerHTML = value ? value : "";
 
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var val = this.normalizeValue(this.element.innerText);
+        var val = this.normalizeValue(this.element.innerHTML);
         return val ? true : false;
     }
 
@@ -65,7 +57,7 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
         this.__refreshUI();
 
         this.request({
-            url: '/brandup.pages/content/text',
+            url: '/brandup.pages/content/html',
             method: "POST",
             type: "JSON",
             data: this.getValue(),
@@ -89,10 +81,7 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
             return "";
 
         value = value.trim();
-
-        if (!this.options.allowMultiline)
-            value = value.replace("\n\r", " ");
-
+        
         return value;
     }
 }

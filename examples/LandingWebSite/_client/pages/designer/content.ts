@@ -8,21 +8,23 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
     get typeName(): string { return "BrandUpPages.ListDesigner"; }
 
     protected onRender(elem: HTMLElement) {
-        elem.classList.add("list-designer");
-        
-        elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "list-designer-new-item brandup-pages-elem" }, '<div><ol>' +
-            '   <li><a href="#" data-command="item-add" class="accent">Все блоки</a></li>' +
-            '   <li>' +
-            '       <ul>' +
-            '           <li><a href="#" data-command="item-add" data-item-type="Content.Text">Текст</a></li>' +
-            '           <li class="split"></li>' +
-            '           <li><a href="#" data-command="item-add" data-item-type="Content.Image">Изображение</a></li>' +
-            '           <li class="split"></li>' +
-            '           <li><a href="#" data-command="item-add" data-item-type="GTR.ImagesBlock">Галерея</a></li>' +
-            '       </ul>' +
-            '   </li>' +
-            '   <li><a href="#" data-command="item-add">Автоподбор</a></li>' +
-            '</ol></div>'));
+        elem.classList.add("content-designer");
+
+        if (this.options.isListValue) {
+            elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "content-designer-new-item brandup-pages-elem" }, '<div><ol>' +
+                '   <li><a href="#" data-command="item-add" class="accent">Все блоки</a></li>' +
+                '   <li>' +
+                '       <ul>' +
+                '           <li><a href="#" data-command="item-add" data-item-type="Content.Text">Текст</a></li>' +
+                '           <li class="split"></li>' +
+                '           <li><a href="#" data-command="item-add" data-item-type="Content.Image">Изображение</a></li>' +
+                '           <li class="split"></li>' +
+                '           <li><a href="#" data-command="item-add" data-item-type="GTR.ImagesBlock">Галерея</a></li>' +
+                '       </ul>' +
+                '   </li>' +
+                '   <li><a href="#" data-command="item-add">Автоподбор</a></li>' +
+                '</ol></div>'));
+        }
 
         var items = DOM.queryElements(elem, "* > [content-path-index]");
         items.forEach((elem) => {
@@ -31,21 +33,30 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
         this.registerCommand("item-add", (elem: HTMLElement) => {
             let itemType = elem.getAttribute("data-item-type");
+            let itemIndex = -1;
+
+            if (this.options.isListValue) {
+                if (elem.parentElement.hasAttribute("content-path-index"))
+                    itemIndex = parseInt(elem.parentElement.getAttribute("content-path-index")) + 1;
+                else
+                    itemIndex = DOM.queryElements(this.element, "* > [content-path-index]").length;
+            }
+
             if (!itemType) {
-                new SelectItemTypeDialog(this.options.itemsTypes).open().then((type) => {
-                    this.addItem(type.name);
+                new SelectItemTypeDialog(this.options.itemTypes).open().then((type) => {
+                    this.addItem(type.name, itemIndex);
                 });
             }
             else
-                this.addItem(itemType);
+                this.addItem(itemType, itemIndex);
         });
         this.registerCommand("item-view", () => { });
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            let itemElem = elem.closest("[content-path-index]");
+            let itemElem = elem.closest("[content-path]");
             let contentPath = itemElem.getAttribute("content-path");
 
             editPage(this.page.editId, contentPath).then(() => {
-
+                this.__refreshItem(itemElem);
             });
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
@@ -81,7 +92,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
                 urlParams: {
                     itemIndex: itemIndex
                 },
-                method: "DELETE",
+                method: "POST",
                 success: (data: string, status: number) => {
                     if (status === 200) {
                     }
@@ -103,25 +114,34 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
                 urlParams: {
                     itemIndex: itemIndex
                 },
-                method: "DELETE",
+                method: "POST",
                 success: (data: string, status: number) => {
                     if (status === 200) {
                     }
                 }
             });
         });
+        this.registerCommand("item-refresh", (elem: HTMLElement) => {
+            let itemElem = elem.closest("[content-path]");
+
+            this.__refreshItem(itemElem);
+        });
     }
 
     private __renderItemUI(elem: HTMLElement) {
-        elem.classList.add("list-designer-item");
+        if (elem.classList.contains("content-designer-item"))
+            return;
+
+        elem.classList.add("content-designer-item");
         
-        elem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "list-designer-item-add", href: "#", "data-command": "item-add" }));
+        elem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "content-designer-item-add", href: "#", "data-command": "item-add" }));
         
-        elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "list-designer-item-tools" }, '<ul class="pad">' +
+        elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "content-designer-item-tools" }, '<ul class="pad">' +
             '   <li data-command="item-view" title="Выбер макета" class="no-icon"><span><b>Макет</b></span></li>' +
             '</ul>'));
         
-        elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "list-designer-item-tools list-designer-item-tools-right" }, '<ul class="pad">' +
+        elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "content-designer-item-tools content-designer-item-tools-right" }, '<ul class="pad">' +
+            '   <li data-command="item-refresh" title="Обновить"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26"><path d="M 17.375 0.125 C 17.34375 0.132813 17.335938 0.136719 17.3125 0.1875 C 17.113281 0.886719 16.488281 2.695313 16.1875 3.59375 C 7.585938 2.09375 4.507813 8.894531 3.90625 10.59375 C 3.804688 10.792969 3.792969 10.792969 4.09375 10.59375 C 4.992188 9.792969 8 7.414063 11.5 7.3125 C 13.898438 7.3125 15.1875 8 15.1875 8 L 14.09375 11.8125 C 14.09375 11.8125 14.011719 12.007813 14.3125 11.90625 C 15.710938 11.207031 22.292969 8.195313 22.59375 8.09375 C 22.792969 7.992188 22.6875 7.8125 22.6875 7.8125 L 17.59375 0.1875 C 17.59375 0.1875 17.472656 0.0976563 17.375 0.125 Z M 11.75 14.28125 C 11.71875 14.265625 11.667969 14.289063 11.59375 14.3125 C 11.292969 14.414063 3.40625 18.09375 3.40625 18.09375 C 3.40625 18.09375 3.304688 18.085938 3.40625 18.1875 C 3.507813 18.289063 7.699219 24.804688 8.5 25.90625 C 8.601563 26.007813 8.585938 26.007813 8.6875 25.90625 C 8.886719 25.304688 9.511719 23.304688 9.8125 22.40625 C 18.511719 23.90625 21.5 17 22 15.5 C 22.101563 15.300781 22.007813 15.304688 21.90625 15.40625 C 21.007813 16.207031 17.90625 18.804688 14.40625 18.90625 C 12.007813 19.007813 10.8125 18.1875 10.8125 18.1875 L 11.8125 14.5 C 11.8125 14.5 11.847656 14.324219 11.75 14.28125 Z "></path></svg></li>' +
             '   <li data-command="item-settings" title="Изменить параметры"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 26"><path d="M 11.46875 0.96875 L 10.90625 4.53125 C 10.050781 4.742188 9.234375 5.058594 8.5 5.5 L 5.5625 3.40625 L 3.4375 5.53125 L 5.5 8.46875 C 5.054688 9.207031 4.714844 10.015625 4.5 10.875 L 0.96875 11.46875 L 0.96875 14.46875 L 4.5 15.09375 C 4.714844 15.953125 5.054688 16.761719 5.5 17.5 L 3.40625 20.4375 L 5.53125 22.5625 L 8.46875 20.5 C 9.203125 20.941406 10.019531 21.257813 10.875 21.46875 L 11.46875 25.03125 L 14.46875 25.03125 L 15.125 21.46875 C 15.976563 21.253906 16.769531 20.914063 17.5 20.46875 L 20.46875 22.5625 L 22.59375 20.4375 L 20.46875 17.5 C 20.90625 16.769531 21.257813 15.972656 21.46875 15.125 L 25.03125 14.46875 L 25.03125 11.46875 L 21.46875 10.875 C 21.257813 10.027344 20.90625 9.230469 20.46875 8.5 L 22.5625 5.53125 L 20.4375 3.40625 L 17.5 5.53125 C 16.769531 5.089844 15.949219 4.746094 15.09375 4.53125 L 14.46875 0.96875 Z M 13 6.46875 C 16.605469 6.46875 19.53125 9.394531 19.53125 13 C 19.53125 16.605469 16.605469 19.53125 13 19.53125 C 9.394531 19.53125 6.46875 16.601563 6.46875 13 C 6.46875 9.398438 9.394531 6.46875 13 6.46875 Z M 13 8.0625 C 10.28125 8.0625 8.0625 10.28125 8.0625 13 C 8.0625 15.71875 10.28125 17.9375 13 17.9375 C 15.71875 17.9375 17.9375 15.71875 17.9375 13 C 17.9375 10.28125 15.71875 8.0625 13 8.0625 Z M 12.96875 10.9375 C 14.113281 10.9375 15.0625 11.851563 15.0625 13 C 15.0625 14.144531 14.113281 15.0625 12.96875 15.0625 C 11.824219 15.0625 10.90625 14.144531 10.90625 13 C 10.90625 11.851563 11.824219 10.9375 12.96875 10.9375 Z "></path></svg></li>' +
             '   <li data-command="item-delete" title="Удалить блок"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><path d="M 11.5 -0.03125 C 9.5416406 -0.03125 7.96875 1.5955183 7.96875 3.5625 L 7.96875 4 L 4 4 C 3.449 4 3 4.449 3 5 L 3 6 L 2 6 L 2 8 L 4 8 L 4 23 C 4 24.645063 5.3549372 26 7 26 L 19 26 C 20.645063 26 22 24.645063 22 23 L 22 8 L 24 8 L 24 6 L 23 6 L 23 5 C 23 4.449 22.551 4 22 4 L 18.03125 4 L 18.03125 3.5625 C 18.03125 1.5955183 16.458359 -0.03125 14.5 -0.03125 L 11.5 -0.03125 z M 11.5 2.03125 L 14.5 2.03125 C 15.303641 2.03125 15.96875 2.6874817 15.96875 3.5625 L 15.96875 4 L 10.03125 4 L 10.03125 3.5625 C 10.03125 2.6874817 10.696359 2.03125 11.5 2.03125 z M 6 8 L 11.125 8 C 11.249098 8.0134778 11.372288 8.03125 11.5 8.03125 L 14.5 8.03125 C 14.627712 8.03125 14.750902 8.0134778 14.875 8 L 20 8 L 20 23 C 20 23.562937 19.562937 24 19 24 L 7 24 C 6.4370628 24 6 23.562937 6 23 L 6 8 z M 8 10 L 8 22 L 10 22 L 10 10 L 8 10 z M 12 10 L 12 22 L 14 22 L 14 10 L 12 10 z M 16 10 L 16 22 L 18 22 L 18 10 L 16 10 z"></path></svg></li>' +
             '</ul>' +
@@ -136,28 +156,83 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             elem.setAttribute("content-path-index", index.toString());
         });
     }
+    private __refreshItem(elem: Element) {
+        var urlParams = {};
+        if (this.options.isListValue)
+            urlParams["itemIndex"] = elem.getAttribute("content-path-index");
+
+        this.request({
+            url: '/brandup.pages/content/content/view',
+            urlParams: urlParams,
+            method: "GET",
+            success: (data: string, status: number) => {
+                if (status === 200) {
+                    let fragment = document.createDocumentFragment();
+                    let container = DOM.tag("div", null, data);
+                    fragment.appendChild(container);
+
+                    let newElem = DOM.queryElement(container, "[content-path]");
+                    elem.insertAdjacentElement("afterend", newElem);
+                    elem.remove();
+
+                    this.__renderItemUI(newElem);
+                }
+            }
+        });
+    }
 
     hasValue(): boolean {
         return DOM.queryElements(this.element, "* > [content-path-index]").length > 0;
     }
-    addItem(itemType: string) {
+    addItem(itemType: string, index: number) {
         this.request({
-            url: '/brandup.pages/content/list',
+            url: '/brandup.pages/content/content',
             urlParams: {
-                itemType: itemType
+                itemType: itemType,
+                itemIndex: index.toString()
             },
             method: "PUT",
             success: (data: string, status: number) => {
                 if (status === 200) {
+                    this.request({
+                        url: '/brandup.pages/content/content/view',
+                        urlParams: { itemIndex: index.toString() },
+                        method: "GET",
+                        success: (data: string, status: number) => {
+                            if (status === 200) {
+                                let fragment = document.createDocumentFragment();
+                                let container = DOM.tag("div", null, data);
+                                fragment.appendChild(container);
+                                let newElem = DOM.queryElement(container, "[content-path]");
+
+                                if (this.options.isListValue) {
+                                    let items = DOM.queryElements(this.element, "* > [content-path-index]");
+
+                                    if (index > 0)
+                                        items.item(index - 1).insertAdjacentElement("afterend", newElem);
+                                    else if (index == 0)
+                                        this.element.insertAdjacentElement("afterbegin", newElem);
+                                    else
+                                        items.item(items.length - 1).insertAdjacentElement("afterend", newElem);
+                                }
+
+                                this.page.render();
+                                
+                                this.__renderItemUI(newElem);
+
+                                this.__refreshItemIndexes();
+                            }
+                        }
+                    });
                 }
             }
         });
     }
 
     destroy() {
-        DOM.queryElements(this.element, "* > [content-path-index] .list-designer-item-add").forEach((elem) => { elem.remove(); });
-        DOM.queryElements(this.element, "* > [content-path-index] .list-designer-item-tools").forEach((elem) => { elem.remove(); });
-        DOM.queryElements(this.element, "* > .list-designer-new-item").forEach((elem) => { elem.remove(); });
+        DOM.queryElements(this.element, "* > [content-path-index] .content-designer-item-add").forEach((elem) => { elem.remove(); });
+        DOM.queryElements(this.element, "* > [content-path-index] .content-designer-item-tools").forEach((elem) => { elem.remove(); });
+        DOM.queryElements(this.element, "* > .content-designer-new-item").forEach((elem) => { elem.remove(); });
         
         super.destroy();
     }
@@ -165,7 +240,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
 export interface ContentDesignerOptions {
     isListValue: boolean;
-    itemsTypes: Array<ContentItemType>;
+    itemTypes: Array<ContentItemType>;
 }
 
 export interface ContentItemType {
@@ -185,10 +260,20 @@ class SelectItemTypeDialog extends Dialog<ContentItemType> {
     get typeName(): string { return "BrandUpPages.SelectItemTypeDialog"; }
 
     protected _onRenderContent() {
+        this.element.classList.add("website-dialog-select");
+
         this.setHeader("Выберите тип элемента");
 
-        //this.__types.map((type) => {
+        this.__types.map((type, index) => {
+            let itemElem = DOM.tag("a", { class: "item", href: "", "data-command": "select", "data-index": index }, type.title);
+            this.content.appendChild(itemElem);
+        });
 
-        //});
+        this.registerCommand("select", (elem: HTMLElement) => {
+            let index = parseInt(elem.getAttribute("data-index"));
+            let type = this.__types[index];
+
+            this.resolve(type);
+        });
     }
 }

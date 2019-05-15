@@ -1,9 +1,9 @@
 ﻿@import "../vars.less";
 
-.list-designer {
+.content-designer {
 }
 
-.list-designer-new-item {
+.content-designer-new-item {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -94,23 +94,23 @@
     }
 }
 
-.list-designer-item {
+.content-designer-item {
     position: relative;
 
     &:hover {
         outline: dashed 1px #cfcfcf;
 
-        & a.list-designer-item-add {
+        & a.content-designer-item-add {
             display: block;
         }
 
-        & .list-designer-item-tools {
+        & .content-designer-item-tools {
             visibility: visible;
         }
     }
 }
 
-.list-designer-item-tools {
+.content-designer-item-tools {
     position: absolute;
     top: 5px;
     left: 5px;
@@ -199,7 +199,7 @@
     }
 }
 
-a.list-designer-item-add {
+a.content-designer-item-add {
     display: none;
     position: absolute;
     bottom: -12px;
@@ -214,5 +214,18 @@ a.list-designer-item-add {
 
     &:hover {
         background-color: rgba(0,0,0,1);
+    }
+}
+
+.website-dialog-select {
+    & .website-dialog-content {
+        padding: 10px 0;
+    }
+
+    & a.item {
+        display: block;
+        padding: 10px 35px;
+        color: @Text-Color;
+        text-decoration: none;
     }
 }

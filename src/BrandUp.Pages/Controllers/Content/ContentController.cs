@@ -1,14 +1,17 @@
-﻿using BrandUp.Pages.Content.Fields;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Views;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
     public class ContentController : FieldController<IContentField>
     {
-        [HttpPut]
+        [HttpGet("view")]
         public async Task<IActionResult> ViewAsync([FromServices]IViewRenderService viewRenderService, [FromQuery]int itemIndex = -1)
         {
             var contentPath = Field.Name;
@@ -40,12 +43,32 @@ namespace BrandUp.Pages.Controllers
             if (itemType == null)
                 return BadRequest();
 
-            if (Field.GetModelValue(ContentContext.Content) is IList list)
-            {
-                Field.SetModelValue(ContentContext.Content, list);
+            if (!Field.ValueContentMetadata.Manager.TryGetMetadata(itemType, out ContentMetadataProvider contentMetadataProvider))
+                return BadRequest();
 
-                await SaveChangesAsync();
+            if (!contentMetadataProvider.IsInheritedOrEqual(Field.ValueContentMetadata))
+                return BadRequest();
+
+            var newItem = contentMetadataProvider.CreateModelInstance();
+
+            if (Field.IsListValue)
+            {
+                if (!(Field.GetModelValue(ContentContext.Content) is IList list))
+                    list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(Field.ValueContentMetadata.ModelType));
+
+                if (itemIndex == -1)
+                    itemIndex = list.Count;
+
+                list.Insert(itemIndex, newItem);
+
+                Field.SetModelValue(ContentContext.Content, list);
             }
+            else
+            {
+                Field.SetModelValue(ContentContext.Content, newItem);
+            }
+
+            await SaveChangesAsync();
 
             return await FormValueAsync();
         }
