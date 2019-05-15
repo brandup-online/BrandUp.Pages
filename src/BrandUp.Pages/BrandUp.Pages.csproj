@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.2</LangVersion>
+    <Authors>Dmitry Kovyazin</Authors>
+    <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+    <Company>BrandUp.online</Company>
   </PropertyGroup>
 
   <ItemGroup>
