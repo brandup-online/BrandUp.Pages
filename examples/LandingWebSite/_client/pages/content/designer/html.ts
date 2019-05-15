@@ -1,67 +1,67 @@
 ﻿import { FieldDesigner } from "./base";
 import { TextboxOptions } from "../../form/textbox";
+import createEditor, { EditorInstance } from "brandup-pages-ckeditor";
 import "./html.less";
 
 export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
     private __isChanged: boolean;
+    private __editor: EditorInstance;
 
     get typeName(): string { return "BrandUpPages.HtmlDesigner"; }
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("html-designer");
-        elem.setAttribute("tabindex", "0");
-        elem.contentEditable = "true";
 
-        elem.addEventListener("paste", (e: ClipboardEvent) => {
-            this.__isChanged = true;
+        createEditor(elem, {
+            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList']
+        }).then(editor => {
+            this.__editor = editor;
 
-            e.preventDefault();
+            editor.model.document.on('change', () => {
+                if (editor.model.document.differ.hasDataChanges()) {
+                    this.__isChanged = true;
+                }
+            });
 
-            var text = e.clipboardData.getData("text/plain");
-            document.execCommand("insertText", false, this.normalizeValue(text));
+            this.__refreshUI();
         });
-        elem.addEventListener("cut", () => {
-            this.__isChanged = true;
-        });
-        elem.addEventListener("keyup", (e: KeyboardEvent) => {
-            this.__isChanged = true;
-        });
-        elem.addEventListener("focus", () => {
+
+        this.element.addEventListener("focus", () => {
             this.__isChanged = false;
-
-            this.page.accentField(this);
         });
-        elem.addEventListener("blur", () => {
-            if (this.__isChanged)
+        this.element.addEventListener("blur", () => {
+            if (this.__isChanged) {
+                this.__editor.model.document.differ.reset();
+
                 this._onChanged();
-
-            this.page.clearAccent();
+            }
         });
-
-        this.__refreshUI();
     }
 
     getValue(): string {
-        var val = this.normalizeValue(this.element.innerHTML);
-        return val ? val : null;
+        var data = this.__editor.data.get();
+        return data ? data : null;
     }
     setValue(value: string) {
-        value = this.normalizeValue(value);
-
-        this.element.innerHTML = value ? value : "";
+        this.__editor.data.set(value ? value : "");
 
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var val = this.normalizeValue(this.element.innerHTML);
+        var val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
         return val ? true : false;
     }
 
     protected _onChanged() {
         this.__refreshUI();
 
-        this.request({
+        this.page.queue.request({
             url: '/brandup.pages/content/html',
+            urlParams: {
+                editId: this.page.editId,
+                path: this.path,
+                field: this.name
+            },
             method: "POST",
             type: "JSON",
             data: this.getValue(),
@@ -72,7 +72,6 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
             }
         });
     }
-
     private __refreshUI() {
         if (this.hasValue())
             this.element.classList.remove("has-value");
@@ -80,12 +79,9 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
             this.element.classList.add("empty-value");
     }
 
-    normalizeValue(value: string): string {
-        if (!value)
-            return "";
-
-        value = value.trim();
-        
-        return value;
+    destroy() {
+        this.__editor.destroy().then(() => {
+            super.destroy();
+        });
     }
 }

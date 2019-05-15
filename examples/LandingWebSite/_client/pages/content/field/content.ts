@@ -94,7 +94,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
         ]));
     }
     private __createItemElem(item: ContentItem, index: number) {
-        let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString() }, [
+        let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString(), draggable: "true" }, [
             DOM.tag("div", { class: "index" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.type.title),
             DOM.tag("ul", null, [
@@ -102,6 +102,15 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-delete" }, iconDelete))
             ])
         ]);
+
+        itemElem.addEventListener("dragstart", (e: DragEvent) => {
+            e.preventDefault();
+        }, false);
+
+        itemElem.addEventListener("dragover", (e: DragEvent) => {
+            e.preventDefault();
+        });
+
         return itemElem;
     }
     private eachItems(f: (elem: Element, index: number) => void) {

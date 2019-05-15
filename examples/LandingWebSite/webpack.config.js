@@ -32,8 +32,7 @@ module.exports = (env) => {
                         {
                             loader: 'css-loader',
                             options: {
-                                minimize: !isDevBuild
-                            }
+                                minimize: !isDevBuild }
                         },
                         {
                             loader: 'less-loader',
