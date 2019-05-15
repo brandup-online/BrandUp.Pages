@@ -47,7 +47,7 @@ namespace BrandUp.Pages.Content
 
         public static bool IsContent(TypeInfo typeInfo)
         {
-            if (!typeInfo.IsClass || !typeInfo.IsPublic || typeInfo.ContainsGenericParameters || !typeInfo.IsDefined(typeof(ContentAttribute), false))
+            if (!typeInfo.IsClass || !typeInfo.IsPublic || typeInfo.ContainsGenericParameters || !typeInfo.IsDefined(typeof(ContentTypeAttribute), false))
                 return false;
             return true;
         }

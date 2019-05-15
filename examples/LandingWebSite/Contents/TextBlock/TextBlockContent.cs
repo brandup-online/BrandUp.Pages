@@ -3,7 +3,7 @@ using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents.TextBlock
 {
-    [Content]
+    [ContentType]
     public class TextBlockContent : PageBlockContent
     {
         [Html]

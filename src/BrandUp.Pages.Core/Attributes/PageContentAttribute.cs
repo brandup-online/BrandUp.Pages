@@ -4,7 +4,7 @@ using System;
 namespace BrandUp.Pages
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class PageContentAttribute : ContentAttribute
+    public class PageContentAttribute : ContentTypeAttribute
     {
     }
 }

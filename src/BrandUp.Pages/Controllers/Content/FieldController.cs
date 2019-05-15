@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/content/[controller]"), ApiController]
-    public abstract class FieldController<TField> : ControllerBase, IAsyncActionFilter
+    public abstract class FieldController<TField> : Controller, IAsyncActionFilter
         where TField : class, IFieldProvider
     {
         private IPageService pageService;

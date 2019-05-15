@@ -44,9 +44,12 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
     }
 
     destroy() {
-        this.__destroyCallbacks.map((f) => {
-            f();
-        });
+        if (this.__destroyCallbacks != null) {
+            this.__destroyCallbacks.map((f) => {
+                f();
+            });
+            this.__destroyCallbacks = null;
+        }
         
         super.destroy();
     }

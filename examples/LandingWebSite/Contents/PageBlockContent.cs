@@ -2,7 +2,7 @@
 
 namespace LandingWebSite.Contents
 {
-    [Content]
+    [ContentType]
     public abstract class PageBlockContent
     {
     }

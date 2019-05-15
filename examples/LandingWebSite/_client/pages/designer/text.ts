@@ -64,13 +64,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     protected _onChanged() {
         this.__refreshUI();
 
-        this.page.queue.request({
+        this.request({
             url: '/brandup.pages/content/text',
-            urlParams: {
-                editId: this.page.editId,
-                path: this.path,
-                field: this.name
-            },
             method: "POST",
             type: "JSON",
             data: this.getValue(),

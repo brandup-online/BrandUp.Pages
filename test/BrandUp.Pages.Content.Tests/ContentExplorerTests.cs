@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.ContentModels;
+using System.Collections.Generic;
 using Xunit;
 
 namespace BrandUp.Pages.Content
@@ -51,12 +52,36 @@ namespace BrandUp.Pages.Content
         }
 
         [Fact]
+        public void Navigate_ContentField()
+        {
+            var content = new TestPageContent
+            {
+                Header = new PageHeaderContent()
+            };
+            var explorer = ContentExplorer.Create(metadataManager, content, "Header");
+
+            Assert.NotNull(explorer);
+        }
+
+        [Fact]
         public void Navigate_ContentField_Null()
         {
             var content = new TestPageContent();
             var explorer = ContentExplorer.Create(metadataManager, content, "Header");
 
             Assert.Null(explorer);
+        }
+
+        [Fact]
+        public void Navigate_ContentListField()
+        {
+            var content = new TestPageContent
+            {
+                Headers = new List<PageHeaderContent> { new PageHeaderContent() }
+            };
+            var explorer = ContentExplorer.Create(metadataManager, content, "Headers[0]");
+
+            Assert.NotNull(explorer);
         }
 
         [Fact]

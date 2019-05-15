@@ -2,7 +2,7 @@
 {
     public interface IFieldNavigationSupported
     {
-        bool IsList { get; }
+        bool IsListValue { get; }
         object Navigate(object value, int index);
     }
 }

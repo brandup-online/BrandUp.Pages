@@ -2,7 +2,7 @@
 import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../typings/content";
 import { TextDesigner } from "./text";
 import { HtmlDesigner } from "./html";
-import { ListDesigner } from "./list";
+import { ContentDesigner } from "./content";
 
 export class PageDesigner implements IPageDesigner {
     readonly editId: string;
@@ -34,8 +34,8 @@ export class PageDesigner implements IPageDesigner {
                     fieldDesigner = new HtmlDesigner(this, fieldElem, fieldModel.options);
                     break;
                 }
-                case "ContentList": {
-                    fieldDesigner = new ListDesigner(this, fieldElem, fieldModel.options);
+                case "Content": {
+                    fieldDesigner = new ContentDesigner(this, fieldElem, fieldModel.options);
                     break;
                 }
                 default:
@@ -50,5 +50,6 @@ export class PageDesigner implements IPageDesigner {
         for (let key in this.__fields) {
             this.__fields[key].destroy();
         }
+        this.__fields = null;
     }
 }

@@ -1,72 +1,118 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Views;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/content"), ApiController]
-    public class ContentController : ControllerBase, IAsyncActionFilter
+    public class ContentController : FieldController<IContentField>
     {
-        private IPageService pageService;
-        private IPageEditingService pageEditingService;
-        private IPage page;
-        private IPageEditSession editSession;
-        private ContentContext rootContentContext;
-        private ContentContext contentContext;
-
-        public IPage Page => page;
-        public IPageEditSession ContentEdit => editSession;
-        public ContentContext RootContentContext => rootContentContext;
-        public ContentContext ContentContext => contentContext;
-
-        #region IAsyncActionFilter members
-
-        async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+        [HttpPut]
+        public async Task<IActionResult> ViewAsync([FromServices]IViewRenderService viewRenderService, [FromQuery]int itemIndex = -1)
         {
-            pageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
-            pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
-
-            if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))
+            var contentPath = Field.Name;
+            if (Field.IsListValue)
             {
-                context.Result = BadRequest();
-                return;
+                if (itemIndex < 0)
+                    return BadRequest();
+
+                contentPath += $"[{itemIndex}]";
             }
 
-            editSession = await pageEditingService.FindEditSessionById(editId);
-            if (editSession == null)
-            {
-                context.Result = BadRequest();
-                return;
-            }
-
-            page = await pageService.FindPageByIdAsync(editSession.PageId);
-            if (page == null)
-            {
-                context.Result = BadRequest();
-                return;
-            }
-
-            var content = await pageEditingService.GetContentAsync(editSession);
-
-            rootContentContext = new ContentContext(page, content, HttpContext.RequestServices);
-
-            string modelPath = string.Empty;
-            if (Request.Query.TryGetValue("path", out Microsoft.Extensions.Primitives.StringValues pathValue))
-                modelPath = pathValue[0];
-
-            contentContext = rootContentContext.Navigate(modelPath);
+            var contentContext = ContentContext.Navigate(contentPath);
             if (contentContext == null)
-            {
-                context.Result = BadRequest();
-                return;
-            }
+                return NotFound();
 
-            await next();
+            var html = await viewRenderService.RenderToStringAsync(contentContext);
+
+            return new ContentResult
+            {
+                ContentType = "text/html",
+                StatusCode = 200,
+                Content = html
+            };
         }
 
-        #endregion
+        [HttpPut]
+        public async Task<IActionResult> AddAsync([FromQuery]string itemType, [FromQuery]int itemIndex = -1)
+        {
+            if (itemType == null)
+                return BadRequest();
+
+            if (Field.GetModelValue(ContentContext.Content) is IList list)
+            {
+                Field.SetModelValue(ContentContext.Content, list);
+
+                await SaveChangesAsync();
+            }
+
+            return await FormValueAsync();
+        }
+
+        [HttpPost("up")]
+        public async Task<IActionResult> UpAsync([FromQuery]int itemIndex)
+        {
+            if (!Field.IsListValue)
+                return BadRequest();
+            if (itemIndex <= 0)
+                return BadRequest();
+
+            if (Field.GetModelValue(ContentContext.Content) is IList list)
+            {
+                var item = list[itemIndex];
+
+                list.RemoveAt(itemIndex);
+                list.Insert(itemIndex - 1, item);
+
+                Field.SetModelValue(ContentContext.Content, list);
+
+                await SaveChangesAsync();
+            }
+
+            return await FormValueAsync();
+        }
+
+        [HttpPost("down")]
+        public async Task<IActionResult> DownAsync([FromQuery]int itemIndex)
+        {
+            if (!Field.IsListValue)
+                return BadRequest();
+
+            if (Field.GetModelValue(ContentContext.Content) is IList list)
+            {
+                if (itemIndex >= list.Count - 1)
+                    return BadRequest();
+
+                var item = list[itemIndex];
+
+                list.RemoveAt(itemIndex);
+                list.Insert(itemIndex + 1, item);
+
+                Field.SetModelValue(ContentContext.Content, list);
+
+                await SaveChangesAsync();
+            }
+
+            return await FormValueAsync();
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAsync([FromQuery]int itemIndex)
+        {
+            if (Field.IsListValue)
+            {
+                if (Field.GetModelValue(ContentContext.Content) is IList list)
+                {
+                    list.RemoveAt(itemIndex);
+
+                    Field.SetModelValue(ContentContext.Content, list);
+
+                    await SaveChangesAsync();
+                }
+            }
+
+            return await FormValueAsync();
+        }
     }
 }

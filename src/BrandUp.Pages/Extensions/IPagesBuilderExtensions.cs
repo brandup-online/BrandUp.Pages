@@ -16,6 +16,8 @@ namespace BrandUp.Pages.Builder
         {
             var services = builder.Services;
 
+            services.AddHttpContextAccessor();
+
             services.Configure<RazorPagesOptions>(options =>
             {
                 options.Conventions.AddPageRoute(Url.RazorPageLinkGenerator.RazorPagePath, "{*url}");
@@ -23,7 +25,7 @@ namespace BrandUp.Pages.Builder
 
             services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
             services.AddSingleton<Views.IViewLocator, Views.ViewLocator>();
-            services.AddHttpContextAccessor();
+            services.AddSingleton<Views.IViewRenderService, Views.ViewRenderService>();
 
             services.Configure(optionAction);
 

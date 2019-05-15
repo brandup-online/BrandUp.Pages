@@ -26,9 +26,9 @@ namespace BrandUp.Pages.Content
             ModelType = modelType;
             BaseMetadata = baseMetadata;
 
-            var contentModelAttribute = modelType.GetCustomAttribute<ContentAttribute>(false);
+            var contentModelAttribute = modelType.GetCustomAttribute<ContentTypeAttribute>(false);
             if (contentModelAttribute == null)
-                throw new ArgumentException($"Для типа модели контента \"{modelType}\" не определён атрибут {nameof(ContentAttribute)}.");
+                throw new ArgumentException($"Для типа модели контента \"{modelType}\" не определён атрибут {nameof(ContentTypeAttribute)}.");
 
             if (!modelType.IsAbstract)
             {

@@ -1,31 +1,93 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Views;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {
-    [HtmlTargetElement("content", TagStructure = TagStructure.NormalOrSelfClosing)]
+    [HtmlTargetElement(Attributes = "content-list")]
     public class ContentTagHelper : TagHelper
     {
-        [HtmlAttributeName("tag")]
-        public string HtmlTag { get; set; } = "div";
+        private readonly IJsonHelper jsonHelper;
+        private readonly IHtmlHelper htmlHelper;
 
-        [HtmlAttributeName("class")]
-        public string CssClass { get; set; }
+        [HtmlAttributeName("content-list")]
+        public ModelExpression FieldName { get; set; }
 
         [HtmlAttributeNotBound, ViewContext]
         public ViewContext ViewContext { get; set; }
 
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public ContentTagHelper(IJsonHelper jsonHelper, IHtmlHelper htmlHelper)
         {
-            if (!(ViewContext.ViewData["_ContentRenderingContext_"] is ContentRenderingContext contentRenderingContext))
+            this.jsonHelper = jsonHelper ?? throw new ArgumentNullException(nameof(jsonHelper));
+            this.htmlHelper = htmlHelper ?? throw new ArgumentNullException(nameof(htmlHelper));
+        }
+
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        {
+            if (!(ViewContext.ViewData["_ContentContext_"] is ContentContext contentContext))
+                throw new InvalidOperationException();
+            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || !(field is IContentField listField))
                 throw new InvalidOperationException();
 
-            output.SuppressOutput();
+            (htmlHelper as IViewContextAware).Contextualize(ViewContext);
 
-            contentRenderingContext.HtmlTag = HtmlTag;
-            contentRenderingContext.CssClass = CssClass;
+            var fieldModel = new Models.ContentFieldModel
+            {
+                Type = field.Type,
+                Name = field.Name,
+                Title = field.Title,
+                Options = field.GetFormOptions(contentContext.Services)
+            };
+
+            var viewRenderService = ViewContext.HttpContext.RequestServices.GetRequiredService<IViewRenderService>();
+
+            output.Attributes.Add("content-path", contentContext.Explorer.Path);
+            output.Attributes.Add("content-field", listField.Name);
+            output.Attributes.Add("content-field-type", listField.Type);
+            output.Attributes.Add(new TagHelperAttribute("content-field-model", jsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
+
+            output.TagMode = TagMode.StartTagAndEndTag;
+
+            if (listField.IsListValue)
+            {
+                var list = listField.GetModelValue(contentContext.Content) as IList;
+                if (list.Count > 0)
+                {
+                    for (var i = 0; i < list.Count; i++)
+                    {
+                        var itemContentContext = contentContext.Navigate(FieldName.Name + "[" + i + "]");
+                        var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
+
+                        output.Content.AppendHtmlLine(itemHtml);
+
+                        i++;
+                    }
+                }
+            }
+            else
+            {
+                var value = listField.GetModelValue(contentContext.Content);
+                if (listField.HasValue(value))
+                {
+                    var itemContentContext = contentContext.Navigate(FieldName.Name);
+                    var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
+
+                    output.Content.AppendHtmlLine(itemHtml);
+                }
+            }
         }
+    }
+
+    public class ContentRenderingContext
+    {
+        public string HtmlTag { get; set; } = "div";
+        public string CssClass { get; set; }
     }
 }

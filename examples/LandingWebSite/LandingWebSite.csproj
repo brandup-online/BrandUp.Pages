@@ -14,13 +14,13 @@
   <ItemGroup>
     <None Remove="_client\pages\admin\page.ts" />
     <None Remove="_client\pages\admin\website.ts" />
+    <None Remove="_client\pages\content\content.ts" />
     <None Remove="_client\pages\content\html.ts" />
     <None Remove="_client\pages\content\image.ts" />
-    <None Remove="_client\pages\content\list.ts" />
     <None Remove="_client\pages\content\text.ts" />
+    <None Remove="_client\pages\designer\content.ts" />
     <None Remove="_client\pages\designer\field.ts" />
     <None Remove="_client\pages\designer\html.ts" />
-    <None Remove="_client\pages\designer\list.ts" />
     <None Remove="_client\pages\designer\page.ts" />
     <None Remove="_client\pages\designer\text.ts" />
     <None Remove="_client\pages\dialogs\dialog-delete.ts" />
@@ -69,10 +69,10 @@
     <TypeScriptCompile Include="_client\pages\admin\website.ts" />
     <TypeScriptCompile Include="_client\pages\content\image.ts" />
     <TypeScriptCompile Include="_client\pages\content\html.ts" />
-    <TypeScriptCompile Include="_client\pages\content\list.ts" />
+    <TypeScriptCompile Include="_client\pages\content\content.ts" />
     <TypeScriptCompile Include="_client\pages\content\text.ts" />
     <TypeScriptCompile Include="_client\pages\designer\field.ts" />
-    <TypeScriptCompile Include="_client\pages\designer\list.ts" />
+    <TypeScriptCompile Include="_client\pages\designer\content.ts" />
     <TypeScriptCompile Include="_client\pages\designer\page.ts" />
     <TypeScriptCompile Include="_client\pages\designer\html.ts" />
     <TypeScriptCompile Include="_client\pages\designer\text.ts" />
@@ -119,8 +119,8 @@
     <None Update="_client\pages\content\html.js">
       <DependentUpon>html.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\content\list.js">
-      <DependentUpon>list.ts</DependentUpon>
+    <None Update="_client\pages\content\content.js">
+      <DependentUpon>content.ts</DependentUpon>
     </None>
     <None Update="_client\pages\dialogs\page-collection-update.js">
       <DependentUpon>page-collection-update.ts</DependentUpon>

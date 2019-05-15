@@ -2,7 +2,7 @@
 
 namespace BrandUp.Pages.Content.Fakes
 {
-    [Content]
+    [ContentType]
     public class TestContent
     {
         [Text(Placeholder = "placeholder", AllowMultiline = true)]

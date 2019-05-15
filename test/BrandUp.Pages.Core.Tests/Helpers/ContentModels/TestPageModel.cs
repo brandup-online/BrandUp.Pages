@@ -12,10 +12,10 @@ namespace BrandUp.Pages.ContentModels
         [PageTitle, Text(Title = "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
-        [ContentValue(Title = "Шапка страницы")]
+        [Content(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
 
-        [ContentList(Title = "Шапки страницы")]
+        [Content(Title = "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
 
         [PageCollection(Title = "Pages")]
@@ -42,13 +42,13 @@ namespace BrandUp.Pages.ContentModels
 
     }
 
-    [Content]
+    [ContentType]
     public class PageHeaderContent
     {
         [Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
-        [ContentValue(Title = "Шапка страницы")]
+        [Content(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
     }
 }

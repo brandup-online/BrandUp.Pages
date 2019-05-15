@@ -1,4 +1,4 @@
-﻿import { UIElement } from "brandup-ui";
+﻿import { UIElement, AjaxRequestOptions } from "brandup-ui";
 import { IContentFieldDesigner, IPageDesigner } from "../typings/content";
 import "./field.less";
 
@@ -28,6 +28,16 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
     }
 
     protected abstract onRender(elem: HTMLElement);
+    request(options: AjaxRequestOptions) {
+        if (!options.urlParams)
+            options.urlParams = {};
+
+        options.urlParams["editId"] = this.page.editId;
+        options.urlParams["path"] = this.path;
+        options.urlParams["field"] = this.name;
+        
+        this.page.queue.request(options);
+    }
     
     abstract hasValue(): boolean;
 }
