@@ -1,0 +1,63 @@
+﻿@import "../../vars.less";
+
+.website-form-field.content {
+    position: relative;
+    border-bottom: solid 1px #eee;
+
+    &:hover {
+        border-bottom-color: #ddd;
+    }
+
+    & .items {
+        padding: 7px 0;
+
+        & .item {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            padding: 5px 0;
+            line-height: 20px;
+
+            & .index {
+                width: 30px;
+                color: #a0a0a0;
+            }
+
+            & a.title {
+                flex: 1 1 auto;
+                display: block;
+                text-decoration: none;
+            }
+
+            & ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                flex-flow: row nowrap;
+
+                & li {
+                    padding: 0;
+                    margin: 0;
+
+                    & a {
+                        display: block;
+                        width: 20px;
+                        height: 20px;
+                        margin-left: 3px;
+                        background-position: 50%;
+                        background-repeat: no-repeat;
+
+                        &.open {
+                            background-image: url(../../svg/toolbar-button-edit.svg);
+                        }
+
+                        &.delete {
+                            background-image: url(../../svg/toolbar-button-discard.svg);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

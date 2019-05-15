@@ -47,6 +47,7 @@
     <None Remove="_client\pages\typings\content.d.ts" />
     <None Remove="_client\pages\typings\models.d.ts" />
     <None Remove="_client\root.ts" />
+    <None Remove="_client\typings\svg.d.ts" />
   </ItemGroup>
 
 
@@ -98,6 +99,7 @@
     <TypeScriptCompile Include="_client\pages\typings\content.d.ts" />
     <TypeScriptCompile Include="_client\pages\typings\models.d.ts" />
     <TypeScriptCompile Include="_client\root.ts" />
+    <TypeScriptCompile Include="_client\typings\svg.d.ts" />
   </ItemGroup>
 
 

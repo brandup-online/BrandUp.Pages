@@ -19,10 +19,20 @@
     align-items: center;
     justify-content: center;
     padding: 50px 0 20px;
-    background: url(../pages/svg/star.svg) no-repeat 50% 15px;
-    background-size: 14px;
     display: flex;
     justify-content: center;
+    position: relative;
+
+    &:before {
+        content: '\2605';
+        font-size: 16px;
+        display: block;
+        color: #bbb;
+        position: absolute;
+        left: 50%;
+        top: 20px;
+        transform: translateX(-50%);
+    }
 
     & > div {
         opacity: 0.7;
@@ -112,7 +122,7 @@
         outline: dashed 1px #cfcfcf;
 
         & a.page-blocks-designer-item-add {
-            display: block;
+            display: flex;
         }
 
         & .page-blocks-designer-item-tools {
@@ -217,17 +227,25 @@
 }
 
 a.page-blocks-designer-item-add {
-    display: none;
     position: absolute;
     bottom: -12px;
     left: 50%;
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.8) url(../pages/svg/list-item-add.svg) no-repeat 50% 50%;
-    background-size: 14px;
     z-index: 110;
     transform: translateX(-50%);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,12);
+
+    & svg {
+        display: block;
+        width: 14px;
+        height: 14px;
+        fill: #fff;
+    }
 
     &:hover {
         background-color: rgba(0,0,0,1);

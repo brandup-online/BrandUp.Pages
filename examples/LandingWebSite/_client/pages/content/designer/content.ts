@@ -149,7 +149,12 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
     }
 
     hasValue(): boolean {
-        return DOM.queryElements(this.element, "* > [content-path-index]").length > 0;
+        for (let i = 0; i < this.element.children.length; i++) {
+            let itemElem = this.element.children.item(i);
+            if (itemElem.hasAttribute("content-path-index"))
+                return true;
+        }
+        return false;
     }
     addItem(itemType: string, index: number) {
         this.request({

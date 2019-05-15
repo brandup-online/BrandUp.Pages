@@ -1,6 +1,7 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
 import { ajaxRequest, DOM } from "brandup-ui";
 import "./dialog-list.less";
+import iconDots from "../svg/list-item-dots.svg";
 
 export abstract class ListDialog<TItem> extends Dialog<any> {
     private __itemsElem: HTMLElement;
@@ -109,7 +110,7 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
         elem.appendChild(contentElem = DOM.tag("div", { class: "content" }));
 
         elem.appendChild(DOM.tag("div", { class: "menu" }, [
-            DOM.tag("button", { "data-command": "item-open-menu" }),
+            DOM.tag("button", { "data-command": "item-open-menu" }, iconDots),
             menuElem = DOM.tag("ul")
         ]));
 

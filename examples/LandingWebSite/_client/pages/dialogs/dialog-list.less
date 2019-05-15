@@ -65,13 +65,19 @@
             & button {
                 box-sizing: border-box;
                 border: 0;
-                background: url(../svg/list-item-dots.svg) no-repeat 50%;
-                background-size: 24px;
                 width: 24px;
                 height: 24px;
                 cursor: pointer;
                 opacity: 0.3;
                 outline: none;
+                background: no-repeat;
+
+                & svg {
+                    fill: @Text-Color;
+                    width: 24px;
+                    height: 24px;
+                    display: block;
+                }
 
                 &:hover,
                 &:focus {

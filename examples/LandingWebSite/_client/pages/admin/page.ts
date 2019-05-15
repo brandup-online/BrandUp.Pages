@@ -2,6 +2,10 @@
 import ContentPage from "../pages/content";
 import { editPage } from "../dialogs/page-edit";
 import { publishPage } from "../dialogs/page-publish";
+import iconDiscard from "../svg/toolbar-button-discard.svg";
+import iconEdit from "../svg/toolbar-button-edit.svg";
+import iconPublish from "../svg/toolbar-button-publish.svg";
+import iconSave from "../svg/toolbar-button-save.svg";
 
 export class PageToolbar extends UIElement {
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
@@ -12,9 +16,9 @@ export class PageToolbar extends UIElement {
         var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar brandup-pages-toolbar-right" });
 
         if (page.model.editId) {
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-content" }));
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button save", "data-command": "brandup-pages-commit" }));
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button discard", "data-command": "brandup-pages-discard" }));
+            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-content" }, iconEdit));
+            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-commit" }, iconSave));
+            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-discard" }, iconDiscard));
 
             this.registerCommand("brandup-pages-content", () => {
                 editPage(page.model.editId).then(() => {
@@ -42,7 +46,7 @@ export class PageToolbar extends UIElement {
         }
         else {
             if (page.model.status !== "Published") {
-                toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button publish", "data-command": "brandup-pages-publish" }));
+                toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-publish" }, iconPublish));
 
                 this.registerCommand("brandup-pages-publish", () => {
                     publishPage(page.model.id).then(result => {
@@ -51,7 +55,7 @@ export class PageToolbar extends UIElement {
                 });
             }
 
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button edit", "data-command": "brandup-pages-edit" }));
+            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-edit" }, iconEdit));
             this.registerCommand("brandup-pages-edit", () => {
                 page.app.request({
                     urlParams: { handler: "BeginEdit" },

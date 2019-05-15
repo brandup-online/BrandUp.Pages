@@ -1,6 +1,7 @@
 ﻿import { Field } from "./field";
 import { DOM } from "brandup-ui";
 import "./combobox.less";
+import iconArrow from "../svg/combobox-arrow.svg";
 
 export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     private __valueElem: HTMLElement;
@@ -15,6 +16,8 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
         this.element.classList.add("combobox");
         this.element.setAttribute("tabindex", "0");
+
+        this.element.appendChild(DOM.tag("i", null, iconArrow));
 
         this.__valueElem = <HTMLInputElement>DOM.tag("div", { class: "value" });
         this.element.appendChild(this.__valueElem);

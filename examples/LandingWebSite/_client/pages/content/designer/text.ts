@@ -44,6 +44,10 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
             this.page.clearAccent();
         });
 
+        elem.addEventListener("click", (e: MouseEvent) => {
+            e.preventDefault();
+        });
+
         this.__refreshUI();
     }
 

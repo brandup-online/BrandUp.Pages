@@ -84,22 +84,24 @@
         & a.button {
             width: 30px;
             height: 30px;
-            display: block;
             opacity: 0.6;
-            background: transparent no-repeat 50%;
-            background-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            & svg {
+                display: block;
+                fill: @Text-Color;
+                width: 20px;
+                height: 20px;
+            }
 
             &:hover {
                 opacity: 1;
             }
 
-            &.back {
-                background-image: url(../svg/dialog-back.svg);
-            }
-
             &.x {
                 margin-right: 10px;
-                background-image: url(../svg/dialog-close.svg);
             }
         }
 

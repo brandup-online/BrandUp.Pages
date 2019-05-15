@@ -6,24 +6,30 @@
     outline: none;
     border-bottom: solid 1px #eee;
 
-    &::before {
-        content: '';
+    & i {
         position: absolute;
         right: 3px;
         top: 14px;
-        height: 10px;
+        display: block;
         width: 10px;
-        background: url(../svg/combobox-arrow.svg) no-repeat 100% 50%;
-        background-size: 10px;
+        height: 10px;
         opacity: 0.7;
-        transition: ease transform 150ms;
+        cursor: pointer;
+        transition: transform ease 120ms;
+
+        & svg {
+            width: 10px;
+            height: 10px;
+            display: block;
+            fill: @Text-Color;
+        }
     }
 
     &:focus,
     &:hover {
         border-bottom-color: #ddd;
 
-        &::before {
+        & i {
             opacity: 0.9;
         }
     }
@@ -88,7 +94,7 @@
     &:focus {
         border-bottom-color: transparent;
 
-        &::before {
+        & i {
             transform: rotate(180deg);
         }
 

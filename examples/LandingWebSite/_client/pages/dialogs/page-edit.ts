@@ -4,7 +4,7 @@ import { IContentForm, IContentField, PageContentForm } from "../typings/content
 import { TextContent } from "../content/field/text";
 import { HtmlContent } from "../content/field/html";
 import { ImageContent } from "../content/field/image";
-import { ListContent } from "../content/field/content";
+import { ContentField } from "../content/field/content";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -76,7 +76,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                     break;
                 }
                 case "Content": {
-                    this.addField(fieldModel.title, new ListContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new ContentField(this, fieldModel.name, fieldModel.options));
                     break;
                 }
                 default: {

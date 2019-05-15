@@ -1,5 +1,7 @@
 ﻿import { UIControl, DOM } from "brandup-ui";
 import "./dialog.less";
+import iconBack from "../svg/dialog-back.svg";
+import iconClose from "../svg/dialog-close.svg";
 
 export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
     protected headerElem: HTMLElement;
@@ -45,10 +47,10 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
             document.body.classList.add("");
 
         if (this.__parentDialog) {
-            this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }));
+            this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button", "data-command": "close" }, iconBack));
         }
         else {
-            this.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }));
+            this.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }, iconClose));
         }
 
         this.registerCommand("close", () => {

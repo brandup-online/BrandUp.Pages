@@ -5,8 +5,8 @@ import { HtmlDesigner } from "./html";
 import { ContentDesigner } from "./content";
 import { ImageDesigner } from "./image";
 import ContentPage from "../../pages/content";
-import "./page.less";
 import { PageBlocksDesigner } from "../../../designers/page-blocks";
+import "./page.less";
 
 export class PageDesigner implements IPageDesigner {
     readonly page: ContentPage;
