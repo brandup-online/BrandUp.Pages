@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Views;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections;
@@ -38,7 +39,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> AddAsync([FromQuery]string itemType, [FromQuery]int itemIndex = -1)
+        public async Task<IActionResult> AddAsync([FromServices]IViewLocator viewLocator, [FromServices]IHostingEnvironment hosting, [FromQuery]string itemType, [FromQuery]int itemIndex = -1)
         {
             if (itemType == null)
                 return BadRequest();
@@ -50,6 +51,20 @@ namespace BrandUp.Pages.Controllers
                 return BadRequest();
 
             var newItem = contentMetadataProvider.CreateModelInstance();
+
+            var view = viewLocator.FindView(newItem.GetType());
+            if (view != null)
+            {
+                var fileInfo = hosting.ContentRootFileProvider.GetFileInfo(view.Name + ".json");
+                if (fileInfo.Exists)
+                {
+                    using (var stream = fileInfo.CreateReadStream())
+                    {
+                        var data = Pages.Content.Serialization.JsonContentDataSerializer.DeserializeFromStream(stream);
+                        newItem = contentMetadataProvider.ConvertDictionaryToContentModel(data);
+                    }
+                }
+            }
 
             if (Field.IsListValue)
             {

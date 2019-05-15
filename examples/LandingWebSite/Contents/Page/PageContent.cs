@@ -8,11 +8,5 @@ namespace LandingWebSite.Contents.Page
     {
         [Text(Placeholder = "Input page title"), PageTitle]
         public string Title { get; set; }
-
-        [Text(Placeholder = "Input page description")]
-        public string Description { get; set; }
-
-        [Text(Placeholder = "Input page keywords")]
-        public string Keywords { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Content.Files;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;

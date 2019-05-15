@@ -12,17 +12,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\designers\page-blocks.ts" />
     <None Remove="_client\pages\admin\page.ts" />
     <None Remove="_client\pages\admin\website.ts" />
     <None Remove="_client\pages\content\content.ts" />
+    <None Remove="_client\pages\content\designer\base.ts" />
+    <None Remove="_client\pages\content\designer\content.ts" />
+    <None Remove="_client\pages\content\designer\html.ts" />
+    <None Remove="_client\pages\content\designer\image.ts" />
+    <None Remove="_client\pages\content\designer\page.ts" />
+    <None Remove="_client\pages\content\designer\text.ts" />
     <None Remove="_client\pages\content\html.ts" />
+    <None Remove="_client\pages\content\image.js.map" />
     <None Remove="_client\pages\content\image.ts" />
+    <None Remove="_client\pages\content\provider\text.ts" />
     <None Remove="_client\pages\content\text.ts" />
-    <None Remove="_client\pages\designer\content.ts" />
-    <None Remove="_client\pages\designer\field.ts" />
-    <None Remove="_client\pages\designer\html.ts" />
-    <None Remove="_client\pages\designer\page.ts" />
-    <None Remove="_client\pages\designer\text.ts" />
     <None Remove="_client\pages\dialogs\dialog-delete.ts" />
     <None Remove="_client\pages\dialogs\dialog-form.ts" />
     <None Remove="_client\pages\dialogs\dialog-list.ts" />
@@ -54,28 +58,26 @@
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\BrandUp.Pages.MongoDb\BrandUp.Pages.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\BrandUp.Pages\BrandUp.Pages.csproj" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <TypeScriptCompile Include="_client\designers\page-blocks.ts" />
     <TypeScriptCompile Include="_client\pages\admin\page.ts" />
     <TypeScriptCompile Include="_client\pages\admin\website.ts" />
-    <TypeScriptCompile Include="_client\pages\content\image.ts" />
-    <TypeScriptCompile Include="_client\pages\content\html.ts" />
-    <TypeScriptCompile Include="_client\pages\content\content.ts" />
-    <TypeScriptCompile Include="_client\pages\content\text.ts" />
-    <TypeScriptCompile Include="_client\pages\designer\field.ts" />
-    <TypeScriptCompile Include="_client\pages\designer\content.ts" />
-    <TypeScriptCompile Include="_client\pages\designer\page.ts" />
-    <TypeScriptCompile Include="_client\pages\designer\html.ts" />
-    <TypeScriptCompile Include="_client\pages\designer\text.ts" />
+    <TypeScriptCompile Include="_client\pages\content\designer\content.ts" />
+    <TypeScriptCompile Include="_client\pages\content\designer\base.ts" />
+    <TypeScriptCompile Include="_client\pages\content\designer\html.ts" />
+    <TypeScriptCompile Include="_client\pages\content\designer\image.ts" />
+    <TypeScriptCompile Include="_client\pages\content\designer\page.ts" />
+    <TypeScriptCompile Include="_client\pages\content\designer\text.ts" />
+    <TypeScriptCompile Include="_client\pages\content\field\image.ts" />
+    <TypeScriptCompile Include="_client\pages\content\field\html.ts" />
+    <TypeScriptCompile Include="_client\pages\content\field\content.ts" />
+    <TypeScriptCompile Include="_client\pages\content\field\text.ts" />
+    <TypeScriptCompile Include="_client\pages\content\provider\text.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-delete.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-form.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-list.ts" />
@@ -100,26 +102,36 @@
 
 
   <ItemGroup>
+    <Content Update="Contents\BannerBlock\BB1_Item.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <DependentUpon>BB1_Item.cshtml</DependentUpon>
+    </Content>
+    <Content Update="Contents\BannerBlock\BB1.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Contents\Page\News.cshtml.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Contents\Page\Article.cshtml.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Contents\TextBlock\TB1.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Contents\TextBlock\TB2.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 
   <ItemGroup>
-    <None Update="_client\pages\content\image.js">
+    <None Update="_client\pages\content\field\image.js">
       <DependentUpon>image.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\content\image.js.map">
-      <DependentUpon>image.js</DependentUpon>
-    </None>
-    <None Update="_client\pages\content\html.js">
+    <None Update="_client\pages\content\field\html.js">
       <DependentUpon>html.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\content\content.js">
+    <None Update="_client\pages\content\field\content.js">
       <DependentUpon>content.ts</DependentUpon>
     </None>
     <None Update="_client\pages\dialogs\page-collection-update.js">
@@ -128,6 +140,11 @@
     <None Update="_client\pages\dialogs\page-collection-update.js.map">
       <DependentUpon>page-collection-update.js</DependentUpon>
     </None>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="wwwroot\dist\" />
   </ItemGroup>
 
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">

@@ -1,31 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Views;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace BrandUp.Pages.TagHelpers
 {
-    [HtmlTargetElement("content", TagStructure = TagStructure.NormalOrSelfClosing)]
-    public class FieldTagHelper : TagHelper
+    public abstract class FieldTagHelper<TField> : TagHelper
+        where TField : IFieldProvider
     {
-        [HtmlAttributeName("tag")]
-        public string HtmlTag { get; set; } = "div";
-
-        [HtmlAttributeName("class")]
-        public string CssClass { get; set; }
-
+        public abstract ModelExpression FieldName { get; set; }
+        [HtmlAttributeName("content-designer")]
+        public string DesignerName { get; set; }
+        [HtmlAttributeNotBound]
+        public TField Field { get; private set; }
         [HtmlAttributeNotBound, ViewContext]
         public ViewContext ViewContext { get; set; }
+        public ContentContext ContentContext { get; private set; }
+        public object Content => ContentContext.Content;
+        protected IJsonHelper JsonHelper => ViewContext.HttpContext.RequestServices.GetRequiredService<IJsonHelper>();
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!(ViewContext.ViewData["_ContentRenderingContext_"] is ContentRenderingContext contentRenderingContext))
+            if (!(ViewContext.ViewData[ViewRenderService.ViewData_ContentContextKeyName] is ContentContext contentContext))
                 throw new InvalidOperationException();
+            ContentContext = contentContext;
 
-            output.SuppressOutput();
+            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || !(field is TField textField))
+                throw new InvalidOperationException();
+            Field = textField;
 
-            contentRenderingContext.HtmlTag = HtmlTag;
-            contentRenderingContext.CssClass = CssClass;
+            var fieldModel = new Models.ContentFieldModel
+            {
+                Type = field.Type,
+                Name = field.Name,
+                Title = field.Title,
+                Options = field.GetFormOptions(contentContext.Services)
+            };
+
+            output.Attributes.Add("content-path", contentContext.Explorer.Path);
+            output.Attributes.Add("content-field", textField.Name);
+            output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
+
+            var designerName = DesignerName;
+            if (string.IsNullOrEmpty(designerName))
+                designerName = Field.Type;
+            output.Attributes.Add("content-designer", designerName.ToLower());
         }
     }
 }

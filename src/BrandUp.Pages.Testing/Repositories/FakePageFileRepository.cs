@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Content.Files;
 using System;
 using System.Collections.Generic;
 using System.IO;

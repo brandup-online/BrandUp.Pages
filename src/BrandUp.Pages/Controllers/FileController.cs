@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Content.Files;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -16,7 +16,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("{fileId}")]
-        public async Task<IActionResult> DownloadAsync(Guid fileId)
+        public async Task<IActionResult> Download(Guid fileId)
         {
             var file = await fileService.FindFileByIdAsync(fileId);
             if (file == null)

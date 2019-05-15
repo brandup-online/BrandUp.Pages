@@ -1,10 +1,10 @@
 ﻿import { DialogOptions, Dialog } from "./dialog";
 import { DOM, AjaxQueue } from "brandup-ui";
-import { IContentForm, IContentField, PageContentForm, ContentFieldModel } from "../typings/content";
-import { TextContent } from "../content/text";
-import { HtmlContent } from "../content/html";
-import { ImageContent } from "../content/image";
-import { ListContent } from "../content/content";
+import { IContentForm, IContentField, PageContentForm } from "../typings/content";
+import { TextContent } from "../content/field/text";
+import { HtmlContent } from "../content/field/html";
+import { ImageContent } from "../content/field/image";
+import { ListContent } from "../content/field/content";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;

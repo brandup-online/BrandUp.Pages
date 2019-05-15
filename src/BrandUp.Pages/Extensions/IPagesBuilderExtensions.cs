@@ -24,6 +24,8 @@ namespace BrandUp.Pages.Builder
             });
 
             services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
+            services.AddTransient<Content.Files.IFileUrlGenerator, Url.FileUrlGenerator>();
+
             services.AddSingleton<Views.IViewLocator, Views.ViewLocator>();
             services.AddScoped<Views.IViewRenderService, Views.ViewRenderService>();
 

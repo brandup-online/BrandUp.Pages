@@ -16,7 +16,6 @@ namespace BrandUp.Pages.Content
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
         private readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
         private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
-        private readonly ConstructorInfo contentConstructor;
 
         #endregion
 
@@ -35,13 +34,6 @@ namespace BrandUp.Pages.Content
                 modelConstructor = modelType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[0], null);
                 if (modelConstructor == null)
                     throw new InvalidOperationException($"Тип модели контента \"{modelType}\" не содержит публичный конструктор без параметров.");
-
-                var genericContentType = typeof(Content<>);
-                var contentType = genericContentType.MakeGenericType(ModelType);
-
-                contentConstructor = contentType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(IContentDocument), modelType, typeof(ContentMetadataProvider) }, null);
-                if (modelConstructor == null)
-                    throw new InvalidOperationException($"Для типа модели \"{modelType}\" не получилось найти конструктор контента.");
             }
 
             if (baseMetadata != null)
@@ -54,7 +46,7 @@ namespace BrandUp.Pages.Content
 
         #region Properties
 
-        public ContentMetadataManager Manager { get; }
+        public IContentMetadataManager Manager { get; }
         public Type ModelType { get; }
         public string Name { get; }
         public string Title { get; }
@@ -216,14 +208,6 @@ namespace BrandUp.Pages.Content
             }
 
             return contentModel;
-        }
-        public IContent ConvertDocumentToContent(IContentDocument document)
-        {
-            if (document == null)
-                throw new ArgumentNullException(nameof(document));
-
-            var contentModel = ConvertDictionaryToContentModel(document.Data);
-            return (IContent)contentConstructor.Invoke(new object[] { document, contentModel, this });
         }
         public bool IsInherited(ContentMetadataProvider baseMetadataProvider)
         {

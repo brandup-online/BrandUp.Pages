@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BrandUp.Pages.Content.Files;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
@@ -44,18 +46,22 @@ namespace BrandUp.Pages.Content.Fields
                 throw new InvalidOperationException();
             return imageValue;
         }
-        public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+        public override async Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
             ImageFieldFormValue formValue = null;
 
             if (HasValue(modelValue))
             {
                 var imageValue = (ImageValue)modelValue;
+
+                var fileUrlGenerator = services.GetRequiredService<IFileUrlGenerator>();
+                var previewUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue);
+
                 formValue = new ImageFieldFormValue
                 {
                     ValueType = imageValue.ValueType,
                     Value = imageValue.Value,
-                    PreviewUrl = "_file/" + imageValue.Value.ToString()
+                    PreviewUrl = previewUrl
                 };
             }
 

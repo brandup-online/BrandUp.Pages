@@ -11,7 +11,7 @@ namespace BrandUp.Pages.Content
         private readonly Dictionary<Type, int> contentTypes = new Dictionary<Type, int>();
         private readonly Dictionary<string, int> contentNames = new Dictionary<string, int>();
 
-        public ContentMetadataManager(IContentLocator contentLocator)
+        public ContentMetadataManager(IContentTypeLocator contentLocator)
         {
             if (contentLocator == null)
                 throw new ArgumentNullException(nameof(contentLocator));

@@ -1,7 +1,6 @@
 ﻿import { AppClientModel, NavigationModel, PageClientModel, PageNavState, IApplication, NavigationOptions } from "./typings/website";
 import Page from "./pages/page";
 import { UIElement, DOM, Utility, ajaxRequest, AjaxRequestOptions } from "brandup-ui";
-import "./styles.less";
 
 export class Application<TModel extends AppClientModel> extends UIElement implements IApplication {
     private __navCounter: number = 0;

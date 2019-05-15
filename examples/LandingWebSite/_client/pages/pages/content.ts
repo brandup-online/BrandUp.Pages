@@ -16,9 +16,8 @@ class ContentPage extends Page<ContentPageModel>
             });
 
             if (this.model.editId) {
-                import("../designer/page").then(d => {
-                    let designer = new d.PageDesigner(this.model.editId);
-                    this.attachDestroyFunc(() => { designer.destroy(); }); 
+                import("../content/designer/page").then(d => {
+                    new d.PageDesigner(this);
                 });
             }
         }

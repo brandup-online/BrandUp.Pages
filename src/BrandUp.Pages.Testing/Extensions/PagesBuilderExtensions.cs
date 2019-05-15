@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content.Files;
+using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +13,7 @@ namespace BrandUp.Pages.Builder
 
             builder.Services.AddSingleton<IPageRepositiry, FakePageRepositiry>();
             builder.Services.AddSingleton<IPageCollectionRepositiry, FakePageCollectionRepositiry>();
-            builder.Services.AddSingleton<Content.IFileRepository, FakePageFileRepository>();
+            builder.Services.AddSingleton<IFileRepository, FakePageFileRepository>();
 
             return builder;
         }

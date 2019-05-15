@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content.Infrastructure
 {
-    public class AssemblyContentTypeResolver : IContentLocator
+    public class AssemblyContentTypeResolver : IContentTypeLocator
     {
         private readonly IList<TypeInfo> types = new List<TypeInfo>();
 

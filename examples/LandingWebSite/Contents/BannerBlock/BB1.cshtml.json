@@ -1,0 +1,14 @@
+{
+  "banners": [
+    {
+      "image": "url(~/images/banner.jpg)",
+      "header": "Test test test",
+      "subHeader": "Test test test test test test"
+    },
+    {
+      "image": "url(~/images/banner.jpg)",
+      "header": "Test test test",
+      "subHeader": "Test test test test test test"
+    }
+  ]
+}

@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Content.Fields
             var services = new ServiceCollection();
 
             services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
-            services.AddSingleton<Infrastructure.IContentLocator>(contentTypeResolver);
+            services.AddSingleton<Infrastructure.IContentTypeLocator>(contentTypeResolver);
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();

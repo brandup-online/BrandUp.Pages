@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Url
@@ -20,7 +21,7 @@ namespace BrandUp.Pages.Url
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
         }
 
-        public Task<string> GetUrlAsync(IPage page)
+        public Task<string> GetUrlAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
@@ -43,7 +44,7 @@ namespace BrandUp.Pages.Url
 
             return Task.FromResult(pageUrl);
         }
-        public Task<string> GetUrlAsync(IPageEditSession pageEditSession)
+        public Task<string> GetUrlAsync(IPageEditSession pageEditSession, CancellationToken cancellationToken = default)
         {
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));
@@ -52,7 +53,7 @@ namespace BrandUp.Pages.Url
 
             return Task.FromResult(url);
         }
-        public Task<string> GetUrlAsync(string pagePath)
+        public Task<string> GetUrlAsync(string pagePath, CancellationToken cancellationToken = default)
         {
             if (pagePath == null)
                 pagePath = string.Empty;
