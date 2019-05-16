@@ -6,6 +6,7 @@ import iconDiscard from "../svg/toolbar-button-discard.svg";
 import iconEdit from "../svg/toolbar-button-edit.svg";
 import iconPublish from "../svg/toolbar-button-publish.svg";
 import iconSave from "../svg/toolbar-button-save.svg";
+import iconSettings from "../svg/toolbar-button-settings.svg";
 
 export class PageToolbar extends UIElement {
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
@@ -16,7 +17,7 @@ export class PageToolbar extends UIElement {
         var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar brandup-pages-toolbar-right" });
 
         if (page.model.editId) {
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-content" }, iconEdit));
+            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-content" }, iconSettings));
             toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-commit" }, iconSave));
             toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-discard" }, iconDiscard));
 
