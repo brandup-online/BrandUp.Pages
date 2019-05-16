@@ -5,6 +5,7 @@ import "./content.less";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { editPage } from "../../dialogs/page-edit";
+import { selectContentType } from "../../dialogs/dialog-select-content-type";
 
 export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOptions> implements IContentField {
     readonly form: IContentForm;
@@ -64,6 +65,11 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
             if (this.options.itemTypes.length === 1) {
                 this.__addItem(this.options.itemTypes[0].name);
             }
+            else {
+                selectContentType(this.options.itemTypes).then((type) => {
+                    this.__addItem(type.name);
+                });
+            }
         });
     }
 
@@ -93,7 +99,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
             DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, "Добавить баннер")
         ]));
     }
-    private __createItemElem(item: ContentItem, index: number) {
+    private __createItemElem(item: ContentModel, index: number) {
         let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString(), draggable: "true" }, [
             DOM.tag("div", { class: "index" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),
@@ -139,7 +145,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
                 itemIndex: itemIndex.toString()
             },
             method: "GET",
-            success: (data: ContentItem, status: number) => {
+            success: (data: ContentModel, status: number) => {
                 if (status === 200) {
                     this.__value.items[itemIndex] = data;
                     
@@ -187,19 +193,9 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
 
 export interface ContentDesignerOptions {
     isListValue: boolean;
-    itemTypes: Array<ContentItemType>;
+    itemTypes: Array<ContentTypeModel>;
 }
 
 export interface ContentFieldFormValue {
-    items: Array<ContentItem>;
-}
-
-export interface ContentItemType {
-    name: string;
-    title: string;
-}
-
-export interface ContentItem {
-    title: string;
-    type: ContentItemType;
+    items: Array<ContentModel>;
 }

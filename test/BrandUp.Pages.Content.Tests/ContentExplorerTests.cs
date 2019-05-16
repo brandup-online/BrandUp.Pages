@@ -26,11 +26,12 @@ namespace BrandUp.Pages.Content
             Assert.NotNull(explorer);
             Assert.NotNull(explorer.Metadata);
             Assert.Null(explorer.Field);
-            Assert.Equal(explorer.Content, content);
-            Assert.Equal(explorer.Path, string.Empty);
+            Assert.Equal(content, explorer.Content);
+            Assert.Equal(string.Empty, explorer.Path);
+            Assert.Equal(content.Title, explorer.Title);
             Assert.Null(explorer.Root);
             Assert.Null(explorer.Parent);
-            Assert.Equal(explorer.Index, -1);
+            Assert.Equal(-1, explorer.Index);
             Assert.True(explorer.IsRoot);
         }
 

@@ -28,13 +28,15 @@ namespace BrandUp.Pages.Controllers
             if (contentContext == null)
                 return NotFound();
 
+            var contentExplorer = contentContext.Explorer;
+
             var result = new ContentItem
             {
-                Title = contentContext.Explorer.Metadata.GetContentTitle(contentContext.Content),
+                Title = contentExplorer.Title,
                 Type = new ContentItemType
                 {
-                    Name = contentContext.Explorer.Metadata.Name,
-                    Title = contentContext.Explorer.Metadata.Title
+                    Name = contentExplorer.Metadata.Name,
+                    Title = contentExplorer.Metadata.Title
                 }
             };
 

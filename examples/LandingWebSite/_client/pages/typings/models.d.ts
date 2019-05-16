@@ -20,6 +20,16 @@ interface PageTypeModel {
     title: string;
 }
 
+interface ContentTypeModel {
+    name: string;
+    title: string;
+}
+
+interface ContentModel {
+    title: string;
+    type: ContentTypeModel;
+}
+
 interface Result {
     succeeded: boolean;
     errors: Array<string>;

@@ -23,6 +23,7 @@ namespace BrandUp.Pages.Content
         public object Content { get; }
         public string FieldPath { get; }
         public string Path { get; }
+        public string Title => Metadata.GetContentTitle(Content);
         public ContentExplorer Root => rootExplorer;
         public ContentExplorer Parent { get; }
         public int Index { get; } = -1;

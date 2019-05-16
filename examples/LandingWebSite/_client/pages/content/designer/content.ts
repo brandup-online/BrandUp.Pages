@@ -2,7 +2,7 @@
 import { DOM } from "brandup-ui";
 import "./content.less";
 import { editPage } from "../../dialogs/page-edit";
-import { Dialog, DialogOptions } from "../../dialogs/dialog";
+import { selectContentType } from "../../dialogs/dialog-select-content-type";
 
 export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
     get typeName(): string { return "BrandUpPages.ContentDesigner"; }
@@ -22,7 +22,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             }
 
             if (!itemType) {
-                new SelectItemTypeDialog(this.options.itemTypes).open().then((type) => {
+                selectContentType(this.options.itemTypes).then((type) => {
                     this.addItem(type.name, itemIndex);
                 });
             }
@@ -207,40 +207,5 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
 export interface ContentDesignerOptions {
     isListValue: boolean;
-    itemTypes: Array<ContentItemType>;
-}
-
-export interface ContentItemType {
-    name: string;
-    title: string;
-}
-
-class SelectItemTypeDialog extends Dialog<ContentItemType> {
-    private __types: Array<ContentItemType>;
-
-    constructor(types: Array<ContentItemType>, options?: DialogOptions) {
-        super(options);
-
-        this.__types = types;
-    }
-
-    get typeName(): string { return "BrandUpPages.SelectItemTypeDialog"; }
-
-    protected _onRenderContent() {
-        this.element.classList.add("website-dialog-select");
-
-        this.setHeader("Выберите тип элемента");
-
-        this.__types.map((type, index) => {
-            let itemElem = DOM.tag("a", { class: "item", href: "", "data-command": "select", "data-index": index }, type.title);
-            this.content.appendChild(itemElem);
-        });
-
-        this.registerCommand("select", (elem: HTMLElement) => {
-            let index = parseInt(elem.getAttribute("data-index"));
-            let type = this.__types[index];
-
-            this.resolve(type);
-        });
-    }
+    itemTypes: Array<ContentTypeModel>;
 }

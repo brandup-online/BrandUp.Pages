@@ -8,6 +8,16 @@ namespace LandingWebSite.Contents.BannerBlock
     public class BB1 : BannerBlockContent
     {
         [Content]
-        public List<BB1_Item> Banners { get; set; }
+        public List<BB1_ItemBase> Banners { get; set; }
+    }
+
+    [ContentType]
+    public abstract class BB1_ItemBase : BannerContent
+    {
+        [Text(IsRequired = true), Title]
+        public string Header { get; set; }
+
+        [Text]
+        public string SubHeader { get; set; }
     }
 }
