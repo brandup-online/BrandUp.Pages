@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace BrandUp.Pages
+namespace BrandUp.Pages.Content
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
-    public class PageTitleAttribute : Attribute
+    public class TitleAttribute : Attribute
     {
     }
 }

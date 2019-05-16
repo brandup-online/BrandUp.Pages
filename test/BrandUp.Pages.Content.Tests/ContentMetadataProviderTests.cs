@@ -138,6 +138,39 @@ namespace BrandUp.Pages.Content
         }
 
         [Fact]
+        public void GetContentTitle()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+
+            var content = new ArticlePage { Title = "test" };
+            var contentTitle = contentMetadata.GetContentTitle(content);
+
+            Assert.Equal(content.Title, contentTitle);
+        }
+
+        [Fact]
+        public void GetContentTitle_NoAttr()
+        {
+            var contentMetadata = metadataManager.GetMetadata<PageHeaderContent>();
+
+            var content = new PageHeaderContent();
+            var contentTitle = contentMetadata.GetContentTitle(content);
+
+            Assert.Equal(contentMetadata.Title, contentTitle);
+        }
+
+        [Fact]
+        public void SetContentTitle()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+
+            var content = new ArticlePage { Title = "test" };
+            contentMetadata.SetContentTitle(content, "test2");
+
+            Assert.Equal("test2", content.Title);
+        }
+
+        [Fact]
         public void Implicit_Type()
         {
             var contentMetadata = metadataManager.GetMetadata<ArticlePage>();

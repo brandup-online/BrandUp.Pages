@@ -6,7 +6,7 @@ namespace LandingWebSite.Contents.BannerBlock
     [ContentType]
     public class BB1_Item : BannerContent
     {
-        [Text(IsRequired = true)]
+        [Text(IsRequired = true), Title]
         public string Header { get; set; }
 
         [Text]

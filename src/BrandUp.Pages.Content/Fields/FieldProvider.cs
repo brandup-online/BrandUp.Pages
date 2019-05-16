@@ -144,5 +144,14 @@ namespace BrandUp.Pages.Content.Fields
         public abstract object ParseValue(string strValue);
 
         #endregion
+
+        #region Object members
+
+        public override string ToString()
+        {
+            return $"{ContentMetadata.Name}.{Name} ({Type})";
+        }
+
+        #endregion
     }
 }

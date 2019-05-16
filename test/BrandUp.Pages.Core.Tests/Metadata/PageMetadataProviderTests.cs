@@ -25,5 +25,36 @@ namespace BrandUp.Pages.Metadata
 
             Assert.True(pageType.IsInherited(basePageType));
         }
+
+        [Fact]
+        public void GetPageTitle()
+        {
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var pageContent = new TestPageContent { Title = "test" };
+
+            var pageTitle = pageType.GetPageTitle(pageContent);
+
+            Assert.Equal(pageContent.Title, pageTitle);
+        }
+
+        [Fact]
+        public void CreatePageModel()
+        {
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+
+            var pageContent = (TestPageContent)pageType.CreatePageModel();
+
+            Assert.Equal((new TestPageContent()).Title, pageContent.Title);
+        }
+
+        [Fact]
+        public void CreatePageModel_WithTitle()
+        {
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+
+            var pageContent = (TestPageContent)pageType.CreatePageModel("test");
+
+            Assert.Equal("test", pageContent.Title);
+        }
     }
 }

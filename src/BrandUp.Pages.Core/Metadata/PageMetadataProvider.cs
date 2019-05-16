@@ -1,14 +1,12 @@
 ﻿using BrandUp.Pages.Content;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace BrandUp.Pages.Metadata
 {
     public class PageMetadataProvider
     {
         private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
-        private readonly Content.Fields.ITextField titleField;
 
         #region Properties
 
@@ -29,22 +27,6 @@ namespace BrandUp.Pages.Metadata
 
             if (parentPageMetadata != null)
                 parentPageMetadata.derivedTypes.Add(this);
-
-            PageTitleAttribute titleAttribute = null;
-            foreach (var field in contentMetadata.Fields)
-            {
-                titleAttribute = field.Binding.Member.GetCustomAttribute<PageTitleAttribute>(true);
-                if (titleAttribute == null)
-                    continue;
-
-                if (!(field is Content.Fields.ITextField title))
-                    throw new InvalidOperationException();
-
-                titleField = title;
-            }
-
-            if (titleField == null)
-                throw new InvalidOperationException();
         }
 
         #region Methods
@@ -55,15 +37,15 @@ namespace BrandUp.Pages.Metadata
 
             if (string.IsNullOrEmpty(title))
             {
-                title = GetPageTitle(model);
+                title = ContentMetadata.GetContentTitle(model);
 
                 if (string.IsNullOrEmpty(title))
                     title = "New page";
 
-                SetPageTitle(model, title);
+                ContentMetadata.SetContentTitle(model, title);
             }
             else
-                SetPageTitle(model, title);
+                ContentMetadata.SetContentTitle(model, title);
 
             return model;
         }
@@ -72,16 +54,7 @@ namespace BrandUp.Pages.Metadata
             if (pageModel == null)
                 throw new ArgumentNullException(nameof(pageModel));
 
-            return (string)titleField.GetModelValue(pageModel);
-        }
-        public void SetPageTitle(object pageModel, string title)
-        {
-            if (pageModel == null)
-                throw new ArgumentNullException(nameof(pageModel));
-            if (string.IsNullOrEmpty(title))
-                throw new ArgumentException();
-
-            titleField.SetModelValue(pageModel, title);
+            return ContentMetadata.GetContentTitle(pageModel);
         }
         public bool IsInherited(PageMetadataProvider baseMetadataProvider)
         {

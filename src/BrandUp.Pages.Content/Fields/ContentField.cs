@@ -150,6 +150,7 @@ namespace BrandUp.Pages.Content.Fields
                             var itemMetadata = ContentMetadata.Manager.GetMetadata(item.GetType());
                             formValue.Items.Add(new ContentItem
                             {
+                                Title = itemMetadata.GetContentTitle(item),
                                 Type = new ContentItemType
                                 {
                                     Name = itemMetadata.Name,
@@ -164,6 +165,7 @@ namespace BrandUp.Pages.Content.Fields
                     var itemMetadata = ContentMetadata.Manager.GetMetadata(modelValue.GetType());
                     formValue.Items.Add(new ContentItem
                     {
+                        Title = itemMetadata.GetContentTitle(modelValue),
                         Type = new ContentItemType
                         {
                             Name = itemMetadata.Name,
@@ -212,6 +214,7 @@ namespace BrandUp.Pages.Content.Fields
 
     public class ContentItem
     {
+        public string Title { get; set; }
         public ContentItemType Type { get; set; }
     }
 }

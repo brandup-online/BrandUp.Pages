@@ -9,7 +9,7 @@ namespace BrandUp.Pages.ContentModels
     {
         public const string ContentTypeTitle = "Test page";
 
-        [PageTitle, Text(Title = "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Title, Text(Title = "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
         [Content(Title = "Шапка страницы")]

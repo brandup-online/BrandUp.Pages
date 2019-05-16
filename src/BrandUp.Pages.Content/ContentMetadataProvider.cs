@@ -16,6 +16,7 @@ namespace BrandUp.Pages.Content
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
         private readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
         private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
+        private ITextField titleField;
 
         #endregion
 
@@ -96,6 +97,22 @@ namespace BrandUp.Pages.Content
 
                 InitializeField(field, propertyInfo);
             }
+
+            foreach (var field in fields)
+            {
+                if (titleField != null)
+                    throw new InvalidOperationException($"Title field already defined for content type {Name}.");
+
+                var titleAttribute = field.Binding.Member.GetCustomAttribute<TitleAttribute>(true);
+                if (titleAttribute != null)
+                {
+                    if (!(field is ITextField title))
+                        throw new InvalidOperationException();
+
+                    titleField = title;
+                    break;
+                }
+            }
         }
         private void InitializeField(FieldProviderAttribute field, MemberInfo fieldMember)
         {
@@ -119,9 +136,12 @@ namespace BrandUp.Pages.Content
         }
         private void AddField(FieldProviderAttribute field)
         {
-            var fIndex = fields.Count;
+            var fieldName = field.Name.ToLower();
+            if (fieldNames.ContainsKey(fieldName))
+                throw new InvalidOperationException($"Field by name {field.Name} already exists.");
 
-            fieldNames.Add(field.Name.ToLower(), fIndex);
+            var fieldIndex = fields.Count;
+            fieldNames.Add(fieldName, fieldIndex);
             fields.Add(field);
         }
         [System.Diagnostics.DebuggerStepThrough]
@@ -219,6 +239,24 @@ namespace BrandUp.Pages.Content
         public bool IsInheritedOrEqual(ContentMetadataProvider baseMetadataProvider)
         {
             return this == baseMetadataProvider || IsInherited(baseMetadataProvider);
+        }
+        public string GetContentTitle(object contentModel)
+        {
+            if (contentModel == null)
+                throw new ArgumentNullException(nameof(contentModel));
+
+            if (titleField != null)
+                return (string)titleField.GetModelValue(contentModel);
+            return Title;
+        }
+        public void SetContentTitle(object contentModel, string title)
+        {
+            if (contentModel == null)
+                throw new ArgumentNullException(nameof(contentModel));
+            if (titleField == null)
+                throw new InvalidOperationException($"Title field is not defined by content type {Name}.");
+
+            titleField.SetModelValue(contentModel, title);
         }
 
         #endregion

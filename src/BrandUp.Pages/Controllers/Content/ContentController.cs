@@ -30,6 +30,7 @@ namespace BrandUp.Pages.Controllers
 
             var result = new ContentItem
             {
+                Title = contentContext.Explorer.Metadata.GetContentTitle(contentContext.Content),
                 Type = new ContentItemType
                 {
                     Name = contentContext.Explorer.Metadata.Name,
