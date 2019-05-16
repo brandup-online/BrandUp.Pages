@@ -92,7 +92,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.__changeType(type);
         });
 
-        this.__changeType("Page");
+        this.__changeType("Url");
     }
 
     private __changeType(type: HyperLinkType) {

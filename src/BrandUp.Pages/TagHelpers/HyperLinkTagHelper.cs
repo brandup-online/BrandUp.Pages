@@ -42,6 +42,8 @@ namespace BrandUp.Pages.TagHelpers
                         var page = await pageService.FindPageByIdAsync(Guid.Parse(hyperLinkValue.Value));
                         if (page == null)
                             return;
+                        if (!await pageService.IsPublishedAsync(page))
+                            return;
                         url = await pageLinkGenerator.GetUrlAsync(page);
                         break;
                     default:
