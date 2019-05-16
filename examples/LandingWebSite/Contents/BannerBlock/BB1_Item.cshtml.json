@@ -1,5 +1,6 @@
 {
   "image": "url(~/images/banner.jpg)",
   "header": "Test test test",
-  "subHeader": "Test test test test test test"
+  "subHeader": "Test test test test test test",
+  "link": "url(/about)"
 }

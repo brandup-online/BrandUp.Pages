@@ -1,0 +1,74 @@
+﻿using System;
+using System.Threading.Tasks;
+
+namespace BrandUp.Pages.Content.Fields
+{
+    public class HyperLinkAttribute : FieldProviderAttribute, IHyperLinkField
+    {
+        private static readonly Type HyperLinkValueType = typeof(HyperLinkValue);
+
+        protected override void OnInitialize()
+        {
+            var valueType = ValueType;
+            if (valueType != HyperLinkValueType)
+                throw new InvalidOperationException();
+        }
+
+        public override bool HasValue(object value)
+        {
+            if (!base.HasValue(value))
+                return false;
+
+            var hyperLinkValue = (HyperLinkValue)value;
+            return hyperLinkValue.HasValue;
+        }
+
+        public override object ParseValue(string strValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object ConvetValueToData(object value)
+        {
+            var hyperLinkValue = (HyperLinkValue)value;
+            return hyperLinkValue.ToString();
+        }
+
+        public override object ConvetValueFromData(object value)
+        {
+            if (!HyperLinkValue.TryParse((string)value, out HyperLinkValue hyperLinkValue))
+                throw new InvalidOperationException();
+            return hyperLinkValue;
+        }
+
+        public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+        {
+            HyperLinkFieldFormValue formValue = null;
+
+            if (HasValue(modelValue))
+            {
+                var hyperLinkValue = (HyperLinkValue)modelValue;
+
+                formValue = new HyperLinkFieldFormValue
+                {
+                    ValueType = hyperLinkValue.ValueType,
+                    Value = hyperLinkValue.Value
+                };
+            }
+
+            return Task.FromResult<object>(formValue);
+        }
+    }
+
+    public class HyperLinkFieldFormValue
+    {
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public HyperLinkType ValueType { get; set; }
+        public string Value { get; set; }
+    }
+
+    public interface IHyperLinkField : IFieldProvider
+    {
+
+    }
+}

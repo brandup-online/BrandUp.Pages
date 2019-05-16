@@ -5,6 +5,7 @@ import { TextContent } from "../content/field/text";
 import { HtmlContent } from "../content/field/html";
 import { ImageContent } from "../content/field/image";
 import { ContentField } from "../content/field/content";
+import { HyperLinkContent } from "../content/field/hyperlink";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -77,6 +78,10 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                 }
                 case "Content": {
                     this.addField(fieldModel.title, new ContentField(this, fieldModel.name, fieldModel.options));
+                    break;
+                }
+                case "HyperLink": {
+                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, fieldModel.options));
                     break;
                 }
                 default: {
