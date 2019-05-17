@@ -148,7 +148,7 @@ namespace BrandUp.Pages
             if (hyperLink.ValueType != HyperLinkType.Url)
                 throw new ArgumentException();
 
-            return new Uri(hyperLink.Value);
+            return new Uri(hyperLink.Value, UriKind.RelativeOrAbsolute);
         }
         public static implicit operator HyperLinkValue(Uri url)
         {

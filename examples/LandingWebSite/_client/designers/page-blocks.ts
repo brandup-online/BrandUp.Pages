@@ -16,14 +16,29 @@ export class PageBlocksDesigner extends ContentDesigner {
 
         elem.classList.add("page-blocks-designer");
 
-        //if (this.options.isListValue) {
-        //    elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-new-item brandup-pages-elem" }, '<div><ol><li><a href="#" data-command="item-add" class="accent">Добавить блок</a></li></ol></div>'));
-        //}
+        if (this.options.isListValue) {
+            elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-new-item brandup-pages-elem" }, '<div><ol><li><a href="#" data-command="item-add" class="accent">Добавить блок</a></li></ol></div>'));
+        }
     }
 
     protected _renderBlock(blockElem: HTMLElement) {
-        if (blockElem.classList.contains("page-blocks-designer-item"))
-            return;
+        if (blockElem.classList.contains("page-blocks-designer-item")) {
+            blockElem.classList.remove("page-blocks-designer-item");
+
+            for (let i = 0; i < blockElem.children.length; i++) {
+                let elem = blockElem.children.item(i);
+
+                if (elem.classList.contains("page-blocks-designer-item-add")) {
+                    elem.remove();
+                    continue;
+                }
+
+                if (elem.classList.contains("page-blocks-designer-item-tools")) {
+                    elem.remove();
+                    continue;
+                }
+            }
+        }
 
         super._renderBlock(blockElem);
 

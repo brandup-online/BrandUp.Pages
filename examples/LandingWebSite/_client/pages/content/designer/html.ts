@@ -11,7 +11,9 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("html-designer");
-        
+        if (this.options.placeholder)
+            elem.setAttribute("data-placeholder", this.options.placeholder);
+
         createEditor(elem, {
             toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
             placeholder: this.options.placeholder
@@ -19,10 +21,25 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
             this.__editor = editor;
 
             editor.model.document.on('change', () => {
-                if (editor.model.document.differ.hasDataChanges()) {
+                if (editor.model.document.differ.hasDataChanges())
                     this.__isChanged = true;
-                }
+
+                this.__refreshUI();
             });
+
+            //editor["editing"].view.document.on('change:isFocused', (evt, name, value) => {
+            //    if (value) {
+            //        this.__isChanged = false;
+            //    }
+            //    else {
+            //        if (this.__isChanged) {
+            //            this.__editor.model.document.differ.reset();
+            //            this._onChanged();
+            //        }
+
+            //        this.__refreshUI();
+            //    }
+            //});
 
             this.__refreshUI();
         });
@@ -33,9 +50,10 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
         this.element.addEventListener("blur", () => {
             if (this.__isChanged) {
                 this.__editor.model.document.differ.reset();
-
                 this._onChanged();
             }
+            
+            this.__refreshUI();
         });
     }
 
@@ -49,8 +67,12 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
         this.__refreshUI();
     }
     hasValue(): boolean {
+        var value = this.normalizeValue(this.element.innerText);
+        if (!value)
+            return false;
+
         var val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
-        return val ? true : false;
+        return value && val ? true : false;
     }
 
     protected _onChanged() {
@@ -77,9 +99,21 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
     }
     private __refreshUI() {
         if (this.hasValue())
-            this.element.classList.remove("has-value");
+            this.element.classList.remove("empty-value");
         else
             this.element.classList.add("empty-value");
+    }
+
+    normalizeValue(value: string): string {
+        if (!value)
+            return "";
+
+        value = value.trim();
+
+        if (!this.options.allowMultiline)
+            value = value.replace("\n\r", " ");
+
+        return value;
     }
 
     destroy() {

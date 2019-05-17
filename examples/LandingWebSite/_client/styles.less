@@ -122,8 +122,17 @@ main.app-content {
     padding-bottom: 30px;
 }
 
+.page-header {
+    & p {
+        & strong {
+            display: block;
+        }
+    }
+}
+
 .block-text {
-    padding: @Content-Padding / 2 0;
+    padding: 0 0 @Content-Padding 0;
+    line-height: 150%;
 
     & .text {
         & h2 {
@@ -157,11 +166,16 @@ main.app-content {
     }
 
     &.tb2 {
+        & > h2 {
+            padding-bottom: 10px;
+        }
     }
 }
 
 .banner-block {
     &.BB1 {
+        padding: 0 0 @Content-Padding 0;
+
         & .items {
             display: flex;
             flex-flow: row wrap;

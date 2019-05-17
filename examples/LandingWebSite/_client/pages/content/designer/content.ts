@@ -50,6 +50,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
             itemElem.remove();
             this._refreshBlockIndexes();
+            this._renderBlocks();
 
             this.request({
                 url: '/brandup.pages/content/content',
@@ -70,6 +71,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
             itemElem.previousElementSibling.insertAdjacentElement("beforebegin", itemElem);
             this._refreshBlockIndexes();
+            this._renderBlocks();
 
             this.request({
                 url: '/brandup.pages/content/content/up',
@@ -91,6 +93,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
             itemElem.nextElementSibling.insertAdjacentElement("afterend", itemElem);
             this._refreshBlockIndexes();
+            this._renderBlocks();
 
             this.request({
                 url: '/brandup.pages/content/content/down',

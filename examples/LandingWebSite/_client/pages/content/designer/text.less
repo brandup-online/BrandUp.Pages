@@ -2,11 +2,22 @@
 
 .text-designer {
     outline: none;
+    position: relative;
+    cursor: text;
 
     &:before {
         content: attr(data-placeholder);
         display: none;
         opacity: 0.5;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        align-items: center;
     }
 
     &:hover {
@@ -19,7 +30,7 @@
 
     &.empty-value {
         &:before {
-            display: block;
+            display: flex;
         }
     }
 

@@ -11,7 +11,6 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
         elem.classList.add("text-designer");
         elem.setAttribute("tabindex", "0");
         elem.contentEditable = "true";
-        elem.style.minHeight = elem.style.lineHeight;
         if (this.options.placeholder)
             elem.setAttribute("data-placeholder", this.options.placeholder);
         
@@ -94,8 +93,9 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     private __refreshUI() {
         if (this.hasValue())
             this.element.classList.remove("empty-value");
-        else
+        else {
             this.element.classList.add("empty-value");
+        }
     }
 
     normalizeValue(value: string): string {

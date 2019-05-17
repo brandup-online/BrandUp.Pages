@@ -1,9 +1,11 @@
 ﻿using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Url;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
@@ -13,14 +15,16 @@ namespace BrandUp.Pages.TagHelpers
     {
         private readonly IPageService pageService;
         private readonly IPageLinkGenerator pageLinkGenerator;
+        private readonly HtmlEncoder htmlEncoder;
 
         [HtmlAttributeName("content-link")]
         public override ModelExpression FieldName { get; set; }
 
-        public HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, IPageService pageService)
+        public HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, IPageService pageService, HtmlEncoder htmlEncoder)
         {
             this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            this.htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
         }
 
         protected override async Task RenderContentAsync(TagHelperOutput output)
@@ -34,7 +38,10 @@ namespace BrandUp.Pages.TagHelpers
                 switch (hyperLinkValue.ValueType)
                 {
                     case HyperLinkType.Url:
-                        url = hyperLinkValue.Value;
+                        var uri = (Uri)hyperLinkValue;
+                        url = uri.OriginalString;
+                        if (!uri.IsAbsoluteUri)
+                            output.AddClass("applink", htmlEncoder);
                         break;
                     case HyperLinkType.Page:
                         var page = await pageService.FindPageByIdAsync(Guid.Parse(hyperLinkValue.Value));
@@ -43,6 +50,9 @@ namespace BrandUp.Pages.TagHelpers
                         if (!await pageService.IsPublishedAsync(page))
                             return;
                         url = await pageLinkGenerator.GetUrlAsync(page);
+
+                        output.AddClass("applink", htmlEncoder);
+
                         break;
                     default:
                         throw new InvalidOperationException();

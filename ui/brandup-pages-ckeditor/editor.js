@@ -41,6 +41,9 @@ var createEditor = function (elem, config) {
     if (config.language)
         editorConfig.language = config.language;
 
+    if (config.placeholder)
+        editorConfig.placeholder = config.placeholder;
+
     return BalloonEditor.create(elem, editorConfig);
 };
 
