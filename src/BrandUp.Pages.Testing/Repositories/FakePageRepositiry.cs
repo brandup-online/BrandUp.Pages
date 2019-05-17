@@ -1,6 +1,8 @@
 ﻿using BrandUp.Pages.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Repositories
@@ -57,6 +59,18 @@ namespace BrandUp.Pages.Repositories
         {
             var pages = pageHierarhy.OnGetPages(ownCollectionId);
             return Task.FromResult(pages);
+        }
+        public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
+        {
+            var result = pages.Values.AsQueryable().Where(it => it.Title.Contains(title));
+
+            if (pagination != null)
+            {
+                result = result.Skip(pagination.Skip);
+                result = result.Take(pagination.Limit);
+            }
+
+            return Task.FromResult<IEnumerable<IPage>>(result.OfType<IPage>().ToArray());
         }
         public Task<PageContent> GetContentAsync(Guid pageId)
         {

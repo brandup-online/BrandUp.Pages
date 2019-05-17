@@ -1,17 +1,23 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui";
+import { DOM, ajaxRequest } from "brandup-ui";
 import iconArrow from "../../svg/combobox-arrow.svg";
 import "./hyperlink.less";
 
 export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> implements IContentField {
     readonly form: IContentForm;
     private __typeElem: HTMLElement;
-    private __pageValueElem: HTMLElement;
-    private __urlValueElem: HTMLInputElement;
-    private __menuElem: HTMLElement;
-    private __closeMenuFunc: (e: MouseEvent) => void;
-    private __type: HyperLinkType;
+    private __valueElem: HTMLElement;
+    private __urlValueInput: HTMLInputElement;
+    private __pageValueInput: HTMLInputElement;
+    private __typeMenuElem: HTMLElement;
+    private __searchElem: HTMLElement;
+    private __placeholderElem: HTMLElement;
+    private __closeTypeMenuFunc: (e: MouseEvent) => void;
+    private __closePageMenuFunc: (e: MouseEvent) => void;
+    private __type: HyperLinkType = "Page";
+    private __searchTimeout: number;
+    private __searchRequest: XMLHttpRequest;
 
     constructor(form: IContentForm, name: string, options: HyperLinkFieldFormOptions) {
         super(name, options);
@@ -25,34 +31,182 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         super._onRender();
 
         this.element.classList.add("hyperlink");
-
-        var typeContainerElem = DOM.tag("div", { class: "type", "data-command": "open-menu" }, [
+        
+        this.element.appendChild(DOM.tag("div", { class: "value-type", "data-command": "open-types-menu" }, [
             this.__typeElem = DOM.tag("span", null, "Page"),
             iconArrow
-        ]);
-        this.element.appendChild(typeContainerElem);
+        ]));
+        this.element.appendChild(this.__valueElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
+        this.element.appendChild(this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }));
 
-        this.__pageValueElem = DOM.tag("div", { class: "value" });
-        this.element.appendChild(this.__pageValueElem);
+        this.__urlValueInput = <HTMLInputElement>DOM.tag("input", { type: "text", class: "url" });
+        this.__urlValueInput.addEventListener("change", () => {
+            this.__refreshUI();
 
-        this.__urlValueElem = <HTMLInputElement>DOM.tag("input", { type: "text" });
-        this.element.appendChild(this.__urlValueElem);
-
-        this.__urlValueElem.addEventListener("change", () => {
             this.form.queue.request({
-                url: `/brandup.pages/content/hyperlink`,
+                url: `/brandup.pages/content/hyperlink/url`,
                 urlParams: {
                     editId: this.form.editId,
                     path: this.form.contentPath,
                     field: this.name,
-                    url: this.__urlValueElem.value
+                    url: this.__urlValueInput.value
                 },
                 method: "POST",
                 success: (data: HyperLinkFieldFormValue, status: number) => {
                     switch (status) {
                         case 200:
                             this.setValue(data);
-                            
+
+                            break;
+                        default:
+                            throw "";
+                    }
+                }
+            });
+        });
+        this.__urlValueInput.addEventListener("blur", () => {
+            this.element.classList.remove("inputing");
+            this.__valueElem.innerText = this.__urlValueInput.value;
+        });
+        this.element.appendChild(this.__urlValueInput);
+
+        this.__pageValueInput = <HTMLInputElement>DOM.tag("input", { type: "text", class: "page" });
+        this.__pageValueInput.addEventListener("focus", () => { });
+        this.__pageValueInput.addEventListener("blur", () => { });
+        this.__pageValueInput.addEventListener("keyup", () => {
+            var title = this.__pageValueInput.value;
+            if (!title || title.length < 3)
+                return;
+
+            if (this.__searchTimeout)
+                clearTimeout(this.__searchTimeout);
+
+            if (this.__searchRequest)
+                this.__searchRequest.abort();
+
+            this.__searchTimeout = setTimeout(() => {
+                this.__searchRequest = ajaxRequest({
+                    url: `/brandup.pages/page/search`,
+                    urlParams: {
+                        title: this.__pageValueInput.value
+                    },
+                    method: "GET",
+                    success: (data: Array<PageModel>, status: number) => {
+                        switch (status) {
+                            case 200:
+                                DOM.empty(this.__searchElem);
+
+                                for (let i = 0; i < data.length; i++) {
+                                    let page = data[i];
+
+                                    this.__searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
+                                }
+
+                                break;
+                            default:
+                                throw "";
+                        }
+                    }
+                });
+            }, 500);
+        });
+        this.element.appendChild(this.__pageValueInput);
+        
+        this.__typeMenuElem = DOM.tag("ul", { class: "hyperlink-menu types" }, [
+            DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Page" }, "Page")),
+            DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Url" }, "Url"))
+        ]);
+        this.element.appendChild(this.__typeMenuElem);
+
+        this.__searchElem = DOM.tag("ul", { class: "hyperlink-menu pages" });
+        this.element.appendChild(this.__searchElem);
+
+        this.__closeTypeMenuFunc = (e: MouseEvent) => {
+            let t = <Element>e.target;
+            if (!t.closest(".hyperlink-menu")) {
+                this.element.classList.remove("opened-types");
+                document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+            }
+        };
+        this.__closePageMenuFunc = (e: MouseEvent) => {
+            let t = <Element>e.target;
+            if (!t.closest(".hyperlink")) {
+                this.element.classList.remove("inputing");
+                this.element.classList.remove("opened-pages");
+                document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+            }
+        };
+
+        this.registerCommand("open-types-menu", () => {
+            if (this.element.classList.contains("opened-types")) {
+                this.element.classList.remove("opened-types");
+                document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+                return;
+            }
+
+            this.element.classList.add("opened-types")
+            document.body.addEventListener("mousedown", this.__closeTypeMenuFunc, false);
+        });
+        this.registerCommand("begin-input", (elem: HTMLElement) => {
+            this.element.classList.add("inputing");
+
+            switch (this.__type) {
+                case "Page":
+                    if (!this.element.classList.toggle("opened-pages")) {
+                        document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+                        return;
+                    }
+
+                    DOM.empty(this.__searchElem);
+                    this.__searchElem.appendChild(DOM.tag("li", { class: "text" }, "Начните вводить название страницы или её url."));
+
+                    this.__pageValueInput.focus();
+                    this.__pageValueInput.select();
+
+                    document.body.addEventListener("mousedown", this.__closePageMenuFunc, false);
+                    break;
+                case "Url":
+                    this.__urlValueInput.focus();
+                    break;
+                default:
+                    throw "";
+            }
+        });
+        this.registerCommand("select-type", (elem: HTMLElement) => {
+            let type = <HyperLinkType>elem.getAttribute("data-value");
+            
+            this.element.classList.remove("opened-types");
+            document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+
+            this.__type = type;
+            this.__refreshUI();
+        });
+        this.registerCommand("select-page", (elem: HTMLElement) => {
+            this.element.classList.remove("inputing");
+            this.element.classList.remove("opened-pages");
+            document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+
+            let pageId = <HyperLinkType>elem.getAttribute("data-value");
+            this.__pageValueInput.setAttribute("value-page-id", pageId);
+            this.__valueElem.innerText = elem.innerText;
+            this.__pageValueInput.value = elem.innerText;
+
+            this.__refreshUI();
+
+            this.form.queue.request({
+                url: `/brandup.pages/content/hyperlink/page`,
+                urlParams: {
+                    editId: this.form.editId,
+                    path: this.form.contentPath,
+                    field: this.name,
+                    pageId: pageId
+                },
+                method: "POST",
+                success: (data: HyperLinkFieldFormValue, status: number) => {
+                    switch (status) {
+                        case 200:
+                            this.setValue(data);
+
                             break;
                         default:
                             throw "";
@@ -61,135 +215,72 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             });
         });
 
-        this.__menuElem = DOM.tag("ul", { class: "hyperlink-menu" }, [
-            DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Page" }, "Page")),
-            DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Url" }, "Url"))
-        ]);
-        this.element.appendChild(this.__menuElem);
-
-        this.__closeMenuFunc = (e: MouseEvent) => {
-            let t = <Element>e.target;
-            if (!t.closest(".hyperlink-menu")) {
-                this.element.classList.remove("opened-menu");
-                document.body.removeEventListener("click", this.__closeMenuFunc, false);
-            }
-        };
-
-        this.registerCommand("open-menu", () => {
-            if (!this.element.classList.toggle("opened-menu")) {
-                document.body.removeEventListener("click", this.__closeMenuFunc, false);
-                return;
-            }
-
-            document.body.addEventListener("mousedown", this.__closeMenuFunc, false);
-        });
-        this.registerCommand("select-type", (elem: HTMLElement) => {
-            let type = <HyperLinkType>elem.getAttribute("data-value");
-            
-            this.element.classList.remove("opened-menu");
-            document.body.removeEventListener("click", this.__closeMenuFunc, false);
-
-            this.__changeType(type);
-        });
-
-        this.__changeType("Url");
+        this.__refreshUI();
     }
-
-    private __changeType(type: HyperLinkType) {
-        this.__typeElem.innerText = type;
-        this.__type = type;
-
-        switch (type) {
-            case "Page": {
-                this.element.classList.remove("url-value");
-                this.element.classList.add("page-value");
-                break;
-            }
-            case "Url": {
-                this.element.classList.remove("page-value");
-                this.element.classList.add("url-value");
-                break;
-            }
-        }
-    }
-
-    getValue(): HyperLinkFieldFormValue {
-        switch (this.__type) {
-            case "Page": {
-                if (!this.__pageValueElem.innerText)
-                    return null;
-
-                return {
-                    valueType: "Page",
-                    value: this.__pageValueElem.innerText
-                };
-            }
-            case "Url": {
-                if (!this.__urlValueElem.value)
-                    return null;
-
-                return {
-                    valueType: "Url",
-                    value: this.__urlValueElem.value
-                };
-            }
-            default:
-                throw "";
-        }
-    }
+    
+    getValue(): HyperLinkFieldFormValue { throw "Not implemented"; }
     setValue(value: HyperLinkFieldFormValue) {
         if (value) {
-            this.__changeType(value.valueType);
+            this.__type = value.valueType;
 
             switch (value.valueType) {
                 case "Page": {
-                    this.__pageValueElem.innerText = value.value;
+                    this.__pageValueInput.setAttribute("value-page-id", value.value);
+                    this.__valueElem.innerText = value.pageTitle;
+                    this.__pageValueInput.value = value.pageTitle;
                     break;
                 }
                 case "Url": {
-                    this.__urlValueElem.value = value.value;
+                    this.__urlValueInput.value = value.value;
+                    this.__valueElem.innerText = value.value;
                     break;
                 }
                 default:
                     throw "";
             }
         }
-        else {
-        }
+
+        this.__refreshUI();
     }
     hasValue(): boolean {
         switch (this.__type) {
             case "Page": {
-                return this.__pageValueElem.innerText ? true : false;
+                return this.__pageValueInput.hasAttribute("value-page-id");
             }
             case "Url": {
-                return this.__urlValueElem.value ? true : false;
+                return this.__urlValueInput.value ? true : false;
             }
             default:
                 throw "";
         }
     }
 
-    protected _onChanged() {
-        this.form.queue.request({
-            url: '/brandup.pages/content/hyperlink',
-            urlParams: {
-                editId: this.form.editId,
-                path: this.form.contentPath,
-                field: this.name
-            },
-            method: "POST",
-            type: "JSON",
-            data: this.getValue(),
-            success: (data: HyperLinkFieldFormValue, status: number) => {
-                if (status === 200) {
-                    this.setValue(data);
-                }
-                else {
-                    this.setErrors([ "error" ]);
-                }
+    private __refreshUI() {
+        if (this.hasValue())
+            this.element.classList.add("has-value");
+        else
+            this.element.classList.remove("has-value");
+
+        this.__typeElem.innerText = this.__type;
+
+        switch (this.__type) {
+            case "Page": {
+                this.element.classList.remove("url-value");
+                this.element.classList.add("page-value");
+                this.__valueElem.innerText = this.__pageValueInput.value;
+                this.__placeholderElem.innerText = "Выберите страницу";
+                break;
             }
-        });
+            case "Url": {
+                this.element.classList.remove("page-value");
+                this.element.classList.add("url-value");
+                this.__valueElem.innerText = this.__urlValueInput.value;
+                this.__placeholderElem.innerText = "Введите url";
+                break;
+            }
+            default:
+                throw "";
+        }
     }
 }
 
@@ -198,6 +289,7 @@ export type HyperLinkType = "Url" | "Page";
 export interface HyperLinkFieldFormValue {
     valueType: HyperLinkType;
     value: string;
+    pageTitle?: string;
 }
 
 export interface HyperLinkFieldFormOptions {

@@ -52,6 +52,18 @@ namespace BrandUp.Pages.Controllers
             return Ok(result);
         }
 
+        [HttpGet, Route("brandup.pages/page/search", Name = "BrandUp.Pages.Page.Search")]
+        public async Task<IActionResult> SearchAsync([FromQuery]string title)
+        {
+            var result = new List<Models.PageModel>();
+
+            var pages = await pageService.SearchPagesAsync(title, new PagePaginationOptions(0, 20), HttpContext.RequestAborted);
+            foreach (var page in pages)
+                result.Add(await GetItemModelAsync(page));
+
+            return Ok(result);
+        }
+
         [HttpDelete, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Delete")]
         public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
         {

@@ -11,9 +11,10 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("html-designer");
-
+        
         createEditor(elem, {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList']
+            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
+            placeholder: this.options.placeholder
         }).then(editor => {
             this.__editor = editor;
 
@@ -55,6 +56,8 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
     protected _onChanged() {
         this.__refreshUI();
 
+        var value = this.getValue();
+
         this.page.queue.request({
             url: '/brandup.pages/content/html',
             urlParams: {
@@ -64,7 +67,7 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
             },
             method: "POST",
             type: "JSON",
-            data: this.getValue(),
+            data: value ? value : "",
             success: (data: string, status: number) => {
                 if (status === 200) {
                     this.setValue(data);

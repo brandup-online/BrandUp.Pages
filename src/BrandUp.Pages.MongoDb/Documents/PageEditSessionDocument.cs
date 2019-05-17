@@ -1,7 +1,9 @@
 ﻿using BrandUp.Pages.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
 using System;
+using System.Threading;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
@@ -13,7 +15,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string ContentManagerId { get; set; }
     }
 
-    [BrandUp.MongoDB.Document]
+    [MongoDB.Document(CollectionContextType = typeof(PageEditSessionDocumentContextType))]
     public class PageEditSessionDocument : Document
     {
         [BsonRequired, BsonRepresentation(BsonType.String)]
@@ -22,5 +24,19 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string ContentManagerId { get; set; }
         [BsonRequired]
         public BsonDocument Content { get; set; }
+    }
+
+    public class PageEditSessionDocumentContextType : MongoDB.MongoDbCollectionContext<PageEditSessionDocument>
+    {
+        protected override void OnSetupCollection(CancellationToken cancellationToken = default)
+        {
+            var versionIndex = Builders<PageEditSessionDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+
+            Collection.Indexes.CreateMany(new CreateIndexModel<PageEditSessionDocument>[] {
+                new CreateIndexModel<PageEditSessionDocument>(versionIndex, new CreateIndexOptions { Name = "Version", Unique = true })
+            });
+
+            base.OnSetupCollection(cancellationToken);
+        }
     }
 }

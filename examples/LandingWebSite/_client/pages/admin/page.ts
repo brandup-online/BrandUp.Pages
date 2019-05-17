@@ -15,32 +15,43 @@ export class PageToolbar extends UIElement {
         super();
 
         var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar brandup-pages-toolbar-right" });
+        let isLoading = false;
 
         if (page.model.editId) {
             toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-content" }, iconSettings));
             toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-commit" }, iconSave));
             toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-discard" }, iconDiscard));
-
+            
             this.registerCommand("brandup-pages-content", () => {
                 editPage(page.model.editId).then(() => {
                     page.app.reload();
                 });
             });
-            this.registerCommand("brandup-pages-commit", () => {
+            this.registerCommand("brandup-pages-commit", (elem: HTMLElement) => {
+                if (isLoading)
+                    return;
+                isLoading = true;
+
                 page.app.request({
                     urlParams: { handler: "CommitEdit" },
                     method: "POST",
                     success: (data: string, status: number) => {
                         page.app.nav({ url: data, pushState: false });
+                        isLoading = false;
                     }
                 });
             });
-            this.registerCommand("brandup-pages-discard", () => {
+            this.registerCommand("brandup-pages-discard", (elem: HTMLElement) => {
+                if (isLoading)
+                    return;
+                isLoading = true;
+
                 page.app.request({
                     urlParams: { handler: "DiscardEdit" },
                     method: "POST",
                     success: (data: string, status: number) => {
                         page.app.nav({ url: data, pushState: false });
+                        isLoading = false;
                     }
                 });
             });
@@ -58,14 +69,16 @@ export class PageToolbar extends UIElement {
 
             toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-edit" }, iconEdit));
             this.registerCommand("brandup-pages-edit", () => {
+                if (isLoading)
+                    return;
+                isLoading = true;
+
                 page.app.request({
                     urlParams: { handler: "BeginEdit" },
                     method: "POST",
                     success: (data: string, status: number) => {
-                        if (status === 200)
-                            page.app.nav({ url: data, pushState: false });
-                        else
-                            throw "";
+                        isLoading = false;
+                        page.app.nav({ url: data, pushState: false });
                     }
                 });
             });

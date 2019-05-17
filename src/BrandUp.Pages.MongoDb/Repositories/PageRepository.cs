@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
@@ -63,15 +64,15 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination)
         {
-            var fintDefinition = mongoCollection.Find(it => it.OwnCollectionId == сollectionId);
+            var findDefinition = mongoCollection.Find(it => it.OwnCollectionId == сollectionId);
 
             switch (pageSort)
             {
                 case PageSortMode.FirstOld:
-                    fintDefinition.SortBy(it => it.CreatedDate);
+                    findDefinition.SortBy(it => it.CreatedDate);
                     break;
                 case PageSortMode.FirstNew:
-                    fintDefinition.SortByDescending(it => it.CreatedDate);
+                    findDefinition.SortByDescending(it => it.CreatedDate);
                     break;
                 default:
                     throw new ArgumentException("Недопустимый тип сортировки.");
@@ -79,13 +80,27 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             if (pagination != null)
             {
-                fintDefinition.Skip(pagination.Skip);
-                fintDefinition.Limit(pagination.Limit);
+                findDefinition.Skip(pagination.Skip);
+                findDefinition.Limit(pagination.Limit);
             }
 
-            var cursor = await fintDefinition.Project(PageProjectionExpression).ToCursorAsync();
+            var cursor = await findDefinition.Project(PageProjectionExpression).ToCursorAsync();
 
             return cursor.ToEnumerable();
+        }
+        public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
+        {
+            var findDefinition = mongoCollection.Find(Builders<PageDocument>.Filter.Text(title, "ru"));
+
+            if (pagination != null)
+            {
+                findDefinition.Skip(pagination.Skip);
+                findDefinition.Limit(pagination.Limit);
+            }
+
+            var cursor = await findDefinition.Project(PageProjectionExpression).ToCursorAsync(cancellationToken);
+
+            return cursor.ToEnumerable(cancellationToken);
         }
         public async Task<bool> HasPagesAsync(Guid сollectionId)
         {

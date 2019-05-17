@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Interfaces
@@ -12,6 +13,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> FindPageByPathAsync(string pagePath);
         Task<IPage> GetDefaultPageAsync();
         Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination);
+        Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page);
         Task<object> GetPageContentAsync(IPage page);
         Task SetPageContentAsync(IPage page, object contentModel);

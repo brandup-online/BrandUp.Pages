@@ -1,11 +1,13 @@
 {
   "banners": [
     {
+      "_type": "BB1_Item",
       "image": "url(~/images/banner.jpg)",
       "header": "Test test test",
       "subHeader": "Test test test test test test"
     },
     {
+      "_type": "BB1_Item2",
       "image": "url(~/images/banner.jpg)",
       "header": "Test test test",
       "subHeader": "Test test test test test test"

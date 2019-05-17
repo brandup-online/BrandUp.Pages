@@ -262,6 +262,8 @@ namespace BrandUp.Pages.Content
                     return deriverMetadata.ConvertDictionaryToContentModel(dictionary);
                 }
             }
+            else if (ModelType.IsAbstract)
+                throw new InvalidOperationException($"Content data required property {ContentTypeNameDataKey}.");
 
             var contentModel = CreateModelInstance();
 

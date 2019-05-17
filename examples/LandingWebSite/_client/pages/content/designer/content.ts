@@ -18,7 +18,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
                 if (elem.parentElement.hasAttribute("content-path-index"))
                     itemIndex = parseInt(elem.parentElement.getAttribute("content-path-index")) + 1;
                 else
-                    itemIndex = DOM.queryElements(this.element, "* > [content-path-index]").length;
+                    itemIndex = this.countItems();
             }
 
             if (!itemType) {
@@ -118,6 +118,25 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             f(itemElem, i);
         }
     }
+    protected countItems(): number {
+        var i = 0;
+        this.eachItems(() => i++);
+        return i;
+    }
+    protected getItem(index: number): Element {
+        var itemElem: Element;
+
+        for (let i = 0; i < this.element.children.length; i++) {
+            itemElem = this.element.children.item(i);
+            if (!itemElem.hasAttribute("content-path-index"))
+                continue;
+
+            if (i === index)
+                break;
+        }
+
+        return itemElem;
+    }
     protected _renderBlocks() {
         this.eachItems((elem) => { this._renderBlock(elem); });
     }
@@ -181,14 +200,12 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
                                 let newElem = DOM.queryElement(container, "[content-path]");
 
                                 if (this.options.isListValue) {
-                                    let items = DOM.queryElements(this.element, "* > [content-path-index]");
-
                                     if (index > 0)
-                                        items.item(index - 1).insertAdjacentElement("afterend", newElem);
+                                        this.getItem(index - 1).insertAdjacentElement("afterend", newElem);
                                     else if (index == 0)
                                         this.element.insertAdjacentElement("afterbegin", newElem);
                                     else
-                                        items.item(items.length - 1).insertAdjacentElement("afterend", newElem);
+                                        this.getItem(-1).insertAdjacentElement("afterend", newElem);
                                 }
 
                                 this.page.render();

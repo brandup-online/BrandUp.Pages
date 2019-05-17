@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
@@ -41,7 +42,7 @@ namespace BrandUp.Pages.Content.Fields
             return hyperLinkValue;
         }
 
-        public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+        public override async Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
             HyperLinkFieldFormValue formValue = null;
 
@@ -54,9 +55,17 @@ namespace BrandUp.Pages.Content.Fields
                     ValueType = hyperLinkValue.ValueType,
                     Value = hyperLinkValue.Value
                 };
+
+                if (hyperLinkValue.ValueType == HyperLinkType.Page)
+                {
+                    var pageService = services.GetRequiredService<Interfaces.IPageService>();
+                    var page = await pageService.FindPageByIdAsync(Guid.Parse(hyperLinkValue.Value));
+                    if (page != null)
+                        formValue.PageTitle = page.Title;
+                }
             }
 
-            return Task.FromResult<object>(formValue);
+            return formValue;
         }
     }
 
@@ -65,6 +74,7 @@ namespace BrandUp.Pages.Content.Fields
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public HyperLinkType ValueType { get; set; }
         public string Value { get; set; }
+        public string PageTitle { get; set; }
     }
 
     public interface IHyperLinkField : IFieldProvider

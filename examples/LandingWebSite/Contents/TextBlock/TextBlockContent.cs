@@ -6,7 +6,7 @@ namespace LandingWebSite.Contents.TextBlock
     [ContentType]
     public abstract class TextBlockContent : PageBlockContent
     {
-        [Html]
+        [Html(Placeholder = "Введите текст")]
         public string Text { get; set; }
     }
 }

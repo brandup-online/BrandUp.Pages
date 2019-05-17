@@ -2,6 +2,7 @@
 using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Services
@@ -80,6 +81,17 @@ namespace BrandUp.Pages.Services
                 throw new ArgumentNullException(nameof(pagination));
 
             return pageRepositiry.GetPagesAsync(collection.Id, collection.SortMode, pagination);
+        }
+        public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
+        {
+            if (title == null)
+                throw new ArgumentNullException(nameof(title));
+            if (title.Length < 3)
+                throw new ArgumentOutOfRangeException(nameof(title));
+            if (pagination == null)
+                throw new ArgumentNullException(nameof(pagination));
+
+            return pageRepositiry.SearchPagesAsync(title, pagination, cancellationToken);
         }
         public Task<PageMetadataProvider> GetPageTypeAsync(IPage page)
         {

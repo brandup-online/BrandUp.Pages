@@ -117,17 +117,6 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     validate(): boolean {
         return true;
     }
-    getValues(): { [key: string]: any } {
-        var values: { [key: string]: any } = {};
-
-        for (var key in this.__fields) {
-            var field = this.__fields[key];
-
-            values[key] = field.getValue();
-        }
-
-        return values;
-    }
     setValues(values: { [key: string]: any }) {
         for (var key in values) {
             var field = this.getField(key);

@@ -1,5 +1,6 @@
 ﻿export interface IEditorConfig {
     language?: string;
+    placeholder?: string;
     toolbar?: Array<string>;
 }
 

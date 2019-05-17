@@ -10,5 +10,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         public Guid Id { get; set; }
         [BsonDateTimeOptions(Representation = BsonType.DateTime)]
         public DateTime CreatedDate { get; set; }
+        public int Version { get; set; }
     }
 }

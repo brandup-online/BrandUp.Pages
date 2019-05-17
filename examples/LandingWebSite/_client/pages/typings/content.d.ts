@@ -6,14 +6,12 @@ export interface IContentForm {
     queue: AjaxQueue;
 
     getField(name: string): IContentField;
-    getValues(): { [key: string]: any };
 }
 
 export interface IContentField {
     form: IContentForm;
     name: string;
-
-    getValue(): any;
+    
     setValue(value: any);
     hasValue(): boolean;
     setErrors(errors: Array<string>);
