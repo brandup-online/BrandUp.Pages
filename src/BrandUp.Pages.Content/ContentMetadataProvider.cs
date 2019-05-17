@@ -1,6 +1,8 @@
 ﻿using BrandUp.Pages.Content.Fields;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace BrandUp.Pages.Content
@@ -17,6 +19,7 @@ namespace BrandUp.Pages.Content
         private readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
         private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
         private ITextField titleField;
+        private readonly List<PropertyInfo> injectProperties;
 
         #endregion
 
@@ -35,6 +38,9 @@ namespace BrandUp.Pages.Content
                 modelConstructor = modelType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[0], null);
                 if (modelConstructor == null)
                     throw new InvalidOperationException($"Тип модели контента \"{modelType}\" не содержит публичный конструктор без параметров.");
+
+                injectProperties = new List<PropertyInfo>();
+                InitializeInjectProperties();
             }
 
             if (baseMetadata != null)
@@ -60,17 +66,17 @@ namespace BrandUp.Pages.Content
 
         #region Methods
 
-        private static string GetTypeName(Type type)
+        private void InitializeInjectProperties()
         {
-            var name = type.Name;
-            foreach (var namePrefix in ContentTypePrefixes)
+            foreach (var propery in ModelType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetProperty | BindingFlags.SetProperty))
             {
-                if (name.EndsWith(namePrefix))
-                    return type.Name.Substring(0, type.Name.LastIndexOf(namePrefix));
-            }
-            return name;
-        }
+                var injectAttribute = propery.GetCustomAttribute<ContentInjectAttribute>(true);
+                if (injectAttribute == null)
+                    continue;
 
+                injectProperties.Add(propery);
+            }
+        }
         internal void InitializeFields()
         {
             var baseModelMetadata = BaseMetadata;
@@ -163,6 +169,48 @@ namespace BrandUp.Pages.Content
         {
             return modelConstructor.Invoke(new object[0]);
         }
+        public void ApplyInjections(object model, IServiceProvider serviceProvider, bool injectInnerModels)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+            if (serviceProvider == null)
+                throw new ArgumentNullException(nameof(serviceProvider));
+            if (model.GetType() != ModelType)
+                throw new ArgumentException();
+            if (ModelType.IsAbstract)
+                throw new InvalidOperationException();
+
+            foreach (var injectProperty in injectProperties)
+            {
+                var injectValue = serviceProvider.GetService(injectProperty.PropertyType);
+                injectProperty.SetValue(model, injectValue);
+            }
+
+            if (injectInnerModels)
+            {
+                foreach (var field in fields.OfType<IContentField>())
+                {
+                    var fieldValue = field.GetModelValue(model);
+                    if (!field.HasValue(fieldValue))
+                        continue;
+
+                    if (field.IsListValue)
+                    {
+                        var list = (IList)fieldValue;
+                        foreach (var item in list)
+                        {
+                            var fieldValueContentMetadata = Manager.GetMetadata(item.GetType());
+                            fieldValueContentMetadata.ApplyInjections(item, serviceProvider, injectInnerModels);
+                        }
+                    }
+                    else
+                    {
+                        var fieldValueContentMetadata = Manager.GetMetadata(fieldValue.GetType());
+                        fieldValueContentMetadata.ApplyInjections(fieldValue, serviceProvider, injectInnerModels);
+                    }
+                }
+            }
+        }
         public IDictionary<string, object> ConvertContentModelToDictionary(object contentModel)
         {
             if (contentModel == null)
@@ -234,11 +282,22 @@ namespace BrandUp.Pages.Content
             if (baseMetadataProvider == null)
                 throw new ArgumentNullException(nameof(baseMetadataProvider));
 
-            return ModelType.IsSubclassOf(baseMetadataProvider.ModelType);
+            return IsInherited(baseMetadataProvider.ModelType);
+        }
+        public bool IsInherited(Type baseModelType)
+        {
+            if (baseModelType == null)
+                throw new ArgumentNullException(nameof(baseModelType));
+
+            return ModelType.IsSubclassOf(baseModelType);
         }
         public bool IsInheritedOrEqual(ContentMetadataProvider baseMetadataProvider)
         {
             return this == baseMetadataProvider || IsInherited(baseMetadataProvider);
+        }
+        public bool IsInheritedOrEqual(Type baseModelType)
+        {
+            return this == baseModelType || IsInherited(baseModelType);
         }
         public string GetContentTitle(object contentModel)
         {
@@ -257,6 +316,21 @@ namespace BrandUp.Pages.Content
                 throw new InvalidOperationException($"Title field is not defined by content type {Name}.");
 
             titleField.SetModelValue(contentModel, title);
+        }
+
+        #endregion
+
+        #region Helper methods
+
+        private static string GetTypeName(Type type)
+        {
+            var name = type.Name;
+            foreach (var namePrefix in ContentTypePrefixes)
+            {
+                if (name.EndsWith(namePrefix))
+                    return type.Name.Substring(0, type.Name.LastIndexOf(namePrefix));
+            }
+            return name;
         }
 
         #endregion

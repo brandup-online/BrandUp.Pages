@@ -19,11 +19,14 @@ namespace BrandUp.Pages.ContentModels
         [Content(Title = "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
 
+        [ContentInject]
+        public TestService Service { get; set; }
+
         public static TestPageContent CreateWithOnlyTitle(string title)
         {
             return Create(title, null, null);
         }
-        public static TestPageContent Create(string title, PageHeaderContent header, IEnumerable<PageHeaderContent> headers)
+        public static TestPageContent Create(string title, PageHeaderContent header = null, IEnumerable<PageHeaderContent> headers = null)
         {
             return new TestPageContent
             {
@@ -51,5 +54,8 @@ namespace BrandUp.Pages.ContentModels
     {
         [Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
+
+        [ContentInject]
+        public TestService Service { get; set; }
     }
 }

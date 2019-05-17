@@ -10,7 +10,7 @@ namespace BrandUp.Pages
     {
         public static async Task<IHtmlContent> RenderPageAsync(this IHtmlHelper<ContentPageModel> htmlHelper)
         {
-            var viewRenderService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<Views.IViewRenderService>();
+            var viewRenderService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IViewRenderService>();
             var pageModel = htmlHelper.ViewData.Model;
 
             var pageHtml = await viewRenderService.RenderToStringAsync(pageModel.ContentContext);

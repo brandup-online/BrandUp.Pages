@@ -83,7 +83,7 @@ namespace BrandUp.Pages.Controllers
 
             var newItem = contentMetadataProvider.CreateModelInstance();
 
-            var view = viewLocator.FindView(newItem.GetType());
+            var view = viewLocator.FindView(contentMetadataProvider.ModelType);
             if (view != null)
             {
                 var fileInfo = hosting.ContentRootFileProvider.GetFileInfo(view.Name + ".json");

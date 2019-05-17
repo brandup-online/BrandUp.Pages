@@ -94,6 +94,8 @@ namespace BrandUp.Pages.Content
             return navExplorer;
         }
 
+        #region Helper methods
+
         private static bool VisitField(ref ContentExplorer parentExplorer, string fieldName)
         {
             var charIndex = fieldName.IndexOf(IndexStart);
@@ -126,7 +128,6 @@ namespace BrandUp.Pages.Content
             parentExplorer = new ContentExplorer(parentExplorer, field, itemIndex, contentModel, contentMetadata);
             return true;
         }
-
         private static string ExtractFirstFieldName(ref string modelPath)
         {
             var firstDotIndex = modelPath.IndexOf(Delimiter);
@@ -146,6 +147,10 @@ namespace BrandUp.Pages.Content
             return fieldPath;
         }
 
+        #endregion
+
+        #region Object members
+
         public override string ToString()
         {
             return name;
@@ -154,5 +159,7 @@ namespace BrandUp.Pages.Content
         {
             return name.GetHashCode();
         }
+
+        #endregion
     }
 }

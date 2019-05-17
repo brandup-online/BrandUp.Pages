@@ -1,4 +1,6 @@
 ﻿using BrandUp.Pages.ContentModels;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -78,6 +80,46 @@ namespace BrandUp.Pages.Content
             var contentMetadatas = contentMetadata.GetDerivedMetadataWithHierarhy(true).ToList();
             Assert.True(contentMetadatas.Count > 0);
             Assert.Contains(contentMetadata, contentMetadatas);
+        }
+
+        [Fact]
+        public void ApplyInjections()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var services = new ServiceCollection().AddScoped<TestService>();
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                using (var serviceScope = serviceProvider.CreateScope())
+                {
+                    var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
+
+                    metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, false);
+
+                    Assert.NotNull(page.Service);
+                    Assert.Null(page.Header.Service);
+                    Assert.Null(page.Headers[0].Service);
+                }
+            }
+        }
+
+        [Fact]
+        public void ApplyInjections_WithInnerModels()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var services = new ServiceCollection().AddScoped<TestService>();
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                using (var serviceScope = serviceProvider.CreateScope())
+                {
+                    var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
+
+                    metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, true);
+
+                    Assert.NotNull(page.Service);
+                    Assert.NotNull(page.Header.Service);
+                    Assert.NotNull(page.Headers[0].Service);
+                }
+            }
         }
 
         #endregion

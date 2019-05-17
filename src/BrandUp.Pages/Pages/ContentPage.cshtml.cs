@@ -14,6 +14,8 @@ namespace BrandUp.Pages
         private IPage page;
         private IPageEditSession editSession;
 
+        #region Properties
+
         public IPageService PageService { get; private set; }
         public IPage PageEntry => page;
         public PageMetadataProvider PageMetadata { get; private set; }
@@ -27,6 +29,8 @@ namespace BrandUp.Pages
         public Models.PageStatus Status { get; private set; }
         [ClientModel]
         public Guid? ParentPageId { get; private set; }
+
+        #endregion
 
         #region AppPageModel members
 
