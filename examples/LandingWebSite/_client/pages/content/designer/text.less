@@ -3,6 +3,12 @@
 .text-designer {
     outline: none;
 
+    &:before {
+        content: attr(data-placeholder);
+        display: none;
+        opacity: 0.5;
+    }
+
     &:hover {
         outline: dotted 1px #cfcfcf;
     }
@@ -12,6 +18,9 @@
     }
 
     &.empty-value {
+        &:before {
+            display: block;
+        }
     }
 
     &.hide-ui {

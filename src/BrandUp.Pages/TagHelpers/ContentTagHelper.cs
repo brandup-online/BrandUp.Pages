@@ -22,10 +22,8 @@ namespace BrandUp.Pages.TagHelpers
             this.viewRenderService = viewRenderService ?? throw new ArgumentNullException(nameof(viewRenderService));
         }
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        protected override async Task RenderContentAsync(TagHelperOutput output)
         {
-            base.Process(context, output);
-
             output.TagMode = TagMode.StartTagAndEndTag;
 
             if (Field.IsListValue)

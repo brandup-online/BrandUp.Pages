@@ -22,10 +22,8 @@ namespace BrandUp.Pages.TagHelpers
             this.fileUrlGenerator = fileUrlGenerator ?? throw new ArgumentNullException(nameof(fileUrlGenerator));
         }
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        protected override async Task RenderContentAsync(TagHelperOutput output)
         {
-            await base.ProcessAsync(context, output);
-
             output.TagMode = TagMode.StartTagAndEndTag;
 
             var value = Field.GetModelValue(Content);

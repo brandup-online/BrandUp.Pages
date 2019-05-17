@@ -11,6 +11,9 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
         elem.classList.add("text-designer");
         elem.setAttribute("tabindex", "0");
         elem.contentEditable = "true";
+        elem.style.minHeight = elem.style.lineHeight;
+        if (this.options.placeholder)
+            elem.setAttribute("data-placeholder", this.options.placeholder);
         
         elem.addEventListener("paste", (e: ClipboardEvent) => {
             this.__isChanged = true;
@@ -28,6 +31,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
                 e.preventDefault();
                 return false;
             }
+
+            this.__refreshUI();
         });
         elem.addEventListener("keyup", (e: KeyboardEvent) => {
             this.__isChanged = true;
@@ -57,9 +62,9 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     }
     setValue(value: string) {
         value = this.normalizeValue(value);
-        if (value && this.options.allowMultiline) {
+        if (value && this.options.allowMultiline)
             value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
-        }
+
         this.element.innerHTML = value ? value : "";
 
         this.__refreshUI();
@@ -71,12 +76,13 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
 
     protected _onChanged() {
         this.__refreshUI();
+        var value = this.getValue();
 
         this.request({
             url: '/brandup.pages/content/text',
             method: "POST",
             type: "JSON",
-            data: this.getValue(),
+            data: value ? value : "",
             success: (data: string, status: number) => {
                 if (status === 200) {
                     this.setValue(data);
@@ -87,7 +93,7 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
 
     private __refreshUI() {
         if (this.hasValue())
-            this.element.classList.remove("has-value");
+            this.element.classList.remove("empty-value");
         else
             this.element.classList.add("empty-value");
     }

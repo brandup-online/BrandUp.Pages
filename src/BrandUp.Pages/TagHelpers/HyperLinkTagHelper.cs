@@ -23,10 +23,8 @@ namespace BrandUp.Pages.TagHelpers
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
         }
 
-        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        protected override async Task RenderContentAsync(TagHelperOutput output)
         {
-            await base.ProcessAsync(context, output);
-
             var value = Field.GetModelValue(Content);
             if (Field.HasValue(value))
             {

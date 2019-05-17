@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Content.Fields;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {
@@ -10,15 +11,15 @@ namespace BrandUp.Pages.TagHelpers
         [HtmlAttributeName("content-html")]
         public override ModelExpression FieldName { get; set; }
 
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        protected override Task RenderContentAsync(TagHelperOutput output)
         {
-            base.Process(context, output);
-
             var value = Field.GetModelValue(Content) as string;
 
             output.Content.SetHtmlContent(value ?? string.Empty);
 
             output.TagMode = TagMode.StartTagAndEndTag;
+
+            return Task.CompletedTask;
         }
     }
 }

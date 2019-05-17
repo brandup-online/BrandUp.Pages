@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {
@@ -22,7 +23,7 @@ namespace BrandUp.Pages.TagHelpers
         public object Content => ContentContext.Content;
         protected IJsonHelper JsonHelper => ViewContext.HttpContext.RequestServices.GetRequiredService<IJsonHelper>();
 
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             if (!(ViewContext.ViewData[ViewRenderService.ViewData_ContentContextKeyName] is ContentContext contentContext))
                 throw new InvalidOperationException();
@@ -32,22 +33,30 @@ namespace BrandUp.Pages.TagHelpers
                 throw new InvalidOperationException();
             Field = textField;
 
-            var fieldModel = new Models.ContentFieldModel
+            var administrationManager = contentContext.Services.GetRequiredService<Administration.IAdministrationManager>();
+            if (await administrationManager.CheckAsync())
             {
-                Type = field.Type,
-                Name = field.Name,
-                Title = field.Title,
-                Options = field.GetFormOptions(contentContext.Services)
-            };
+                var fieldModel = new Models.ContentFieldModel
+                {
+                    Type = field.Type,
+                    Name = field.Name,
+                    Title = field.Title,
+                    Options = field.GetFormOptions(contentContext.Services)
+                };
 
-            output.Attributes.Add("content-path", contentContext.Explorer.Path);
-            output.Attributes.Add("content-field", textField.Name);
-            output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
+                output.Attributes.Add("content-path", contentContext.Explorer.Path);
+                output.Attributes.Add("content-field", textField.Name);
+                output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
 
-            var designerName = DesignerName;
-            if (string.IsNullOrEmpty(designerName))
-                designerName = Field.Type;
-            output.Attributes.Add("content-designer", designerName.ToLower());
+                var designerName = DesignerName;
+                if (string.IsNullOrEmpty(designerName))
+                    designerName = Field.Type;
+                output.Attributes.Add("content-designer", designerName.ToLower());
+            }
+
+            await RenderContentAsync(output);
         }
+
+        protected abstract Task RenderContentAsync(TagHelperOutput output);
     }
 }

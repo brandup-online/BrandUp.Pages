@@ -42,6 +42,10 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             let itemElem = elem.closest("[content-path-index]");
+            if (itemElem.classList.contains("processing"))
+                return;
+            itemElem.classList.add("processing");
+
             let itemIndex = itemElem.getAttribute("content-path-index");
 
             itemElem.remove();
@@ -49,14 +53,9 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
 
             this.request({
                 url: '/brandup.pages/content/content',
-                urlParams: {
-                    itemIndex: itemIndex
-                },
+                urlParams: { itemIndex: itemIndex },
                 method: "DELETE",
-                success: (data: string, status: number) => {
-                    if (status === 200) {
-                    }
-                }
+                success: () => itemElem.classList.remove("processing")
             });
         });
         this.registerCommand("item-up", (elem: HTMLElement) => {
@@ -65,19 +64,18 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             if (parseInt(itemIndex) <= 0)
                 return;
 
+            if (itemElem.classList.contains("processing"))
+                return;
+            itemElem.classList.add("processing");
+
             itemElem.previousElementSibling.insertAdjacentElement("beforebegin", itemElem);
             this._refreshBlockIndexes();
 
             this.request({
                 url: '/brandup.pages/content/content/up',
-                urlParams: {
-                    itemIndex: itemIndex
-                },
+                urlParams: { itemIndex: itemIndex },
                 method: "POST",
-                success: (data: string, status: number) => {
-                    if (status === 200) {
-                    }
-                }
+                success: () => itemElem.classList.remove("processing")
             });
         });
         this.registerCommand("item-down", (elem: HTMLElement) => {
@@ -87,23 +85,25 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             if (parseInt(itemIndex) >= DOM.queryElements(this.element, "* > [content-path-index]").length - 1)
                 return;
 
+            if (itemElem.classList.contains("processing"))
+                return;
+            itemElem.classList.add("processing");
+
             itemElem.nextElementSibling.insertAdjacentElement("afterend", itemElem);
             this._refreshBlockIndexes();
 
             this.request({
                 url: '/brandup.pages/content/content/down',
-                urlParams: {
-                    itemIndex: itemIndex
-                },
+                urlParams: { itemIndex: itemIndex },
                 method: "POST",
-                success: (data: string, status: number) => {
-                    if (status === 200) {
-                    }
-                }
+                success: () => itemElem.classList.remove("processing")
             });
         });
         this.registerCommand("item-refresh", (elem: HTMLElement) => {
             let itemElem = elem.closest("[content-path]");
+            if (itemElem.classList.contains("processing"))
+                return;
+            itemElem.classList.add("processing");
 
             this.__refreshItem(itemElem);
         });
