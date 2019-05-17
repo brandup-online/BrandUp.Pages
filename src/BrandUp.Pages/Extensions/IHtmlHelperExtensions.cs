@@ -13,9 +13,8 @@ namespace BrandUp.Pages
             var viewRenderService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IViewRenderService>();
             var pageModel = htmlHelper.ViewData.Model;
 
-            var pageHtml = await viewRenderService.RenderToStringAsync(pageModel.ContentContext);
-
             var builder = new HtmlContentBuilder();
+            var pageHtml = await viewRenderService.RenderToStringAsync(pageModel.ContentContext);
             builder.AppendHtml(pageHtml);
             return builder;
         }

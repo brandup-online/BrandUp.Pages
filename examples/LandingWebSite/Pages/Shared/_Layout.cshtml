@@ -16,9 +16,9 @@
     <div class="app">
         <nav class="app-top">
             <div class="content-width">
-                <a content-page="/" class="logo applink">LandingWebSite</a>
+                <a asp-page-path="/" class="logo">LandingWebSite</a>
                 <ul>
-                    <li><a asp-page-path="/test" class="applink">Test</a></li>
+                    <li><a asp-page-path="/test">Test</a></li>
                     <li><a asp-page="/about" class="applink">About</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
