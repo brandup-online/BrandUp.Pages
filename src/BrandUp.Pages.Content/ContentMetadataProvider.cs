@@ -188,7 +188,7 @@ namespace BrandUp.Pages.Content
 
             if (injectInnerModels)
             {
-                foreach (var field in fields.OfType<IContentField>())
+                foreach (var field in fields.OfType<IModelField>())
                 {
                     var fieldValue = field.GetModelValue(model);
                     if (!field.HasValue(fieldValue))

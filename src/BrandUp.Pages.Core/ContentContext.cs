@@ -10,7 +10,7 @@ namespace BrandUp.Pages
         public IPage Page { get; }
         public ContentExplorer Explorer { get; }
         public IServiceProvider Services { get; }
-        public object Content => Explorer.Content;
+        public object Content => Explorer.Model;
 
         public ContentContext(IPage page, object pageContent, IServiceProvider services)
         {

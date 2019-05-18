@@ -15,7 +15,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string ContentManagerId { get; set; }
     }
 
-    [MongoDB.Document(CollectionContextType = typeof(PageEditSessionDocumentContextType))]
+    [MongoDB.Document(CollectionName = "BrandUpPages.edits", CollectionContextType = typeof(PageEditSessionDocumentContextType))]
     public class PageEditSessionDocument : Document
     {
         [BsonRequired, BsonRepresentation(BsonType.String)]

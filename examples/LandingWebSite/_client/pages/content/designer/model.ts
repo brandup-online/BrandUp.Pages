@@ -1,10 +1,10 @@
 ﻿import { FieldDesigner } from "./base";
 import { DOM } from "brandup-ui";
-import "./content.less";
 import { editPage } from "../../dialogs/page-edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
+import "./model.less";
 
-export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
+export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     get typeName(): string { return "BrandUpPages.ContentDesigner"; }
 
     protected onRender(elem: HTMLElement) {
@@ -53,7 +53,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             this._renderBlocks();
 
             this.request({
-                url: '/brandup.pages/content/content',
+                url: '/brandup.pages/content/model',
                 urlParams: { itemIndex: itemIndex },
                 method: "DELETE",
                 success: () => itemElem.classList.remove("processing")
@@ -74,7 +74,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             this._renderBlocks();
 
             this.request({
-                url: '/brandup.pages/content/content/up',
+                url: '/brandup.pages/content/model/up',
                 urlParams: { itemIndex: itemIndex },
                 method: "POST",
                 success: () => itemElem.classList.remove("processing")
@@ -96,7 +96,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             this._renderBlocks();
 
             this.request({
-                url: '/brandup.pages/content/content/down',
+                url: '/brandup.pages/content/model/down',
                 urlParams: { itemIndex: itemIndex },
                 method: "POST",
                 success: () => itemElem.classList.remove("processing")
@@ -153,7 +153,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             urlParams["itemIndex"] = elem.getAttribute("content-path-index");
 
         this.request({
-            url: '/brandup.pages/content/content/view',
+            url: '/brandup.pages/content/model/view',
             urlParams: urlParams,
             method: "GET",
             success: (data: string, status: number) => {
@@ -183,7 +183,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
     }
     addItem(itemType: string, index: number) {
         this.request({
-            url: '/brandup.pages/content/content',
+            url: '/brandup.pages/content/model',
             urlParams: {
                 itemType: itemType,
                 itemIndex: index.toString()
@@ -192,7 +192,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
             success: (data: string, status: number) => {
                 if (status === 200) {
                     this.request({
-                        url: '/brandup.pages/content/content/view',
+                        url: '/brandup.pages/content/model/view',
                         urlParams: { itemIndex: index.toString() },
                         method: "GET",
                         success: (data: string, status: number) => {
@@ -225,7 +225,7 @@ export class ContentDesigner extends FieldDesigner<ContentDesignerOptions> {
     }
 }
 
-export interface ContentDesignerOptions {
+export interface ModelDesignerOptions {
     isListValue: boolean;
     itemTypes: Array<ContentTypeModel>;
 }

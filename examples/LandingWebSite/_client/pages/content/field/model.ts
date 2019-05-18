@@ -7,12 +7,12 @@ import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { editPage } from "../../dialogs/page-edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 
-export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOptions> implements IContentField {
+export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions> implements IContentField {
     readonly form: IContentForm;
-    private __value: ContentFieldFormValue;
+    private __value: ModelFieldFormValue;
     private __itemsElem: HTMLElement;
 
-    constructor(form: IContentForm, name: string, options: ContentDesignerOptions) {
+    constructor(form: IContentForm, name: string, options: ModelDesignerOptions) {
         super(name, options);
 
         this.form = form;
@@ -46,7 +46,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
             this._refreshBlockIndexes();
 
             this.form.queue.request({
-                url: '/brandup.pages/content/content',
+                url: '/brandup.pages/content/model',
                 urlParams: {
                     editId: this.form.editId,
                     path: this.form.contentPath,
@@ -73,10 +73,10 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
         });
     }
 
-    getValue(): ContentFieldFormValue {
+    getValue(): ModelFieldFormValue {
         return this.__value;
     }
-    setValue(value: ContentFieldFormValue) {
+    setValue(value: ModelFieldFormValue) {
         this.__value = value;
 
         this.__renderItems();
@@ -137,7 +137,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
         let itemIndex = parseInt(elem.getAttribute("content-path-index"));
 
         this.form.queue.request({
-            url: '/brandup.pages/content/content/data',
+            url: '/brandup.pages/content/model/data',
             urlParams: {
                 editId: this.form.editId,
                 path: this.form.contentPath,
@@ -158,7 +158,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
     }
     private __addItem(itemType: string) {
         this.form.queue.request({
-            url: '/brandup.pages/content/content',
+            url: '/brandup.pages/content/model',
             urlParams: {
                 editId: this.form.editId,
                 path: this.form.contentPath,
@@ -166,7 +166,7 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
                 itemType: itemType
             },
             method: "PUT",
-            success: (data: ContentFieldFormValue, status: number) => {
+            success: (data: ModelFieldFormValue, status: number) => {
                 if (status === 200) {
                     this.setValue(data);
                 }
@@ -175,14 +175,14 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
     }
     private __refreshItems() {
         this.form.queue.request({
-            url: '/brandup.pages/content/content',
+            url: '/brandup.pages/content/model',
             urlParams: {
                 editId: this.form.editId,
                 path: this.form.contentPath,
                 field: this.name
             },
             method: "GET",
-            success: (data: ContentFieldFormValue, status: number) => {
+            success: (data: ModelFieldFormValue, status: number) => {
                 if (status === 200) {
                     this.setValue(data);
                 }
@@ -191,11 +191,11 @@ export class ContentField extends Field<ContentFieldFormValue, ContentDesignerOp
     }
 }
 
-export interface ContentDesignerOptions {
+export interface ModelDesignerOptions {
     isListValue: boolean;
     itemTypes: Array<ContentTypeModel>;
 }
 
-export interface ContentFieldFormValue {
+export interface ModelFieldFormValue {
     items: Array<ContentModel>;
 }

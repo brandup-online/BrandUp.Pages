@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    [MongoDB.Document(CollectionContextType = typeof(PageCollectionDocumentContextType))]
+    [MongoDB.Document(CollectionName = "BrandUpPages.collections", CollectionContextType = typeof(PageCollectionDocumentContextType))]
     public class PageCollectionDocument : Document, IPageCollection
     {
         [BsonRequired]

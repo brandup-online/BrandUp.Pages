@@ -1,4 +1,4 @@
-﻿import { ContentDesigner } from "../pages/content/designer/content";
+﻿import { ModelDesigner } from "../pages/content/designer/model";
 import { DOM } from "brandup-ui";
 import "./page-blocks.less";
 import iconRefresh from "../svg/page-blocks-refresh.svg";
@@ -8,7 +8,7 @@ import iconUp from "../svg/page-blocks-up.svg";
 import iconDown from "../svg/page-blocks-down.svg";
 import iconAdd from "../svg/page-blocks-add.svg";
 
-export class PageBlocksDesigner extends ContentDesigner {
+export class PageBlocksDesigner extends ModelDesigner {
     get typeName(): string { return "BrandUpPages.PageBlocksDesigner"; }
 
     protected onRender(elem: HTMLElement) {

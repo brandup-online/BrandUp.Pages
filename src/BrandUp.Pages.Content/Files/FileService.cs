@@ -14,8 +14,10 @@ namespace BrandUp.Pages.Content.Files
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public Task<IFile> UploadFileAsync(string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public Task<IFile> UploadFileAsync(IContentEntry contentEntry, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
+            if (contentEntry == null)
+                throw new ArgumentNullException(nameof(contentEntry));
             if (contentType == null)
                 throw new ArgumentNullException(nameof(contentType));
             if (stream == null)
@@ -23,7 +25,7 @@ namespace BrandUp.Pages.Content.Files
             if (fileName == null)
                 throw new ArgumentNullException(nameof(fileName));
 
-            return repository.UploadFileAsync(fileName, contentType, stream, cancellationToken);
+            return repository.UploadFileAsync(contentEntry.EntryId, fileName, contentType, stream, cancellationToken);
         }
         public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
         {

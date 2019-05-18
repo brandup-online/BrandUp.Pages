@@ -13,10 +13,10 @@ namespace BrandUp.Pages.ContentModels
         [Title, Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
         public string Title { get; set; } = "Test";
 
-        [Content(Title = "Шапка страницы")]
+        [Model(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
 
-        [Content(Title = "Шапки страницы")]
+        [Model(Title = "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
 
         [ContentInject]

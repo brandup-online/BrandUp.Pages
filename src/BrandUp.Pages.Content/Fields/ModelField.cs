@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class ContentAttribute : FieldProviderAttribute, IContentField
+    public class ModelAttribute : FieldProviderAttribute, IModelField
     {
         private static readonly Type ListInterfaceType = typeof(IList);
         private static readonly Type ListGenericTypeDefinition = typeof(List<>);
@@ -111,7 +111,7 @@ namespace BrandUp.Pages.Content.Fields
         }
         public override object GetFormOptions(IServiceProvider services)
         {
-            var options = new ContentFieldFormOptions
+            var options = new ModelFieldFormOptions
             {
                 IsListValue = IsListValue,
                 ItemTypes = new List<ContentItemType>()
@@ -133,7 +133,7 @@ namespace BrandUp.Pages.Content.Fields
         }
         public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
-            var formValue = new ContentFieldFormValue
+            var formValue = new ModelFieldFormValue
             {
                 Items = new List<ContentItem>()
             };
@@ -190,18 +190,20 @@ namespace BrandUp.Pages.Content.Fields
         #endregion
     }
 
-    public interface IContentField : IFieldProvider, IFieldNavigationSupported
+    public interface IModelField : IFieldProvider
     {
+        bool IsListValue { get; }
+        object Navigate(object value, int index);
         ContentMetadataProvider ValueContentMetadata { get; }
     }
 
-    public class ContentFieldFormOptions
+    public class ModelFieldFormOptions
     {
         public bool IsListValue { get; set; }
         public List<ContentItemType> ItemTypes { get; set; }
     }
 
-    public class ContentFieldFormValue
+    public class ModelFieldFormValue
     {
         public List<ContentItem> Items { get; set; }
     }

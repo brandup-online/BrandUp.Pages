@@ -82,7 +82,7 @@ namespace BrandUp.Pages.Views
                 if (contentContext.Explorer.IsRoot)
                     tag.Attributes.Add("content-root", string.Empty);
                 tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);
-                tag.Attributes.Add("content-path", contentContext.Explorer.Path);
+                tag.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
                 tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
 
                 tag.InnerHtml.AppendHtml(contentOutput.ToString());

@@ -2,7 +2,7 @@
 import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../../typings/content";
 import { TextDesigner } from "./text";
 import { HtmlDesigner } from "./html";
-import { ContentDesigner } from "./content";
+import { ModelDesigner } from "./model";
 import { ImageDesigner } from "./image";
 import ContentPage from "../../pages/content";
 import { PageBlocksDesigner } from "../../../designers/page-blocks";
@@ -80,8 +80,8 @@ export class PageDesigner implements IPageDesigner {
                     fieldDesigner = new ImageDesigner(this, fieldElem, fieldModel.options);
                     break;
                 }
-                case "content": {
-                    fieldDesigner = new ContentDesigner(this, fieldElem, fieldModel.options);
+                case "model": {
+                    fieldDesigner = new ModelDesigner(this, fieldElem, fieldModel.options);
                     break;
                 }
                 case "page-blocks": {

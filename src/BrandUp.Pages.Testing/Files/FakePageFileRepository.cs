@@ -24,14 +24,15 @@ namespace BrandUp.Pages.Content.Files
             throw new NotImplementedException();
         }
 
-        public Task<IFile> UploadFileAsync(string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public Task<IFile> UploadFileAsync(string entryId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
             var file = new MemoryFile
             {
                 Id = Guid.NewGuid(),
                 Name = fileName,
                 ContentType = contentType,
-                Data = ReadFully(stream)
+                Data = ReadFully(stream),
+                EntryId = entryId
             };
 
             files.Add(file.Id, file);
@@ -68,7 +69,7 @@ namespace BrandUp.Pages.Content.Files
             public string ContentType { get; set; }
             public byte[] Data { get; set; }
             public long Size => Data.Length;
-
+            public string EntryId { get; set; }
         }
     }
 }

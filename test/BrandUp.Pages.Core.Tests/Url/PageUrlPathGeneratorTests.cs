@@ -75,6 +75,7 @@ namespace BrandUp.Pages.Url
             public Guid OwnCollectionId => throw new NotImplementedException();
             public string Title { get; set; }
             public string UrlPath { get; set; }
+            public string EntryId => throw new NotImplementedException();
 
             public Page(string title)
             {

@@ -96,6 +96,20 @@ namespace BrandUp.Pages.Content
             metadata = metadataProviders[index];
             return true;
         }
+        public object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary)
+        {
+            if (dictionary == null)
+                throw new ArgumentNullException(nameof(dictionary));
+
+            if (!dictionary.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object contentTypeNameValue))
+                throw new InvalidOperationException();
+
+            var contentTypeName = (string)contentTypeNameValue;
+            if (!TryGetMetadata(contentTypeName, out ContentMetadataProvider contentMetadataProvider))
+                throw new InvalidOperationException();
+
+            return contentMetadataProvider.ConvertDictionaryToContentModel(dictionary);
+        }
 
         #endregion
     }
@@ -107,5 +121,6 @@ namespace BrandUp.Pages.Content
         ContentMetadataProvider GetMetadata(Type contentType);
         bool TryGetMetadata(Type contentType, out ContentMetadataProvider metadata);
         bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata);
+        object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary);
     }
 }

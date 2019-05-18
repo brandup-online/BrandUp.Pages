@@ -27,7 +27,7 @@ namespace BrandUp.Pages.Controllers
                 return BadRequest();
             var fileType = contentType.Substring(contentType.IndexOf("/") + 1);
 
-            var file = await fileService.UploadFileAsync(fileName, contentType, Request.Body);
+            var file = await fileService.UploadFileAsync(Page, fileName, contentType, Request.Body);
 
             //if (Field.TryGetModelValue(ContentContext.Content, out ImageValue curValue) && curValue.ValueType == ImageValueType.Id)
             //{

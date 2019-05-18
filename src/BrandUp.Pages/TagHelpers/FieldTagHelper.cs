@@ -44,7 +44,7 @@ namespace BrandUp.Pages.TagHelpers
                     Options = field.GetFormOptions(contentContext.Services)
                 };
 
-                output.Attributes.Add("content-path", contentContext.Explorer.Path);
+                output.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
                 output.Attributes.Add("content-field", textField.Name);
                 output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
 

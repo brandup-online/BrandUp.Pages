@@ -23,7 +23,7 @@ namespace BrandUp.Pages.Interfaces
         Task<Guid?> GetParentPageIdAsync(IPage page);
     }
 
-    public interface IPage
+    public interface IPage : Content.IContentEntry
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }

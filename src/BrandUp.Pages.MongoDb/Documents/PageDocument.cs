@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -15,9 +16,11 @@ namespace BrandUp.Pages.MongoDb.Documents
         public Guid OwnCollectionId { get; set; }
         public string UrlPath { get; set; }
         public string Title { get; set; }
+
+        string IContentEntry.EntryId => Id.ToString();
     }
 
-    [MongoDB.Document(CollectionContextType = typeof(PageDocumentContextType))]
+    [MongoDB.Document(CollectionName = "BrandUpPages.pages", CollectionContextType = typeof(PageDocumentContextType))]
     public class PageDocument : Document
     {
         [BsonRequired]

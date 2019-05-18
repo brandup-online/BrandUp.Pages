@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    public class ContentController : FieldController<IContentField>
+    public class ModelController : FieldController<IModelField>
     {
         [HttpGet("data")]
         public IActionResult GetData([FromQuery]int itemIndex = -1)

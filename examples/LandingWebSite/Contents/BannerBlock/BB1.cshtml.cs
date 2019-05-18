@@ -8,7 +8,7 @@ namespace LandingWebSite.Contents.BannerBlock
     [ContentType(Title = "Слайдер баннеров")]
     public class BB1 : BannerBlockContent
     {
-        [Content]
+        [Model]
         public List<BB1_ItemBase> Banners { get; set; }
     }
 

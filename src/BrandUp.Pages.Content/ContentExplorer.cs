@@ -19,11 +19,11 @@ namespace BrandUp.Pages.Content
         #region Properties
 
         public ContentMetadataProvider Metadata { get; }
-        public FieldProviderAttribute Field { get; }
-        public object Content { get; }
+        public IFieldProvider Field { get; }
+        public object Model { get; }
+        public string ModelPath { get; }
         public string FieldPath { get; }
-        public string Path { get; }
-        public string Title => Metadata.GetContentTitle(Content);
+        public string Title => Metadata.GetContentTitle(Model);
         public ContentExplorer Root => rootExplorer;
         public ContentExplorer Parent { get; }
         public int Index { get; } = -1;
@@ -31,21 +31,21 @@ namespace BrandUp.Pages.Content
 
         #endregion
 
-        private ContentExplorer(object content, ContentMetadataProvider contentMetadata)
+        private ContentExplorer(object model, ContentMetadataProvider contentMetadata)
         {
             Field = null;
-            Content = content;
+            Model = model;
             Metadata = contentMetadata;
-            Path = string.Empty;
+            ModelPath = string.Empty;
             Parent = null;
 
             rootExplorer = null;
             name = contentMetadata.Name;
         }
-        private ContentExplorer(ContentExplorer parent, FieldProviderAttribute field, int index, object content, ContentMetadataProvider contentMetadata)
+        private ContentExplorer(ContentExplorer parent, IFieldProvider field, int index, object model, ContentMetadataProvider contentMetadata)
         {
             Field = field;
-            Content = content;
+            Model = model;
             Metadata = contentMetadata;
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
@@ -53,39 +53,39 @@ namespace BrandUp.Pages.Content
             if (index >= 0)
                 FieldPath += "[" + index + "]";
 
-            Path = !parent.IsRoot ? string.Concat(parent.Path, Delimiter, FieldPath) : FieldPath;
+            ModelPath = !parent.IsRoot ? string.Concat(parent.ModelPath, Delimiter, FieldPath) : FieldPath;
             Index = index;
 
             rootExplorer = parent.rootExplorer ?? parent;
-            name = rootExplorer.name + ":" + Path;
+            name = rootExplorer.name + ":" + ModelPath;
         }
 
-        public static ContentExplorer Create(IContentMetadataManager metadataManager, object content)
+        public static ContentExplorer Create(IContentMetadataManager metadataManager, object model)
         {
             if (metadataManager == null)
                 throw new ArgumentNullException(nameof(metadataManager));
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
 
-            var contentMetadata = metadataManager.GetMetadata(content.GetType());
-            return new ContentExplorer(content, contentMetadata);
+            var contentMetadata = metadataManager.GetMetadata(model.GetType());
+            return new ContentExplorer(model, contentMetadata);
         }
-        public static ContentExplorer Create(IContentMetadataManager metadataManager, object content, string path)
+        public static ContentExplorer Create(IContentMetadataManager metadataManager, object model, string modelPath)
         {
-            var explorer = Create(metadataManager, content);
-            return explorer.Navigate(path);
+            var explorer = Create(metadataManager, model);
+            return explorer.Navigate(modelPath);
         }
 
-        public ContentExplorer Navigate(string path)
+        public ContentExplorer Navigate(string modelPath)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            if (modelPath == null)
+                throw new ArgumentNullException(nameof(modelPath));
 
             ContentExplorer navExplorer = this;
 
-            while (path != string.Empty)
+            while (modelPath != string.Empty)
             {
-                var fieldName = ExtractFirstFieldName(ref path);
+                var fieldName = ExtractFirstFieldName(ref modelPath);
 
                 if (!VisitField(ref navExplorer, fieldName))
                     return null;
@@ -106,16 +106,16 @@ namespace BrandUp.Pages.Content
                 fieldName = fieldName.Substring(0, charIndex);
             }
 
-            var parentModel = parentExplorer.Content;
+            var parentModel = parentExplorer.Model;
 
             if (!parentExplorer.Metadata.TryGetField(fieldName, out FieldProviderAttribute field))
                 throw new InvalidOperationException(string.Format("Не найдено поле {0}.", fieldName));
 
-            if (!(field is IFieldNavigationSupported fieldNavigation))
+            if (!(field is IModelField modelField))
                 throw new InvalidOperationException($"Поле {fieldName} не поддерживает навигацию по своему контенту.");
 
             var fieldValue = field.GetModelValue(parentModel);
-            var contentModel = fieldNavigation.Navigate(fieldValue, itemIndex);
+            var contentModel = modelField.Navigate(fieldValue, itemIndex);
 
             if (contentModel == null)
             {

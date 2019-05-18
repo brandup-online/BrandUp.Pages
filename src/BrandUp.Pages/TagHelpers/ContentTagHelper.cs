@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages.TagHelpers
 {
     [HtmlTargetElement(Attributes = "content-object")]
-    public class ContentTagHelper : FieldTagHelper<IContentField>
+    public class ContentTagHelper : FieldTagHelper<IModelField>
     {
         private readonly IViewRenderService viewRenderService;
 

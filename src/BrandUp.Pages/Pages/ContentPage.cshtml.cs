@@ -164,7 +164,7 @@ namespace BrandUp.Pages
 
             var formModel = new Models.PageContentForm
             {
-                Path = contentContext.Explorer.Path
+                Path = contentContext.Explorer.ModelPath
             };
 
             foreach (var field in contentContext.Explorer.Metadata.Fields)

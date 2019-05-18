@@ -18,12 +18,12 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (dbContext == null)
                 throw new ArgumentNullException(nameof(dbContext));
 
-            files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "PageFiles", DisableMD5 = false });
+            files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages", DisableMD5 = false });
         }
 
-        public async Task<IFile> UploadFileAsync(string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public async Task<IFile> UploadFileAsync(string entryId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
-            var fileDoc = new FileDocument(fileName, contentType);
+            var fileDoc = new FileDocument(entryId, fileName, contentType);
 
             var uploadOptions = new GridFSUploadOptions
             {
@@ -35,7 +35,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return fileDoc;
         }
-
         public async Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             var filter = Builders<GridFSFileInfo<Guid>>.Filter.Eq(info => info.Id, fileId);
@@ -47,12 +46,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return new FileDocument(fileInfo);
         }
-
         public async Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             return await files.OpenDownloadStreamAsync(fileId, cancellationToken: cancellationToken);
         }
-
         public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             return files.DeleteAsync(fileId, cancellationToken);
@@ -71,15 +68,16 @@ namespace BrandUp.Pages.MongoDb.Repositories
         public Guid Id { get; }
         public string ContentType { get => (string)Data["contentType"]; private set => Data["contentType"] = value; }
         public string FileName { get => (string)Data["fileName"]; private set => Data["fileName"] = value; }
+        public string EntryId { get => (string)Data["pageId"]; private set => Data["pageId"] = value; }
 
-        public FileDocument(string fileName, string contentType)
+        public FileDocument(string entryId, string fileName, string contentType)
         {
             Data = new Dictionary<string, object>();
             Id = Guid.NewGuid();
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+            EntryId = entryId ?? throw new ArgumentNullException(nameof(entryId));
         }
-
         public FileDocument(GridFSFileInfo<Guid> fileInfo)
         {
             Id = fileInfo.Id;

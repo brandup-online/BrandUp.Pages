@@ -4,7 +4,7 @@ import { IContentForm, IContentField, PageContentForm } from "../typings/content
 import { TextContent } from "../content/field/text";
 import { HtmlContent } from "../content/field/html";
 import { ImageContent } from "../content/field/image";
-import { ContentField } from "../content/field/content";
+import { ModelField } from "../content/field/model";
 import { HyperLinkContent } from "../content/field/hyperlink";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
@@ -63,24 +63,24 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         for (let i = 0; i < model.fields.length; i++) {
             var fieldModel = model.fields[i];
 
-            switch (fieldModel.type) {
-                case "Text": {
+            switch (fieldModel.type.toLowerCase()) {
+                case "text": {
                     this.addField(fieldModel.title, new TextContent(this, fieldModel.name, fieldModel.options));
                     break;
                 }
-                case "Html": {
+                case "html": {
                     this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, fieldModel.options));
                     break;
                 }
-                case "Image": {
+                case "image": {
                     this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, fieldModel.options));
                     break;
                 }
-                case "Content": {
-                    this.addField(fieldModel.title, new ContentField(this, fieldModel.name, fieldModel.options));
+                case "model": {
+                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, fieldModel.options));
                     break;
                 }
-                case "HyperLink": {
+                case "hyperlink": {
                     this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, fieldModel.options));
                     break;
                 }

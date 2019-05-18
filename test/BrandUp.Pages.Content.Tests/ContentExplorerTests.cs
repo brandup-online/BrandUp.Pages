@@ -26,8 +26,8 @@ namespace BrandUp.Pages.Content
             Assert.NotNull(explorer);
             Assert.NotNull(explorer.Metadata);
             Assert.Null(explorer.Field);
-            Assert.Equal(content, explorer.Content);
-            Assert.Equal(string.Empty, explorer.Path);
+            Assert.Equal(content, explorer.Model);
+            Assert.Equal(string.Empty, explorer.ModelPath);
             Assert.Equal(content.Title, explorer.Title);
             Assert.Null(explorer.Root);
             Assert.Null(explorer.Parent);
@@ -44,8 +44,8 @@ namespace BrandUp.Pages.Content
             Assert.NotNull(explorer);
             Assert.NotNull(explorer.Metadata);
             Assert.NotNull(explorer.Field);
-            Assert.Equal(explorer.Content, content.Header);
-            Assert.Equal("Header", explorer.Path);
+            Assert.Equal(explorer.Model, content.Header);
+            Assert.Equal("Header", explorer.ModelPath);
             Assert.NotEqual(explorer.Root, explorer);
             Assert.NotNull(explorer.Parent);
             Assert.Equal(explorer.Index, -1);

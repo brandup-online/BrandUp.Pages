@@ -13,7 +13,7 @@ namespace LandingWebSite.Contents.Page
         [Text(Placeholder = "Input page sub header")]
         public string SubHeader { get; set; }
 
-        [Content]
+        [Model]
         public List<PageBlockContent> Blocks { get; set; }
     }
 }
