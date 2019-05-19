@@ -84,7 +84,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             if (this.__searchRequest)
                 this.__searchRequest.abort();
 
-            this.__searchTimeout = setTimeout(() => {
+            this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
                     url: `/brandup.pages/page/search`,
                     urlParams: {

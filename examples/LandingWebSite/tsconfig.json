@@ -3,12 +3,14 @@
     "module": "amd",
     "moduleResolution": "node",
     "target": "es5",
-    "jsx": "react",
     "sourceMap": true,
     "strict": false,
-    "lib": [ "es5", "es6", "dom", "es2015.promise", "dom.iterable", "es2015.iterable", "es2015.collection", "es2015", "es2015.core" ],
+    //"lib": [ "es5", "es6", "dom", "es2015.promise", "dom.iterable", "es2015.iterable", "es2015.collection", "es2015", "es2015.core" ],
     "noImplicitAny": false,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "types": [
+      "node"
+    ]
   },
   "exclude": [
     "node_modules",
@@ -16,5 +18,5 @@
     ".idea",
     ".vscode"
   ],
-  "compileOnSave": true
+  "compileOnSave": false
 }

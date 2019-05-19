@@ -48,7 +48,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
             return false;
         };
         this.valueElem.ondragleave = (e: DragEvent) => {
-            dragleaveTime = setTimeout(() => { this.valueElem.classList.remove("draging"); }, 50);
+            dragleaveTime = window.setTimeout(() => { this.valueElem.classList.remove("draging"); }, 50);
             return false;
         };
         this.valueElem.ondrop = (e: DragEvent) => {
