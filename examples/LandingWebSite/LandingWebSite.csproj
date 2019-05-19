@@ -24,6 +24,7 @@
     <None Remove="_client\pages\content\designer\page.ts" />
     <None Remove="_client\pages\content\designer\text.ts" />
     <None Remove="_client\pages\content\field\hyperlink.ts" />
+    <None Remove="_client\pages\content\field\pages.ts" />
     <None Remove="_client\pages\content\html.ts" />
     <None Remove="_client\pages\content\image.js.map" />
     <None Remove="_client\pages\content\image.ts" />
@@ -82,6 +83,7 @@
     <TypeScriptCompile Include="_client\pages\content\field\html.ts" />
     <TypeScriptCompile Include="_client\pages\content\field\model.ts" />
     <TypeScriptCompile Include="_client\pages\content\field\hyperlink.ts" />
+    <TypeScriptCompile Include="_client\pages\content\field\pages.ts" />
     <TypeScriptCompile Include="_client\pages\content\field\text.ts" />
     <TypeScriptCompile Include="_client\pages\content\provider\text.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-delete.ts" />

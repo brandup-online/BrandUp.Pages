@@ -25,9 +25,11 @@ namespace BrandUp.Pages.MongoDb.Documents
         protected override void OnSetupCollection(CancellationToken cancellationToken = default)
         {
             var versionIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+            var textIndex = Builders<PageCollectionDocument>.IndexKeys.Text(it => it.Title).Text(it => it.PageTypeName);
 
             Collection.Indexes.CreateMany(new CreateIndexModel<PageCollectionDocument>[] {
-                new CreateIndexModel<PageCollectionDocument>(versionIndex, new CreateIndexOptions { Name = "Version", Unique = true })
+                new CreateIndexModel<PageCollectionDocument>(versionIndex, new CreateIndexOptions { Name = "Version", Unique = true }),
+                new CreateIndexModel<PageCollectionDocument>(textIndex, new CreateIndexOptions { Name = "TextSearch" })
             });
 
             base.OnSetupCollection(cancellationToken);

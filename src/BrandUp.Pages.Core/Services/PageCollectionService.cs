@@ -41,7 +41,7 @@ namespace BrandUp.Pages.Services
             return repositiry.GetCollectionsAsync(pageId);
         }
 
-        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, bool includeDerivedTypes)
+        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, string title, bool includeDerivedTypes)
         {
             if (pageTypeName == null)
                 throw new ArgumentNullException(nameof(pageTypeName));
@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Services
                     pageTypeNames.Add(derivedPageMetadata.Name);
             }
 
-            return repositiry.GetCollectionsAsync(pageTypeNames.ToArray());
+            return repositiry.GetCollectionsAsync(pageTypeNames.ToArray(), title);
         }
 
         public Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort)

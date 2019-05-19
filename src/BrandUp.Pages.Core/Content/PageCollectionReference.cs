@@ -16,7 +16,7 @@ namespace BrandUp.Pages
         Type IPageCollectionReference.PageModelType => typeof(TPageModel);
     }
 
-    internal interface IPageCollectionReference
+    public interface IPageCollectionReference
     {
         Guid CollectionId { get; }
         Type PageModelType { get; }

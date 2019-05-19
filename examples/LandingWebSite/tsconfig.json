@@ -18,5 +18,5 @@
     ".idea",
     ".vscode"
   ],
-  "compileOnSave": false
+  "compileOnSave": true
 }

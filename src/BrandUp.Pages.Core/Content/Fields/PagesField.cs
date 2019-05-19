@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class PagesAttribute : FieldProviderAttribute
+    public class PagesAttribute : FieldProviderAttribute, IPagesField
     {
-        private Type pageModelType;
         private ConstructorInfo valueConstructor;
 
         public string Placeholder { get; set; }
+        public Type PageModelType { get; private set; }
 
         #region FieldProviderAttribute members
 
@@ -24,7 +24,7 @@ namespace BrandUp.Pages.Content.Fields
             if (valueConstructor == null)
                 throw new InvalidOperationException();
 
-            pageModelType = valueType.GenericTypeArguments[0];
+            PageModelType = valueType.GenericTypeArguments[0];
         }
 
         public override bool HasValue(object value)
@@ -59,7 +59,7 @@ namespace BrandUp.Pages.Content.Fields
         {
             var pageMetadataManager = services.GetRequiredService<Metadata.IPageMetadataManager>();
 
-            var pageMetadata = pageMetadataManager.FindPageMetadataByContentType(pageModelType);
+            var pageMetadata = pageMetadataManager.FindPageMetadataByContentType(PageModelType);
             if (pageMetadata == null)
                 throw new InvalidOperationException();
 
@@ -90,6 +90,11 @@ namespace BrandUp.Pages.Content.Fields
         }
 
         #endregion
+    }
+
+    public interface IPagesField : IFieldProvider
+    {
+        Type PageModelType { get; }
     }
 
     public class PagesFieldFormOptions

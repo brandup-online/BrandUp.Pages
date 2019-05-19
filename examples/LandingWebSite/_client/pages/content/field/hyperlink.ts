@@ -71,8 +71,6 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.element.appendChild(this.__urlValueInput);
 
         this.__pageValueInput = <HTMLInputElement>DOM.tag("input", { type: "text", class: "page" });
-        this.__pageValueInput.addEventListener("focus", () => { });
-        this.__pageValueInput.addEventListener("blur", () => { });
         this.__pageValueInput.addEventListener("keyup", () => {
             var title = this.__pageValueInput.value;
             if (!title || title.length < 3)
@@ -88,7 +86,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                 this.__searchRequest = ajaxRequest({
                     url: `/brandup.pages/page/search`,
                     urlParams: {
-                        title: this.__pageValueInput.value
+                        title: title
                     },
                     method: "GET",
                     success: (data: Array<PageModel>, status: number) => {

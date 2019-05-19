@@ -90,7 +90,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var findDefinition = mongoCollection.Find(Builders<PageDocument>.Filter.Text(title, "ru"));
+            var findDefinition = mongoCollection.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false, Language = "ru" }));
 
             if (pagination != null)
             {
@@ -106,14 +106,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
         {
             var count = await mongoCollection.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId);
             return count > 0;
-        }
-        public Task<IPage> GetDefaultPageAsync()
-        {
-            return FindPageByPathAsync("home");
-        }
-        public Task SetDefaultPageAsync(IPage page)
-        {
-            throw new NotImplementedException();
         }
         public async Task<PageContent> GetContentAsync(Guid pageId)
         {
@@ -137,7 +129,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 .Set(it => it.Title, title);
 
             var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
-
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }
@@ -147,8 +138,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 throw new ArgumentNullException(nameof(urlPath));
 
             var updateDefinition = Builders<PageDocument>.Update.Set(it => it.UrlPath, urlPath);
-            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
 
+            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
             if (updateResult.ModifiedCount != 1)
                 throw new InvalidOperationException();
         }

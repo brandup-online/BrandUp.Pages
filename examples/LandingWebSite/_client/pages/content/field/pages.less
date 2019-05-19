@@ -1,0 +1,110 @@
+﻿@import "../../vars.less";
+
+.website-form-field.pages {
+    position: relative;
+    line-height: 20px;
+    border-bottom: solid 1px #eee;
+    padding: 7px 0 5px;
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    height: 20px;
+    position: relative;
+
+    & input {
+        flex: 1 1 100%;
+        background: none;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        outline: none;
+        line-height: 20px;
+        display: none;
+    }
+
+    & .value {
+        flex: 1 1 100%;
+        font-weight: 500;
+        cursor: text;
+        color: #aaa;
+        display: none;
+    }
+
+    & .placeholder {
+        flex: 1 1 100%;
+        font-weight: 500;
+        cursor: text;
+        color: #aaa;
+    }
+
+    & ul.pages-menu {
+        list-style: none;
+        padding: 10px 0;
+        margin: 0;
+        position: absolute;
+        left: 0;
+        top: 30px;
+        width: 100%;
+        background: #FFFFFF;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        border: solid 1px #ddd;
+        z-index: 100;
+        display: none;
+        overflow: auto;
+        max-height: 150px;
+
+        & li {
+            padding: 0;
+            margin: 0;
+            padding: 4px 20px;
+            margin: 0;
+
+            &.text {
+                padding: 20px;
+                text-align: center;
+            }
+        }
+
+        & a {
+            color: @Text-Color;
+            text-decoration: none;
+            opacity: 0.8;
+
+            &:hover,
+            &.selected {
+                opacity: 1;
+            }
+        }
+    }
+
+    &.inputing {
+        & .placeholder {
+            display: none;
+        }
+
+        & input {
+            display: block;
+        }
+
+        & ul.pages-menu {
+            display: block;
+        }
+    }
+
+    &.has-value {
+        & .placeholder {
+            display: none;
+        }
+
+        & .value {
+            display: block;
+        }
+    }
+
+    &:hover,
+    &:focus {
+        border-bottom-color: #ddd;
+    }
+}

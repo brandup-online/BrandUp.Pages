@@ -42,9 +42,17 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return cursor.ToEnumerable();
         }
 
-        public async Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames)
+        public async Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames, string title)
         {
-            var filterDefinition = Builders<PageCollectionDocument>.Filter.Or(pageTypeNames.Select(it => Builders<PageCollectionDocument>.Filter.Eq(d => d.PageTypeName, it)));
+            var filters = new List<FilterDefinition<PageCollectionDocument>>
+            {
+                Builders<PageCollectionDocument>.Filter.Or(pageTypeNames.Select(it => Builders<PageCollectionDocument>.Filter.Eq(d => d.PageTypeName, it)))
+            };
+
+            if (!string.IsNullOrWhiteSpace(title))
+                filters.Add(Builders<PageCollectionDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false, Language = "ru" }));
+
+            var filterDefinition = Builders<PageCollectionDocument>.Filter.And(filters);
 
             var cursor = await mongoCollection
                 .Find(filterDefinition)
@@ -63,6 +71,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var updateDefinition = Builders<PageCollectionDocument>.Update
                 .Set(it => it.Title, title)
                 .Set(it => it.SortMode, pageSort);
+
             var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == id, updateDefinition);
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();

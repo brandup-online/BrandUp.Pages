@@ -65,6 +65,24 @@ namespace BrandUp.Pages.Controllers
             return Ok(result);
         }
 
+        [HttpGet, Route("brandup.pages/collection/search", Name = "BrandUp.Pages.Collection.Search")]
+        public async Task<IActionResult> SearchAsync([FromQuery]string pageType, [FromQuery]string title = null)
+        {
+            if (pageType == null)
+                return BadRequest();
+
+            var result = new List<Models.PageCollectionModel>();
+
+            var collections = await pageCollectionService.GetCollectionsAsync(pageType, title, true);
+            foreach (var pageCollection in collections)
+            {
+                var model = GetItemModel(pageCollection);
+                result.Add(model);
+            }
+
+            return Ok(result);
+        }
+
         [HttpDelete, Route("brandup.pages/collection/{id}", Name = "BrandUp.Pages.Collection.Delete")]
         public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
         {
