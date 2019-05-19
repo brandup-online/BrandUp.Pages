@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
-    public class PageCollectionAttribute : FieldProviderAttribute
+    public class PagesAttribute : FieldProviderAttribute
     {
         private Type pageModelType;
         private ConstructorInfo valueConstructor;
@@ -63,7 +63,7 @@ namespace BrandUp.Pages.Content.Fields
             if (pageMetadata == null)
                 throw new InvalidOperationException();
 
-            return new PageCollectionFieldFormOptions
+            return new PagesFieldFormOptions
             {
                 Placeholder = Placeholder,
                 PageType = pageMetadata.Name
@@ -82,7 +82,7 @@ namespace BrandUp.Pages.Content.Fields
             if (pageCollection == null)
                 return null;
 
-            return new PageCollectionFieldFormValue
+            return new PagesFieldFormValue
             {
                 Id = pageCollection.Id,
                 Title = pageCollection.Title
@@ -92,13 +92,13 @@ namespace BrandUp.Pages.Content.Fields
         #endregion
     }
 
-    public class PageCollectionFieldFormOptions
+    public class PagesFieldFormOptions
     {
         public string Placeholder { get; set; }
         public string PageType { get; set; }
     }
 
-    public class PageCollectionFieldFormValue
+    public class PagesFieldFormValue
     {
         public Guid Id { get; set; }
         public string Title { get; set; }

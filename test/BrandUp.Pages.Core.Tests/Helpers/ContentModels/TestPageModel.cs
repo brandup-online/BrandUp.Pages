@@ -18,7 +18,7 @@ namespace BrandUp.Pages.ContentModels
         [Model(Title = "Шапки страницы")]
         public List<PageHeaderContent> Headers { get; set; }
 
-        [PageCollection(Title = "Pages")]
+        [Pages(Title = "Pages")]
         public PageCollectionReference<TestPageContent> Pages { get; set; }
 
         public static TestPageContent CreateWithOnlyTitle(string title)

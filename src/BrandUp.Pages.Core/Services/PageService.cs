@@ -34,16 +34,11 @@ namespace BrandUp.Pages.Services
             if (pageType == null)
                 pageType = collection.PageTypeName;
 
-            var basePageMetadata = pageMetadataManager.FindPageMetadataByName(collection.PageTypeName);
-            if (basePageMetadata == null)
-                throw new InvalidOperationException();
+            var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
+            var pageMetadata = pageMetadataManager.GetMetadata(pageType);
 
-            var pageMetadata = pageMetadataManager.FindPageMetadataByName(pageType);
-            if (pageMetadata == null)
-                throw new ArgumentException();
-
-            if (pageMetadata != basePageMetadata && !pageMetadata.IsInherited(basePageMetadata))
-                throw new ArgumentException();
+            if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
+                throw new ArgumentException($"Тип страницы {pageType} не подходит для коллекции {collection.Title} ({collection.Id}).");
 
             var pageContentModel = pageMetadata.CreatePageModel(pageTitle);
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContentModel);

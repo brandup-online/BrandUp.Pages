@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Views
 {
-    public class ViewRenderService : IViewRenderService
+    public class RazorViewRenderService : IViewRenderService
     {
         public const string ViewData_ContentContextKeyName = "_ContentContext_";
         public const string ViewData_ViewRenderingContextKeyName = "_ViewRenderingContext_";
@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Views
         private readonly IViewLocator viewLocator;
         private readonly HtmlEncoder htmlEncoder;
 
-        public ViewRenderService(ICompositeViewEngine viewEngine, IHttpContextAccessor httpContextAccessor, IViewLocator viewLocator, HtmlEncoder htmlEncoder)
+        public RazorViewRenderService(ICompositeViewEngine viewEngine, IHttpContextAccessor httpContextAccessor, IViewLocator viewLocator, HtmlEncoder htmlEncoder)
         {
             this.viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
             this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));

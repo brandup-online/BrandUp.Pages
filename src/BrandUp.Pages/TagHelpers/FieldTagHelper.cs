@@ -25,7 +25,7 @@ namespace BrandUp.Pages.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            if (!(ViewContext.ViewData[ViewRenderService.ViewData_ContentContextKeyName] is ContentContext contentContext))
+            if (!(ViewContext.ViewData[RazorViewRenderService.ViewData_ContentContextKeyName] is ContentContext contentContext))
                 throw new InvalidOperationException();
             ContentContext = contentContext;
 

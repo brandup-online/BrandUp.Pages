@@ -20,7 +20,7 @@ namespace BrandUp.Pages.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!(ViewContext.ViewData[ViewRenderService.ViewData_ViewRenderingContextKeyName] is ViewRenderingContext contentRenderingContext))
+            if (!(ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is ViewRenderingContext contentRenderingContext))
                 throw new InvalidOperationException();
 
             output.SuppressOutput();

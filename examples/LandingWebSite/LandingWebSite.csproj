@@ -55,6 +55,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="BrandUp.Extensions.Migrations" Version="1.0.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
@@ -118,6 +119,12 @@
       <DependentUpon>BB1_Item.cshtml</DependentUpon>
     </Content>
     <Content Update="Contents\BannerBlock\BB1.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Contents\Page\Common.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Contents\Page\NewsList.cshtml.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Contents\Page\News.cshtml.json">

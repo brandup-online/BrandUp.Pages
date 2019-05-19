@@ -13,17 +13,15 @@ namespace BrandUp.Pages.Controllers
     public class PageCreateController : FormController<PageCreateForm, PageCreateValues, PageModel>
     {
         private readonly IPageService pageService;
-        private IPageCollectionService pageCollectionService;
+        private readonly IPageCollectionService pageCollectionService;
         private readonly IPageLinkGenerator pageLinkGenerator;
-        private readonly IPageUrlPathGenerator pageUrlPathGenerator;
         private IPageCollection pageCollection;
 
-        public PageCreateController(IPageService pageService, IPageCollectionService pageCollectionService, IPageLinkGenerator pageLinkGenerator, IPageUrlPathGenerator pageUrlPathGenerator)
+        public PageCreateController(IPageService pageService, IPageCollectionService pageCollectionService, IPageLinkGenerator pageLinkGenerator)
         {
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
-            this.pageUrlPathGenerator = pageUrlPathGenerator ?? throw new ArgumentNullException(nameof(pageUrlPathGenerator));
         }
 
         #region Action methods

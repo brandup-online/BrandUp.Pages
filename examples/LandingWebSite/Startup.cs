@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
 using System.Globalization;
 using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LandingWebSite
 {
@@ -54,12 +56,12 @@ namespace LandingWebSite
 
             #endregion
 
-            services.AddPages(options =>
-            {
-            })
-            .AddRazorContentPage()
-            .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-            .AddMongoDb(Configuration.GetSection("MongoDb"));
+            services.AddMongoDbContext<Models.WebSiteDbContext>(Configuration.GetSection("MongoDb"));
+
+            services.AddPages()
+                .AddRazorContentPage()
+                .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
+                .AddMongoDb<Models.WebSiteDbContext>();
 
             services
                 .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
@@ -70,6 +72,10 @@ namespace LandingWebSite
                     options.SlidingExpiration = true;
                     options.ReturnUrlParameter = "returnUrl";
                 });
+
+            services.AddMigrations(typeof(Startup).Assembly);
+            services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationStore, _migrations.MigrationStore>();
+            services.AddHostedService<MigrationService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -93,6 +99,26 @@ namespace LandingWebSite
             app.UseStaticFiles();
 
             app.UseMvc();
+        }
+    }
+
+    public class MigrationService : Microsoft.Extensions.Hosting.IHostedService
+    {
+        private readonly BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor;
+
+        public MigrationService(BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor)
+        {
+            this.migrationExecutor = migrationExecutor ?? throw new System.ArgumentNullException(nameof(migrationExecutor));
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await migrationExecutor.UpAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

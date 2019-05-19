@@ -63,6 +63,13 @@ namespace BrandUp.Pages.Metadata
 
             return ContentMetadata.IsInherited(baseMetadataProvider.ContentMetadata);
         }
+        public bool IsInheritedOrEqual(PageMetadataProvider baseMetadataProvider)
+        {
+            if (baseMetadataProvider == null)
+                throw new ArgumentNullException(nameof(baseMetadataProvider));
+
+            return ContentMetadata.IsInheritedOrEqual(baseMetadataProvider.ContentMetadata);
+        }
 
         #endregion
 
