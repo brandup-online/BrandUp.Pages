@@ -50,7 +50,7 @@ namespace BrandUp.Pages.Controllers
                     return;
                 }
 
-                if (await pageService.IsPublishedAsync(page))
+                if (!await pageService.IsPublishedAsync(page))
                 {
                     AddErrors("Нельзя создать коллекцию для страницы, которая не опубликована.");
                     return;

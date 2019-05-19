@@ -145,7 +145,7 @@ namespace BrandUp.Pages.Services
             if (collection.PageId.HasValue)
             {
                 var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value);
-                if (await IsPublishedAsync(parentPage))
+                if (!await IsPublishedAsync(parentPage))
                     return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
                 urlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);
             }

@@ -61,6 +61,7 @@ namespace BrandUp.Pages.Url
         [InlineData("/Test ", "test")]
         [InlineData("Test-", "test")]
         [InlineData("Test_", "test")]
+        [InlineData("/Test/test", "test/test")]
         public void NormalizeUrlPath(string urlPath, string validValue)
         {
             var normalizedUrlPath = pageUrlHelper.NormalizeUrlPath(urlPath);

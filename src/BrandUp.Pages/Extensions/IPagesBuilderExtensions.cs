@@ -20,7 +20,7 @@ namespace BrandUp.Pages.Builder
 
             services.Configure<RazorPagesOptions>(options =>
             {
-                options.Conventions.AddPageRoute(Url.RazorPageLinkGenerator.RazorPagePath, "{*url}");
+                options.Conventions.AddPageRoute(Url.RazorPageLinkGenerator.RazorPagePath, "{**url}");
             });
 
             services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
