@@ -35,6 +35,7 @@
     <None Remove="_client\pages\dialogs\dialog-list.ts" />
     <None Remove="_client\pages\dialogs\dialog-select-content-type.ts" />
     <None Remove="_client\pages\dialogs\dialog.ts" />
+    <None Remove="_client\pages\dialogs\page-browser.ts" />
     <None Remove="_client\pages\dialogs\page-collection-create.ts" />
     <None Remove="_client\pages\dialogs\page-collection-delete.ts" />
     <None Remove="_client\pages\dialogs\page-collection-list.ts" />
@@ -91,6 +92,7 @@
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-list.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog-select-content-type.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\dialog.ts" />
+    <TypeScriptCompile Include="_client\pages\dialogs\page-browser.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\page-collection-update.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\page-collection-delete.ts" />
     <TypeScriptCompile Include="_client\pages\dialogs\page-collection-create.ts" />

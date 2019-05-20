@@ -8,6 +8,36 @@
         align-items: stretch;
     }
 
+    & ul.tabs {
+        flex: 0 0 auto;
+        list-style: none;
+        padding: 20px 35px;
+        margin: 0;
+        display: flex;
+        flex-flow: row nowrap;
+        overflow: auto;
+
+        & li {
+            padding: 0 20px 0 0;
+            margin: 0;
+        }
+
+        & a {
+            text-decoration: none;
+            color: @Text-Color;
+            opacity: 0.8;
+
+            &:hover {
+                opacity: 0.9;
+            }
+
+            &.selected {
+                color: @Accent-Color;
+                opacity: 1;
+            }
+        }
+    }
+
     & .items {
         flex: 1 1 100%;
         padding: 0;
