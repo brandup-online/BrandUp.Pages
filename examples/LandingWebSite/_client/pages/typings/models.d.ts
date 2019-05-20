@@ -5,6 +5,7 @@
     title: string;
     pageType: string;
     sort: "FirstOld" | "FirstNew";
+    pageUrl: string;
 }
 
 interface PageModel {

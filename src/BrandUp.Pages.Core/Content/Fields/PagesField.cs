@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BrandUp.Pages.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -84,17 +85,26 @@ namespace BrandUp.Pages.Content.Fields
             if (!HasValue(modelValue))
                 return null;
 
-            var pageCollectionService = services.GetRequiredService<Interfaces.IPageCollectionService>();
+            var pageCollectionService = services.GetRequiredService<IPageCollectionService>();
 
             var value = (IPageCollectionReference)modelValue;
             var pageCollection = await pageCollectionService.FindCollectiondByIdAsync(value.CollectionId);
             if (pageCollection == null)
                 return null;
 
+            string pageUrl = "/";
+            if (pageCollection.PageId.HasValue)
+            {
+                var pageService = services.GetRequiredService<IPageService>();
+                var page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
+                pageUrl = page.UrlPath;
+            }
+
             return new PagesFieldFormValue
             {
                 Id = pageCollection.Id,
-                Title = pageCollection.Title
+                Title = pageCollection.Title,
+                PageUrl = pageUrl
             };
         }
 
@@ -117,5 +127,6 @@ namespace BrandUp.Pages.Content.Fields
     {
         public Guid Id { get; set; }
         public string Title { get; set; }
+        public string PageUrl { get; set; }
     }
 }

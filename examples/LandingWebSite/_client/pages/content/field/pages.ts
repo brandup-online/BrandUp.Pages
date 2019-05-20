@@ -57,7 +57,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                                 for (let i = 0; i < data.length; i++) {
                                     let collection = data[i];
 
-                                    this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id }, collection.title)));
+                                    this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id, "data-url": collection.pageUrl }, collection.title + ": " + collection.pageUrl)));
                                 }
 
                                 break;
@@ -96,15 +96,16 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
         this.registerCommand("select", (elem: HTMLElement) => {
             this.element.classList.remove("inputing");
-            this.element.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
             let pageCollectionId = elem.getAttribute("data-value");
-            this.inputElem.setAttribute("value-collection-id", pageCollectionId);
-            this.inputElem.value = elem.innerText;
-            this.valueElem.innerText = elem.innerText;
+            let pageUrl = elem.getAttribute("data-url");
 
-            this.__refreshUI();
+            this.setValue({
+                id: pageCollectionId,
+                title: elem.innerText,
+                pageUrl: pageUrl
+            });
 
             this.form.queue.request({
                 url: `/brandup.pages/content/pages`,
@@ -135,11 +136,13 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
     setValue(value: PagesFieldFormValue) {
         if (!value) {
             this.inputElem.removeAttribute("value-collection-id");
+            this.inputElem.value = "";
+            this.valueElem.innerText = "";
         }
         else {
             this.inputElem.setAttribute("value-collection-id", value.id);
             this.inputElem.value = value.title;
-            this.valueElem.innerText = value.title;
+            this.valueElem.innerText = value.title + ": " + value.pageUrl;
         }
 
         this.__refreshUI();
@@ -164,4 +167,5 @@ export interface PagesFieldFormOptions {
 export interface PagesFieldFormValue {
     id: string;
     title: string;
+    pageUrl: string;
 }

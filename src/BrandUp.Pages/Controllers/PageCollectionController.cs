@@ -10,10 +10,14 @@ namespace BrandUp.Pages.Controllers
     public class PageCollectionController : ControllerBase
     {
         private readonly IPageCollectionService pageCollectionService;
+        private readonly IPageService pageService;
+        private readonly Url.IPageLinkGenerator pageLinkGenerator;
 
-        public PageCollectionController(IPageCollectionService pageCollectionService)
+        public PageCollectionController(IPageCollectionService pageCollectionService, IPageService pageService, Url.IPageLinkGenerator pageLinkGenerator)
         {
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
+            this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
+            this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
         }
 
         #region Action methods
@@ -25,7 +29,7 @@ namespace BrandUp.Pages.Controllers
             if (pageCollection == null)
                 return NotFound();
 
-            var model = GetItemModel(pageCollection);
+            var model = await GetItemModelAsync(pageCollection);
 
             return Ok(model);
         }
@@ -56,11 +60,7 @@ namespace BrandUp.Pages.Controllers
 
             var collections = await pageCollectionService.GetCollectionsAsync(pageId);
             foreach (var pageCollection in collections)
-            {
-                var model = GetItemModel(pageCollection);
-
-                result.Add(model);
-            }
+                result.Add(await GetItemModelAsync(pageCollection));
 
             return Ok(result);
         }
@@ -75,10 +75,7 @@ namespace BrandUp.Pages.Controllers
 
             var collections = await pageCollectionService.GetCollectionsAsync(pageType, title, true);
             foreach (var pageCollection in collections)
-            {
-                var model = GetItemModel(pageCollection);
-                result.Add(model);
-            }
+                result.Add(await GetItemModelAsync(pageCollection));
 
             return Ok(result);
         }
@@ -99,8 +96,15 @@ namespace BrandUp.Pages.Controllers
 
         #region Helper methods
 
-        private static Models.PageCollectionModel GetItemModel(IPageCollection pageCollection)
+        private async Task<Models.PageCollectionModel> GetItemModelAsync(IPageCollection pageCollection)
         {
+            string pageUrl = "/";
+            if (pageCollection.PageId.HasValue)
+            {
+                IPage page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
+                pageUrl = await pageLinkGenerator.GetUrlAsync(page);
+            }
+
             return new Models.PageCollectionModel
             {
                 Id = pageCollection.Id,
@@ -108,10 +112,11 @@ namespace BrandUp.Pages.Controllers
                 PageId = pageCollection.PageId,
                 Title = pageCollection.Title,
                 PageType = pageCollection.PageTypeName,
-                Sort = pageCollection.SortMode
+                Sort = pageCollection.SortMode,
+                PageUrl = pageUrl
             };
         }
-        private IActionResult WithResult(BrandUp.Pages.Result result)
+        private IActionResult WithResult(Result result)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
