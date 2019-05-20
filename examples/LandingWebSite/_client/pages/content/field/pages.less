@@ -27,8 +27,11 @@
         flex: 1 1 100%;
         font-weight: 500;
         cursor: text;
-        color: #aaa;
         display: none;
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
     & .placeholder {
@@ -71,25 +74,16 @@
             color: @Text-Color;
             text-decoration: none;
             opacity: 0.8;
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
 
             &:hover,
             &.selected {
                 opacity: 1;
             }
-        }
-    }
-
-    &.inputing {
-        & .placeholder {
-            display: none;
-        }
-
-        & input {
-            display: block;
-        }
-
-        & ul.pages-menu {
-            display: block;
         }
     }
 
@@ -99,6 +93,24 @@
         }
 
         & .value {
+            display: block;
+        }
+    }
+
+    &.inputing {
+        & .placeholder {
+            display: none;
+        }
+
+        & .value {
+            display: none;
+        }
+
+        & input {
+            display: block;
+        }
+
+        & ul.pages-menu {
             display: block;
         }
     }

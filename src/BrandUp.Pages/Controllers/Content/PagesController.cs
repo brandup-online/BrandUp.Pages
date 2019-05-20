@@ -8,9 +8,21 @@ namespace BrandUp.Pages.Controllers
     public class PagesController : FieldController<IPagesField>
     {
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody]Guid? pageCollectionId = null)
+        public async Task<IActionResult> PostAsync([FromQuery]Guid? pageCollectionId = null)
         {
-            var currentModelValue = Field.GetModelValue(ContentContext.Content) as IPageCollectionReference;
+            object newValue;
+            if (pageCollectionId.HasValue)
+                newValue = Field.CreateValue(pageCollectionId.Value);
+            else
+            {
+                if (Field.AllowNull)
+                    newValue = null;
+                else
+                    newValue = Field.CreateValue(Guid.Empty);
+            }
+
+            Field.SetModelValue(ContentContext.Content, newValue);
+            await SaveChangesAsync();
 
             return await FormValueAsync();
         }

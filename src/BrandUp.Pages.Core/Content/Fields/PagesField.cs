@@ -10,7 +10,16 @@ namespace BrandUp.Pages.Content.Fields
         private ConstructorInfo valueConstructor;
 
         public string Placeholder { get; set; }
+
+        #region IPagesField members
+
         public Type PageModelType { get; private set; }
+        public IPageCollectionReference CreateValue(Guid collectionId)
+        {
+            return (IPageCollectionReference)valueConstructor.Invoke(new object[] { collectionId });
+        }
+
+        #endregion
 
         #region FieldProviderAttribute members
 
@@ -95,6 +104,7 @@ namespace BrandUp.Pages.Content.Fields
     public interface IPagesField : IFieldProvider
     {
         Type PageModelType { get; }
+        IPageCollectionReference CreateValue(Guid collectionId);
     }
 
     public class PagesFieldFormOptions

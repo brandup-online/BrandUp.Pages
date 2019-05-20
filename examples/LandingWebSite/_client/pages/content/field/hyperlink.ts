@@ -184,7 +184,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.element.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
-            let pageId = <HyperLinkType>elem.getAttribute("data-value");
+            let pageId = elem.getAttribute("data-value");
             this.__pageValueInput.setAttribute("value-page-id", pageId);
             this.__valueElem.innerText = elem.innerText;
             this.__pageValueInput.value = elem.innerText;

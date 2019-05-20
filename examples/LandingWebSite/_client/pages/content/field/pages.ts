@@ -49,15 +49,15 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                         title: title
                     },
                     method: "GET",
-                    success: (data: Array<PageModel>, status: number) => {
+                    success: (data: Array<PageCollectionModel>, status: number) => {
                         switch (status) {
                             case 200:
                                 DOM.empty(this.searchElem);
 
                                 for (let i = 0; i < data.length; i++) {
-                                    let page = data[i];
+                                    let collection = data[i];
 
-                                    this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
+                                    this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id }, collection.title)));
                                 }
 
                                 break;
@@ -93,14 +93,66 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
             document.body.addEventListener("mousedown", this.__closeMenuFunc, false);
         });
+
+        this.registerCommand("select", (elem: HTMLElement) => {
+            this.element.classList.remove("inputing");
+            this.element.classList.remove("opened-pages");
+            document.body.removeEventListener("click", this.__closeMenuFunc, false);
+
+            let pageCollectionId = elem.getAttribute("data-value");
+            this.inputElem.setAttribute("value-collection-id", pageCollectionId);
+            this.inputElem.value = elem.innerText;
+            this.valueElem.innerText = elem.innerText;
+
+            this.__refreshUI();
+
+            this.form.queue.request({
+                url: `/brandup.pages/content/pages`,
+                urlParams: {
+                    editId: this.form.editId,
+                    path: this.form.contentPath,
+                    field: this.name,
+                    pageCollectionId: pageCollectionId
+                },
+                method: "POST",
+                success: (data: PagesFieldFormValue, status: number) => {
+                    switch (status) {
+                        case 200:
+                            this.setValue(data);
+
+                            break;
+                        default:
+                            throw "";
+                    }
+                }
+            });
+        });
+
+        this.__refreshUI();
     }
 
     getValue(): PagesFieldFormValue { throw new Error("Method not implemented."); }
     setValue(value: PagesFieldFormValue) {
-        
+        if (!value) {
+            this.inputElem.removeAttribute("value-collection-id");
+        }
+        else {
+            this.inputElem.setAttribute("value-collection-id", value.id);
+            this.inputElem.value = value.title;
+            this.valueElem.innerText = value.title;
+        }
+
+        this.__refreshUI();
     }
     hasValue(): boolean {
-        return false;
+        return this.inputElem.hasAttribute("value-collection-id");
+    }
+
+    private __refreshUI() {
+        if (this.hasValue())
+            this.element.classList.add("has-value");
+        else
+            this.element.classList.remove("has-value");
     }
 }
 
