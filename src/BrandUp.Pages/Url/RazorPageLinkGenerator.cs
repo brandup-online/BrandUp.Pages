@@ -38,7 +38,7 @@ namespace BrandUp.Pages.Url
 
             return Task.FromResult(pageUrl);
         }
-        public Task<string> GetUrlAsync(IPageEditSession pageEditSession, CancellationToken cancellationToken = default)
+        public Task<string> GetUrlAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
         {
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));

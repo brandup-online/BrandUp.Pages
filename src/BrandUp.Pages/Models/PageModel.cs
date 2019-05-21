@@ -18,4 +18,10 @@ namespace BrandUp.Pages.Models
         Draft,
         Published
     }
+
+    public class BeginPageEditResult
+    {
+        public DateTime? CurrentDate { get; set; }
+        public string Url { get; set; }
+    }
 }

@@ -65,3 +65,38 @@ button.brandup-pages-toolbar-button {
         opacity: 1;
     }
 }
+
+.brandup-pages-toolbar-popup {
+    position: absolute;
+    right: 0;
+    bottom: 60px;
+    min-width: 250px;
+    padding: 30px 0;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+
+    & .text {
+        padding: 0 30px 20px;
+    }
+
+    & .buttons {
+        display: flex;
+        flex-flow: row nowrap;
+        margin: 0 25px;
+
+        & button {
+            background: @Accent-Color;
+            color: @Main-Color;
+            border: 0;
+            border-radius: @Border-Radius;
+            outline: none;
+            height: 42px;
+            box-sizing: border-box;
+            padding: 0 20px;
+            white-space: nowrap;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+    }
+}

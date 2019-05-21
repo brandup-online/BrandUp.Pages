@@ -12,7 +12,7 @@ namespace BrandUp.Pages
     public sealed class ContentPageModel : AppPageModel
     {
         private IPage page;
-        private IPageEditSession editSession;
+        private IPageEdit editSession;
 
         #region Properties
 
@@ -53,7 +53,7 @@ namespace BrandUp.Pages
                     return;
                 }
 
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditService>();
                 editSession = await pageEditingService.FindEditSessionById(editId);
                 if (editSession == null)
                 {
@@ -70,7 +70,7 @@ namespace BrandUp.Pages
 
                 var administrationManager = HttpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
 
-                if (!await administrationManager.CheckAsync() || await administrationManager.GetUserIdAsync() != editSession.ContentManagerId)
+                if (!await administrationManager.CheckAsync() || await administrationManager.GetUserIdAsync() != editSession.UserId)
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 
@@ -99,7 +99,7 @@ namespace BrandUp.Pages
 
             if (editSession != null)
             {
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditService>();
                 PageContent = await pageEditingService.GetContentAsync(editSession);
             }
             else
@@ -117,14 +117,31 @@ namespace BrandUp.Pages
 
         #region Handler methods
 
-        public async Task<IActionResult> OnPostBeginEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        public async Task<IActionResult> OnPostBeginEditAsync([FromQuery]bool force, [FromServices]IPageEditService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
         {
             if (editSession != null)
                 return BadRequest();
 
-            editSession = await pageEditingService.BeginEditAsync(page);
+            var result = new Models.BeginPageEditResult();
 
-            return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(editSession));
+            var currentEdit = await pageEditingService.FindEditByUserAsync(page, HttpContext.RequestAborted);
+            if (currentEdit != null)
+            {
+                if (force)
+                {
+                    await pageEditingService.DiscardEditSession(currentEdit, HttpContext.RequestAborted);
+                    currentEdit = null;
+                }
+                else
+                    result.CurrentDate = currentEdit.CreatedDate;
+            }
+
+            if (currentEdit == null)
+                currentEdit = await pageEditingService.BeginEditAsync(page, HttpContext.RequestAborted);
+
+            result.Url = await pageLinkGenerator.GetUrlAsync(currentEdit, HttpContext.RequestAborted);
+
+            return new OkObjectResult(result);
         }
 
         public async Task<IActionResult> OnGetFormModelAsync([FromQuery]string contentPath)
@@ -162,7 +179,7 @@ namespace BrandUp.Pages
             return new OkObjectResult(formModel);
         }
 
-        public async Task<IActionResult> OnPostCommitEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        public async Task<IActionResult> OnPostCommitEditAsync([FromServices]IPageEditService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
         {
             if (editSession == null)
                 return BadRequest();
@@ -173,7 +190,7 @@ namespace BrandUp.Pages
             return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(page));
         }
 
-        public async Task<IActionResult> OnPostDiscardEditAsync([FromServices]IPageEditingService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        public async Task<IActionResult> OnPostDiscardEditAsync([FromServices]IPageEditService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
         {
             if (editSession == null)
                 return BadRequest();

@@ -33,7 +33,7 @@ namespace BrandUp.Pages.Builder
             services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IPageEditingService, PageEditingService>();
+            services.AddScoped<IPageEditService, PageEditService>();
             services.AddScoped<Files.FileService>();
         }
     }

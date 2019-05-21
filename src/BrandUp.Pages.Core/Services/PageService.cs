@@ -172,7 +172,7 @@ namespace BrandUp.Pages.Services
 
             try
             {
-                await pageRepositiry.DeletePageAsync(page.Id, cancellationToken);
+                await pageRepositiry.DeletePageAsync(page, cancellationToken);
 
                 return Result.Success;
             }

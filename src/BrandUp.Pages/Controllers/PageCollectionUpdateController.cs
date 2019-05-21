@@ -66,9 +66,12 @@ namespace BrandUp.Pages.Controllers
         }
         protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionUpdateValues values)
         {
-            var updatedPageCollection = await pageCollectionService.UpdateCollectionAsync(pageCollection.Id, values.Title, values.Sort);
+            pageCollection.SetTitle(values.Title);
+            pageCollection.SetSortModel(values.Sort);
 
-            return GetPageCollectionModel(updatedPageCollection);
+            await pageCollectionService.UpdateCollectionAsync(pageCollection, HttpContext.RequestAborted);
+
+            return GetPageCollectionModel(pageCollection);
         }
 
         #endregion

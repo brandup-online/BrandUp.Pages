@@ -10,7 +10,7 @@ namespace BrandUp.Pages.MongoDb
 
         public IMongoCollection<PageCollectionDocument> PageCollections => GetCollection<PageCollectionDocument>();
         public IMongoCollection<PageDocument> Pages => GetCollection<PageDocument>();
-        public IMongoCollection<PageEditSessionDocument> PageEditSessions => GetCollection<PageEditSessionDocument>();
+        public IMongoCollection<PageEditDocument> PageEditSessions => GetCollection<PageEditDocument>();
         public IMongoCollection<PageContentDocument> Contents => GetCollection<PageContentDocument>();
         public IMongoCollection<PageRecyclebinDocument> PageRecyclebin => GetCollection<PageRecyclebinDocument>();
     }

@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
@@ -68,29 +69,24 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return cursor.ToEnumerable();
         }
 
-        public async Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort)
+        public async Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
         {
-            var filter = Builders<PageCollectionDocument>.Filter.Eq(it => it.Id, id);
-            var cursor = await documents.FindAsync(filter);
-            var collection = await cursor.SingleOrDefaultAsync();
+            var collectionDocument = (PageCollectionDocument)collection;
+            var curVersion = collectionDocument.Version;
+            collectionDocument.Version++;
 
-            collection.Title = title;
-            collection.SortMode = pageSort;
-
-            var updateDefinition = Builders<PageCollectionDocument>.Update
-                .Set(it => it.Title, title)
-                .Set(it => it.SortMode, pageSort);
-
-            var updateResult = await documents.UpdateOneAsync(filter, updateDefinition);
+            var updateResult = await documents.ReplaceOneAsync(it => it.Id == collection.Id && it.Version == curVersion, collectionDocument, cancellationToken: cancellationToken);
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
-
-            return collection;
         }
 
-        public async Task DeleteCollectionAsync(Guid id)
+        public async Task DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
         {
-            var deleteResult = await documents.DeleteOneAsync(it => it.Id == id);
+            var collectionDocument = (PageCollectionDocument)collection;
+            var curVersion = collectionDocument.Version;
+            collectionDocument.Version++;
+
+            var deleteResult = await documents.DeleteOneAsync(it => it.Id == collection.Id && it.Version == curVersion, cancellationToken: cancellationToken);
             if (deleteResult.DeletedCount != 1)
                 throw new InvalidOperationException();
         }

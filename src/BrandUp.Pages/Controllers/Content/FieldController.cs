@@ -14,15 +14,15 @@ namespace BrandUp.Pages.Controllers
         where TField : class, IFieldProvider
     {
         private IPageService pageService;
-        private IPageEditingService pageEditingService;
+        private IPageEditService pageEditingService;
         private IPage page;
-        private IPageEditSession editSession;
+        private IPageEdit editSession;
         private ContentContext contentContext;
         private TField field;
         private ContentContext rootContentContext;
 
         public IPage Page => page;
-        public IPageEditSession ContentEdit => editSession;
+        public IPageEdit ContentEdit => editSession;
         public TField Field => field;
         public ContentContext ContentContext => contentContext;
 
@@ -31,7 +31,7 @@ namespace BrandUp.Pages.Controllers
         async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             pageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
-            pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditingService>();
+            pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditService>();
 
             if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))
             {
@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            editSession = await pageEditingService.FindEditSessionById(editId);
+            editSession = await pageEditingService.FindEditSessionById(editId, HttpContext.RequestAborted);
             if (editSession == null)
             {
                 context.Result = BadRequest();
@@ -53,7 +53,7 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            var content = await pageEditingService.GetContentAsync(editSession);
+            var content = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
 
             rootContentContext = new ContentContext(page, content, HttpContext.RequestServices);
 

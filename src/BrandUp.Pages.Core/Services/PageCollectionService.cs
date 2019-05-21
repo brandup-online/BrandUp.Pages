@@ -2,6 +2,7 @@
 using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Services
@@ -64,12 +65,12 @@ namespace BrandUp.Pages.Services
             return repositiry.GetCollectionsAsync(pageTypeNames.ToArray(), title);
         }
 
-        public Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort)
+        public Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
         {
-            return repositiry.UpdateCollectionAsync(id, title, pageSort);
+            return repositiry.UpdateCollectionAsync(collection, cancellationToken);
         }
 
-        public async Task<Result> DeleteCollectionAsync(IPageCollection collection)
+        public async Task<Result> DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
@@ -79,7 +80,7 @@ namespace BrandUp.Pages.Services
 
             try
             {
-                await repositiry.DeleteCollectionAsync(collection.Id);
+                await repositiry.DeleteCollectionAsync(collection, cancellationToken);
 
                 return Result.Success;
             }

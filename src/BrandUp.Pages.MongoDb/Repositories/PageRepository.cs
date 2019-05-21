@@ -14,7 +14,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         readonly IMongoCollection<PageDocument> documents;
         readonly IMongoCollection<PageContentDocument> contentDocuments;
         readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments;
-        readonly IMongoCollection<PageEditSessionDocument> editDocuments;
+        readonly IMongoCollection<PageEditDocument> editDocuments;
 
         public PageRepository(IPagesDbContext dbContext)
         {
@@ -180,23 +180,27 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id, (PageDocument)page);
+            var pageDocument = (PageDocument)page;
+            var curVersion = pageDocument.Version;
+            pageDocument.Version++;
+
+            var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id && it.Version == curVersion, pageDocument);
             if (replaceResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }
-        public async Task DeletePageAsync(Guid pageId, CancellationToken cancellationToken = default)
+        public async Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
+            var pageDocument = (PageDocument)page;
+            var curVersion = pageDocument.Version;
+            pageDocument.Version++;
+
             using (var session = await documents.Database.Client.StartSessionAsync())
             {
                 session.StartTransaction();
 
                 try
                 {
-                    var page = await (await documents.Find(it => it.Id == pageId).ToCursorAsync(cancellationToken)).SingleOrDefaultAsync(cancellationToken);
-                    if (page == null)
-                        throw new InvalidOperationException();
-
-                    var pageContent = await (await contentDocuments.Find(it => it.PageId == pageId).ToCursorAsync(cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+                    var pageContent = await (await contentDocuments.Find(it => it.PageId == page.Id).ToCursorAsync(cancellationToken)).SingleOrDefaultAsync(cancellationToken);
                     if (pageContent == null)
                         throw new InvalidOperationException();
 
@@ -208,20 +212,20 @@ namespace BrandUp.Pages.MongoDb.Repositories
                         TypeName = page.TypeName,
                         Title = page.Title,
                         UrlPath = page.UrlPath,
-                        Status = page.Status,
+                        Status = pageDocument.Status,
                         Content = pageContent.Data
                     };
                     await recyclebinDocuments.InsertOneAsync(recycleBinDocument, new InsertOneOptions(), cancellationToken);
 
-                    var pageDeleteResult = await documents.DeleteOneAsync(it => it.Id == pageId, cancellationToken);
+                    var pageDeleteResult = await documents.DeleteOneAsync(it => it.Id == page.Id && it.Version == curVersion, cancellationToken);
                     if (pageDeleteResult.DeletedCount != 1)
                         throw new InvalidOperationException();
 
-                    var contentDeleteResult = await contentDocuments.DeleteOneAsync(it => it.PageId == pageId, cancellationToken);
+                    var contentDeleteResult = await contentDocuments.DeleteOneAsync(it => it.PageId == page.Id, cancellationToken);
                     if (contentDeleteResult.DeletedCount != 1)
                         throw new InvalidOperationException();
 
-                    await editDocuments.DeleteManyAsync(it => it.PageId == pageId, cancellationToken);
+                    await editDocuments.DeleteManyAsync(it => it.PageId == page.Id, cancellationToken);
 
                     await session.CommitTransactionAsync();
                 }

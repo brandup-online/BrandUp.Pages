@@ -85,9 +85,9 @@ namespace BrandUp.Pages.Controllers
         {
             var pageCollection = await pageCollectionService.FindCollectiondByIdAsync(id);
             if (pageCollection == null)
-                return WithResult(BrandUp.Pages.Result.Failed($"Not found page collection with id \"{id}\"."));
+                return WithResult(Result.Failed($"Not found page collection with id \"{id}\"."));
 
-            var deleteResult = await pageCollectionService.DeleteCollectionAsync(pageCollection);
+            var deleteResult = await pageCollectionService.DeleteCollectionAsync(pageCollection, HttpContext.RequestAborted);
 
             return WithResult(deleteResult);
         }

@@ -16,7 +16,7 @@ namespace BrandUp.Pages.Interfaces
         Task<PageContent> GetContentAsync(Guid pageId);
         Task SetContentAsync(Guid pageId, string title, PageContent content);
         Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default);
-        Task DeletePageAsync(Guid pageId, CancellationToken cancellationToken = default);
+        Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default);
     }
 
     public class PageContent

@@ -99,16 +99,15 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
-        public Task DeletePageAsync(Guid pageId, CancellationToken cancellationToken = default)
+        public Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            if (!pageIds.TryGetValue(pageId, out int index))
+            if (!pageIds.TryGetValue(page.Id, out int index))
                 throw new InvalidOperationException();
-            var page = pages[index];
 
             pageHierarhy.OnRemovePage(page);
 
             pages.Remove(index);
-            pageIds.Remove(pageId);
+            pageIds.Remove(page.Id);
             pagePaths.Remove(page.UrlPath.ToLower());
             pageContents.Remove(index);
 

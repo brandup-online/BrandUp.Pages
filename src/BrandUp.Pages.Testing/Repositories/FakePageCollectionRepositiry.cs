@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Repositories
@@ -48,27 +49,23 @@ namespace BrandUp.Pages.Repositories
             var pageCollections = pageHierarhy.OnGetCollections(pageId);
             return Task.FromResult(pageCollections);
         }
-        public Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort)
+        public Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
         {
-            if (!collectionIds.TryGetValue(id, out int index))
+            if (!collectionIds.TryGetValue(collection.Id, out int index))
                 throw new InvalidOperationException();
 
-            var collection = collections[index];
+            collections[index] = (PageCollection)collection;
 
-            collection.Title = title;
-            collection.SortMode = pageSort;
-
-            return Task.FromResult<IPageCollection>(collection);
+            return Task.CompletedTask;
         }
-        public Task DeleteCollectionAsync(Guid id)
+        public Task DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
         {
-            if (!collectionIds.TryGetValue(id, out int index))
+            if (!collectionIds.TryGetValue(collection.Id, out int index))
                 throw new InvalidOperationException();
-            var collection = collections[index];
 
             pageHierarhy.OnRemoveCollection(collection);
 
-            collectionIds.Remove(id);
+            collectionIds.Remove(collection.Id);
             collections.Remove(index);
 
             return Task.CompletedTask;
@@ -107,6 +104,15 @@ namespace BrandUp.Pages.Repositories
                 Title = title;
                 PageTypeName = pageTypeName;
                 PageId = pageId;
+            }
+
+            void IPageCollection.SetSortModel(PageSortMode sortMode)
+            {
+                SortMode = sortMode;
+            }
+            void IPageCollection.SetTitle(string newTitle)
+            {
+                Title = newTitle ?? throw new ArgumentNullException(nameof(newTitle));
             }
         }
     }

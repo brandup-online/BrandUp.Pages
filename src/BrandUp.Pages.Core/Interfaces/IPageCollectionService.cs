@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Interfaces
@@ -11,8 +12,8 @@ namespace BrandUp.Pages.Interfaces
         Task<IPageCollection> FindCollectiondByIdAsync(Guid id);
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId);
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, string title, bool includeDerivedTypes);
-        Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort);
-        Task<Result> DeleteCollectionAsync(IPageCollection collection);
+        Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
+        Task<Result> DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
         Task<List<PageMetadataProvider>> GetPageTypesAsync(IPageCollection collection);
     }
 
@@ -24,5 +25,8 @@ namespace BrandUp.Pages.Interfaces
         string PageTypeName { get; }
         Guid? PageId { get; }
         PageSortMode SortMode { get; }
+
+        void SetTitle(string newTitle);
+        void SetSortModel(PageSortMode sortMode);
     }
 }

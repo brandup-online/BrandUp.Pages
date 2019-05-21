@@ -106,12 +106,13 @@ namespace BrandUp.Pages.Services
         {
             var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
 
-            var updatedPageCollection = await pageCollectionService.UpdateCollectionAsync(pageCollection.Id, "New title", PageSortMode.FirstNew);
+            pageCollection.SetTitle("New title");
+            pageCollection.SetSortModel(PageSortMode.FirstNew);
 
-            Assert.NotNull(updatedPageCollection);
-            Assert.Equal(pageCollection.Id, updatedPageCollection.Id);
-            Assert.Equal("New title", updatedPageCollection.Title);
-            Assert.Equal(PageSortMode.FirstNew, updatedPageCollection.SortMode);
+            await pageCollectionService.UpdateCollectionAsync(pageCollection);
+
+            Assert.Equal("New title", pageCollection.Title);
+            Assert.Equal(PageSortMode.FirstNew, pageCollection.SortMode);
         }
 
         [Fact]

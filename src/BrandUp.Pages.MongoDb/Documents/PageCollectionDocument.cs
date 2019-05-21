@@ -18,6 +18,15 @@ namespace BrandUp.Pages.MongoDb.Documents
         public PageSortMode SortMode { get; set; }
         [BsonIgnoreIfNull, BsonRepresentation(BsonType.String)]
         public Guid? PageId { get; set; }
+
+        void IPageCollection.SetSortModel(PageSortMode sortMode)
+        {
+            SortMode = sortMode;
+        }
+        void IPageCollection.SetTitle(string newTitle)
+        {
+            Title = newTitle ?? throw new ArgumentNullException(nameof(newTitle));
+        }
     }
 
     public class PageCollectionDocumentContextType : MongoDB.MongoDbCollectionContext<PageCollectionDocument>

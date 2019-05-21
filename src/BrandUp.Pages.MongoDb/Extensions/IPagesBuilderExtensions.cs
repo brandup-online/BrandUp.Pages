@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Builder
             services.AddSingleton<IPageCollectionRepositiry, PageCollectionRepository>();
             services.AddSingleton<IPageRepositiry, PageRepository>();
             services.AddSingleton<IFileRepository, PageFileRepository>();
-            services.AddSingleton<IPageEditSessionRepository, PageEditSessionRepository>();
+            services.AddSingleton<IPageEditRepository, PageEditRepository>();
         }
     }
 }
