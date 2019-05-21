@@ -12,6 +12,8 @@ namespace BrandUp.Pages.Content.Fields
         private static readonly Type ListGenericTypeDefinition = typeof(List<>);
         private ConstructorInfo listConstructor;
 
+        public string AddText { get; set; }
+
         #region  IListField members
 
         public ContentMetadataProvider ValueContentMetadata { get; private set; }
@@ -113,6 +115,7 @@ namespace BrandUp.Pages.Content.Fields
         {
             var options = new ModelFieldFormOptions
             {
+                AddText = AddText,
                 IsListValue = IsListValue,
                 ItemTypes = new List<ContentItemType>()
             };
@@ -200,6 +203,7 @@ namespace BrandUp.Pages.Content.Fields
     public class ModelFieldFormOptions
     {
         public bool IsListValue { get; set; }
+        public string AddText { get; set; }
         public List<ContentItemType> ItemTypes { get; set; }
     }
 

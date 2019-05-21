@@ -1,7 +1,7 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
 import { DOM } from "brandup-ui";
-import "./content.less";
+import "./model.less";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { editPage } from "../../dialogs/page-edit";
@@ -96,13 +96,14 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
         this.__itemsElem.appendChild(DOM.tag("div", { class: "item new" }, [
             DOM.tag("div", { class: "index" }, `#${i + 1}`),
-            DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, "Добавить баннер")
+            DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, this.options.addText ? this.options.addText : "Добавить")
         ]));
     }
     private __createItemElem(item: ContentModel, index: number) {
         let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString(), draggable: "true" }, [
             DOM.tag("div", { class: "index" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),
+            DOM.tag("div", { class: "type" }, item.type.title),
             DOM.tag("ul", null, [
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-settings" }, iconEdit)),
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-delete" }, iconDelete))
@@ -192,6 +193,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 }
 
 export interface ModelDesignerOptions {
+    addText: string;
     isListValue: boolean;
     itemTypes: Array<ContentTypeModel>;
 }
