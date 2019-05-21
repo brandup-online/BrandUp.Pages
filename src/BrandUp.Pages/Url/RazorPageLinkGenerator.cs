@@ -27,20 +27,14 @@ namespace BrandUp.Pages.Url
                 throw new ArgumentNullException(nameof(page));
 
             string pageUrl;
+            string urlPath;
             var httpContext = httpContextAccessor.HttpContext;
-
-            if (page.UrlPath == null)
-                pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { pageId = page.Id.ToString().ToLower() });
+            if (pageUrlHelper.IsDefaultUrlPath(page.UrlPath))
+                urlPath = string.Empty;
             else
-            {
-                string urlPath;
-                if (pageUrlHelper.IsDefaultUrlPath(page.UrlPath))
-                    urlPath = string.Empty;
-                else
-                    urlPath = pageUrlHelper.NormalizeUrlPath(page.UrlPath);
+                urlPath = pageUrlHelper.NormalizeUrlPath(page.UrlPath);
 
-                pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { url = urlPath });
-            }
+            pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
         }

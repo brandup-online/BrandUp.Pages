@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Interfaces
         Task<bool> HasPagesAsync(Guid сollectionId);
         Task<PageContent> GetContentAsync(Guid pageId);
         Task SetContentAsync(Guid pageId, string title, PageContent content);
-        Task SetUrlPathAsync(Guid pageId, string urlPath);
+        Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default);
         Task DeletePageAsync(Guid pageId);
     }
 

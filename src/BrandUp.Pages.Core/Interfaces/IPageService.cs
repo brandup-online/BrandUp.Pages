@@ -19,21 +19,20 @@ namespace BrandUp.Pages.Interfaces
         Task SetPageContentAsync(IPage page, object contentModel);
         Task<Result> PublishPageAsync(IPage page, string urlPath);
         Task<Result> DeletePageAsync(IPage page);
-        Task<bool> IsPublishedAsync(IPage page);
         Task<Guid?> GetParentPageIdAsync(IPage page);
     }
 
-    public interface IPage// : Content.IContentEntry
+    public interface IPage
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }
         string TypeName { get; }
         Guid OwnCollectionId { get; }
         string Title { get; set; }
-        string UrlPath { get; set; }
+        string UrlPath { get; }
+        bool IsPublished { get; }
 
-        //bool IsDeleted { get; set; }
-        //bool IsDraft { get; set; }
+        Task SetUrlAsync(string urlPath);
     }
 
     public enum PageSortMode

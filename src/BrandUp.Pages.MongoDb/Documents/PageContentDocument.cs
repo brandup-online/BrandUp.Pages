@@ -13,8 +13,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         public Guid Id { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid PageId { get; set; }
-        [BsonRequired, BsonRepresentation(BsonType.String)]
-        public Guid? EditId { get; set; }
         [BsonRequired]
         public BsonDocument Data { get; set; }
     }
@@ -23,7 +21,7 @@ namespace BrandUp.Pages.MongoDb.Documents
     {
         protected override void OnSetupCollection(CancellationToken cancellationToken = default)
         {
-            var pageIdIndex = Builders<PageContentDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.EditId);
+            var pageIdIndex = Builders<PageContentDocument>.IndexKeys.Ascending(it => it.PageId);
 
             Collection.Indexes.CreateMany(new CreateIndexModel<PageContentDocument>[] {
                 new CreateIndexModel<PageContentDocument>(pageIdIndex, new CreateIndexOptions { Name = "Page", Unique = true })

@@ -30,7 +30,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 CreatedDate = DateTime.UtcNow,
                 OwnCollectionId = сollectionId,
                 TypeName = typeName,
-                Title = pageTitle
+                Title = pageTitle,
+                UrlPath = pageId.ToString(),
+                Status = PageStatus.Draft
             };
 
             var contentDocument = new PageContentDocument
@@ -164,22 +166,37 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 }
             }
         }
-        public async Task SetUrlPathAsync(Guid pageId, string urlPath)
+        public async Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
-
-            var updateDefinition = Builders<PageDocument>.Update.Set(it => it.UrlPath, urlPath);
-
-            var updateResult = await documents.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
-            if (updateResult.ModifiedCount != 1)
+            var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id, (PageDocument)page);
+            if (replaceResult.MatchedCount != 0)
                 throw new InvalidOperationException();
         }
         public async Task DeletePageAsync(Guid pageId)
         {
-            var deleteResult = await documents.DeleteOneAsync(it => it.Id == pageId);
-            if (deleteResult.DeletedCount != 1)
-                throw new InvalidOperationException();
+            using (var session = await documents.Database.Client.StartSessionAsync())
+            {
+                session.StartTransaction();
+
+                try
+                {
+                    var pageDeleteResult = await documents.DeleteOneAsync(it => it.Id == pageId);
+                    if (pageDeleteResult.DeletedCount != 1)
+                        throw new InvalidOperationException();
+
+                    var contentDeleteResult = await contentDocuments.DeleteOneAsync(it => it.PageId == pageId);
+                    if (contentDeleteResult.DeletedCount != 1)
+                        throw new InvalidOperationException();
+
+                    await session.CommitTransactionAsync();
+                }
+                catch (Exception ex)
+                {
+                    await session.AbortTransactionAsync();
+
+                    throw ex;
+                }
+            }
         }
     }
 }

@@ -77,9 +77,16 @@ namespace BrandUp.Pages.Url
             public string UrlPath { get; set; }
             public string EntryId => throw new NotImplementedException();
 
+            public bool IsPublished => throw new NotImplementedException();
+
             public Page(string title)
             {
                 Title = title;
+            }
+
+            public Task SetUrlAsync(string urlPath)
+            {
+                throw new NotImplementedException();
             }
         }
     }

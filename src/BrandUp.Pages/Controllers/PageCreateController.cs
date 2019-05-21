@@ -84,14 +84,12 @@ namespace BrandUp.Pages.Controllers
         }
         private async Task<PageModel> GetPageModelAsync(IPage page)
         {
-            var isPublished = await pageService.IsPublishedAsync(page);
-
             return new PageModel
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
                 Title = page.Title,
-                Status = isPublished ? PageStatus.Published : PageStatus.Draft,
+                Status = page.IsPublished ? PageStatus.Published : PageStatus.Draft,
                 Url = await pageLinkGenerator.GetUrlAsync(page)
             };
         }

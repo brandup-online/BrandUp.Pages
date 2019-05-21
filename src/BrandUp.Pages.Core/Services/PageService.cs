@@ -134,7 +134,7 @@ namespace BrandUp.Pages.Services
             if (urlPath == null)
                 throw new ArgumentNullException(nameof(urlPath));
 
-            if (await IsPublishedAsync(page))
+            if (page.IsPublished)
                 return Result.Failed("Страница уже опубликована.");
 
             var urlPathValidationResult = pageUrlHelper.ValidateUrlPath(urlPath);
@@ -145,7 +145,7 @@ namespace BrandUp.Pages.Services
             if (collection.PageId.HasValue)
             {
                 var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value);
-                if (!await IsPublishedAsync(parentPage))
+                if (!parentPage.IsPublished)
                     return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
                 urlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);
             }
@@ -155,9 +155,9 @@ namespace BrandUp.Pages.Services
             if (await pageRepositiry.FindPageByPathAsync(urlPath) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
-            await pageRepositiry.SetUrlPathAsync(page.Id, urlPath);
+            await page.SetUrlAsync(urlPath);
 
-            page.UrlPath = urlPath;
+            await pageRepositiry.UpdatePageAsync(page);
 
             return Result.Success;
         }
@@ -176,13 +176,6 @@ namespace BrandUp.Pages.Services
             {
                 return Result.Failed(ex);
             }
-        }
-        public Task<bool> IsPublishedAsync(IPage page)
-        {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-
-            return Task.FromResult(page.UrlPath != null);
         }
         public async Task<Guid?> GetParentPageIdAsync(IPage page)
         {

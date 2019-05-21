@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
@@ -14,10 +15,27 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string TypeName { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid OwnCollectionId { get; set; }
-        [BsonIgnoreIfNull]
+        [BsonRequired]
         public string UrlPath { get; set; }
         [BsonRequired]
         public string Title { get; set; }
+        [BsonRequired, BsonRepresentation(BsonType.String)]
+        public PageStatus Status { get; set; }
+        public bool IsPublished { get => Status == PageStatus.Published; }
+
+        Task IPage.SetUrlAsync(string urlPath)
+        {
+            UrlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
+            Status = PageStatus.Published;
+
+            return Task.CompletedTask;
+        }
+    }
+
+    public enum PageStatus
+    {
+        Draft,
+        Published
     }
 
     public class PageDocumentContextType : MongoDB.MongoDbCollectionContext<PageDocument>

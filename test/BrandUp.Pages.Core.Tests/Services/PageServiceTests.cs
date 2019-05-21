@@ -47,10 +47,12 @@ namespace BrandUp.Pages.Services
             var pageCollection = await pageCollectionRepository.CreateCollectionAsync("Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
             var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(mainPage.Id, "index");
+            await mainPage.SetUrlAsync("index");
+            await pageRepository.UpdatePageAsync(mainPage);
 
             var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(testPage.Id, "test");
+            await testPage.SetUrlAsync("test");
+            await pageRepository.UpdatePageAsync(testPage);
         }
         Task IAsyncLifetime.DisposeAsync()
         {
@@ -125,14 +127,14 @@ namespace BrandUp.Pages.Services
             Assert.Equal(pageCollection.Id, page.OwnCollectionId);
             Assert.Equal(pageCollection.PageTypeName, page.TypeName);
             Assert.Equal("test", page.Title);
-            Assert.Null(page.UrlPath);
+            Assert.NotNull(page.UrlPath);
         }
         [Fact]
         public async Task IsPublished_True()
         {
             var page = await pageService.FindPageByPathAsync(string.Empty);
 
-            var result = await pageService.IsPublishedAsync(page);
+            var result = page.IsPublished;
 
             Assert.True(result);
         }
@@ -143,7 +145,7 @@ namespace BrandUp.Pages.Services
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 
-            var result = await pageService.IsPublishedAsync(page);
+            var result = page.IsPublished;
 
             Assert.False(result);
         }

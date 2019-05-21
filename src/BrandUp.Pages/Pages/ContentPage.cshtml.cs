@@ -45,30 +45,7 @@ namespace BrandUp.Pages
         {
             PageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
 
-            if (Request.Query.TryGetValue("pageId", out string pageIdValue))
-            {
-                if (!Guid.TryParse(pageIdValue, out Guid pageId))
-                {
-                    context.Result = BadRequest();
-                    return;
-                }
-
-                page = await PageService.FindPageByIdAsync(pageId);
-                if (page == null)
-                {
-                    context.Result = NotFound();
-                    return;
-                }
-
-                if (await PageService.IsPublishedAsync(page))
-                {
-                    var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
-
-                    context.Result = RedirectPermanent(await pageLinkGenerator.GetUrlAsync(page));
-                    return;
-                }
-            }
-            else if (Request.Query.TryGetValue("editId", out string editIdValue))
+            if (Request.Query.TryGetValue("editId", out string editIdValue))
             {
                 if (!Guid.TryParse(editIdValue, out Guid editId))
                 {
@@ -132,8 +109,7 @@ namespace BrandUp.Pages
 
             ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices);
 
-            var isPublished = await PageService.IsPublishedAsync(page);
-            Status = isPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
+            Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
             ParentPageId = await PageService.GetParentPageIdAsync(page);
         }
 

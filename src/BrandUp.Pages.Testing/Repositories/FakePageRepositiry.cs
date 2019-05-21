@@ -24,13 +24,15 @@ namespace BrandUp.Pages.Repositories
 
         public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData)
         {
-            var page = new Page(Guid.NewGuid(), typeName, ownCollectionId) { Title = title };
+            var pageId = Guid.NewGuid();
+            var page = new Page(pageId, typeName, ownCollectionId) { Title = title, UrlPath = pageId.ToString() };
 
             pageIndex++;
             var index = pageIndex;
 
             pageIds.Add(page.Id, index);
             pageContents.Add(index, new PageContent(1, contentData));
+            pagePaths.Add(page.UrlPath.ToLower(), index);
             pages.Add(pageIndex, page);
 
             pageHierarhy.OnAddPage(page);
@@ -97,17 +99,6 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
-        public Task SetUrlPathAsync(Guid pageId, string urlPath)
-        {
-            if (!pageIds.TryGetValue(pageId, out int index))
-                throw new InvalidOperationException();
-
-            pages[index].UrlPath = urlPath;
-
-            pagePaths.Add(urlPath.ToLower(), index);
-
-            return Task.CompletedTask;
-        }
         public Task DeletePageAsync(Guid pageId)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
@@ -118,8 +109,7 @@ namespace BrandUp.Pages.Repositories
 
             pages.Remove(index);
             pageIds.Remove(pageId);
-            if (page.UrlPath != null)
-                pagePaths.Remove(page.UrlPath.ToLower());
+            pagePaths.Remove(page.UrlPath.ToLower());
             pageContents.Remove(index);
 
             return Task.CompletedTask;
@@ -127,6 +117,21 @@ namespace BrandUp.Pages.Repositories
         public Task<bool> HasPagesAsync(Guid ownCollectionId)
         {
             return Task.FromResult(pageHierarhy.HasPages(ownCollectionId));
+        }
+
+        public Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            if (!pageIds.TryGetValue(page.Id, out int index))
+                throw new InvalidOperationException();
+
+            var oldPage = pages[index];
+
+            pages[index] = (Page)page;
+
+            pagePaths.Remove(oldPage.UrlPath.ToLower());
+            pagePaths.Add(page.UrlPath.ToLower(), index);
+
+            return Task.CompletedTask;
         }
 
         private class Page : IPage
@@ -138,6 +143,8 @@ namespace BrandUp.Pages.Repositories
             public string UrlPath { get; set; }
             public string Title { get; set; }
             public int ContentVersion { get; set; } = 1;
+            public bool IsPublished => Status == PageStatus.Published;
+            private PageStatus Status { get; set; }
 
             public Page(Guid id, string typeName, Guid collectionId)
             {
@@ -145,7 +152,22 @@ namespace BrandUp.Pages.Repositories
                 CreatedDate = DateTime.UtcNow;
                 TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
                 OwnCollectionId = collectionId;
+                Status = PageStatus.Draft;
             }
+
+            public Task SetUrlAsync(string urlPath)
+            {
+                Status = PageStatus.Published;
+                UrlPath = urlPath;
+
+                return Task.CompletedTask;
+            }
+        }
+
+        enum PageStatus
+        {
+            Draft,
+            Published
         }
     }
 }
