@@ -169,7 +169,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         public async Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id, (PageDocument)page);
-            if (replaceResult.MatchedCount != 0)
+            if (replaceResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }
         public async Task DeletePageAsync(Guid pageId)
