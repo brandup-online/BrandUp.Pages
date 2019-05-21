@@ -1,15 +1,20 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using System;
 using System.Threading;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
     [MongoDB.Document(CollectionName = "BrandUpPages.contents", CollectionContextType = typeof(PageContentDocumentContextType))]
-    public class PageContentDocument : Document
+    public class PageContentDocument
     {
-        [BsonRequired]
-        public string PageId { get; set; }
+        [BsonId, BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
+        [BsonRequired, BsonRepresentation(BsonType.String)]
+        public Guid PageId { get; set; }
+        [BsonRequired, BsonRepresentation(BsonType.String)]
+        public Guid? EditId { get; set; }
         [BsonRequired]
         public BsonDocument Data { get; set; }
     }
@@ -18,10 +23,10 @@ namespace BrandUp.Pages.MongoDb.Documents
     {
         protected override void OnSetupCollection(CancellationToken cancellationToken = default)
         {
-            var versionIndex = Builders<PageContentDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+            var pageIdIndex = Builders<PageContentDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.EditId);
 
             Collection.Indexes.CreateMany(new CreateIndexModel<PageContentDocument>[] {
-                new CreateIndexModel<PageContentDocument>(versionIndex, new CreateIndexOptions { Name = "Version", Unique = true })
+                new CreateIndexModel<PageContentDocument>(pageIdIndex, new CreateIndexOptions { Name = "Page", Unique = true })
             });
 
             base.OnSetupCollection(cancellationToken);

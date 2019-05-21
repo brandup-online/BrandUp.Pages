@@ -104,12 +104,12 @@ namespace BrandUp.Pages.Services
                 throw new ArgumentNullException(nameof(page));
 
             var contentData = await pageRepositiry.GetContentAsync(page.Id);
-            if (contentData == null)
-                throw new InvalidOperationException();
-
             var pageMetadata = await GetPageTypeAsync(page);
 
-            return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData.Data);
+            if (contentData != null)
+                return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData.Data);
+            else
+                return pageMetadata.CreatePageModel();
         }
         public async Task SetPageContentAsync(IPage page, object contentModel)
         {

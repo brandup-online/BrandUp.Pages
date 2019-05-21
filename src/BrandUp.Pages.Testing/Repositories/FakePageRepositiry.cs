@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -139,8 +138,6 @@ namespace BrandUp.Pages.Repositories
             public string UrlPath { get; set; }
             public string Title { get; set; }
             public int ContentVersion { get; set; } = 1;
-
-            string IContentEntry.EntryId => Id.ToString();
 
             public Page(Guid id, string typeName, Guid collectionId)
             {

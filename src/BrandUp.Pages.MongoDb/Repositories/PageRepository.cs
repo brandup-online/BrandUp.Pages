@@ -4,7 +4,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,47 +11,59 @@ namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageRepository : IPageRepositiry
     {
-        private static readonly Expression<Func<PageDocument, Page>> PageProjectionExpression;
         readonly IMongoCollection<PageDocument> documents;
-
-        static PageRepository()
-        {
-            PageProjectionExpression = it => new Page
-            {
-                Id = it.Id,
-                CreatedDate = it.CreatedDate,
-                TypeName = it.PageType,
-                OwnCollectionId = it.OwnCollectionId,
-                UrlPath = it.UrlPath,
-                Title = it.Title
-            };
-        }
+        readonly IMongoCollection<PageContentDocument> contentDocuments;
 
         public PageRepository(IPagesDbContext dbContext)
         {
             documents = dbContext.Pages;
+            contentDocuments = dbContext.Contents;
         }
 
         public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageTitle, IDictionary<string, object> contentData)
         {
+            var pageId = Guid.NewGuid();
+
             var pageDocument = new PageDocument
             {
-                Id = Guid.NewGuid(),
+                Id = pageId,
                 CreatedDate = DateTime.UtcNow,
                 OwnCollectionId = сollectionId,
-                PageType = typeName,
-                Title = pageTitle,
-                Content = new BsonDocument(contentData)
+                TypeName = typeName,
+                Title = pageTitle
             };
 
-            await documents.InsertOneAsync(pageDocument);
+            var contentDocument = new PageContentDocument
+            {
+                Id = Guid.NewGuid(),
+                PageId = pageId,
+                Data = new BsonDocument(contentData)
+            };
 
-            return new Page { Id = pageDocument.Id, TypeName = pageDocument.PageType, OwnCollectionId = pageDocument.OwnCollectionId, UrlPath = pageDocument.UrlPath };
+            using (var session = await documents.Database.Client.StartSessionAsync())
+            {
+                session.StartTransaction();
+
+                try
+                {
+                    await documents.InsertOneAsync(pageDocument);
+                    await contentDocuments.InsertOneAsync(contentDocument);
+
+                    await session.CommitTransactionAsync();
+                }
+                catch (Exception ex)
+                {
+                    await session.AbortTransactionAsync();
+
+                    throw ex;
+                }
+            }
+
+            return pageDocument;
         }
         public async Task<IPage> FindPageByIdAsync(Guid id)
         {
-            var cursor = await documents.Find(it => it.Id == id)
-                .Project(PageProjectionExpression).ToCursorAsync();
+            var cursor = await documents.Find(it => it.Id == id).ToCursorAsync();
 
             return await cursor.FirstOrDefaultAsync();
         }
@@ -61,8 +72,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            var cursor = await documents.Find(it => it.UrlPath == path)
-                .Project(PageProjectionExpression).ToCursorAsync();
+            var cursor = await documents.Find(it => it.UrlPath == path).ToCursorAsync();
 
             return await cursor.FirstOrDefaultAsync();
         }
@@ -88,7 +98,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 findDefinition.Limit(pagination.Limit);
             }
 
-            var cursor = await findDefinition.Project(PageProjectionExpression).ToCursorAsync();
+            var cursor = await findDefinition.ToCursorAsync();
 
             return cursor.ToEnumerable();
         }
@@ -102,7 +112,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 findDefinition.Limit(pagination.Limit);
             }
 
-            var cursor = await findDefinition.Project(PageProjectionExpression).ToCursorAsync(cancellationToken);
+            var cursor = await findDefinition.ToCursorAsync(cancellationToken);
 
             return cursor.ToEnumerable(cancellationToken);
         }
@@ -113,11 +123,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<PageContent> GetContentAsync(Guid pageId)
         {
-            var pageDocument = await (await documents.FindAsync(it => it.Id == pageId)).FirstOrDefaultAsync();
+            var pageDocument = await (await contentDocuments.FindAsync(it => it.PageId == pageId)).FirstOrDefaultAsync();
             if (pageDocument == null)
                 return null;
 
-            return new PageContent(1, MongoDbHelper.BsonDocumentToDictionary(pageDocument.Content));
+            return new PageContent(1, MongoDbHelper.BsonDocumentToDictionary(pageDocument.Data));
         }
         public async Task SetContentAsync(Guid pageId, string title, PageContent content)
         {
@@ -128,13 +138,31 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
 
-            var updateDefinition = Builders<PageDocument>.Update
-                .Set(it => it.Content, contentDataDocument)
-                .Set(it => it.Title, title);
+            using (var session = await documents.Database.Client.StartSessionAsync())
+            {
+                session.StartTransaction();
 
-            var updateResult = await documents.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
-            if (updateResult.MatchedCount != 1)
-                throw new InvalidOperationException();
+                try
+                {
+                    var pageUpdateResult = await documents.UpdateOneAsync(it => it.Id == pageId, Builders<PageDocument>.Update
+                        .Set(it => it.Title, title));
+                    if (pageUpdateResult.MatchedCount != 1)
+                        throw new InvalidOperationException();
+
+                    var contentUpdateResult = await contentDocuments.UpdateOneAsync(it => it.PageId == pageId, Builders<PageContentDocument>.Update
+                        .Set(it => it.Data, contentDataDocument));
+                    if (contentUpdateResult.MatchedCount != 1)
+                        throw new InvalidOperationException();
+
+                    await session.CommitTransactionAsync();
+                }
+                catch (Exception ex)
+                {
+                    await session.AbortTransactionAsync();
+
+                    throw ex;
+                }
+            }
         }
         public async Task SetUrlPathAsync(Guid pageId, string urlPath)
         {

@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -8,31 +7,17 @@ using System.Threading;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    public class Page : IPage
-    {
-        public Guid Id { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string TypeName { get; set; }
-        public Guid OwnCollectionId { get; set; }
-        public string UrlPath { get; set; }
-        public string Title { get; set; }
-
-        string IContentEntry.EntryId => Id.ToString();
-    }
-
     [MongoDB.Document(CollectionName = "BrandUpPages.pages", CollectionContextType = typeof(PageDocumentContextType))]
-    public class PageDocument : Document
+    public class PageDocument : Document, IPage
     {
         [BsonRequired]
-        public string PageType { get; set; }
+        public string TypeName { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid OwnCollectionId { get; set; }
         [BsonIgnoreIfNull]
         public string UrlPath { get; set; }
         [BsonRequired]
         public string Title { get; set; }
-        [BsonRequired]
-        public BsonDocument Content { get; set; }
     }
 
     public class PageDocumentContextType : MongoDB.MongoDbCollectionContext<PageDocument>

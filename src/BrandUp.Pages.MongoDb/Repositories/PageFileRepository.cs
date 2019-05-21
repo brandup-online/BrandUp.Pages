@@ -21,9 +21,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
             files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages", DisableMD5 = false });
         }
 
-        public async Task<IFile> UploadFileAsync(string entryId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public async Task<IFile> UploadFileAsync(Guid pageId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
-            var fileDoc = new PageFileDocument(entryId, fileName, contentType);
+            var fileDoc = new PageFileDocument(pageId, fileName, contentType);
 
             var uploadOptions = new GridFSUploadOptions
             {

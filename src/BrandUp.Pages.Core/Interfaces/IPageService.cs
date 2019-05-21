@@ -23,7 +23,7 @@ namespace BrandUp.Pages.Interfaces
         Task<Guid?> GetParentPageIdAsync(IPage page);
     }
 
-    public interface IPage : Content.IContentEntry
+    public interface IPage// : Content.IContentEntry
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }
@@ -31,6 +31,9 @@ namespace BrandUp.Pages.Interfaces
         Guid OwnCollectionId { get; }
         string Title { get; set; }
         string UrlPath { get; set; }
+
+        //bool IsDeleted { get; set; }
+        //bool IsDraft { get; set; }
     }
 
     public enum PageSortMode

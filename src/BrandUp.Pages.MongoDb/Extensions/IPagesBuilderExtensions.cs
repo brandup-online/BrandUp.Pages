@@ -1,5 +1,4 @@
 ﻿using BrandUp.MongoDB;
-using BrandUp.Pages.Content;
 using BrandUp.Pages.Files;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Repositories;
@@ -39,7 +38,6 @@ namespace BrandUp.Pages.Builder
         {
             services.AddSingleton<IPageCollectionRepositiry, PageCollectionRepository>();
             services.AddSingleton<IPageRepositiry, PageRepository>();
-            services.AddSingleton<IContentStore<IPage>, PageContentRepository>();
             services.AddSingleton<IFileRepository, PageFileRepository>();
             services.AddSingleton<IPageEditSessionRepository, PageEditSessionRepository>();
         }
