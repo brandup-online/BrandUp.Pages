@@ -99,7 +99,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
-        public Task DeletePageAsync(Guid pageId)
+        public Task DeletePageAsync(Guid pageId, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
                 throw new InvalidOperationException();

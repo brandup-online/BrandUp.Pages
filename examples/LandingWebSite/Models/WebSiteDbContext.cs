@@ -16,6 +16,7 @@ namespace LandingWebSite.Models
         public IMongoCollection<PageDocument> Pages => GetCollection<PageDocument>();
         public IMongoCollection<PageContentDocument> Contents => GetCollection<PageContentDocument>();
         public IMongoCollection<PageEditSessionDocument> PageEditSessions => GetCollection<PageEditSessionDocument>();
+        public IMongoCollection<PageRecyclebinDocument> PageRecyclebin => GetCollection<PageRecyclebinDocument>();
 
         #endregion
     }

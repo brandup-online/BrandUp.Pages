@@ -17,8 +17,8 @@ namespace BrandUp.Pages.Interfaces
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page);
         Task<object> GetPageContentAsync(IPage page);
         Task SetPageContentAsync(IPage page, object contentModel);
-        Task<Result> PublishPageAsync(IPage page, string urlPath);
-        Task<Result> DeletePageAsync(IPage page);
+        Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default);
+        Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default);
         Task<Guid?> GetParentPageIdAsync(IPage page);
     }
 

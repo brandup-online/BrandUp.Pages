@@ -127,7 +127,7 @@ namespace BrandUp.Pages.Services
 
             page.Title = pageTitle;
         }
-        public async Task<Result> PublishPageAsync(IPage page, string urlPath)
+        public async Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
@@ -156,19 +156,18 @@ namespace BrandUp.Pages.Services
                 return Result.Failed("Страница с таким url уже существует.");
 
             await page.SetUrlAsync(urlPath);
-
             await pageRepositiry.UpdatePageAsync(page);
 
             return Result.Success;
         }
-        public async Task<Result> DeletePageAsync(IPage page)
+        public async Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
             try
             {
-                await pageRepositiry.DeletePageAsync(page.Id);
+                await pageRepositiry.DeletePageAsync(page.Id, cancellationToken);
 
                 return Result.Success;
             }
