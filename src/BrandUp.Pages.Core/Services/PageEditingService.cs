@@ -74,14 +74,14 @@ namespace BrandUp.Pages.Services
 
             await pageService.SetPageContentAsync(page, pageContentModel);
 
-            await editSessionRepository.DeleteEditSession(editSession.Id);
+            await editSessionRepository.DeleteEditSessionAsync(editSession.Id);
         }
         public Task DiscardEditSession(IPageEditSession editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
 
-            return editSessionRepository.DeleteEditSession(editSession.Id);
+            return editSessionRepository.DeleteEditSessionAsync(editSession.Id);
         }
     }
 }

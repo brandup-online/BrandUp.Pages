@@ -9,13 +9,18 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class ContentRepository : MongoRepository<ContentDocument>, IContentStore<IPage>
+    public class PageContentRepository : IContentStore<IPage>
     {
-        public ContentRepository(IPagesDbContext dbContext) : base(dbContext.Contents) { }
+        readonly IMongoCollection<PageContentDocument> documents;
+
+        public PageContentRepository(IPagesDbContext dbContext)
+        {
+            documents = dbContext.Contents;
+        }
 
         public async Task<IDictionary<string, object>> GetContentDataAsync(IPage entry, CancellationToken cancellationToken = default)
         {
-            var contentDocument = await (await mongoCollection.FindAsync(it => it.PageId == entry.EntryId)).FirstOrDefaultAsync();
+            var contentDocument = await (await documents.FindAsync(it => it.PageId == entry.EntryId)).FirstOrDefaultAsync();
             if (contentDocument == null)
                 return null;
 
@@ -25,9 +30,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
         {
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(data);
 
-            var updateDefinition = Builders<ContentDocument>.Update.Set(it => it.Data, contentDataDocument);
+            var updateDefinition = Builders<PageContentDocument>.Update.Set(it => it.Data, contentDataDocument);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(it => it.PageId == entry.EntryId, updateDefinition);
+            var updateResult = await documents.UpdateOneAsync(it => it.PageId == entry.EntryId, updateDefinition);
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }

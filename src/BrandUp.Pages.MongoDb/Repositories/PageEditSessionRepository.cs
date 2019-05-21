@@ -1,17 +1,16 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Documents;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class PageEditSessionRepository : MongoRepository<PageEditSessionDocument>, IPageEditSessionRepository
+    public class PageEditSessionRepository : IPageEditSessionRepository
     {
         private static readonly Expression<Func<PageEditSessionDocument, PageEditSession>> ProjectionExpression;
+        readonly IMongoCollection<PageEditSessionDocument> documents;
 
         static PageEditSessionRepository()
         {
@@ -24,7 +23,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
         }
 
-        public PageEditSessionRepository(IPagesDbContext dbContext) : base(dbContext.PageEditSessions) { }
+        public PageEditSessionRepository(IPagesDbContext dbContext)
+        {
+            documents = dbContext.PageEditSessions;
+        }
 
         public async Task<IPageEditSession> CreateEditSessionAsync(Guid pageId, string contentManagerId, PageContent content)
         {
@@ -39,14 +41,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Content = contentDataDocument
             };
 
-            await AddAsync(document);
+            await documents.InsertOneAsync(document);
 
             return new PageEditSession { Id = document.Id, PageId = document.PageId, ContentManagerId = document.ContentManagerId };
         }
 
         public async Task<IPageEditSession> FindEditSessionByIdAsync(Guid id)
         {
-            var cursor = await mongoCollection.Find(it => it.Id == id)
+            var cursor = await documents.Find(it => it.Id == id)
                 .Project(ProjectionExpression).ToCursorAsync();
 
             return await cursor.FirstOrDefaultAsync();
@@ -54,7 +56,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<PageContent> GetContentAsync(Guid sessionId)
         {
-            var document = await (await mongoCollection.FindAsync(it => it.Id == sessionId)).FirstOrDefaultAsync();
+            var document = await (await documents.FindAsync(it => it.Id == sessionId)).FirstOrDefaultAsync();
             if (document == null)
                 return null;
 
@@ -69,44 +71,16 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
             var updateDefinition = Builders<PageEditSessionDocument>.Update.Set(it => it.Content, contentDataDocument);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == sessionId, updateDefinition);
+            var updateResult = await documents.UpdateOneAsync(it => it.Id == sessionId, updateDefinition);
 
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }
 
-        public Task DeleteEditSession(Guid sessionId)
+        public async Task DeleteEditSessionAsync(Guid sessionId)
         {
-            return DeleteAsync(sessionId);
-        }
-    }
-
-    public static class MongoDbHelper
-    {
-        public static BsonDocument DictionaryToBsonDocument(IDictionary<string, object> dictionary)
-        {
-            return new BsonDocument(dictionary);
-        }
-        public static IDictionary<string, object> BsonDocumentToDictionary(BsonDocument document)
-        {
-            var result = new Dictionary<string, object>();
-
-            foreach (var element in document.Elements)
-            {
-                if (element.Value.IsBsonArray)
-                {
-                    var list = new List<IDictionary<string, object>>();
-                    foreach (var d in element.Value.AsBsonArray)
-                        list.Add(BsonDocumentToDictionary(d.AsBsonDocument));
-                    result.Add(element.Name, list);
-                }
-                else if (element.Value.IsBsonDocument)
-                    result.Add(element.Name, BsonDocumentToDictionary(element.Value.AsBsonDocument));
-                else
-                    result.Add(element.Name, BsonTypeMapper.MapToDotNetValue(element.Value));
-            }
-
-            return result;
+            var filter = Builders<PageEditSessionDocument>.Filter.Eq(it => it.Id, sessionId);
+            await documents.FindOneAndDeleteAsync(filter);
         }
     }
 }

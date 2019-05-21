@@ -1,19 +1,19 @@
 ﻿using BrandUp.Pages.Content.Files;
+using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class FileRepository : IFileRepository
+    public class PageFileRepository : IFileRepository
     {
         private readonly FileBucket files;
 
-        public FileRepository(IPagesDbContext dbContext)
+        public PageFileRepository(IPagesDbContext dbContext)
         {
             if (dbContext == null)
                 throw new ArgumentNullException(nameof(dbContext));
@@ -23,7 +23,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<IFile> UploadFileAsync(string entryId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
-            var fileDoc = new FileDocument(entryId, fileName, contentType);
+            var fileDoc = new PageFileDocument(entryId, fileName, contentType);
 
             var uploadOptions = new GridFSUploadOptions
             {
@@ -44,7 +44,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (fileInfo == null)
                 return null;
 
-            return new FileDocument(fileInfo);
+            return new PageFileDocument(fileInfo);
         }
         public async Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
@@ -54,34 +54,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
         {
             return files.DeleteAsync(fileId, cancellationToken);
         }
-    }
 
-    public class FileBucket : GridFSBucket<Guid>
-    {
-        public FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : base(database, options) { }
-    }
-
-    public class FileDocument : IFile
-    {
-        public IDictionary<string, object> Data { get; private set; }
-
-        public Guid Id { get; }
-        public string ContentType { get => (string)Data["contentType"]; private set => Data["contentType"] = value; }
-        public string FileName { get => (string)Data["fileName"]; private set => Data["fileName"] = value; }
-        public string EntryId { get => (string)Data["pageId"]; private set => Data["pageId"] = value; }
-
-        public FileDocument(string entryId, string fileName, string contentType)
+        class FileBucket : GridFSBucket<Guid>
         {
-            Data = new Dictionary<string, object>();
-            Id = Guid.NewGuid();
-            ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
-            EntryId = entryId ?? throw new ArgumentNullException(nameof(entryId));
-        }
-        public FileDocument(GridFSFileInfo<Guid> fileInfo)
-        {
-            Id = fileInfo.Id;
-            Data = MongoDbHelper.BsonDocumentToDictionary(fileInfo.Metadata);
+            public FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : base(database, options) { }
         }
     }
 }

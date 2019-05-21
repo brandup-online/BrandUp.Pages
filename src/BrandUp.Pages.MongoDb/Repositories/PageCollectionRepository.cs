@@ -8,9 +8,14 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class PageCollectionRepository : MongoRepository<PageCollectionDocument>, IPageCollectionRepositiry
+    public class PageCollectionRepository : IPageCollectionRepositiry
     {
-        public PageCollectionRepository(IPagesDbContext dbContext) : base(dbContext.PageCollections) { }
+        readonly IMongoCollection<PageCollectionDocument> documents;
+
+        public PageCollectionRepository(IPagesDbContext dbContext)
+        {
+            documents = dbContext.PageCollections;
+        }
 
         public async Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
         {
@@ -24,19 +29,21 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 PageId = pageId
             };
 
-            await AddAsync(collection);
+            await documents.InsertOneAsync(collection);
 
             return collection;
         }
 
         public async Task<IPageCollection> FindCollectiondByIdAsync(Guid id)
         {
-            return await GetByIdAsync(id);
+            var filter = Builders<PageCollectionDocument>.Filter.Eq(it => it.Id, id);
+            var cursor = await documents.FindAsync(filter);
+            return await cursor.SingleOrDefaultAsync();
         }
 
         public async Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId)
         {
-            var cursor = await mongoCollection
+            var cursor = await documents
                 .Find(it => it.PageId == pageId)
                 .ToCursorAsync();
             return cursor.ToEnumerable();
@@ -54,7 +61,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var filterDefinition = Builders<PageCollectionDocument>.Filter.And(filters);
 
-            var cursor = await mongoCollection
+            var cursor = await documents
                 .Find(filterDefinition)
                 .ToCursorAsync();
 
@@ -63,7 +70,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<IPageCollection> UpdateCollectionAsync(Guid id, string title, PageSortMode pageSort)
         {
-            var collection = await GetByIdAsync(id);
+            var filter = Builders<PageCollectionDocument>.Filter.Eq(it => it.Id, id);
+            var cursor = await documents.FindAsync(filter);
+            var collection = await cursor.SingleOrDefaultAsync();
 
             collection.Title = title;
             collection.SortMode = pageSort;
@@ -72,7 +81,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 .Set(it => it.Title, title)
                 .Set(it => it.SortMode, pageSort);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == id, updateDefinition);
+            var updateResult = await documents.UpdateOneAsync(filter, updateDefinition);
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
 
@@ -81,7 +90,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task DeleteCollectionAsync(Guid id)
         {
-            var deleteResult = await mongoCollection.DeleteOneAsync(it => it.Id == id);
+            var deleteResult = await documents.DeleteOneAsync(it => it.Id == id);
             if (deleteResult.DeletedCount != 1)
                 throw new InvalidOperationException();
         }

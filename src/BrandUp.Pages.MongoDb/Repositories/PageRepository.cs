@@ -10,9 +10,10 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class PageRepository : MongoRepository<PageDocument>, IPageRepositiry
+    public class PageRepository : IPageRepositiry
     {
         private static readonly Expression<Func<PageDocument, Page>> PageProjectionExpression;
+        readonly IMongoCollection<PageDocument> documents;
 
         static PageRepository()
         {
@@ -27,7 +28,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
         }
 
-        public PageRepository(IPagesDbContext dbContext) : base(dbContext.Pages) { }
+        public PageRepository(IPagesDbContext dbContext)
+        {
+            documents = dbContext.Pages;
+        }
 
         public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageTitle, IDictionary<string, object> contentData)
         {
@@ -41,13 +45,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Content = new BsonDocument(contentData)
             };
 
-            await AddAsync(pageDocument);
+            await documents.InsertOneAsync(pageDocument);
 
             return new Page { Id = pageDocument.Id, TypeName = pageDocument.PageType, OwnCollectionId = pageDocument.OwnCollectionId, UrlPath = pageDocument.UrlPath };
         }
         public async Task<IPage> FindPageByIdAsync(Guid id)
         {
-            var cursor = await mongoCollection.Find(it => it.Id == id)
+            var cursor = await documents.Find(it => it.Id == id)
                 .Project(PageProjectionExpression).ToCursorAsync();
 
             return await cursor.FirstOrDefaultAsync();
@@ -57,14 +61,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            var cursor = await mongoCollection.Find(it => it.UrlPath == path)
+            var cursor = await documents.Find(it => it.UrlPath == path)
                 .Project(PageProjectionExpression).ToCursorAsync();
 
             return await cursor.FirstOrDefaultAsync();
         }
         public async Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination)
         {
-            var findDefinition = mongoCollection.Find(it => it.OwnCollectionId == сollectionId);
+            var findDefinition = documents.Find(it => it.OwnCollectionId == сollectionId);
 
             switch (pageSort)
             {
@@ -90,7 +94,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var findDefinition = mongoCollection.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false, Language = "ru" }));
+            var findDefinition = documents.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false, Language = "ru" }));
 
             if (pagination != null)
             {
@@ -104,12 +108,12 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<bool> HasPagesAsync(Guid сollectionId)
         {
-            var count = await mongoCollection.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId);
+            var count = await documents.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId);
             return count > 0;
         }
         public async Task<PageContent> GetContentAsync(Guid pageId)
         {
-            var pageDocument = await (await mongoCollection.FindAsync(it => it.Id == pageId)).FirstOrDefaultAsync();
+            var pageDocument = await (await documents.FindAsync(it => it.Id == pageId)).FirstOrDefaultAsync();
             if (pageDocument == null)
                 return null;
 
@@ -128,7 +132,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 .Set(it => it.Content, contentDataDocument)
                 .Set(it => it.Title, title);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
+            var updateResult = await documents.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }
@@ -139,13 +143,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var updateDefinition = Builders<PageDocument>.Update.Set(it => it.UrlPath, urlPath);
 
-            var updateResult = await mongoCollection.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
+            var updateResult = await documents.UpdateOneAsync(it => it.Id == pageId, updateDefinition);
             if (updateResult.ModifiedCount != 1)
                 throw new InvalidOperationException();
         }
         public async Task DeletePageAsync(Guid pageId)
         {
-            var deleteResult = await mongoCollection.DeleteOneAsync(it => it.Id == pageId);
+            var deleteResult = await documents.DeleteOneAsync(it => it.Id == pageId);
             if (deleteResult.DeletedCount != 1)
                 throw new InvalidOperationException();
         }

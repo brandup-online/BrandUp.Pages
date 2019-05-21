@@ -28,6 +28,6 @@ namespace BrandUp.Pages.Interfaces
         Task<IPageEditSession> FindEditSessionByIdAsync(Guid id);
         Task<PageContent> GetContentAsync(Guid sessionId);
         Task SetContentAsync(Guid sessionId, PageContent content);
-        Task DeleteEditSession(Guid sessionId);
+        Task DeleteEditSessionAsync(Guid sessionId);
     }
 }

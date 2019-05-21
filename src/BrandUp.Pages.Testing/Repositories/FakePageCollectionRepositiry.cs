@@ -73,14 +73,19 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
-        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames)
+        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames, string title)
         {
             var result = new List<IPageCollection>();
 
             foreach (var collection in collections.Values)
             {
                 if (pageTypeNames.Any(it => it.ToLower() == collection.PageTypeName.ToLower()))
+                {
+                    if (title != null && !collection.Title.Contains(title))
+                        continue;
+
                     result.Add(collection);
+                }
             }
 
             return Task.FromResult<IEnumerable<IPageCollection>>(result);
