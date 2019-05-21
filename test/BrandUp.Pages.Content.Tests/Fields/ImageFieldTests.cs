@@ -99,8 +99,6 @@ namespace BrandUp.Pages.Content.Fields
         [Fact]
         public void GetFormOptions()
         {
-            var content = new TestContent { Image = "url(http://test/test.jpg)" };
-
             var formOptions = field.GetFormOptions(serviceScope.ServiceProvider);
 
             Assert.Null(formOptions);

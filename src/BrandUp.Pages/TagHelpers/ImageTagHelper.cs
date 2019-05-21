@@ -1,6 +1,5 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Content.Files;
+﻿using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Files;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;

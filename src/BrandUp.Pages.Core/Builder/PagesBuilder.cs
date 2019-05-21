@@ -1,5 +1,4 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Content.Files;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Services;
@@ -36,7 +35,7 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPageEditingService, PageEditingService>();
-            services.AddScoped<FileService>();
+            services.AddScoped<Files.FileService>();
         }
     }
 }

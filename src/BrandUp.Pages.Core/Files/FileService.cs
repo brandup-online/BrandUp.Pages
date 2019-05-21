@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Content.Files
+namespace BrandUp.Pages.Files
 {
     public class FileService
     {
@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Content.Files
             this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public Task<IFile> UploadFileAsync(IContentEntry contentEntry, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public Task<IFile> UploadFileAsync(Content.IContentEntry contentEntry, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
             if (contentEntry == null)
                 throw new ArgumentNullException(nameof(contentEntry));

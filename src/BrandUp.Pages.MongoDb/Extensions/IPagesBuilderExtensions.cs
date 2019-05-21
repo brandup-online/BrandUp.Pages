@@ -1,6 +1,6 @@
 ﻿using BrandUp.MongoDB;
 using BrandUp.Pages.Content;
-using BrandUp.Pages.Content.Files;
+using BrandUp.Pages.Files;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Repositories;
 using Microsoft.Extensions.Configuration;

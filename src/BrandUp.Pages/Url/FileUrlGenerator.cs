@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Content.Files;
+﻿using BrandUp.Pages.Files;
 using Microsoft.AspNetCore.Routing;
 using System;
 using System.Threading;

@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Content.Files;
+﻿using BrandUp.Pages.Files;
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;

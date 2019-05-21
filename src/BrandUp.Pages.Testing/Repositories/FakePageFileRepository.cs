@@ -1,10 +1,11 @@
-﻿using System;
+﻿using BrandUp.Pages.Files;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Content.Files
+namespace BrandUp.Pages.Repositories
 {
     public class FakePageFileRepository : IFileRepository
     {

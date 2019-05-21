@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BrandUp.Pages.Content
+namespace BrandUp.Pages
 {
     public readonly struct ImageValue : IEquatable<ImageValue>
     {

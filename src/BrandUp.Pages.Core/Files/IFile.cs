@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BrandUp.Pages.Content.Files
+namespace BrandUp.Pages.Files
 {
     public interface IFile
     {

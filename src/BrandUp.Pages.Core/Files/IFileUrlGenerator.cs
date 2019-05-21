@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Content.Files
+namespace BrandUp.Pages.Files
 {
     public interface IFileUrlGenerator
     {

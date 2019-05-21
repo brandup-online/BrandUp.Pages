@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Content;
+﻿using BrandUp.Pages;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents.TextBlock

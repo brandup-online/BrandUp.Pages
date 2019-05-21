@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Content.Files;
+﻿using BrandUp.Pages.Files;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
