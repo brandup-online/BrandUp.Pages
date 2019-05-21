@@ -82,11 +82,19 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return await cursor.FirstOrDefaultAsync();
         }
-        public async Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination)
+        public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
-            var findDefinition = documents.Find(it => it.OwnCollectionId == сollectionId);
+            var filters = new List<FilterDefinition<PageDocument>>
+            {
+                Builders<PageDocument>.Filter.Eq(it => it.OwnCollectionId, options.CollectionId)
+            };
 
-            switch (pageSort)
+            if (!options.IncludeDrafts)
+                filters.Add(Builders<PageDocument>.Filter.Eq(it => it.Status, PageStatus.Published));
+
+            var findDefinition = documents.Find(Builders<PageDocument>.Filter.And(filters));
+            var sorting = options.Sorting ?? PageSortMode.FirstOld;
+            switch (options.Sorting.Value)
             {
                 case PageSortMode.FirstOld:
                     findDefinition.SortBy(it => it.CreatedDate);
@@ -98,15 +106,15 @@ namespace BrandUp.Pages.MongoDb.Repositories
                     throw new ArgumentException("Недопустимый тип сортировки.");
             }
 
-            if (pagination != null)
+            if (options.Pagination != null)
             {
-                findDefinition.Skip(pagination.Skip);
-                findDefinition.Limit(pagination.Limit);
+                findDefinition.Skip(options.Pagination.Skip);
+                findDefinition.Limit(options.Pagination.Limit);
             }
 
-            var cursor = await findDefinition.ToCursorAsync();
+            var cursor = await findDefinition.ToCursorAsync(cancellationToken);
 
-            return cursor.ToEnumerable();
+            return cursor.ToEnumerable(cancellationToken);
         }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {

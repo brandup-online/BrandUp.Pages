@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string title, IDictionary<string, object> contentData);
         Task<IPage> FindPageByIdAsync(Guid id);
         Task<IPage> FindPageByPathAsync(string path);
-        Task<IEnumerable<IPage>> GetPagesAsync(Guid сollectionId, PageSortMode pageSort, PagePaginationOptions pagination);
+        Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<bool> HasPagesAsync(Guid сollectionId);
         Task<PageContent> GetContentAsync(Guid pageId);

@@ -68,14 +68,19 @@ namespace BrandUp.Pages.Services
         {
             return pageRepositiry.FindPageByPathAsync(pageUrlHelper.GetDefaultPagePath());
         }
-        public Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination)
+        public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
-            if (pagination == null)
-                throw new ArgumentNullException(nameof(pagination));
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
 
-            return pageRepositiry.GetPagesAsync(collection.Id, collection.SortMode, pagination);
+            var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(options.CollectionId);
+            if (collection == null)
+                throw new InvalidOperationException();
+
+            if (!options.Sorting.HasValue)
+                options.Sorting = collection.SortMode;
+
+            return await pageRepositiry.GetPagesAsync(options, cancellationToken);
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {

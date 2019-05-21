@@ -6,4 +6,13 @@
     <h1 content-text="Header" />
 </header>
 
+<div>
+    @foreach (var item in await GetChildPagesAsync(Model.NewsCollection))
+    {
+        <div>
+            <a asp-page-path="@item.UrlPath">@item.Title</a>
+        </div>
+    }
+</div>
+
 <div content-object="Blocks" content-designer="page-blocks"></div>

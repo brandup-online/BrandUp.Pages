@@ -45,7 +45,7 @@ namespace BrandUp.Pages.Controllers
 
             var result = new List<Models.PageModel>();
 
-            var pages = await pageService.GetPagesAsync(collection, new PagePaginationOptions(0, 20));
+            var pages = await pageService.GetPagesAsync(new GetPagesOptions(collection.Id) { IncludeDrafts = true });
             foreach (var page in pages)
                 result.Add(await GetItemModelAsync(page));
 

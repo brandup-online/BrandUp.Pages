@@ -57,9 +57,9 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
-        public Task<IEnumerable<IPage>> GetPagesAsync(Guid ownCollectionId, PageSortMode sortMode, PagePaginationOptions pagination)
+        public Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
-            var pages = pageHierarhy.OnGetPages(ownCollectionId);
+            var pages = pageHierarhy.OnGetPages(options.CollectionId);
             return Task.FromResult(pages);
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)

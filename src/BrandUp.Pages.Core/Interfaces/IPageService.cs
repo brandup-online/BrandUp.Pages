@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> FindPageByIdAsync(Guid id);
         Task<IPage> FindPageByPathAsync(string pagePath);
         Task<IPage> GetDefaultPageAsync();
-        Task<IEnumerable<IPage>> GetPagesAsync(IPageCollection collection, PagePaginationOptions pagination);
+        Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page);
         Task<object> GetPageContentAsync(IPage page);
@@ -39,5 +39,18 @@ namespace BrandUp.Pages.Interfaces
     {
         FirstOld = 0,
         FirstNew = 1
+    }
+
+    public class GetPagesOptions
+    {
+        public Guid CollectionId { get; set; }
+        public PageSortMode? Sorting { get; set; }
+        public bool IncludeDrafts { get; set; }
+        public PagePaginationOptions Pagination { get; set; }
+
+        public GetPagesOptions(Guid collectionId)
+        {
+            CollectionId = collectionId;
+        }
     }
 }
