@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Interfaces
 {
-    public interface IPageRepositiry
+    public interface IPageRepository
     {
         Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string title, IDictionary<string, object> contentData);
         Task<IPage> FindPageByIdAsync(Guid id);

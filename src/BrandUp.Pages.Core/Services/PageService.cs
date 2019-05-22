@@ -9,14 +9,14 @@ namespace BrandUp.Pages.Services
 {
     public class PageService : IPageService
     {
-        private readonly IPageRepositiry pageRepositiry;
-        private readonly IPageCollectionRepositiry pageCollectionRepositiry;
+        private readonly IPageRepository pageRepositiry;
+        private readonly IPageCollectionRepository pageCollectionRepositiry;
         private readonly IPageMetadataManager pageMetadataManager;
         private readonly Url.IPageUrlHelper pageUrlHelper;
 
         public PageService(
-            IPageRepositiry pageRepositiry,
-            IPageCollectionRepositiry pageCollectionRepositiry,
+            IPageRepository pageRepositiry,
+            IPageCollectionRepository pageCollectionRepositiry,
             IPageMetadataManager pageMetadataManager,
             Url.IPageUrlHelper pageUrlHelper)
         {
@@ -56,9 +56,7 @@ namespace BrandUp.Pages.Services
             if (pagePath == null)
                 throw new ArgumentNullException(nameof(pagePath));
 
-            if (pagePath.Length > 0)
-                pagePath = pagePath.Trim(new char[] { '/' });
-
+            pagePath = pageUrlHelper.NormalizeUrlPath(pagePath.Trim(new char[] { '/' }));
             if (pagePath == string.Empty)
                 return GetDefaultPageAsync();
 

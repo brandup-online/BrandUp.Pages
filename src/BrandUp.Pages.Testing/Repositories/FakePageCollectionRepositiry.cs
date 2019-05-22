@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Repositories
 {
-    public class FakePageCollectionRepositiry : IPageCollectionRepositiry
+    public class FakePageCollectionRepositiry : IPageCollectionRepository
     {
         private int collectionIndex = 0;
         private readonly Dictionary<int, PageCollection> collections = new Dictionary<int, PageCollection>();

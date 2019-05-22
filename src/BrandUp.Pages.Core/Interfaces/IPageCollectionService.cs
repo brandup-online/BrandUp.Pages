@@ -8,11 +8,11 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageCollectionService
     {
-        Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId);
+        Task<Result<IPageCollection>> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId);
         Task<IPageCollection> FindCollectiondByIdAsync(Guid id);
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId);
         Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, string title, bool includeDerivedTypes);
-        Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
+        Task<Result> UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
         Task<Result> DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
         Task<List<PageMetadataProvider>> GetPageTypesAsync(IPageCollection collection);
     }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class PageCollectionRepository : IPageCollectionRepositiry
+    public class PageCollectionRepository : IPageCollectionRepository
     {
         readonly IMongoCollection<PageCollectionDocument> documents;
 

@@ -1,5 +1,4 @@
 ﻿using BrandUp.Pages.Builder;
-using BrandUp.Pages.Content;
 using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
@@ -13,8 +12,8 @@ namespace BrandUp.Pages.Services
 {
     public class PageServiceTests : IAsyncLifetime
     {
-        private ServiceProvider serviceProvider;
-        private IServiceScope serviceScope;
+        private readonly ServiceProvider serviceProvider;
+        private readonly IServiceScope serviceScope;
         private readonly IPageService pageService;
         private readonly IPageCollectionService pageCollectionService;
         private IPageMetadataManager pageMetadataManager;
@@ -38,10 +37,9 @@ namespace BrandUp.Pages.Services
 
         async Task IAsyncLifetime.InitializeAsync()
         {
-            var contentMetadataManager = serviceScope.ServiceProvider.GetService<IContentMetadataManager>();
             pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
-            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepositiry>();
-            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepositiry>();
+            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
+            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
 
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
@@ -134,7 +132,7 @@ namespace BrandUp.Pages.Services
         public async Task CreatePage_Fail_PageTypeNotAllowered()
         {
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(ArticlePageContent));
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("test", pageType.Name, PageSortMode.FirstOld, null);
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync("test", pageType.Name, PageSortMode.FirstOld, null)).Data;
 
             pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
@@ -178,20 +176,6 @@ namespace BrandUp.Pages.Services
 
             Assert.True(publishResult.Succeeded);
             Assert.Equal("test2", page.UrlPath);
-        }
-        [Fact]
-        public async Task PublishPage_Fail_ParentPageNotPublished()
-        {
-            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
-            var parentPageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
-            var parentPage = await pageService.CreatePageAsync(parentPageCollection, pageType.Name);
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test", pageType.Name, PageSortMode.FirstOld, parentPage.Id);
-            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
-
-            var publishResult = await pageService.PublishPageAsync(page, "test2");
-
-            Assert.False(publishResult.Succeeded);
-            Assert.NotEqual("test2", page.UrlPath);
         }
         [Fact]
         public async Task PublishPage_Fail_PageUrlExist()

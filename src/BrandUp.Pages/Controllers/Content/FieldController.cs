@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Controllers
         where TField : class, IFieldProvider
     {
         private IPageService pageService;
-        private IPageEditService pageEditingService;
+        private IPageContentService pageEditingService;
         private IPage page;
         private IPageEdit editSession;
         private ContentContext contentContext;
@@ -31,7 +31,7 @@ namespace BrandUp.Pages.Controllers
         async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             pageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
-            pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageEditService>();
+            pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageContentService>();
 
             if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))
             {
@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            editSession = await pageEditingService.FindEditSessionById(editId, HttpContext.RequestAborted);
+            editSession = await pageEditingService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
             {
                 context.Result = BadRequest();

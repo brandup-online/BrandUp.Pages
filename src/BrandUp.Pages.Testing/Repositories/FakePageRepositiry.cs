@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Repositories
 {
-    public class FakePageRepositiry : IPageRepositiry
+    public class FakePageRepositiry : IPageRepository
     {
         private readonly FakePageHierarhyRepository pageHierarhy;
 

@@ -76,9 +76,14 @@ namespace BrandUp.Pages.Controllers
         }
         protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionCreateValues values)
         {
-            var pageCollection = await pageCollectionService.CreateCollectionAsync(values.Title, values.PageType, values.Sort, page?.Id);
+            var createResult = await pageCollectionService.CreateCollectionAsync(values.Title, values.PageType, values.Sort, page?.Id);
+            if (!createResult.Succeeded)
+            {
+                AddErrors(createResult);
+                return null;
+            }
 
-            return GetPageCollectionModel(pageCollection);
+            return GetPageCollectionModel(createResult.Data);
         }
 
         #endregion

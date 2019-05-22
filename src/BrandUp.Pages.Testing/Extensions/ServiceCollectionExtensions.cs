@@ -9,9 +9,11 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<FakePageHierarhyRepository>();
 
-            services.AddSingleton<IPageRepositiry, FakePageRepositiry>();
-            services.AddSingleton<IPageCollectionRepositiry, FakePageCollectionRepositiry>();
+            services.AddSingleton<IPageRepository, FakePageRepositiry>();
+            services.AddSingleton<IPageCollectionRepository, FakePageCollectionRepositiry>();
+            services.AddSingleton<IPageContentRepository, FakePageContentRepository>();
             services.AddSingleton<BrandUp.Pages.Files.IFileRepository, FakePageFileRepository>();
+            services.AddSingleton<BrandUp.Pages.Administration.IAdministrationManager, BrandUp.Pages.Administration.FakeAdministrationManager>();
 
             return services;
         }

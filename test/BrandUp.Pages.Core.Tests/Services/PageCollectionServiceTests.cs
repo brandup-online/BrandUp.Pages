@@ -1,9 +1,9 @@
 ﻿using BrandUp.Pages.Builder;
-using BrandUp.Pages.Content;
 using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -37,9 +37,8 @@ namespace BrandUp.Pages.Services
 
         async Task IAsyncLifetime.InitializeAsync()
         {
-            var contentMetadataManager = serviceScope.ServiceProvider.GetService<IContentMetadataManager>();
-            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepositiry>();
-            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepositiry>();
+            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
+            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
 
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
@@ -68,32 +67,45 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreateCollection_root()
         {
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
+            var result = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
 
-            Assert.NotNull(pageCollection);
-            Assert.Equal("Test collection", pageCollection.Title);
-            Assert.Equal("TestPage", pageCollection.PageTypeName);
-            Assert.Null(pageCollection.PageId);
-            Assert.Equal(PageSortMode.FirstOld, pageCollection.SortMode);
+            Assert.True(result.Succeeded);
+            Assert.NotNull(result.Data);
+            Assert.Equal("Test collection", result.Data.Title);
+            Assert.Equal("TestPage", result.Data.PageTypeName);
+            Assert.Null(result.Data.PageId);
+            Assert.Equal(PageSortMode.FirstOld, result.Data.SortMode);
         }
 
         [Fact]
         public async Task CreateCollection_bypage()
         {
             var defaultPage = await pageService.GetDefaultPageAsync();
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, defaultPage.Id);
+            var result = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, defaultPage.Id);
 
-            Assert.NotNull(pageCollection);
-            Assert.Equal("Test collection", pageCollection.Title);
-            Assert.Equal("TestPage", pageCollection.PageTypeName);
-            Assert.Equal(defaultPage.Id, pageCollection.PageId);
-            Assert.Equal(PageSortMode.FirstOld, pageCollection.SortMode);
+            Assert.True(result.Succeeded);
+            Assert.NotNull(result.Data);
+            Assert.Equal("Test collection", result.Data.Title);
+            Assert.Equal("TestPage", result.Data.PageTypeName);
+            Assert.Equal(defaultPage.Id, result.Data.PageId);
+            Assert.Equal(PageSortMode.FirstOld, result.Data.SortMode);
+        }
+
+        [Fact]
+        public async Task CreateCollection_Fail_PageNotPublished()
+        {
+            var parentPageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var page = await pageService.CreatePageAsync(parentPageCollection);
+
+            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, page.Id);
+
+            Assert.False(pageCollection.Succeeded);
         }
 
         [Fact]
         public async Task FindCollectiondById()
         {
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null)).Data;
 
             var findedPageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id);
 
@@ -104,13 +116,14 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task UpdateCollection()
         {
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null)).Data;
 
             pageCollection.SetTitle("New title");
             pageCollection.SetSortModel(PageSortMode.FirstNew);
 
-            await pageCollectionService.UpdateCollectionAsync(pageCollection);
+            var result = await pageCollectionService.UpdateCollectionAsync(pageCollection);
 
+            Assert.True(result.Succeeded);
             Assert.Equal("New title", pageCollection.Title);
             Assert.Equal(PageSortMode.FirstNew, pageCollection.SortMode);
         }
@@ -118,11 +131,22 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task DeleteCollection()
         {
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null)).Data;
 
-            await pageCollectionService.DeleteCollectionAsync(pageCollection);
+            var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
+            Assert.True(result.Succeeded);
             Assert.Null(await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id));
+        }
+
+        [Fact]
+        public async Task DeleteCollection_Fail_HavePages()
+        {
+            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+
+            var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
+
+            Assert.False(result.Succeeded);
         }
 
         #endregion

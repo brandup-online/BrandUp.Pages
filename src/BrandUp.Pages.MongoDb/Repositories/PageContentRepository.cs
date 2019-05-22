@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class PageEditRepository : IPageEditRepository
+    public class PageContentRepository : IPageContentRepository
     {
         private static readonly Expression<Func<PageEditDocument, PageEdit>> ProjectionExpression;
         readonly IMongoCollection<PageEditDocument> documents;
         readonly IMongoCollection<PageContentDocument> contentDocuments;
 
-        static PageEditRepository()
+        static PageContentRepository()
         {
             ProjectionExpression = it => new PageEdit
             {
@@ -26,7 +26,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
         }
 
-        public PageEditRepository(IPagesDbContext dbContext)
+        public PageContentRepository(IPagesDbContext dbContext)
         {
             documents = dbContext.PageEditSessions;
             contentDocuments = dbContext.Contents;
@@ -71,9 +71,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IDictionary<string, object>> GetContentAsync(Guid sessionId, CancellationToken cancellationToken = default)
+        public async Task<IDictionary<string, object>> GetContentAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
         {
-            var document = await (await documents.FindAsync(it => it.Id == sessionId, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
+            var document = await (await documents.FindAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
             if (document == null)
                 return null;
 

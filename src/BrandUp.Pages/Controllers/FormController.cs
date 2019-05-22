@@ -60,7 +60,7 @@ namespace BrandUp.Pages.Controllers
         protected abstract Task OnChangeValueAsync(string field, TValues values);
         protected abstract Task<TResult> OnCommitAsync(TValues values);
 
-        protected void AddErrors(Result result)
+        protected void AddErrors(IResult result)
         {
             if (result == null)
                 throw new ArgumentNullException(nameof(result));

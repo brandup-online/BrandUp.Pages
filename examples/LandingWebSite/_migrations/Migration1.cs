@@ -25,7 +25,7 @@ namespace LandingWebSite._migrations
         {
             var pageContentMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.CommonPageContent));
 
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Main pages", pageContentMetadata.Name, PageSortMode.FirstOld, null);
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Main pages", pageContentMetadata.Name, PageSortMode.FirstOld, null)).Data;
 
             var page = await pageService.CreatePageAsync(pageCollection, pageContentMetadata.Name);
 
