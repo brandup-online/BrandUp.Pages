@@ -85,12 +85,32 @@ namespace BrandUp.Pages
                 var pagePath = string.Empty;
                 if (routeData.Values.TryGetValue("url", out object urlValue) && urlValue != null)
                     pagePath = (string)urlValue;
-                pagePath = pagePath.Trim(new char[] { '/' });
 
-                page = await PageService.FindPageByPathAsync(pagePath);
-                if (page == null)
+                var url = await PageService.FindPageUrlAsync(pagePath);
+                if (url == null)
                 {
                     context.Result = NotFound();
+                    return;
+                }
+
+                if (url.PageId.HasValue)
+                {
+                    page = await PageService.FindPageByIdAsync(url.PageId.Value);
+                    if (page == null)
+                    {
+                        context.Result = NotFound();
+                        return;
+                    }
+                }
+                else
+                {
+                    var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
+                    var redirectUrl = await pageLinkGenerator.GetUrlAsync(url.Redirect.Path);
+
+                    if (url.Redirect.IsPermament)
+                        context.Result = RedirectPermanent(redirectUrl);
+                    else
+                        context.Result = Redirect(redirectUrl);
                     return;
                 }
             }

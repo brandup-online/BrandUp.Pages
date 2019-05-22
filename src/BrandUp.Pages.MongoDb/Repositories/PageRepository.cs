@@ -15,6 +15,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         readonly IMongoCollection<PageContentDocument> contentDocuments;
         readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments;
         readonly IMongoCollection<PageEditDocument> editDocuments;
+        readonly IMongoCollection<PageUrlDocument> urlDocuments;
 
         public PageRepository(IPagesDbContext dbContext)
         {
@@ -22,6 +23,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             contentDocuments = dbContext.Contents;
             recyclebinDocuments = dbContext.PageRecyclebin;
             editDocuments = dbContext.PageEditSessions;
+            urlDocuments = dbContext.PageUrls;
         }
 
         public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageTitle, IDictionary<string, object> contentData)
@@ -46,6 +48,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Data = new BsonDocument(contentData)
             };
 
+            var urlDocument = new PageUrlDocument
+            {
+                Id = Guid.NewGuid(),
+                CreatedDate = DateTime.UtcNow,
+                PageId = pageId,
+                Path = pageDocument.UrlPath
+            };
+
             using (var session = await documents.Database.Client.StartSessionAsync())
             {
                 session.StartTransaction();
@@ -54,6 +64,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 {
                     await documents.InsertOneAsync(pageDocument);
                     await contentDocuments.InsertOneAsync(contentDocument);
+                    await urlDocuments.InsertOneAsync(urlDocument);
 
                     await session.CommitTransactionAsync();
                 }
@@ -67,20 +78,40 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return pageDocument;
         }
-        public async Task<IPage> FindPageByIdAsync(Guid id)
+        public async Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var cursor = await documents.Find(it => it.Id == id).ToCursorAsync();
+            var cursor = await documents.Find(it => it.Id == id).ToCursorAsync(cancellationToken);
 
-            return await cursor.FirstOrDefaultAsync();
+            return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
-        public async Task<IPage> FindPageByPathAsync(string path)
+        public async Task<IPage> FindPageByPathAsync(string path, CancellationToken cancellationToken = default)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            var cursor = await documents.Find(it => it.UrlPath == path).ToCursorAsync();
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            if (urlDocument == null)
+                return null;
+            if (!urlDocument.PageId.HasValue)
+                return null;
 
-            return await cursor.FirstOrDefaultAsync();
+            var cursor = await documents.Find(it => it.Id == urlDocument.PageId).ToCursorAsync(cancellationToken);
+
+            return await cursor.FirstOrDefaultAsync(cancellationToken);
+        }
+        public async Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default)
+        {
+            if (path == null)
+                throw new ArgumentNullException(nameof(path));
+
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            if (urlDocument == null)
+                return null;
+            if (urlDocument.PageId.HasValue)
+                return new PageUrlResult(urlDocument.PageId.Value);
+
+            return new PageUrlResult(new PageUrlRedirect(urlDocument.Redirect.Path, urlDocument.Redirect.IsPermament));
+
         }
         public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
@@ -130,20 +161,20 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return cursor.ToEnumerable(cancellationToken);
         }
-        public async Task<bool> HasPagesAsync(Guid сollectionId)
+        public async Task<bool> HasPagesAsync(Guid сollectionId, CancellationToken cancellationToken = default)
         {
-            var count = await documents.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId);
+            var count = await documents.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId, cancellationToken: cancellationToken);
             return count > 0;
         }
-        public async Task<IDictionary<string, object>> GetContentAsync(Guid pageId)
+        public async Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
         {
-            var pageDocument = await (await contentDocuments.FindAsync(it => it.PageId == pageId)).FirstOrDefaultAsync();
+            var pageDocument = await (await contentDocuments.FindAsync(it => it.PageId == pageId, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
             if (pageDocument == null)
                 return null;
 
             return MongoDbHelper.BsonDocumentToDictionary(pageDocument.Data);
         }
-        public async Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData)
+        public async Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             if (title == null)
                 throw new ArgumentNullException(nameof(title));
@@ -152,27 +183,27 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
-            using (var session = await documents.Database.Client.StartSessionAsync())
+            using (var session = await documents.Database.Client.StartSessionAsync(cancellationToken: cancellationToken))
             {
                 session.StartTransaction();
 
                 try
                 {
                     var pageUpdateResult = await documents.UpdateOneAsync(it => it.Id == pageId, Builders<PageDocument>.Update
-                        .Set(it => it.Title, title));
+                        .Set(it => it.Title, title), cancellationToken: cancellationToken);
                     if (pageUpdateResult.MatchedCount != 1)
                         throw new InvalidOperationException();
 
                     var contentUpdateResult = await contentDocuments.UpdateOneAsync(it => it.PageId == pageId, Builders<PageContentDocument>.Update
-                        .Set(it => it.Data, contentDataDocument));
+                        .Set(it => it.Data, contentDataDocument), cancellationToken: cancellationToken);
                     if (contentUpdateResult.MatchedCount != 1)
                         throw new InvalidOperationException();
 
-                    await session.CommitTransactionAsync();
+                    await session.CommitTransactionAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {
-                    await session.AbortTransactionAsync();
+                    await session.AbortTransactionAsync(cancellationToken);
 
                     throw ex;
                 }
@@ -184,9 +215,36 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var curVersion = pageDocument.Version;
             pageDocument.Version++;
 
-            var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id && it.Version == curVersion, pageDocument);
-            if (replaceResult.MatchedCount != 1)
-                throw new InvalidOperationException();
+            using (var session = await documents.Database.Client.StartSessionAsync())
+            {
+                session.StartTransaction();
+
+                try
+                {
+                    var urlDocument = await (await urlDocuments.FindAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+                    if (urlDocument == null)
+                        throw new InvalidOperationException("Не найден url страницы.");
+
+                    if (urlDocument.Path != page.UrlPath)
+                    {
+                        var urlUpdateResult = await urlDocuments.UpdateOneAsync(it => it.PageId == page.Id, Builders<PageUrlDocument>.Update.Set(it => it.Path, page.UrlPath), cancellationToken: cancellationToken);
+                        if (urlUpdateResult.MatchedCount != 1)
+                            throw new InvalidOperationException("Не удалось изменить url страницы.");
+                    }
+
+                    var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id && it.Version == curVersion, pageDocument);
+                    if (replaceResult.MatchedCount != 1)
+                        throw new InvalidOperationException("Не удалось изменить документ страницы.");
+
+                    await session.CommitTransactionAsync();
+                }
+                catch (Exception ex)
+                {
+                    await session.AbortTransactionAsync();
+
+                    throw ex;
+                }
+            }
         }
         public async Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
@@ -202,7 +260,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 {
                     var pageContent = await (await contentDocuments.Find(it => it.PageId == page.Id).ToCursorAsync(cancellationToken)).SingleOrDefaultAsync(cancellationToken);
                     if (pageContent == null)
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException("Не найден контент страницы.");
 
                     var recycleBinDocument = new PageRecyclebinDocument
                     {
@@ -219,11 +277,15 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                     var pageDeleteResult = await documents.DeleteOneAsync(it => it.Id == page.Id && it.Version == curVersion, cancellationToken);
                     if (pageDeleteResult.DeletedCount != 1)
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException("Не удалось удалить документ страницы.");
 
                     var contentDeleteResult = await contentDocuments.DeleteOneAsync(it => it.PageId == page.Id, cancellationToken);
                     if (contentDeleteResult.DeletedCount != 1)
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException("Не удалось удалить контент страницы.");
+
+                    var urlDeleteResult = await urlDocuments.DeleteOneAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken);
+                    if (urlDeleteResult.DeletedCount != 1)
+                        throw new InvalidOperationException("Не удалось удалить url страницы.");
 
                     await editDocuments.DeleteManyAsync(it => it.PageId == page.Id, cancellationToken);
 

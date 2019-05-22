@@ -9,17 +9,18 @@ namespace BrandUp.Pages.Interfaces
     public interface IPageService
     {
         Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageTitle = null);
-        Task<IPage> FindPageByIdAsync(Guid id);
-        Task<IPage> FindPageByPathAsync(string pagePath);
-        Task<IPage> GetDefaultPageAsync();
+        Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<IPage> FindPageByPathAsync(string pagePath, CancellationToken cancellationToken = default);
+        Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default);
+        Task<IPage> GetDefaultPageAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
-        Task<PageMetadataProvider> GetPageTypeAsync(IPage page);
-        Task<object> GetPageContentAsync(IPage page);
-        Task SetPageContentAsync(IPage page, object contentModel);
+        Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default);
+        Task<object> GetPageContentAsync(IPage page, CancellationToken cancellationToken = default);
+        Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default);
         Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default);
         Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default);
-        Task<Guid?> GetParentPageIdAsync(IPage page);
+        Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default);
     }
 
     public interface IPage

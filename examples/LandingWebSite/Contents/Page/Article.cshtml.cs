@@ -7,9 +7,6 @@ namespace LandingWebSite.Contents.Page
     [PageContent(Title = "Article page")]
     public class ArticlePageContent : PageContent
     {
-        [Text(Placeholder = "Input page header")]
-        public string Header { get; set; }
-
         [Text(Placeholder = "Input page sub header")]
         public string SubHeader { get; set; }
 

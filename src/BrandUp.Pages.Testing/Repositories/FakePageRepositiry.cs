@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
-        public Task<IPage> FindPageByPathAsync(string path)
+        public Task<IPage> FindPageByPathAsync(string path, CancellationToken cancellationToken = default)
         {
             if (!pagePaths.TryGetValue(path.ToLower(), out int index))
                 return Task.FromResult<IPage>(null);
@@ -48,7 +48,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
-        public Task<IPage> FindPageByIdAsync(Guid id)
+        public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(id, out int index))
                 return Task.FromResult<IPage>(null);
@@ -56,6 +56,15 @@ namespace BrandUp.Pages.Repositories
             var page = pages[index];
 
             return Task.FromResult<IPage>(page);
+        }
+        public Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default)
+        {
+            if (!pagePaths.TryGetValue(path.ToLower(), out int index))
+                return Task.FromResult<PageUrlResult>(null);
+
+            var page = pages[index];
+
+            return Task.FromResult(new PageUrlResult(page.Id));
         }
         public Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
@@ -74,7 +83,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IEnumerable<IPage>>(result.OfType<IPage>().ToArray());
         }
-        public Task<IDictionary<string, object>> GetContentAsync(Guid pageId)
+        public Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
                 throw new InvalidOperationException();
@@ -84,7 +93,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult(contentData);
         }
-        public Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData)
+        public Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
                 throw new InvalidOperationException();
@@ -109,7 +118,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
-        public Task<bool> HasPagesAsync(Guid ownCollectionId)
+        public Task<bool> HasPagesAsync(Guid ownCollectionId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(pageHierarhy.HasPages(ownCollectionId));
         }
