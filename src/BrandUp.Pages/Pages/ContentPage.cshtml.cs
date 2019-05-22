@@ -34,13 +34,8 @@ namespace BrandUp.Pages
 
         #region AppPageModel members
 
-        public override string Title => PageMetadata.GetPageTitle(PageContent);
+        public override string Title => PageMetadata.GetPageHeader(PageContent);
         public override string ScriptName => "content";
-
-        #endregion
-
-        #region AppPageModel members
-
         protected override async Task OnInitializeAsync(PageHandlerExecutingContext context)
         {
             PageService = HttpContext.RequestServices.GetRequiredService<IPageService>();

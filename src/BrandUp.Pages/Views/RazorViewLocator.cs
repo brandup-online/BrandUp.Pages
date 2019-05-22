@@ -7,12 +7,12 @@ namespace BrandUp.Pages.Views
 {
     public class RazorViewLocator : IViewLocator
     {
-        IHostingEnvironment hostingEnvironment;
         private readonly Dictionary<Type, ContentView> views = new Dictionary<Type, ContentView>();
 
         public RazorViewLocator(ApplicationPartManager applicationPartManager, IHostingEnvironment hostingEnvironment)
         {
-            this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
+            if (hostingEnvironment == null)
+                throw new ArgumentNullException(nameof(hostingEnvironment));
 
             var viewsFeature = new Microsoft.AspNetCore.Mvc.Razor.Compilation.ViewsFeature();
             applicationPartManager.PopulateFeature(viewsFeature);

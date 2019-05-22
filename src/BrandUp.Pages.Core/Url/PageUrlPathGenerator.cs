@@ -21,7 +21,7 @@ namespace BrandUp.Pages.Url
             if (page == null)
                 throw new System.ArgumentNullException(nameof(page));
 
-            var input = page.Title;
+            var input = page.Header;
             if (input == null)
                 return Task.FromResult<string>(null);
 

@@ -16,7 +16,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         [BsonRequired]
         public string UrlPath { get; set; }
         [BsonRequired]
-        public string Title { get; set; }
+        public string Header { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public PageStatus Status { get; set; }
         public BsonDocument Content { get; set; }

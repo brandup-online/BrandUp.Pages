@@ -86,7 +86,7 @@ namespace BrandUp.Pages.Controllers
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
-                Title = page.Title,
+                Title = page.Header,
                 Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft,
                 Url = await pageLinkGenerator.GetUrlAsync(page)
             };

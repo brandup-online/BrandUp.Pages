@@ -22,10 +22,10 @@ namespace BrandUp.Pages.Repositories
             this.pageHierarhy = pageHierarhy ?? throw new ArgumentNullException(nameof(pageHierarhy));
         }
 
-        public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData)
+        public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var pageId = Guid.NewGuid();
-            var page = new Page(pageId, typeName, ownCollectionId) { Title = title, UrlPath = pageId.ToString() };
+            var page = new Page(pageId, typeName, ownCollectionId) { Header = title, UrlPath = pageId.ToString() };
 
             pageIndex++;
             var index = pageIndex;
@@ -73,7 +73,7 @@ namespace BrandUp.Pages.Repositories
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var result = pages.Values.AsQueryable().Where(it => it.Title.Contains(title));
+            var result = pages.Values.AsQueryable().Where(it => it.Header.Contains(title));
 
             if (pagination != null)
             {
@@ -99,7 +99,7 @@ namespace BrandUp.Pages.Repositories
                 throw new InvalidOperationException();
             var page = pages[index];
 
-            page.Title = title;
+            page.Header = title;
             pageContents[index] = contentData;
 
             return Task.CompletedTask;
@@ -145,7 +145,7 @@ namespace BrandUp.Pages.Repositories
             public string TypeName { get; }
             public Guid OwnCollectionId { get; }
             public string UrlPath { get; set; }
-            public string Title { get; set; }
+            public string Header { get; set; }
             public int ContentVersion { get; set; } = 1;
             public bool IsPublished => Status == PageStatus.Published;
             private PageStatus Status { get; set; }

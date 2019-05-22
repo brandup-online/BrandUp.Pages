@@ -18,7 +18,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         [BsonRequired]
         public string UrlPath { get; set; }
         [BsonRequired]
-        public string Title { get; set; }
+        public string Header { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public PageStatus Status { get; set; }
         public bool IsPublished { get => Status == PageStatus.Published; }
@@ -44,7 +44,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         {
             var versionIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
             var urlIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.UrlPath);
-            var textIndex = Builders<PageDocument>.IndexKeys.Text(it => it.Title).Text(it => it.UrlPath);
+            var textIndex = Builders<PageDocument>.IndexKeys.Text(it => it.Header).Text(it => it.UrlPath);
 
             Collection.Indexes.CreateMany(new CreateIndexModel<PageDocument>[] {
                 new CreateIndexModel<PageDocument>(versionIndex, new CreateIndexOptions { Name = "Version", Unique = true }),

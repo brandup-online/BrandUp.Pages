@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Controllers
         {
             formModel.Page = await GetItemModelAsync(page);
 
-            formModel.Values.Title = page.Title;
+            formModel.Values.Header = page.Header;
             formModel.Values.UrlPath = await pageUrlPathGenerator.GenerateAsync(page);
         }
 
@@ -85,7 +85,7 @@ namespace BrandUp.Pages.Controllers
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
-                Title = page.Title,
+                Title = page.Header,
                 Status = page.IsPublished ? PageStatus.Published : PageStatus.Draft,
                 Url = await pageLinkGenerator.GetUrlAsync(page)
             };

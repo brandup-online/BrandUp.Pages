@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Content.Fields
                     var pageService = services.GetRequiredService<Interfaces.IPageService>();
                     var page = await pageService.FindPageByIdAsync(Guid.Parse(hyperLinkValue.Value));
                     if (page != null)
-                        formValue.PageTitle = page.Title;
+                        formValue.PageTitle = page.Header;
                 }
             }
 

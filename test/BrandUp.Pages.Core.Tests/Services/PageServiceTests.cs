@@ -12,6 +12,7 @@ namespace BrandUp.Pages.Services
 {
     public class PageServiceTests : IAsyncLifetime
     {
+        const string DefaultPageHeader = "New page";
         private readonly ServiceProvider serviceProvider;
         private readonly IServiceScope serviceScope;
         private readonly IPageService pageService;
@@ -22,7 +23,10 @@ namespace BrandUp.Pages.Services
         {
             var services = new ServiceCollection();
 
-            services.AddPages()
+            services.AddPages(options =>
+            {
+                options.DefaultPageHeader = DefaultPageHeader;
+            })
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakeRepositories();
 
@@ -116,7 +120,20 @@ namespace BrandUp.Pages.Services
             Assert.Equal(newContent.Title, pageModel.Title);
         }
         [Fact]
-        public async Task CreatePage()
+        public async Task CreatePage_WithDefaultHeader()
+        {
+            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
+            Assert.NotNull(page);
+            Assert.Equal(pageCollection.Id, page.OwnCollectionId);
+            Assert.Equal(pageCollection.PageTypeName, page.TypeName);
+            Assert.Equal(TestPageContent.ContentTypeTitle, page.Header);
+            Assert.NotNull(page.UrlPath);
+        }
+        [Fact]
+        public async Task CreatePage_WithSpecifyHeader()
         {
             var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
@@ -125,7 +142,7 @@ namespace BrandUp.Pages.Services
             Assert.NotNull(page);
             Assert.Equal(pageCollection.Id, page.OwnCollectionId);
             Assert.Equal(pageCollection.PageTypeName, page.TypeName);
-            Assert.Equal("test", page.Title);
+            Assert.Equal("test", page.Header);
             Assert.NotNull(page.UrlPath);
         }
         [Fact]

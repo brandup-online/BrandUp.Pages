@@ -18,8 +18,8 @@ export class PagePublishDialog extends FormDialog<PagePublishForm, PagePublishVa
     protected _buildForm() {
         this.setHeader("Публикация страницы");
 
-        this.addTextBox("title", "Заголовок title", { });
         this.addTextBox("urlPath", "Название в url", { placeholder: "Введите название в url для страницы" });
+        this.addTextBox("header", "Заголовок страницы", { });
     }
     protected _getSaveButtonTitle(): string {
         return "Опубликовать";
@@ -31,7 +31,7 @@ interface PagePublishForm extends FormModel<PagePublishValues> {
 }
 
 interface PagePublishValues {
-    title: string;
+    header: string;
     urlPath: string;
 }
 

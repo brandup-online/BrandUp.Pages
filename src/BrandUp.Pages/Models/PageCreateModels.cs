@@ -14,6 +14,6 @@ namespace BrandUp.Pages.Models
         [Required]
         public string PageType { get; set; }
         [Required(AllowEmptyStrings = false), MaxLength(255)]
-        public string Title { get; set; }
+        public string Header { get; set; }
     }
 }

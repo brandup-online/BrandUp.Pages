@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,24 +10,33 @@ namespace BrandUp.Pages.Services
 {
     public class PageService : IPageService
     {
-        private readonly IPageRepository pageRepositiry;
-        private readonly IPageCollectionRepository pageCollectionRepositiry;
-        private readonly IPageMetadataManager pageMetadataManager;
-        private readonly Url.IPageUrlHelper pageUrlHelper;
+        readonly IPageRepository pageRepositiry;
+        readonly IPageCollectionRepository pageCollectionRepositiry;
+        readonly IPageMetadataManager pageMetadataManager;
+        readonly Url.IPageUrlHelper pageUrlHelper;
+        readonly Views.IViewLocator viewLocator;
+        readonly PagesOptions options;
 
         public PageService(
             IPageRepository pageRepositiry,
             IPageCollectionRepository pageCollectionRepositiry,
             IPageMetadataManager pageMetadataManager,
-            Url.IPageUrlHelper pageUrlHelper)
+            Url.IPageUrlHelper pageUrlHelper,
+            Views.IViewLocator viewLocator,
+            IOptions<PagesOptions> options)
         {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
             this.pageCollectionRepositiry = pageCollectionRepositiry ?? throw new ArgumentNullException(nameof(pageCollectionRepositiry));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
+            this.viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
+            this.options = options.Value;
         }
 
-        public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageTitle = null)
+        public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
@@ -37,15 +47,19 @@ namespace BrandUp.Pages.Services
             var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
             var pageMetadata = pageMetadataManager.GetMetadata(pageType);
 
+            if (!pageMetadata.AllowCreateModel)
+                throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
             if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
                 throw new ArgumentException($"Тип страницы {pageType} не подходит для коллекции {collection.Title} ({collection.Id}).");
 
-            var pageContentModel = pageMetadata.CreatePageModel(pageTitle);
+            var pageContentModel = pageMetadata.CreatePageModel();
+
+            ApplyDefaultDataToContentModel(pageMetadata, pageContentModel, pageHeader);
+
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContentModel);
+            pageHeader = pageMetadata.GetPageHeader(pageContentModel);
 
-            pageTitle = pageMetadata.GetPageTitle(pageContentModel);
-
-            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageTitle, pageContentData);
+            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
         }
         public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
@@ -118,12 +132,11 @@ namespace BrandUp.Pages.Services
                 throw new ArgumentNullException(nameof(page));
 
             var contentData = await pageRepositiry.GetContentAsync(page.Id, cancellationToken);
+            if (contentData == null)
+                throw new InvalidOperationException("Для страницы не задан контент.");
             var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
 
-            if (contentData != null)
-                return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
-            else
-                return pageMetadata.CreatePageModel();
+            return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
         }
         public async Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default)
         {
@@ -134,12 +147,12 @@ namespace BrandUp.Pages.Services
             if (contentModel.GetType() != pageMetadata.ContentType)
                 throw new ArgumentException();
 
-            var pageTitle = pageMetadata.GetPageTitle(contentModel);
+            var pageTitle = pageMetadata.GetPageHeader(contentModel);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
             await pageRepositiry.SetContentAsync(page.Id, pageTitle, pageData, cancellationToken);
 
-            page.Title = pageTitle;
+            page.Header = pageTitle;
         }
         public async Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
@@ -197,6 +210,22 @@ namespace BrandUp.Pages.Services
 
             var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
             return pageCollection.PageId;
+        }
+
+        private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
+        {
+            if (string.IsNullOrEmpty(header) && !string.IsNullOrEmpty(options.DefaultPageHeader))
+                pageMetadataProvider.SetPageHeader(contentModel, options.DefaultPageHeader);
+
+            var view = viewLocator.FindView(pageMetadataProvider.ContentType);
+            if (view == null)
+                throw new InvalidOperationException();
+
+            if (view.DefaultModelData != null)
+                pageMetadataProvider.ContentMetadata.ApplyDataToModel(view.DefaultModelData, contentModel);
+
+            if (!string.IsNullOrEmpty(header))
+                pageMetadataProvider.SetPageHeader(contentModel, header);
         }
     }
 }

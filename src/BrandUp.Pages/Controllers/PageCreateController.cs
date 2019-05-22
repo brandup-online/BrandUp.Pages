@@ -62,7 +62,7 @@ namespace BrandUp.Pages.Controllers
 
         protected override async Task<PageModel> OnCommitAsync(PageCreateValues values)
         {
-            var page = await pageService.CreatePageAsync(pageCollection, values.PageType, values.Title);
+            var page = await pageService.CreatePageAsync(pageCollection, values.PageType, values.Header, HttpContext.RequestAborted);
             return await GetPageModelAsync(page);
         }
 
@@ -88,7 +88,7 @@ namespace BrandUp.Pages.Controllers
             {
                 Id = page.Id,
                 CreatedDate = page.CreatedDate,
-                Title = page.Title,
+                Title = page.Header,
                 Status = page.IsPublished ? PageStatus.Published : PageStatus.Draft,
                 Url = await pageLinkGenerator.GetUrlAsync(page)
             };

@@ -24,7 +24,7 @@ export class PageCreateDialog extends FormDialog<PageCreateForm, PageCreateValue
     protected _buildForm(model: PageCreateForm) {
         this.setHeader("Параметры новой страницы");
 
-        this.addTextBox("Title", "Название", { placeholder: "Введите название новой страницы" });
+        this.addTextBox("Header", "Название", { placeholder: "Введите название новой страницы" });
         this.addComboBox("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, model.pageTypes);
     }
 }
@@ -35,7 +35,7 @@ interface PageCreateForm extends FormModel<PageCreateValues> {
 }
 
 interface PageCreateValues {
-    title: string;
+    header: string;
     urlPath: string;
 }
 

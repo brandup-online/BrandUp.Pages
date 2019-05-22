@@ -73,15 +73,15 @@ namespace BrandUp.Pages.Url
             public DateTime CreatedDate => throw new NotImplementedException();
             public string TypeName => throw new NotImplementedException();
             public Guid OwnCollectionId => throw new NotImplementedException();
-            public string Title { get; set; }
+            public string Header { get; set; }
             public string UrlPath { get; set; }
             public string EntryId => throw new NotImplementedException();
 
             public bool IsPublished => throw new NotImplementedException();
 
-            public Page(string title)
+            public Page(string header)
             {
-                Title = title;
+                Header = header;
             }
 
             public Task SetUrlAsync(string urlPath)

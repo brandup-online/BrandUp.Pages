@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageService
     {
-        Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageTitle = null);
+        Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByPathAsync(string pagePath, CancellationToken cancellationToken = default);
         Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default);
@@ -29,7 +29,7 @@ namespace BrandUp.Pages.Interfaces
         DateTime CreatedDate { get; }
         string TypeName { get; }
         Guid OwnCollectionId { get; }
-        string Title { get; set; }
+        string Header { get; set; }
         string UrlPath { get; }
         bool IsPublished { get; }
 

@@ -26,7 +26,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             urlDocuments = dbContext.PageUrls;
         }
 
-        public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageTitle, IDictionary<string, object> contentData)
+        public async Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var pageId = Guid.NewGuid();
 
@@ -36,7 +36,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 CreatedDate = DateTime.UtcNow,
                 OwnCollectionId = сollectionId,
                 TypeName = typeName,
-                Title = pageTitle,
+                Header = pageHeader,
                 UrlPath = pageId.ToString(),
                 Status = PageStatus.Draft
             };
@@ -62,15 +62,15 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                 try
                 {
-                    await documents.InsertOneAsync(pageDocument);
-                    await contentDocuments.InsertOneAsync(contentDocument);
-                    await urlDocuments.InsertOneAsync(urlDocument);
+                    await documents.InsertOneAsync(pageDocument, cancellationToken: cancellationToken);
+                    await contentDocuments.InsertOneAsync(contentDocument, cancellationToken: cancellationToken);
+                    await urlDocuments.InsertOneAsync(urlDocument, cancellationToken: cancellationToken);
 
-                    await session.CommitTransactionAsync();
+                    await session.CommitTransactionAsync(cancellationToken);
                 }
                 catch (Exception ex)
                 {
-                    await session.AbortTransactionAsync();
+                    await session.AbortTransactionAsync(cancellationToken);
 
                     throw ex;
                 }
@@ -190,7 +190,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 try
                 {
                     var pageUpdateResult = await documents.UpdateOneAsync(it => it.Id == pageId, Builders<PageDocument>.Update
-                        .Set(it => it.Title, title), cancellationToken: cancellationToken);
+                        .Set(it => it.Header, title), cancellationToken: cancellationToken);
                     if (pageUpdateResult.MatchedCount != 1)
                         throw new InvalidOperationException();
 
@@ -268,7 +268,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                         CreatedDate = DateTime.UtcNow,
                         OwnCollectionId = page.OwnCollectionId,
                         TypeName = page.TypeName,
-                        Title = page.Title,
+                        Header = page.Header,
                         UrlPath = page.UrlPath,
                         Status = pageDocument.Status,
                         Content = pageContent.Data

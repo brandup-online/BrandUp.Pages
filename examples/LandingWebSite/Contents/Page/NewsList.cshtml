@@ -10,7 +10,7 @@
     @foreach (var item in await GetChildPagesAsync(Model.NewsCollection))
     {
         <div>
-            <a asp-page-path="@item.UrlPath">@item.Title</a>
+            <a asp-page-path="@item.UrlPath">@item.Header</a>
         </div>
     }
 </div>

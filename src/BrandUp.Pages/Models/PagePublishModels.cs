@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Models
     public class PagePublishValues
     {
         [Required(AllowEmptyStrings = false), MaxLength(255)]
-        public string Title { get; set; }
+        public string Header { get; set; }
         [Required(AllowEmptyStrings = false), MaxLength(255)]
         public string UrlPath { get; set; }
     }

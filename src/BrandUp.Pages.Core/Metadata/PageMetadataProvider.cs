@@ -17,6 +17,7 @@ namespace BrandUp.Pages.Metadata
         public Type ContentType => ContentMetadata.ModelType;
         public PageMetadataProvider ParentMetadata { get; }
         public IEnumerable<PageMetadataProvider> DerivedTypes => derivedTypes;
+        public bool AllowCreateModel => !ContentMetadata.IsAbstract;
 
         #endregion
 
@@ -31,30 +32,23 @@ namespace BrandUp.Pages.Metadata
 
         #region Methods
 
-        public object CreatePageModel(string title = null)
+        public object CreatePageModel()
         {
-            var model = ContentMetadata.CreateModelInstance();
-
-            if (string.IsNullOrEmpty(title))
-            {
-                title = ContentMetadata.GetContentTitle(model);
-
-                if (string.IsNullOrEmpty(title))
-                    title = "New page";
-
-                ContentMetadata.SetContentTitle(model, title);
-            }
-            else
-                ContentMetadata.SetContentTitle(model, title);
-
-            return model;
+            return ContentMetadata.CreateModelInstance();
         }
-        public string GetPageTitle(object pageModel)
+        public string GetPageHeader(object pageModel)
         {
             if (pageModel == null)
                 throw new ArgumentNullException(nameof(pageModel));
 
             return ContentMetadata.GetContentTitle(pageModel);
+        }
+        public void SetPageHeader(object pageModel, string value)
+        {
+            if (pageModel == null)
+                throw new ArgumentNullException(nameof(pageModel));
+
+            ContentMetadata.SetContentTitle(pageModel, value);
         }
         public bool IsInherited(PageMetadataProvider baseMetadataProvider)
         {

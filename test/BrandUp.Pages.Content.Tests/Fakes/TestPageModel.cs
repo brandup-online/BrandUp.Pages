@@ -1,10 +1,11 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Views;
 using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [ContentType(Title = ContentTypeTitle, Description = ContentTypeDescription)]
+    [ContentType(Title = ContentTypeTitle, Description = ContentTypeDescription), View]
     public class TestPageContent
     {
         public const string ContentTypeTitle = "Test page";
@@ -37,13 +38,13 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
-    [ContentType(Title = "Article")]
+    [ContentType(Title = "Article"), View]
     public class ArticlePage : TestPageContent
     {
 
     }
 
-    [ContentType(Title = "News")]
+    [ContentType(Title = "News"), View]
     public class NewsPage : ArticlePage
     {
 

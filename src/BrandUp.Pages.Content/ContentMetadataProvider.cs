@@ -61,6 +61,8 @@ namespace BrandUp.Pages.Content
         public ContentMetadataProvider BaseMetadata { get; }
         public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
         public IEnumerable<FieldProviderAttribute> Fields => fields;
+        public bool IsAbstract => ModelType.IsAbstract;
+        public bool IsDefinedTitleField => Title != null;
 
         #endregion
 
@@ -167,6 +169,9 @@ namespace BrandUp.Pages.Content
         [System.Diagnostics.DebuggerStepThrough]
         public object CreateModelInstance()
         {
+            if (modelConstructor == null)
+                throw new InvalidOperationException($"Content type {Name} is abstract.");
+
             return modelConstructor.Invoke(new object[0]);
         }
         public void ApplyInjections(object model, IServiceProvider serviceProvider, bool injectInnerModels)
@@ -279,6 +284,32 @@ namespace BrandUp.Pages.Content
 
             return contentModel;
         }
+        public object ApplyDataToModel(IDictionary<string, object> data, object contentModel)
+        {
+            if (data == null)
+                throw new ArgumentNullException(nameof(data));
+            if (contentModel == null)
+                throw new ArgumentNullException(nameof(contentModel));
+
+            if (data.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
+            {
+                var contentTypeName = (string)contentTypeNameValue;
+                if (string.Compare(contentTypeName, Name, true) != 0)
+                    throw new InvalidOperationException();
+            }
+
+            foreach (var kv in data)
+            {
+                if (!TryGetField(kv.Key, out IFieldProvider field))
+                    continue;
+
+                var dataValue = kv.Value;
+                var value = field.ConvetValueFromData(dataValue);
+                field.SetModelValue(contentModel, value);
+            }
+
+            return contentModel;
+        }
         public bool IsInherited(ContentMetadataProvider baseMetadataProvider)
         {
             if (baseMetadataProvider == null)
@@ -314,7 +345,7 @@ namespace BrandUp.Pages.Content
         {
             if (contentModel == null)
                 throw new ArgumentNullException(nameof(contentModel));
-            if (titleField == null)
+            if (!IsDefinedTitleField)
                 throw new InvalidOperationException($"Title field is not defined by content type {Name}.");
 
             titleField.SetModelValue(contentModel, title);

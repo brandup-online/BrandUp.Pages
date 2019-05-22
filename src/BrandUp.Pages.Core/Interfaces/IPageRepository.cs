@@ -7,7 +7,7 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageRepository
     {
-        Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string title, IDictionary<string, object> contentData);
+        Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByPathAsync(string path, CancellationToken cancellationToken = default);
         Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default);

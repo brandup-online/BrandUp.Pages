@@ -38,8 +38,6 @@ namespace BrandUp.Pages.Metadata
                 return false;
             }
 
-            ValidateContentMetadata(contentMetadata);
-
             PageMetadataProvider parentPageMetadata = null;
             if (contentMetadata.BaseMetadata != null)
                 TryRegisterPageType(contentMetadata.BaseMetadata, out parentPageMetadata);
@@ -47,13 +45,11 @@ namespace BrandUp.Pages.Metadata
             pageMetadataProvider = AddPageType(contentMetadata, pageAttribute, parentPageMetadata);
             return true;
         }
-        private void ValidateContentMetadata(ContentMetadataProvider contentMetadataProvider)
-        {
-            //if (!contentMetadata.SupportViews)
-            //    throw new InvalidOperationException($"Тип контента страницы {contentMetadata.Name} не поддерживает представления.");
-        }
         private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
         {
+            if (!contentMetadataProvider.IsDefinedTitleField)
+                throw new InvalidOperationException("Тип контента не может быть контентом страницы, так как для него не определено поле заголовка.");
+
             var pageMetadata = new PageMetadataProvider(contentMetadataProvider, parentPageMetadata);
 
             var index = metadataProviders.Count;

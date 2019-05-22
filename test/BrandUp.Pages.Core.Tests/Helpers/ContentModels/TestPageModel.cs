@@ -1,16 +1,18 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Views;
 using System.Collections.Generic;
 
 namespace BrandUp.Pages.ContentModels
 {
-    [PageContent(Title = ContentTypeTitle)]
+    [PageContent(Title = ContentTypeTitle), View]
+    [DefaultValue(nameof(Title), ContentTypeTitle)]
     public class TestPageContent
     {
         public const string ContentTypeTitle = "Test page";
 
         [Title, Text(Title = "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
-        public string Title { get; set; } = "Test";
+        public string Title { get; set; }
 
         [Model(Title = "Шапка страницы")]
         public PageHeaderContent Header { get; set; }
@@ -36,7 +38,7 @@ namespace BrandUp.Pages.ContentModels
         }
     }
 
-    [PageContent(Title = "Article")]
+    [PageContent(Title = "Article"), View]
     public class ArticlePageContent : TestPageContent
     {
 

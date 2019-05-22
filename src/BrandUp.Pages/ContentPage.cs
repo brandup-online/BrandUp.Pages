@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,6 +14,9 @@ namespace BrandUp.Pages
         public async Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference)
         {
             var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
+
+            if (pageCollectionReference.CollectionId == Guid.Empty)
+                return new IPage[0];
 
             var pages = await pageService.GetPagesAsync(new GetPagesOptions(pageCollectionReference.CollectionId));
 
