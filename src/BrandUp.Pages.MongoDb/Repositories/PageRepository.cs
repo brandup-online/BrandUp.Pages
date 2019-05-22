@@ -135,22 +135,22 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var count = await documents.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId);
             return count > 0;
         }
-        public async Task<PageContent> GetContentAsync(Guid pageId)
+        public async Task<IDictionary<string, object>> GetContentAsync(Guid pageId)
         {
             var pageDocument = await (await contentDocuments.FindAsync(it => it.PageId == pageId)).FirstOrDefaultAsync();
             if (pageDocument == null)
                 return null;
 
-            return new PageContent(1, MongoDbHelper.BsonDocumentToDictionary(pageDocument.Data));
+            return MongoDbHelper.BsonDocumentToDictionary(pageDocument.Data);
         }
-        public async Task SetContentAsync(Guid pageId, string title, PageContent content)
+        public async Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData)
         {
             if (title == null)
                 throw new ArgumentNullException(nameof(title));
-            if (content == null)
-                throw new ArgumentNullException(nameof(content));
+            if (contentData == null)
+                throw new ArgumentNullException(nameof(contentData));
 
-            var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(content.Data);
+            var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
             using (var session = await documents.Database.Client.StartSessionAsync())
             {

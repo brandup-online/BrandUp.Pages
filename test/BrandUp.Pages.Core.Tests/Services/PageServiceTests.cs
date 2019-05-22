@@ -4,6 +4,7 @@ using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -130,6 +131,23 @@ namespace BrandUp.Pages.Services
             Assert.NotNull(page.UrlPath);
         }
         [Fact]
+        public async Task CreatePage_Fail_PageTypeNotAllowered()
+        {
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(ArticlePageContent));
+            var pageCollection = await pageCollectionService.CreateCollectionAsync("test", pageType.Name, PageSortMode.FirstOld, null);
+
+            pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+
+            try
+            {
+                var page = await pageService.CreatePageAsync(pageCollection, pageType.Name, "test");
+            }
+            catch (ArgumentException)
+            {
+                Assert.True(true);
+            }
+        }
+        [Fact]
         public async Task IsPublished_True()
         {
             var page = await pageService.FindPageByPathAsync(string.Empty);
@@ -158,7 +176,42 @@ namespace BrandUp.Pages.Services
 
             var publishResult = await pageService.PublishPageAsync(page, "test2");
 
+            Assert.True(publishResult.Succeeded);
             Assert.Equal("test2", page.UrlPath);
+        }
+        [Fact]
+        public async Task PublishPage_Fail_ParentPageNotPublished()
+        {
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var parentPageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var parentPage = await pageService.CreatePageAsync(parentPageCollection, pageType.Name);
+            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test", pageType.Name, PageSortMode.FirstOld, parentPage.Id);
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
+
+            var publishResult = await pageService.PublishPageAsync(page, "test2");
+
+            Assert.False(publishResult.Succeeded);
+            Assert.NotEqual("test2", page.UrlPath);
+        }
+        [Fact]
+        public async Task PublishPage_Fail_PageUrlExist()
+        {
+            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
+
+            var publishResult = await pageService.PublishPageAsync(page, "test");
+
+            Assert.False(publishResult.Succeeded);
+        }
+        [Fact]
+        public async Task PublishPage_Fail_AlreadyPublished()
+        {
+            var page = await pageService.FindPageByPathAsync("test");
+
+            var publishResult = await pageService.PublishPageAsync(page, "test2");
+
+            Assert.False(publishResult.Succeeded);
         }
 
         #endregion

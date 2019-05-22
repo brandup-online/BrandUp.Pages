@@ -112,7 +112,7 @@ namespace BrandUp.Pages.Services
             var pageMetadata = await GetPageTypeAsync(page);
 
             if (contentData != null)
-                return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData.Data);
+                return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
             else
                 return pageMetadata.CreatePageModel();
         }
@@ -128,7 +128,7 @@ namespace BrandUp.Pages.Services
             var pageTitle = pageMetadata.GetPageTitle(contentModel);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await pageRepositiry.SetContentAsync(page.Id, pageTitle, new PageContent(1, pageData));
+            await pageRepositiry.SetContentAsync(page.Id, pageTitle, pageData);
 
             page.Title = pageTitle;
         }

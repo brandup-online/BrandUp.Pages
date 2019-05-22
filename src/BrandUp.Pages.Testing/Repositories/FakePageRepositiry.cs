@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Repositories
         private readonly Dictionary<int, Page> pages = new Dictionary<int, Page>();
         private readonly Dictionary<Guid, int> pageIds = new Dictionary<Guid, int>();
         private readonly Dictionary<string, int> pagePaths = new Dictionary<string, int>();
-        private readonly Dictionary<int, PageContent> pageContents = new Dictionary<int, PageContent>();
+        private readonly Dictionary<int, IDictionary<string, object>> pageContents = new Dictionary<int, IDictionary<string, object>>();
 
         public FakePageRepositiry(FakePageHierarhyRepository pageHierarhy)
         {
@@ -31,7 +31,7 @@ namespace BrandUp.Pages.Repositories
             var index = pageIndex;
 
             pageIds.Add(page.Id, index);
-            pageContents.Add(index, new PageContent(1, contentData));
+            pageContents.Add(index, contentData);
             pagePaths.Add(page.UrlPath.ToLower(), index);
             pages.Add(pageIndex, page);
 
@@ -74,28 +74,24 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IEnumerable<IPage>>(result.OfType<IPage>().ToArray());
         }
-        public Task<PageContent> GetContentAsync(Guid pageId)
+        public Task<IDictionary<string, object>> GetContentAsync(Guid pageId)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
                 throw new InvalidOperationException();
 
-            if (!pageContents.TryGetValue(index, out PageContent content))
+            if (!pageContents.TryGetValue(index, out IDictionary<string, object> contentData))
                 throw new InvalidOperationException();
 
-            return Task.FromResult(content);
+            return Task.FromResult(contentData);
         }
-        public Task SetContentAsync(Guid pageId, string title, PageContent data)
+        public Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData)
         {
             if (!pageIds.TryGetValue(pageId, out int index))
                 throw new InvalidOperationException();
             var page = pages[index];
 
-            if (page.ContentVersion != data.Version)
-                throw new InvalidOperationException();
-
             page.Title = title;
-            page.ContentVersion = data.Version + 1;
-            pageContents[index] = data;
+            pageContents[index] = contentData;
 
             return Task.CompletedTask;
         }

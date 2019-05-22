@@ -13,25 +13,10 @@ namespace BrandUp.Pages.Interfaces
         Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<bool> HasPagesAsync(Guid сollectionId);
-        Task<PageContent> GetContentAsync(Guid pageId);
-        Task SetContentAsync(Guid pageId, string title, PageContent content);
+        Task<IDictionary<string, object>> GetContentAsync(Guid pageId);
+        Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData);
         Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default);
         Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default);
-    }
-
-    public class PageContent
-    {
-        public int Version { get; }
-        public IDictionary<string, object> Data { get; }
-
-        public PageContent(int version, IDictionary<string, object> data)
-        {
-            if (version < 1)
-                throw new ArgumentOutOfRangeException(nameof(version));
-
-            Version = version;
-            Data = data ?? throw new ArgumentNullException(nameof(data));
-        }
     }
 
     public class PagePaginationOptions
