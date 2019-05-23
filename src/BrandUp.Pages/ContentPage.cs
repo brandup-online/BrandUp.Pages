@@ -30,6 +30,10 @@ namespace BrandUp.Pages
             if (offset >= 0 && limit > 0)
                 options.Pagination = new PagePaginationOptions(offset, limit);
 
+            var administrationManager = ViewContext.HttpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
+            if (await administrationManager.CheckAsync())
+                options.IncludeDrafts = true;
+
             var pages = await pageService.GetPagesAsync(options);
 
             return pages;
