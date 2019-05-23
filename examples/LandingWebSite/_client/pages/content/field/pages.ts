@@ -54,10 +54,15 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                             case 200:
                                 DOM.empty(this.searchElem);
 
-                                for (let i = 0; i < data.length; i++) {
-                                    let collection = data[i];
+                                if (data.length) {
+                                    for (let i = 0; i < data.length; i++) {
+                                        let collection = data[i];
 
-                                    this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id, "data-url": collection.pageUrl }, collection.title + ": " + collection.pageUrl)));
+                                        this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id, "data-url": collection.pageUrl }, collection.title + ": " + collection.pageUrl)));
+                                    }
+                                }
+                                else {
+                                    this.searchElem.appendChild(DOM.tag("li", { class: "text" }, "Коллекций страниц не найдено"));
                                 }
 
                                 break;

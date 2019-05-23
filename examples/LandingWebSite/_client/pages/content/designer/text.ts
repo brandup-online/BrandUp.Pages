@@ -13,7 +13,7 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
         elem.contentEditable = "true";
         if (this.options.placeholder)
             elem.setAttribute("data-placeholder", this.options.placeholder);
-        
+
         elem.addEventListener("paste", (e: ClipboardEvent) => {
             this.__isChanged = true;
 
@@ -50,6 +50,7 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
 
         elem.addEventListener("click", (e: MouseEvent) => {
             e.preventDefault();
+            e.stopPropagation();
         });
 
         this.__refreshUI();

@@ -15,7 +15,6 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         elem.appendChild(this.__button = DOM.tag("button", { class: "image-designer-upload", "data-command": "select-file" }, iconUpload));
 
         this.__fileInputElem = <HTMLInputElement>DOM.tag("input", { type: "file" })
-
         this.__fileInputElem.addEventListener("change", () => {
             if (this.__fileInputElem.files.length === 0)
                 return;
@@ -25,7 +24,10 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             this.__button.focus();
         });
 
-        this.registerCommand("select-file", () => {
+        this.__button.addEventListener("click", (e: MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+
             this.__fileInputElem.click();
         });
     }

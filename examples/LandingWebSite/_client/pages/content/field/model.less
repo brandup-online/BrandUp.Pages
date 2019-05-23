@@ -21,20 +21,29 @@
             & .index {
                 width: 30px;
                 color: #a0a0a0;
+                flex: 0 0 auto;
             }
 
             & a.title {
-                flex: 1 1 auto;
+                flex: 0 1 100%;
                 display: block;
                 text-decoration: none;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 100%;
+                padding-right: 10px;
             }
 
             & .type {
                 color: #aaa;
                 padding-right: 10px;
+                white-space: nowrap;
+                flex: 0 0 auto;
             }
 
             & ul {
+                flex: 0 0 auto;
                 list-style: none;
                 padding: 0;
                 margin: 0;
@@ -54,11 +63,16 @@
                         margin-left: 3px;
                         background-position: 50%;
                         background-repeat: no-repeat;
+                        opacity: 0.7;
 
                         & svg {
                             fill: @Text-Color;
                             width: 12px;
                             height: 12px;
+                        }
+
+                        &:hover {
+                            opacity: 1;
                         }
                     }
                 }

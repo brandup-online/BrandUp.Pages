@@ -260,7 +260,7 @@ namespace BrandUp.Pages.Content
                 if (string.Compare(contentTypeName, Name, true) != 0)
                 {
                     if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider deriverMetadata))
-                        throw new InvalidOperationException();
+                        throw new InvalidOperationException($"Не найден тип контента с именем {contentTypeName}.");
                     if (!deriverMetadata.ModelType.IsSubclassOf(ModelType))
                         throw new InvalidOperationException();
 

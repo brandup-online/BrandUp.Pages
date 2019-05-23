@@ -31,7 +31,10 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             let itemElem = elem.closest("[content-path-index]");
             let itemIndex = itemElem.getAttribute("content-path-index");
-            let contentPath = `${this.form.contentPath}.${this.name}[${itemIndex}]`;
+            let contentPath = `${this.name}[${itemIndex}]`;
+
+            if (this.form.contentPath)
+                contentPath = this.form.contentPath + "." + contentPath;
 
             editPage(this.form.editId, contentPath).then(() => {
                 this.__refreshItem(itemElem);
@@ -149,7 +152,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             success: (data: ContentModel, status: number) => {
                 if (status === 200) {
                     this.__value.items[itemIndex] = data;
-                    
+
                     let newElem = this.__createItemElem(data, itemIndex);
                     elem.insertAdjacentElement("afterend", newElem);
                     elem.remove();

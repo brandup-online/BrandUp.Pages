@@ -149,7 +149,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var findDefinition = documents.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false, Language = "ru" }));
+            var findDefinition = documents.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false }));
 
             if (pagination != null)
             {

@@ -94,11 +94,15 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                             case 200:
                                 DOM.empty(this.__searchElem);
 
-                                for (let i = 0; i < data.length; i++) {
-                                    let page = data[i];
+                                if (data.length) {
+                                    for (let i = 0; i < data.length; i++) {
+                                        let page = data[i];
 
-                                    this.__searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
+                                        this.__searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
+                                    }
                                 }
+                                else
+                                    this.__searchElem.appendChild(DOM.tag("li", { class: "text" }, "Страниц не найдено"));
 
                                 break;
                             default:

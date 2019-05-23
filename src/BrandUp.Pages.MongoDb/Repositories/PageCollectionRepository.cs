@@ -58,7 +58,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
 
             if (!string.IsNullOrWhiteSpace(title))
-                filters.Add(Builders<PageCollectionDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false, Language = "ru" }));
+                filters.Add(Builders<PageCollectionDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false }));
 
             var filterDefinition = Builders<PageCollectionDocument>.Filter.And(filters);
 
