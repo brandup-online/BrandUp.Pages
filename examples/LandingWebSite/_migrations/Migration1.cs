@@ -23,13 +23,25 @@ namespace LandingWebSite._migrations
 
         public async Task UpAsync(CancellationToken cancellationToken = default)
         {
-            var pageContentMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.CommonPageContent));
+            var commonPageMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.CommonPageContent));
+            var newsPageMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.NewsPageContent));
 
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Main pages", pageContentMetadata.Name, PageSortMode.FirstOld, null)).Data;
+            var mainPages = (await pageCollectionService.CreateCollectionAsync("Main pages", commonPageMetadata.Name, PageSortMode.FirstOld, null)).Data;
 
-            var page = await pageService.CreatePageAsync(pageCollection, pageContentMetadata.Name);
+            var homePage = await pageService.CreatePageAsync(mainPages, new Contents.Page.CommonPageContent { Header = "Home page" });
+            await pageService.PublishPageAsync(homePage, "index");
 
-            await pageService.PublishPageAsync(page, "index");
+            var newsListPages = await pageService.CreatePageAsync(mainPages, new Contents.Page.NewsListPageContent { Header = "News" });
+            await pageService.PublishPageAsync(newsListPages, "news");
+
+            var newsPages = (await pageCollectionService.CreateCollectionAsync("Actual news", newsPageMetadata.Name, PageSortMode.FirstNew, newsListPages.Id)).Data;
+            await pageCollectionService.CreateCollectionAsync("Archive news", newsPageMetadata.Name, PageSortMode.FirstNew, newsListPages.Id);
+
+            var newsPage1 = await pageService.CreatePageAsync(newsPages, new Contents.Page.NewsPageContent { Header = "First news", SubHeader = "This is first news" });
+            await pageService.PublishPageAsync(newsPage1, "first-news");
+
+            var newsPage2 = await pageService.CreatePageAsync(newsPages, new Contents.Page.NewsPageContent { Header = "Second news", SubHeader = "This is second news" });
+            await pageService.PublishPageAsync(newsPage2, "second-news");
         }
 
         public Task DownAsync(CancellationToken cancellationToken = default)

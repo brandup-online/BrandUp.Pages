@@ -36,6 +36,24 @@ namespace BrandUp.Pages.Services
             this.options = options.Value;
         }
 
+        public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
+        {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
+            var pageMetadata = pageMetadataManager.GetMetadata(pageContent.GetType());
+
+            if (!pageMetadata.AllowCreateModel)
+                throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
+            if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
+                throw new ArgumentException($"Тип страницы {pageMetadata.Name} не подходит для коллекции {collection.Title} ({collection.Id}).");
+
+            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
+            var pageHeader = pageMetadata.GetPageHeader(pageContent);
+
+            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+        }
         public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default)
         {
             if (collection == null)
@@ -52,12 +70,12 @@ namespace BrandUp.Pages.Services
             if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
                 throw new ArgumentException($"Тип страницы {pageType} не подходит для коллекции {collection.Title} ({collection.Id}).");
 
-            var pageContentModel = pageMetadata.CreatePageModel();
+            var pageContent = pageMetadata.CreatePageModel();
 
-            ApplyDefaultDataToContentModel(pageMetadata, pageContentModel, pageHeader);
+            ApplyDefaultDataToContentModel(pageMetadata, pageContent, pageHeader);
 
-            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContentModel);
-            pageHeader = pageMetadata.GetPageHeader(pageContentModel);
+            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
+            pageHeader = pageMetadata.GetPageHeader(pageContent);
 
             return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
         }
@@ -224,8 +242,10 @@ namespace BrandUp.Pages.Services
             if (view.DefaultModelData != null)
                 pageMetadataProvider.ContentMetadata.ApplyDataToModel(view.DefaultModelData, contentModel);
 
-            if (!string.IsNullOrEmpty(header))
-                pageMetadataProvider.SetPageHeader(contentModel, header);
+            if (string.IsNullOrEmpty(header))
+                header = pageMetadataProvider.Title;
+
+            pageMetadataProvider.SetPageHeader(contentModel, header);
         }
     }
 }

@@ -11,14 +11,26 @@ namespace BrandUp.Pages
     {
         public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext;
 
-        public async Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference)
+        public Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference)
+        {
+            return GetChildPagesAsync(pageCollectionReference, -1, -1);
+        }
+        public Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference, int limit)
+        {
+            return GetChildPagesAsync(pageCollectionReference, 0, limit);
+        }
+        public async Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference, int offset, int limit)
         {
             var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
 
             if (pageCollectionReference.CollectionId == Guid.Empty)
                 return new IPage[0];
 
-            var pages = await pageService.GetPagesAsync(new GetPagesOptions(pageCollectionReference.CollectionId));
+            var options = new GetPagesOptions(pageCollectionReference.CollectionId);
+            if (offset >= 0 && limit > 0)
+                options.Pagination = new PagePaginationOptions(offset, limit);
+
+            var pages = await pageService.GetPagesAsync(options);
 
             return pages;
         }
@@ -45,7 +57,6 @@ namespace BrandUp.Pages
 
             return result;
         }
-
         public Task<IEnumerable<IPage>> EachParentPagesAsync(bool includeCurrentPage = false)
         {
             return EachParentPagesAsync(Content.Page, includeCurrentPage);

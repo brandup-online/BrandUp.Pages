@@ -120,6 +120,19 @@ namespace BrandUp.Pages.Services
             Assert.Equal(newContent.Title, pageModel.Title);
         }
         [Fact]
+        public async Task CreatePage_WithContentModel()
+        {
+            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+
+            var page = await pageService.CreatePageAsync(pageCollection, new TestPageContent { Title = "title" });
+
+            Assert.NotNull(page);
+            Assert.Equal(pageCollection.Id, page.OwnCollectionId);
+            Assert.Equal(pageCollection.PageTypeName, page.TypeName);
+            Assert.Equal("title", page.Header);
+            Assert.NotNull(page.UrlPath);
+        }
+        [Fact]
         public async Task CreatePage_WithDefaultHeader()
         {
             var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
