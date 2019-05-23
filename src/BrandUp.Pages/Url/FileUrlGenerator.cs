@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Url
             this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
         }
 
-        public Task<string> GetImageUrlAsync(ImageValue image, CancellationToken cancellationToken = default)
+        public Task<string> GetImageUrlAsync(ImageValue image, int width = 0, int height = 0, CancellationToken cancellationToken = default)
         {
             if (!image.HasValue)
                 throw new ArgumentException();
@@ -24,7 +24,7 @@ namespace BrandUp.Pages.Url
             switch (image.ValueType)
             {
                 case ImageValueType.Id:
-                    url = linkGenerator.GetPathByAction("Download", "File", new { fileId = image.Value });
+                    url = linkGenerator.GetPathByAction("Image", "File", new { fileId = image.Value, width, height });
                     break;
                 case ImageValueType.Url:
                     url = image.Value;
@@ -37,7 +37,6 @@ namespace BrandUp.Pages.Url
                 default:
                     throw new InvalidOperationException();
             }
-
 
             return Task.FromResult(url);
         }

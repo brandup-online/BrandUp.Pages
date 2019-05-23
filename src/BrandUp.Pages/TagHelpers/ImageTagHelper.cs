@@ -16,6 +16,12 @@ namespace BrandUp.Pages.TagHelpers
         [HtmlAttributeName("content-image")]
         public override ModelExpression FieldName { get; set; }
 
+        [HtmlAttributeName("content-image-width")]
+        public int Width { get; set; }
+
+        [HtmlAttributeName("content-image-height")]
+        public int Height { get; set; }
+
         public ImageTagHelper(IFileUrlGenerator fileUrlGenerator)
         {
             this.fileUrlGenerator = fileUrlGenerator ?? throw new ArgumentNullException(nameof(fileUrlGenerator));
@@ -36,7 +42,7 @@ namespace BrandUp.Pages.TagHelpers
             if (!string.IsNullOrEmpty(styleStr) && !styleStr.EndsWith(";"))
                 styleStr += ";";
 
-            var imageUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue);
+            var imageUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue, Width, Height);
 
             styleStr += $"background-image: url({imageUrl});";
 

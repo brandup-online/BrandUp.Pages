@@ -63,6 +63,8 @@ namespace LandingWebSite
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
                 .AddMongoDb<Models.WebSiteDbContext>();
 
+            services.AddSingleton<BrandUp.Pages.Images.IImageResizer, Infrastructure.ImageResizer>();
+
             services
                 .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

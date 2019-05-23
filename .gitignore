@@ -343,3 +343,5 @@ package-lock.json
 /ui/brandup-pages-ui/src/**/*.d.ts
 /ui/brandup-pages-ui/src/**/*.js
 !/ui/brandup-pages-ui/src/typings/*.d.ts
+/examples/LandingWebSite/_temp/files
+/examples/LandingWebSite/_temp/images
