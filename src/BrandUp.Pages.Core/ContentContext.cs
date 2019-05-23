@@ -11,8 +11,9 @@ namespace BrandUp.Pages
         public ContentExplorer Explorer { get; }
         public IServiceProvider Services { get; }
         public object Content => Explorer.Model;
+        public bool IsDesigner { get; }
 
-        public ContentContext(IPage page, object pageContent, IServiceProvider services)
+        public ContentContext(IPage page, object pageContent, IServiceProvider services, bool isDesigner)
         {
             if (pageContent == null)
                 throw new ArgumentNullException(nameof(pageContent));
@@ -23,12 +24,14 @@ namespace BrandUp.Pages
             var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
 
             Explorer = ContentExplorer.Create(contentMetadataManager, pageContent);
+            IsDesigner = isDesigner;
         }
         private ContentContext(ContentContext parent, ContentExplorer contentExplorer)
         {
             Page = parent.Page;
             Services = parent.Services;
             Explorer = contentExplorer;
+            IsDesigner = parent.IsDesigner;
         }
 
         public ContentContext Navigate(string path)

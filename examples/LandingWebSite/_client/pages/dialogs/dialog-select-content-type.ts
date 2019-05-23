@@ -16,7 +16,7 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
     protected _onRenderContent() {
         this.element.classList.add("website-dialog-select-content-type");
 
-        this.setHeader("Выберите тип элемента");
+        this.setHeader("Выберите тип контента");
 
         this.__types.map((type, index) => {
             let itemElem = DOM.tag("a", { class: "item", href: "", "data-command": "select", "data-index": index }, type.title);

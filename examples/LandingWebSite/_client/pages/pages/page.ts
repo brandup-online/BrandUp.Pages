@@ -23,22 +23,7 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
 
         this.renderWebsiteToolbar();
 
-        var scriptElements = DOM.queryElements(this.element, "[content-script]");
-        for (var i = 0; i < scriptElements.length; i++) {
-            let elem = scriptElements.item(i);
-            let scriptName = elem.getAttribute("content-script");
-
-            let s = this.app.script(scriptName);
-            if (s) {
-                s.then((t) => {
-                    if (!this.__scripts)
-                        return;
-
-                    let uiElem: UIElement = new t.default(elem);
-                    this.__scripts.push(uiElem);
-                });
-            }
-        }
+        this.refreshScripts();
 
         this.onRenderContent();
     }
@@ -59,6 +44,27 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
     }
     attachDestroyElement(elem: UIElement) {
         this.__destroyCallbacks.push(() => { elem.destroy(); });
+    }
+
+    refreshScripts() {
+        var scriptElements = DOM.queryElements(this.element, "[content-script]");
+        for (var i = 0; i < scriptElements.length; i++) {
+            let elem = scriptElements.item(i);
+            if (elem.hasAttribute("brandup-ui-element"))
+                continue;
+
+            let scriptName = elem.getAttribute("content-script");
+            let s = this.app.script(scriptName);
+            if (s) {
+                s.then((t) => {
+                    if (!this.__scripts)
+                        return;
+
+                    let uiElem: UIElement = new t.default(elem);
+                    this.__scripts.push(uiElem);
+                });
+            }
+        }
     }
 
     destroy() {

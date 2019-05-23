@@ -22,6 +22,8 @@ namespace BrandUp.Pages.TagHelpers
         public ContentContext ContentContext { get; private set; }
         public object Content => ContentContext.Content;
         protected IJsonHelper JsonHelper => ViewContext.HttpContext.RequestServices.GetRequiredService<IJsonHelper>();
+        [HtmlAttributeName("content-render-mode")]
+        public FieldRenderMode RenderMode { get; set; }
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
@@ -34,7 +36,8 @@ namespace BrandUp.Pages.TagHelpers
             Field = textField;
 
             var administrationManager = contentContext.Services.GetRequiredService<Administration.IAdministrationManager>();
-            if (await administrationManager.CheckAsync())
+            var isAdmin = await administrationManager.CheckAsync();
+            if (isAdmin)
             {
                 var fieldModel = new Models.ContentFieldModel
                 {
@@ -54,9 +57,25 @@ namespace BrandUp.Pages.TagHelpers
                 output.Attributes.Add("content-designer", designerName.ToLower());
             }
 
+            if (!contentContext.IsDesigner && RenderMode == FieldRenderMode.HasValue)
+            {
+                var value = Field.GetModelValue(contentContext.Content);
+                if (!Field.HasValue(value))
+                {
+                    output.SuppressOutput();
+                    return;
+                }
+            }
+
             await RenderContentAsync(output);
         }
 
         protected abstract Task RenderContentAsync(TagHelperOutput output);
+    }
+
+    public enum FieldRenderMode
+    {
+        Always,
+        HasValue
     }
 }

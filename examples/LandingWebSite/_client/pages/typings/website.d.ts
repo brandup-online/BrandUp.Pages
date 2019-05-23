@@ -48,4 +48,6 @@ export interface NavigationOptions {
 
 export interface IPage {
     app: IApplication;
+
+    refreshScripts();
 }

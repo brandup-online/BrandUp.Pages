@@ -122,7 +122,7 @@ namespace BrandUp.Pages
             if (PageContent == null)
                 throw new InvalidOperationException();
 
-            ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices);
+            ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices, editSession != null);
 
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
             ParentPageId = await PageService.GetParentPageIdAsync(page);

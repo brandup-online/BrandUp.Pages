@@ -94,6 +94,8 @@ export class PageDesigner implements IPageDesigner {
 
             this.__fields[fieldDesigner.fullPath] = fieldDesigner;
         }
+
+        this.page.refreshScripts();
     }
 
     destroy() {

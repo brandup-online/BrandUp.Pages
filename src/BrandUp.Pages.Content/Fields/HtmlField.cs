@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #endregion
 
-        #region ModelField members
+        #region FieldProviderAttribute members
 
         protected override void OnInitialize()
         {
@@ -31,6 +31,13 @@ namespace BrandUp.Pages.Content.Fields
             {
                 Placeholder = Placeholder
             };
+        }
+        public override bool HasValue(object value)
+        {
+            if (!base.HasValue(value))
+                return false;
+
+            return !string.IsNullOrEmpty((string)value);
         }
 
         #endregion
