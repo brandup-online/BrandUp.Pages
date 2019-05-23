@@ -79,6 +79,9 @@ namespace BrandUp.Pages.Views
                 if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
                     tag.AddCssClass(itemRenderingContext.CssClass);
 
+                if (!string.IsNullOrEmpty(itemRenderingContext.ScriptName))
+                    tag.Attributes.Add("content-script", itemRenderingContext.ScriptName);
+
                 if (contentContext.Explorer.IsRoot)
                     tag.Attributes.Add("content-root", string.Empty);
                 tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);

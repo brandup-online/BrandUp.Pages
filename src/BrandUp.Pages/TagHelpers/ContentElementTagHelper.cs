@@ -15,6 +15,9 @@ namespace BrandUp.Pages.TagHelpers
         [HtmlAttributeName("class")]
         public string CssClass { get; set; }
 
+        [HtmlAttributeName("script")]
+        public string ScriptName { get; set; }
+
         [HtmlAttributeNotBound, ViewContext]
         public ViewContext ViewContext { get; set; }
 
@@ -27,6 +30,7 @@ namespace BrandUp.Pages.TagHelpers
 
             contentRenderingContext.HtmlTag = HtmlTag;
             contentRenderingContext.CssClass = CssClass;
+            contentRenderingContext.ScriptName = ScriptName;
         }
     }
 }

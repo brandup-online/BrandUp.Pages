@@ -152,6 +152,13 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     nav(options: NavigationOptions) {
         this.__refreshNavigation(options);
     }
+
+    script(name: string): Promise<{ default: any }> {
+        var scriptPromise = this.__builder.getScript(name);
+        if (!scriptPromise)
+            return;
+        return scriptPromise;
+    }
     
     private __refreshNavigation(options: NavigationOptions) {
         let { url, pushState } = options;
@@ -390,12 +397,21 @@ export interface AppSetupOptions {
 
 export class ApplicationBuilder {
     private __pageTypes: { [key: string]: () => Promise<any> } = {};
+    private __scripts: { [key: string]: () => Promise<any> } = {};
 
     addPageType(name: string, importFunc: () => Promise<any>) {
         this.__pageTypes[name] = importFunc;
     }
     getPageType(name: string): Promise<{ default: any }> {
         var f = this.__pageTypes[name];
+        return f();
+    }
+
+    addScript(name: string, importFunc: () => Promise<any>) {
+        this.__scripts[name] = importFunc;
+    }
+    getScript(name: string): Promise<{ default: any }> {
+        var f = this.__scripts[name];
         return f();
     }
 }

@@ -8,6 +8,7 @@ export interface LandingWebSiteModel extends AppClientModel {
 Application.setup<LandingWebSiteModel>({
     configure: (builder) => {
         builder.addPageType("content-page", () => import("./pages/pages/page"));
+        builder.addScript("BB1", () => import("./contents/BB1"));
     }
 }, (app) => {
     app.registerCommand("signin", () => {
