@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
@@ -20,11 +19,11 @@ namespace BrandUp.Pages.Controllers
             this.fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
 
-            imagesTempPath = Path.Combine(hostingEnvironment.ContentRootPath, "_temp", "images");
+            imagesTempPath = System.IO.Path.Combine(hostingEnvironment.ContentRootPath, "_temp", "images");
             if (!System.IO.Directory.Exists(imagesTempPath))
                 System.IO.Directory.CreateDirectory(imagesTempPath);
 
-            filesTempPath = Path.Combine(hostingEnvironment.ContentRootPath, "_temp", "files");
+            filesTempPath = System.IO.Path.Combine(hostingEnvironment.ContentRootPath, "_temp", "files");
             if (!System.IO.Directory.Exists(filesTempPath))
                 System.IO.Directory.CreateDirectory(filesTempPath);
         }
@@ -43,10 +42,9 @@ namespace BrandUp.Pages.Controllers
             }
 
             var imageResizer = HttpContext.RequestServices.GetService<Images.IImageResizer>();
-
             if (imageResizer != null)
             {
-                var imageTempPath = Path.Combine(imagesTempPath, $"{fileId}-{width}-{height}.jpg");
+                var imageTempPath = System.IO.Path.Combine(imagesTempPath, $"{fileId}-{width}-{height}.jpg");
                 if (System.IO.File.Exists(imageTempPath))
                     return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
 
@@ -57,7 +55,7 @@ namespace BrandUp.Pages.Controllers
                 return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
             }
 
-            var fileTempPath = Path.Combine(filesTempPath, $"{fileId}");
+            var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}");
             if (!System.IO.File.Exists(fileTempPath))
             {
                 using (var fileStream = await fileService.ReadFileAsync(fileId))

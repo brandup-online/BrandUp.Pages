@@ -61,9 +61,8 @@ namespace LandingWebSite
             services.AddPages()
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-                .AddMongoDb<Models.WebSiteDbContext>();
-
-            services.AddSingleton<BrandUp.Pages.Images.IImageResizer, Infrastructure.ImageResizer>();
+                .AddMongoDb<Models.WebSiteDbContext>()
+                .AddImageResizer<Infrastructure.ImageResizer>();
 
             services
                 .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
