@@ -36,7 +36,7 @@ namespace BrandUp.Pages.Controllers
             return Ok(model);
         }
 
-        [HttpGet, Route("brandup.pages/page", Name = "BrandUp.Pages.Page.List")]
+        [HttpGet, Route("brandup.pages/page", Name = "BrandUp.Pages.Page.Items")]
         public async Task<IActionResult> ListAsync([FromQuery]Guid collectionId)
         {
             var collection = await pageCollectionService.FindCollectiondByIdAsync(collectionId);

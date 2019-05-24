@@ -8,10 +8,45 @@
         align-items: stretch;
     }
 
+    & ol.nav {
+        flex: 0 0 auto;
+        padding: 20px 35px 15px;
+        margin: 0;
+        font-size: 12px;
+        line-height: 18px;
+        list-style: none;
+        display: flex;
+        flex-flow: row nowrap;
+        overflow: auto;
+        text-transform: lowercase;
+
+        & li {
+            padding: 0;
+            margin: 0;
+        }
+
+        & span {
+            opacity: 0.5;
+            font-weight: 600;
+
+            &:before {
+                content: '.';
+                padding: 0 5px;
+                color: #aaa;
+            }
+
+            &.root {
+                &:before {
+                    display: none;
+                }
+            }
+        }
+    }
+
     & ul.tabs {
         flex: 0 0 auto;
         list-style: none;
-        padding: 20px 35px;
+        padding: 0 35px 20px;
         margin: 0;
         display: flex;
         flex-flow: row nowrap;
@@ -26,6 +61,9 @@
             text-decoration: none;
             color: @Text-Color;
             opacity: 0.8;
+            border-bottom: solid 2px transparent;
+            text-transform: lowercase;
+            padding-bottom: 3px;
 
             &:hover {
                 opacity: 0.9;
@@ -34,6 +72,7 @@
             &.selected {
                 color: @Accent-Color;
                 opacity: 1;
+                border-bottom-color: @Accent-Color;
             }
         }
     }
@@ -177,10 +216,18 @@
 
     & .empty {
         display: flex;
+        flex-flow: column nowrap;
         justify-content: center;
         align-items: center;
         padding: 35px 35px;
         box-sizing: border-box;
+
+        & .text {
+        }
+
+        & .buttons {
+            padding-top: 20px;
+        }
     }
 
     & .new-item {
@@ -192,6 +239,7 @@
 
         & a {
             text-decoration: none;
+            font-weight: bold;
         }
     }
 }

@@ -24,6 +24,7 @@ namespace BrandUp.Pages.TagHelpers
         protected IJsonHelper JsonHelper => ViewContext.HttpContext.RequestServices.GetRequiredService<IJsonHelper>();
         [HtmlAttributeName("content-render-mode")]
         public FieldRenderMode RenderMode { get; set; }
+        public bool IsDesigner => ContentContext.IsDesigner;
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {

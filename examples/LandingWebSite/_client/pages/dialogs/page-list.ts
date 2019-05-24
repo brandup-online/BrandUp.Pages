@@ -4,7 +4,10 @@ import { DOM } from "brandup-ui";
 import { createPage } from "./page-create";
 import { deletePage } from "./page-delete";
 
-export class PageListDialog extends ListDialog<PageModel> {
+export class PageListDialog extends ListDialog<any, PageModel> {
+    protected _buildList(model: any) {
+        throw new Error("Method not implemented.");
+    }
     readonly collectionId: string;
 
     constructor(collectionId: string, options?: DialogOptions) {
@@ -38,10 +41,10 @@ export class PageListDialog extends ListDialog<PageModel> {
         this.loadItems();
     }
 
-    protected _getItemsUrl(): string {
+    protected _buildUrl(): string {
         return `/brandup.pages/page`;
     }
-    protected _onSetUrlParams(urlParams: { [key: string]: string; }) {
+    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
         urlParams["collectionId"] = this.collectionId;
     }
     protected _getItemId(item: PageModel): string {

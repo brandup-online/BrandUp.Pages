@@ -53,7 +53,7 @@ namespace BrandUp.Pages.Controllers
             return Ok(result);
         }
 
-        [HttpGet, Route("brandup.pages/collection", Name = "BrandUp.Pages.Collection.List")]
+        [HttpGet, Route("brandup.pages/collection", Name = "BrandUp.Pages.Collection.Items")]
         public async Task<IActionResult> ListAsync([FromQuery]Guid? pageId)
         {
             var result = new List<Models.PageCollectionModel>();

@@ -42,17 +42,22 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         if (file instanceof File) {
             let fileObject = <File>file;
 
+            let width = this.element.getAttribute("content-image-width");
+            let height = this.element.getAttribute("content-image-height");
+
             this.request({
                 url: `/brandup.pages/content/image`,
                 urlParams: {
-                    fileName: file.name
+                    fileName: file.name,
+                    width: width,
+                    height: height
                 },
                 method: "POST",
                 data: fileObject,
-                success: (data: ImageFieldValue, status: number) => {
+                success: (data: string, status: number) => {
                     switch (status) {
                         case 200:
-                            this.element.style.backgroundImage = `url(${data.previewUrl})`;
+                            this.element.style.backgroundImage = `url(${data})`;
 
                             this.element.classList.remove("uploading");
 

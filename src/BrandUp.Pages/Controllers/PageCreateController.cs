@@ -24,7 +24,7 @@ namespace BrandUp.Pages.Controllers
             this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
         }
 
-        #region Action methods
+        #region FormController methods
 
         protected override async Task OnInitializeAsync()
         {

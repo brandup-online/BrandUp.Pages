@@ -1,21 +1,26 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { ajaxRequest, DOM } from "brandup-ui";
+import { ajaxRequest, DOM, AjaxQueue } from "brandup-ui";
 import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 
-export abstract class ListDialog<TItem> extends Dialog<any> {
-    private __itemsElem: HTMLElement;
+export abstract class ListDialog<TList, TItem> extends Dialog<any> {
+    protected __itemsElem: HTMLElement;
+    private __newItemElem: HTMLElement;
+    readonly queue: AjaxQueue;
     private __closeItemMenuFunc: (e: MouseEvent) => void;
+    protected __model: TList;
+
+    constructor(options?: DialogOptions) {
+        super(options);
+
+        this.queue = new AjaxQueue();
+    }
     
     protected _onRenderContent() {
         this.element.classList.add("website-dialog-list");
         
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.content.appendChild(this.__itemsElem);
-        
-        let newItemElem = DOM.tag("div", { class: "new-item" });
-        this.content.appendChild(newItemElem);
-        this._renderNewItem(newItemElem);
         
         this.registerCommand("item-open-menu", (el: HTMLElement) => {
             el.parentElement.parentElement.classList.add("opened-menu");
@@ -28,17 +33,68 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
         };
 
         document.body.addEventListener("mousedown", this.__closeItemMenuFunc);
+
+        this.__loadList();
     }
 
+    private __loadList() {
+        var urlParams: { [key: string]: string; } = {};
+
+        this._buildUrlParams(urlParams);
+
+        this.setLoading(true);
+
+        this.queue.request({
+            url: this._buildUrl(),
+            urlParams: urlParams,
+            method: "GET",
+            success: (data: any, status: number) => {
+                this.setLoading(false);
+
+                switch (status) {
+                    case 200: {
+                        this.__model = <TList>data;
+                        this._buildList(this.__model);
+                        this.loadItems();
+                        break;
+                    }
+                    default: {
+                        this.setError("Error loading list.");
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    refresh() {
+        this.__loadList();
+    }
     loadItems() {
+        if (!this._allowLoadItems()) {
+            DOM.empty(this.__itemsElem);
+
+            if (this.__newItemElem) {
+                this.__newItemElem.remove();
+                this.__newItemElem = null;
+            }
+
+            return;
+        }
+
         this.setLoading(true);
 
         var urlParams: { [key: string]: string; } = {};
+        this._buildUrlParams(urlParams);
 
-        this._onSetUrlParams(urlParams);
+        urlParams["offset"] = "0";
+        urlParams["limit"] = "50";
+
+        var url = this._buildUrl();
+        url += "/item";
 
         ajaxRequest({
-            url: this._getItemsUrl(),
+            url: url,
             urlParams: urlParams,
             success: (data: Array<TItem>, status: number) => {
                 this.setLoading(false);
@@ -102,6 +158,12 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
 
         DOM.empty(this.__itemsElem);
         this.__itemsElem.appendChild(fragment);
+
+        if (!this.__newItemElem) {
+            this.__newItemElem = DOM.tag("div", { class: "new-item" });
+            this.content.appendChild(this.__newItemElem);
+            this._renderNewItem(this.__newItemElem);
+        }
     }
     private __renderItem(itemId: string, item: TItem, elem: HTMLElement) {
         var contentElem: HTMLElement;
@@ -121,8 +183,10 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
         DOM.removeClass(this.__itemsElem, ".opened-menu", "opened-menu");
     }
 
-    protected abstract _getItemsUrl(): string;
-    protected abstract _onSetUrlParams(urlParams: { [key: string]: string; });
+    protected abstract _buildUrl(): string;
+    protected _buildUrlParams(urlParams: { [key: string]: string; }) { }
+    protected abstract _buildList(model: TList);
+    protected _allowLoadItems(): boolean { return true; }
     protected abstract _getItemId(item: TItem): string;
     protected abstract _renderItemContent(item: TItem, contentElem: HTMLElement);
     protected abstract _renderItemMenu(item: TItem, menuElem: HTMLElement);
@@ -131,6 +195,8 @@ export abstract class ListDialog<TItem> extends Dialog<any> {
 
     destroy() {
         document.body.removeEventListener("mousedown", this.__closeItemMenuFunc);
+
+        this.queue.destroy();
 
         super.destroy();
     }

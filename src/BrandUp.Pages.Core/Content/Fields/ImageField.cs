@@ -55,7 +55,7 @@ namespace BrandUp.Pages.Content.Fields
                 var imageValue = (ImageValue)modelValue;
 
                 var fileUrlGenerator = services.GetRequiredService<IFileUrlGenerator>();
-                var previewUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue);
+                var previewUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue, 600, 500);
 
                 formValue = new ImageFieldFormValue
                 {

@@ -162,9 +162,6 @@
     <None Update="_client\pages\dialogs\page-collection-update.js">
       <DependentUpon>page-collection-update.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\dialogs\page-collection-update.js.map">
-      <DependentUpon>page-collection-update.js</DependentUpon>
-    </None>
   </ItemGroup>
 
 

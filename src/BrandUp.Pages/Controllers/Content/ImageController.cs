@@ -8,15 +8,17 @@ namespace BrandUp.Pages.Controllers
 {
     public class ImageController : FieldController<IImageField>
     {
-        private readonly FileService fileService;
+        readonly FileService fileService;
+        readonly Files.IFileUrlGenerator fileUrlGenerator;
 
-        public ImageController(FileService fileService)
+        public ImageController(FileService fileService, Files.IFileUrlGenerator fileUrlGenerator)
         {
             this.fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+            this.fileUrlGenerator = fileUrlGenerator ?? throw new ArgumentNullException(nameof(fileUrlGenerator));
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromQuery]string fileName)
+        public async Task<IActionResult> PostAsync([FromQuery]string fileName, [FromQuery]string width = null, [FromQuery]string height = null)
         {
             if (string.IsNullOrEmpty(fileName))
                 return BadRequest();
@@ -24,19 +26,19 @@ namespace BrandUp.Pages.Controllers
             var contentType = Request.ContentType;
             if (!contentType.StartsWith("image"))
                 return BadRequest();
-            var fileType = contentType.Substring(contentType.IndexOf("/") + 1);
 
             var file = await fileService.UploadFileAsync(Page, fileName, contentType, Request.Body);
-
-            //if (Field.TryGetModelValue(ContentContext.Content, out ImageValue curValue) && curValue.ValueType == ImageValueType.Id)
-            //{
-            //    await fileService.DeleteFileAsync(curValue);
-            //}
 
             var modelValue = new ImageValue(file.Id);
             Field.SetModelValue(ContentContext.Content, modelValue);
 
             await SaveChangesAsync();
+
+            if (width != null && height != null)
+            {
+                var fielUrl = await fileUrlGenerator.GetImageUrlAsync(modelValue, int.Parse(width), int.Parse(height));
+                return Ok(fielUrl);
+            }
 
             return await FormValueAsync();
         }

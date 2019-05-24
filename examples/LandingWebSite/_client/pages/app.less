@@ -100,3 +100,26 @@ button.brandup-pages-toolbar-button {
         }
     }
 }
+
+button.brandup-pages-button {
+    box-sizing: border-box;
+    background: none;
+    border: 0;
+    outline: none;
+    height: 42px;
+    cursor: pointer;
+    opacity: 0.8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: @Accent-Color;
+    padding: 0 20px;
+    color: @Main-Color;
+    border-radius: @Border-Radius;
+
+    &:hover,
+    &:focus,
+    &:active {
+        opacity: 1;
+    }
+}

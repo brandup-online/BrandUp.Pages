@@ -47,6 +47,12 @@ namespace BrandUp.Pages.TagHelpers
             styleStr += $"background-image: url({imageUrl});";
 
             output.Attributes.SetAttribute(new TagHelperAttribute(StyleAttributeName, styleStr));
+
+            if (IsDesigner)
+            {
+                output.Attributes.SetAttribute("content-image-width", Width);
+                output.Attributes.SetAttribute("content-image-height", Height);
+            }
         }
     }
 }
