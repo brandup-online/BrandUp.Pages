@@ -40,7 +40,6 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                 this.__refreshItem(itemElem);
             });
         });
-
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             let itemElem = elem.closest("[content-path-index]");
             let itemIndex = parseInt(itemElem.getAttribute("content-path-index"));
@@ -63,7 +62,6 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                 }
             });
         });
-
         this.registerCommand("item-add", (elem: HTMLElement) => {
             if (this.options.itemTypes.length === 1) {
                 this.__addItem(this.options.itemTypes[0].name);
@@ -73,6 +71,61 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                     this.__addItem(type.name);
                 });
             }
+        });
+
+        this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
+            let target = <Element>e.target;
+            if (target.hasAttribute("content-path-index")) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData("content-path-index", target.getAttribute('content-path-index'));
+                return true;
+            }
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+        }, false);
+        this.__itemsElem.addEventListener("dragenter", (e: DragEvent) => {
+            e.preventDefault();
+            return true;
+        });
+        this.__itemsElem.addEventListener("dragover", (e: DragEvent) => {
+            e.preventDefault();
+        });
+        this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
+            let target = <Element>e.target;
+            var sourceIndex = e.dataTransfer.getData("content-path-index");
+            let elem = target.closest("[content-path-index]");
+            if (elem) {
+                let destIndex = elem.getAttribute("content-path-index");
+                if (destIndex !== sourceIndex) {
+                    console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
+
+                    let sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
+                    if (sourceElem) {
+                        elem.insertAdjacentElement("afterend", sourceElem);
+
+                        this.form.queue.request({
+                            url: '/brandup.pages/content/model/move',
+                            urlParams: {
+                                editId: this.form.editId,
+                                path: this.form.contentPath,
+                                field: this.name,
+                                itemIndex: sourceIndex,
+                                newIndex: destIndex
+                            },
+                            method: "POST",
+                            success: (data: ModelFieldFormValue, status: number) => {
+                                if (status === 200) {
+                                    this.setValue(data);
+                                }
+                            }
+                        });
+                    }
+                }
+            }
+
+            e.stopPropagation();
+            return false;
         });
     }
 
@@ -104,22 +157,14 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
     }
     private __createItemElem(item: ContentModel, index: number) {
         let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString(), draggable: "true" }, [
-            DOM.tag("div", { class: "index" }, `#${index + 1}`),
+            DOM.tag("div", { class: "index", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),
             DOM.tag("div", { class: "type" }, item.type.title),
             DOM.tag("ul", null, [
-                DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-settings" }, iconEdit)),
-                DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-delete" }, iconDelete))
+                DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-settings", title: "Редактировать" }, iconEdit)),
+                DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "item-delete", title: "Удалить" }, iconDelete))
             ])
         ]);
-
-        itemElem.addEventListener("dragstart", (e: DragEvent) => {
-            e.preventDefault();
-        }, false);
-
-        itemElem.addEventListener("dragover", (e: DragEvent) => {
-            e.preventDefault();
-        });
 
         return itemElem;
     }

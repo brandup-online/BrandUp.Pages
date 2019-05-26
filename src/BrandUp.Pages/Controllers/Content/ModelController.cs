@@ -155,6 +155,34 @@ namespace BrandUp.Pages.Controllers
             return await FormValueAsync();
         }
 
+        [HttpPost("move")]
+        public async Task<IActionResult> MoveAsync([FromQuery]int itemIndex, [FromQuery]int newIndex)
+        {
+            if (itemIndex == newIndex)
+                return BadRequest();
+            if (!Field.IsListValue)
+                return BadRequest();
+
+            if (Field.GetModelValue(ContentContext.Content) is IList list)
+            {
+                if (itemIndex > list.Count - 1)
+                    return BadRequest();
+                if (newIndex > list.Count - 1)
+                    return BadRequest();
+
+                var item = list[itemIndex];
+
+                list.RemoveAt(itemIndex);
+                list.Insert(newIndex, item);
+
+                Field.SetModelValue(ContentContext.Content, list);
+
+                await SaveChangesAsync();
+            }
+
+            return await FormValueAsync();
+        }
+
         [HttpDelete]
         public async Task<IActionResult> DeleteAsync([FromQuery]int itemIndex)
         {
