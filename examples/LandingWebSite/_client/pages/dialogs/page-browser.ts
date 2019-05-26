@@ -131,7 +131,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
 
             this.__itemsElem.insertAdjacentElement("beforebegin", this.__createCollElem = DOM.tag("div", { class: "empty" }, [
                 DOM.tag("div", { class: "text" }, "Для страницы не созрано коллекций страниц."),
-                DOM.tag("div", { class: "buttons" }, DOM.tag("button", { class: "brandup-pages-button", "data-command": "create-collection" }, "Создать коллекцию"))
+                DOM.tag("div", { class: "buttons" }, DOM.tag("button", { class: "bp-button", "data-command": "create-collection" }, "Создать коллекцию"))
             ]));
         }
 

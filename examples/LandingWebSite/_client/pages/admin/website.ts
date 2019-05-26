@@ -16,20 +16,20 @@ export class WebSiteToolbar extends UIElement {
         var buttons: Array<HTMLElement> = [];
 
         if (isContentPage && (<ContentPage>page).model.parentPageId) {
-            buttons.push(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-back" }, iconBack));
+            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-back" }, iconBack));
         }
 
-        buttons.push(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-collections" }, iconList));
+        buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-collections" }, iconList));
 
         if (isContentPage) {
-            buttons.push(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-collections2" }, iconTree));
+            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-collections2" }, iconTree));
         }
 
-        var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar" }, buttons);
+        var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
 
-        this.registerCommand("brandup-pages-back", () => {
+        this.registerCommand("bp-back", () => {
             let parentPageId: string = null;
             if (isContentPage)
                 parentPageId = (<ContentPage>page).model.parentPageId;
@@ -43,14 +43,14 @@ export class WebSiteToolbar extends UIElement {
             }
         });
 
-        this.registerCommand("brandup-pages-collections", () => {
+        this.registerCommand("bp-collections", () => {
             let parentPageId: string = null;
             if (isContentPage)
                 parentPageId = (<ContentPage>page).model.parentPageId;
             browserPage(parentPageId);
         });
 
-        this.registerCommand("brandup-pages-collections2", () => {
+        this.registerCommand("bp-collections2", () => {
             let parentPageId: string = null;
             if (isContentPage)
                 parentPageId = (<ContentPage>page).model.id;

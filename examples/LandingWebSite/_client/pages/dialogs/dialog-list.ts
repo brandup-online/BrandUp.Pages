@@ -17,7 +17,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
     }
     
     protected _onRenderContent() {
-        this.element.classList.add("website-dialog-list");
+        this.element.classList.add("bp-dialog-list");
         
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.content.appendChild(this.__itemsElem);

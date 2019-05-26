@@ -14,7 +14,7 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
     get typeName(): string { return "BrandUpPages.SelectItemTypeDialog"; }
 
     protected _onRenderContent() {
-        this.element.classList.add("website-dialog-select-content-type");
+        this.element.classList.add("bp-dialog-select-content-type");
 
         this.setHeader("Выберите тип контента");
 

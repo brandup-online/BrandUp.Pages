@@ -17,7 +17,7 @@ export class PageBlocksDesigner extends ModelDesigner {
         elem.classList.add("page-blocks-designer");
 
         if (this.options.isListValue) {
-            elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-new-item brandup-pages-elem" }, '<div><ol><li><a href="#" data-command="item-add" class="accent">Добавить блок</a></li></ol></div>'));
+            elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-new-item bp-elem" }, '<div><ol><li><a href="#" data-command="item-add" class="accent">Добавить блок</a></li></ol></div>'));
         }
     }
 

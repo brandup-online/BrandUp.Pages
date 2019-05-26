@@ -8,7 +8,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     private __item: TItem;
     
     protected _onRenderContent() {
-        this.element.classList.add("website-dialog-delete");
+        this.element.classList.add("bp-dialog-delete");
         
         this.addAction("close", "Отмена");
         this.addAction("confirm", "Удалить", true);

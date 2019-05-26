@@ -22,29 +22,27 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
     }
 
     protected _getHtmlTemplate(): string {
-        return '<div class="website-dialog-header">' +
+        return '<div class="bp-dialog-header">' +
             '    <span class="title"></span>' +
             '</div>' +
-            '<div class="website-dialog-content"></div>' +
-            '<div class="website-dialog-footer">' +
+            '<div class="bp-dialog-content"></div>' +
+            '<div class="bp-dialog-footer">' +
             '   <span class="notes"></span>' +
             '</div>';
     }
     protected _onRender() {
-        this.element.classList.add("website-dialog");
+        this.element.classList.add("bp-dialog");
 
-        this.headerElem = DOM.getElementByClass(this.element, "website-dialog-header");
+        this.headerElem = DOM.getElementByClass(this.element, "bp-dialog-header");
         this.headerTitleElem = DOM.getElementByClass(this.headerElem, "title");
-        this.contentElem = DOM.getElementByClass(this.element, "website-dialog-content");
-        this.footerElem = DOM.getElementByClass(this.element, "website-dialog-footer");
+        this.contentElem = DOM.getElementByClass(this.element, "bp-dialog-content");
+        this.footerElem = DOM.getElementByClass(this.element, "bp-dialog-footer");
         this.footerNotesElem = DOM.getElementByClass(this.footerElem, "notes");
 
         if (this.options.header)
             this.setHeader(this.options.header);
         if (this.options.notes)
             this.setHeader(this.options.notes);
-        if (this.options.disablePageScroll)
-            document.body.classList.add("");
 
         if (this.__parentDialog) {
             this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
@@ -103,7 +101,7 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
     setError(title: string, notes?: string) {
         this.element.classList.add("has-error");
 
-        this.__errorElem = DOM.tag("div", { class: "website-dialog-error" }, title);
+        this.__errorElem = DOM.tag("div", { class: "bp-dialog-error" }, title);
 
         this.content.insertAdjacentElement("beforebegin", this.__errorElem);
     }
@@ -177,9 +175,8 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
 export interface DialogOptions {
     header?: string;
     notes?: string;
-    disablePageScroll?: boolean;
 }
 
-var dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "brandup-pages-elem website-dialogs-panel" });
+var dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
 var currentDialog: Dialog<any> = null;
 document.body.appendChild(dialogsPanelElem);

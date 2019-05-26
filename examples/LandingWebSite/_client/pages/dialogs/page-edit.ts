@@ -27,7 +27,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     get typeName(): string { return "BrandUpPages.PageEditDialog"; }
 
     protected _onRenderContent() {
-        this.element.classList.add("website-dialog-form");
+        this.element.classList.add("bp-dialog-form");
 
         this.content.appendChild(this.__formElem = <HTMLFormElement>DOM.tag("form", { method: "POST" }));
         this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));

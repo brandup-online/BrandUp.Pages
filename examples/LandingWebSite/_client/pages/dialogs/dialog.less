@@ -2,7 +2,7 @@
 
 @Dialog-List-ChangedItem-Background: #ffff95;
 
-.website-dialogs-panel {
+.bp-dialog-panel {
     position: fixed;
     left: 0;
     top: 0;
@@ -15,7 +15,7 @@
     overflow: hidden;
 }
 
-.website-dialog {
+.bp-dialog {
     position: absolute;
     right: 0;
     top: 0;
@@ -161,28 +161,28 @@
     }
 
     &.has-header {
-        & .website-dialog-header {
+        & .bp-dialog-header {
             display: flex;
         }
     }
 
     &.has-notes,
     &.has-actions {
-        & .website-dialog-footer {
+        & .bp-dialog-footer {
             display: flex;
         }
     }
 
     &.has-error {
-        & .website-dialog-content {
+        & .bp-dialog-content {
             display: none;
         }
 
-        & .website-dialog-footer {
+        & .bp-dialog-footer {
             display: none;
         }
 
-        & .website-dialog-error {
+        & .bp-dialog-error {
             visibility: visible;
         }
     }
@@ -212,7 +212,7 @@
 
 body {
     &.website-state-showdialog {
-        & .website-dialogs-panel {
+        & .bp-dialog-panel {
             visibility: visible;
         }
     }
@@ -230,14 +230,14 @@ body {
 @-webkit-keyframes cms-dialog-show { 0% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes cms-dialog-show { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-@-moz-keyframes website-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
-@-webkit-keyframes website-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
-@keyframes website-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
+@-moz-keyframes bp-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
+@-webkit-keyframes bp-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
+@keyframes bp-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
 
-@-moz-keyframes website-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
-@-webkit-keyframes website-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes website-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
+@-moz-keyframes bp-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
+@-webkit-keyframes bp-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes bp-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
 
-@-moz-keyframes website-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
-@-webkit-keyframes website-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
-@keyframes website-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
+@-moz-keyframes bp-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
+@-webkit-keyframes bp-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
+@keyframes bp-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }

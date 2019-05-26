@@ -8,7 +8,6 @@ import iconPublish from "../svg/toolbar-button-publish.svg";
 import iconSave from "../svg/toolbar-button-save.svg";
 import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
-import { Element } from "brandup-pages-ckeditor";
 
 export class PageToolbar extends UIElement {
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
@@ -16,20 +15,20 @@ export class PageToolbar extends UIElement {
     constructor(page: ContentPage) {
         super();
 
-        var toolbarElem = DOM.tag("div", { class: "brandup-pages-elem brandup-pages-toolbar brandup-pages-toolbar-right" });
+        var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
         let isLoading = false;
 
         if (page.model.editId) {
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-content" }, iconSettings));
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-commit" }, iconSave));
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-discard" }, iconDiscard));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-content" }, iconSettings));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-commit" }, iconSave));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-discard" }, iconDiscard));
             
-            this.registerCommand("brandup-pages-content", () => {
+            this.registerCommand("bp-content", () => {
                 editPage(page.model.editId).then(() => {
                     page.app.reload();
                 });
             });
-            this.registerCommand("brandup-pages-commit", (elem: HTMLElement) => {
+            this.registerCommand("bp-commit", (elem: HTMLElement) => {
                 if (isLoading)
                     return;
                 isLoading = true;
@@ -43,7 +42,7 @@ export class PageToolbar extends UIElement {
                     }
                 });
             });
-            this.registerCommand("brandup-pages-discard", (elem: HTMLElement) => {
+            this.registerCommand("bp-discard", (elem: HTMLElement) => {
                 if (isLoading)
                     return;
                 isLoading = true;
@@ -60,19 +59,19 @@ export class PageToolbar extends UIElement {
         }
         else {
             if (page.model.status !== "Published") {
-                toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-publish" }, iconPublish));
+                toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-publish" }, iconPublish));
 
-                this.registerCommand("brandup-pages-publish", () => {
+                this.registerCommand("bp-publish", () => {
                     publishPage(page.model.id).then(result => {
                         page.app.nav({ url: result.url, pushState: false });
                     });
                 });
             }
 
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-seo" }, iconSeo));
-            toolbarElem.appendChild(DOM.tag("button", { class: "brandup-pages-toolbar-button", "data-command": "brandup-pages-edit" }, iconEdit));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-seo" }, iconSeo));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-edit" }, iconEdit));
 
-            this.registerCommand("brandup-pages-edit", () => {
+            this.registerCommand("bp-edit", () => {
                 if (isLoading)
                     return;
                 isLoading = true;
@@ -84,7 +83,7 @@ export class PageToolbar extends UIElement {
                         isLoading = false;
 
                         if (data.currentDate) {
-                            let popup = DOM.tag("div", { class: "brandup-pages-toolbar-popup" }, [
+                            let popup = DOM.tag("div", { class: "bp-toolbar-popup" }, [
                                 DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                                 DOM.tag("div", { class: "buttons" }, [
                                     DOM.tag("button", { "data-command": "continue-edit", "data-value": data.url }, "Продолжить"),
@@ -125,7 +124,7 @@ export class PageToolbar extends UIElement {
             this.__closePopupFunc = (e: MouseEvent) => {
                 let t = <HTMLElement>e.target;
 
-                if (!t.closest(".brandup-pages-toolbar-popup")) {
+                if (!t.closest(".bp-toolbar-popup")) {
                     this.__popupElem.remove();
                     this.__popupElem = null;
                     document.body.removeEventListener("click", this.__closePopupFunc);
