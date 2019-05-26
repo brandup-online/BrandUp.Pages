@@ -7,9 +7,11 @@ import { ImageContent } from "../content/field/image";
 import { ModelField } from "../content/field/model";
 import { HyperLinkContent } from "../content/field/hyperlink";
 import { PagesContent } from "../content/field/pages";
+import "./dialog-form.less";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
+    private navElem: HTMLElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IContentField } = {};
     readonly queue: AjaxQueue;
@@ -29,16 +31,13 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-form");
 
-        this.content.appendChild(this.__formElem = <HTMLFormElement>DOM.tag("form", { method: "POST" }));
+        this.content.appendChild(this.__formElem = <HTMLFormElement>DOM.tag("form", { method: "POST", class: "nopad" }));
         this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));
 
         this.__formElem.addEventListener("submit", (e: Event) => {
             e.preventDefault();
             return false;
         });
-        //this.__formElem.addEventListener("changed", (e: CustomEvent) => {
-        //    this.__onChangeField(e.detail.field);
-        //});
 
         this.setHeader("Контент страницы");
 
@@ -55,12 +54,29 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                 }
 
                 this.__renderForm(data);
-
-                
             }
         });
     }
     private __renderForm(model: PageContentForm) {
+        if (!this.navElem) {
+            this.navElem = DOM.tag("ol", { class: "nav" });
+            this.content.insertAdjacentElement("afterbegin", this.navElem);
+        }
+        else {
+            DOM.empty(this.navElem);
+        }
+
+        var path = model.path;
+        while (path) {
+            let title = path.title;
+            if (path.index >= 0)
+                title = `#${path.index + 1} ${title}`;
+
+            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", null, DOM.tag("span", {}, title)));
+
+            path = path.parent;
+        }
+
         for (let i = 0; i < model.fields.length; i++) {
             var fieldModel = model.fields[i];
 

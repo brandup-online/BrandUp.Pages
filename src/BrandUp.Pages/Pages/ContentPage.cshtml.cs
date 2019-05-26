@@ -172,8 +172,28 @@ namespace BrandUp.Pages
 
             var formModel = new Models.PageContentForm
             {
-                Path = contentContext.Explorer.ModelPath
+                Path = new Models.PageContentPath
+                {
+                    Name = contentContext.Explorer.Metadata.Name,
+                    Title = contentContext.Explorer.Metadata.Title,
+                    Index = contentContext.Explorer.Index
+                }
             };
+
+            var path = formModel.Path;
+            var explorer = contentContext.Explorer.Parent;
+            while (explorer != null)
+            {
+                path.Parent = new Models.PageContentPath
+                {
+                    Name = explorer.Metadata.Name,
+                    Title = explorer.Metadata.Title,
+                    Index = explorer.Index
+                };
+
+                explorer = explorer.Parent;
+                path = path.Parent;
+            }
 
             foreach (var field in contentContext.Explorer.Metadata.Fields)
             {

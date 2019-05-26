@@ -39,9 +39,16 @@ export interface IContentFieldDesigner {
 }
 
 interface PageContentForm {
-    path: string;
+    path: PageContentPath;
     fields: Array<ContentFieldModel>;
     values: { [key: string]: any };
+}
+
+interface PageContentPath {
+    parent: PageContentPath;
+    name: string;
+    title: string;
+    index: number;
 }
 
 interface ContentFieldModel {
