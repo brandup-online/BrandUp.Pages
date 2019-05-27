@@ -13,7 +13,6 @@ namespace BrandUp.Pages.Content
 
         public const string ContentTypeNameDataKey = "_type";
         public static readonly string[] ContentTypePrefixes = new string[] { "Content", "Model" };
-        private static readonly object[] ModelConstructorParameters = new object[0];
         private readonly ConstructorInfo modelConstructor = null;
         private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
         private readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
@@ -49,12 +48,6 @@ namespace BrandUp.Pages.Content
             Name = contentTypeAttribute.Name ?? GetTypeName(modelType);
             Title = contentTypeAttribute.Title ?? Name;
             Description = contentTypeAttribute.Description;
-
-            IsGroup = contentTypeAttribute.IsGroup;
-            if (IsGroup)
-            {
-
-            }
         }
 
         #region Properties

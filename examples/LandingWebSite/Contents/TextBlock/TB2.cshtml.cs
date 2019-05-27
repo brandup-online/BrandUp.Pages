@@ -6,7 +6,7 @@ namespace LandingWebSite.Contents.TextBlock
     [ContentType(Title = "Текст с заголовком")]
     public class TB2 : TextBlockContent
     {
-        [Text]
+        [Text(DisplayBeforeField = nameof(Text))]
         public string Header { get; set; }
     }
 }

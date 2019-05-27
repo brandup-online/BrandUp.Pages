@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
@@ -195,7 +196,9 @@ namespace BrandUp.Pages
                 path = path.Parent;
             }
 
-            foreach (var field in contentContext.Explorer.Metadata.Fields)
+            var fields = contentContext.Explorer.Metadata.Fields.ToList();
+
+            foreach (var field in fields)
             {
                 formModel.Fields.Add(new Models.ContentFieldModel
                 {

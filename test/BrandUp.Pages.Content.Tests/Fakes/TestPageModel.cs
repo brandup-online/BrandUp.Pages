@@ -41,7 +41,8 @@ namespace BrandUp.Pages.ContentModels
     [ContentType(Title = "Article"), View]
     public class ArticlePage : TestPageContent
     {
-
+        [Text(DisplayBeforeField = nameof(Header))]
+        public string SubHeader { get; set; }
     }
 
     [ContentType(Title = "News"), View]

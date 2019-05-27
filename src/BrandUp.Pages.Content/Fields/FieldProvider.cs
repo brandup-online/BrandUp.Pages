@@ -15,6 +15,7 @@ namespace BrandUp.Pages.Content.Fields
         #region Properties
 
         internal string JsonPropertyName { get; private set; }
+        public string DisplayBeforeField { get; set; }
 
         #endregion
 

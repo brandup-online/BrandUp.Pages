@@ -231,6 +231,33 @@ namespace BrandUp.Pages.Content
             }
         }
 
+        [Fact]
+        public void Fields_DefaultSorting()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+
+            var fields = contentMetadata.Fields.ToList();
+
+            Assert.Equal("Title", fields[0].Name);
+            Assert.Equal("Header", fields[1].Name);
+            Assert.Equal("Headers", fields[2].Name);
+            Assert.Equal("SubHeader", fields[3].Name);
+        }
+
+        //[Fact]
+        //public void Fields_CustomSorting()
+        //{
+        //    var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+
+        //    var fields = contentMetadata.Fields.ToList();
+        //    fields.Sort();
+
+        //    Assert.Equal("Title", fields[0].Name);
+        //    Assert.Equal("SubHeader", fields[1].Name);
+        //    Assert.Equal("Header", fields[2].Name);
+        //    Assert.Equal("Headers", fields[3].Name);
+        //}
+
         #endregion
     }
 }
