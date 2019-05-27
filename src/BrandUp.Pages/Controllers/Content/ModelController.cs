@@ -11,6 +11,27 @@ namespace BrandUp.Pages.Controllers
 {
     public class ModelController : FieldController<IModelField>
     {
+        [HttpGet("types")]
+        public IActionResult GetContentTypes()
+        {
+            var result = new List<Models.ContentTypeModel>();
+
+            var contentTypes = Field.ContentMetadata.GetDerivedMetadataWithHierarhy(true);
+            foreach (var contentType in contentTypes)
+            {
+                if (!contentType.IsAbstract)
+                    continue;
+
+                result.Add(new Models.ContentTypeModel
+                {
+                    Name = contentType.Name,
+                    Title = contentType.Title
+                });
+            }
+
+            return Ok(result);
+        }
+
         [HttpGet("data")]
         public IActionResult GetData([FromQuery]int itemIndex = -1)
         {
@@ -39,7 +60,7 @@ namespace BrandUp.Pages.Controllers
                 }
             };
 
-            return Json(result);
+            return Ok(result);
         }
 
         [HttpGet("view")]

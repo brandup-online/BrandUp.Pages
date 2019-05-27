@@ -1,9 +1,8 @@
 ﻿import { FieldDesigner } from "./base";
-import { TextboxOptions } from "../../form/textbox";
 import createEditor, { EditorInstance } from "brandup-pages-ckeditor";
 import "./html.less";
 
-export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
+export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     private __isChanged: boolean;
     private __editor: EditorInstance;
 
@@ -26,20 +25,6 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
 
                 this.__refreshUI();
             });
-
-            //editor["editing"].view.document.on('change:isFocused', (evt, name, value) => {
-            //    if (value) {
-            //        this.__isChanged = false;
-            //    }
-            //    else {
-            //        if (this.__isChanged) {
-            //            this.__editor.model.document.differ.reset();
-            //            this._onChanged();
-            //        }
-
-            //        this.__refreshUI();
-            //    }
-            //});
 
             this.__refreshUI();
         });
@@ -110,9 +95,6 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
 
         value = value.trim();
 
-        if (!this.options.allowMultiline)
-            value = value.replace("\n\r", " ");
-
         return value;
     }
 
@@ -120,5 +102,11 @@ export class HtmlDesigner extends FieldDesigner<TextboxOptions> {
         this.__editor.destroy().then(() => {
             super.destroy();
         });
+
+        super.destroy();
     }
+}
+
+export interface HtmlFieldFormOptions {
+    placeholder: string;
 }

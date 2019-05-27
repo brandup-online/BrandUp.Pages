@@ -1,0 +1,34 @@
+﻿@import "../../vars.less";
+
+.website-form-field.html {
+    position: relative;
+    line-height: 20px;
+    min-height: 20px;
+    position: relative;
+
+    & .value {
+        &.ck.ck-editor__editable_inline {
+            border: 0 !important;
+            border-bottom: solid 1px #eee !important;
+            outline: none;
+            padding: 7px 0 5px;
+
+            &:hover {
+                border-bottom-color: #ddd !important;
+            }
+
+            &:focus {
+                border-bottom-color: #ddd !important;
+            }
+
+            & p {
+                margin: 5px 0;
+            }
+        }
+
+        & .ck-placeholder {
+            opacity: 0.5;
+            color: inherit;
+        }
+    }
+}

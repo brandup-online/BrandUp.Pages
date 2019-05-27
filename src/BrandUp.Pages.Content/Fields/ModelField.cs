@@ -204,6 +204,7 @@ namespace BrandUp.Pages.Content.Fields
     {
         public bool IsListValue { get; set; }
         public string AddText { get; set; }
+        public ContentItemType ItemType { get; set; }
         public List<ContentItemType> ItemTypes { get; set; }
     }
 

@@ -51,7 +51,7 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         blockElem.classList.add("page-blocks-designer-item");
 
-        blockElem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "bp-elem page-blocks-designer-item-add", href: "#", "data-command": "item-add" }, iconAdd));
+        blockElem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "bp-elem page-blocks-designer-item-add", href: "#", "data-command": "item-add", title: this.options.addText ? this.options.addText : "Добавить" }, iconAdd));
 
         blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "bp-elem page-blocks-designer-item-tools" }, '<ul class="pad">' +
             '   <li data-command="item-view" class="no-icon"><span><b>' + type + '</b></span></li>' +

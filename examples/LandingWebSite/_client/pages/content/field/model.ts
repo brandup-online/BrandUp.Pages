@@ -243,6 +243,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 export interface ModelDesignerOptions {
     addText: string;
     isListValue: boolean;
+    itemType: ContentTypeModel;
     itemTypes: Array<ContentTypeModel>;
 }
 

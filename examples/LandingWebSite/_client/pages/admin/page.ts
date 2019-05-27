@@ -68,7 +68,7 @@ export class PageToolbar extends UIElement {
                 });
             }
 
-            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-seo" }, iconSeo));
+            //toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-seo" }, iconSeo));
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-edit" }, iconEdit));
 
             this.registerCommand("bp-edit", () => {

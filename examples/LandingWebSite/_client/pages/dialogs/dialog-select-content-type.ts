@@ -29,6 +29,8 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
 
             this.resolve(type);
         });
+
+
     }
 }
 

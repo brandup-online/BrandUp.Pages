@@ -226,6 +226,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 }
 
 export interface ModelDesignerOptions {
+    addText: string;
     isListValue: boolean;
+    itemType: ContentTypeModel;
     itemTypes: Array<ContentTypeModel>;
 }
