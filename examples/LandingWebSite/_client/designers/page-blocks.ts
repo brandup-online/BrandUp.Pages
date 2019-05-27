@@ -51,13 +51,13 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         blockElem.classList.add("page-blocks-designer-item");
 
-        blockElem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "page-blocks-designer-item-add", href: "#", "data-command": "item-add" }, iconAdd));
+        blockElem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "bp-elem page-blocks-designer-item-add", href: "#", "data-command": "item-add" }, iconAdd));
 
-        blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-item-tools" }, '<ul class="pad">' +
+        blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "bp-elem page-blocks-designer-item-tools" }, '<ul class="pad">' +
             '   <li data-command="item-view" class="no-icon"><span><b>' + type + '</b></span></li>' +
             '</ul>'));
 
-        blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-item-tools page-blocks-designer-item-tools-right" }, '<ul class="pad">' +
+        blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "bp-elem page-blocks-designer-item-tools page-blocks-designer-item-tools-right" }, '<ul class="pad">' +
             '   <li data-command="item-refresh" title="Обновить">' + iconRefresh+'</li>' +
             '   <li data-command="item-settings" title="Изменить параметры">' + iconSettings +'</li>' +
             '   <li data-command="item-delete" title="Удалить блок">' + iconDelete +'</li>' +

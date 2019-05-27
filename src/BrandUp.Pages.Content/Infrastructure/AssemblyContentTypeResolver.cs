@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Content.Infrastructure
                 {
                     var typeInfo = type.GetTypeInfo();
 
-                    if (!ContentMetadataManager.IsContent(typeInfo) || types.Contains(typeInfo))
+                    if (!ContentMetadataManager.TypeIsContent(typeInfo) || types.Contains(typeInfo))
                         continue;
 
                     types.Add(typeInfo);

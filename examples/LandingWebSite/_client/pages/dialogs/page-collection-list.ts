@@ -71,7 +71,7 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
             DOM.empty(this.navElem);
         }
 
-        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", { class: "root" }, "root")));
+        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", null, "root")));
         if (model.parents && model.parents.length) {
             for (let i = 0; i < model.parents.length; i++) {
                 this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", {}, model.parents[i])));

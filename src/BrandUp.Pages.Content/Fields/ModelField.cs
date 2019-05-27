@@ -58,7 +58,7 @@ namespace BrandUp.Pages.Content.Fields
             else
                 contentType = valueType;
 
-            if (!ContentMetadataManager.IsContent(contentType.GetTypeInfo()))
+            if (!ContentMetadataManager.TypeIsContent(contentType.GetTypeInfo()))
                 throw new InvalidOperationException();
 
             if (!ContentMetadata.Manager.TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata))

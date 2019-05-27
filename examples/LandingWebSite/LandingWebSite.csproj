@@ -143,6 +143,9 @@
     <Content Update="Contents\TextBlock\TB1.cshtml.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Contents\TextBlock\TB3.cshtml.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Contents\TextBlock\TB2.cshtml.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

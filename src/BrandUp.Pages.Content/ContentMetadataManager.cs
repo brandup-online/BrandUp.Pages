@@ -17,35 +17,35 @@ namespace BrandUp.Pages.Content
                 throw new ArgumentNullException(nameof(contentLocator));
 
             foreach (var contentModelType in contentLocator.ContentTypes)
-                TryRegisterType(contentModelType, out ContentMetadataProvider typeMetadata);
+                TryRegisterContentType(contentModelType, out ContentMetadataProvider typeMetadata);
 
             foreach (var metadata in metadataProviders)
                 metadata.InitializeFields();
         }
 
-        private bool TryRegisterType(Type contentType, out ContentMetadataProvider contentMetadata)
+        private bool TryRegisterContentType(Type modelType, out ContentMetadataProvider contentMetadata)
         {
-            if (TryGetMetadata(contentType, out contentMetadata))
+            if (TryGetMetadata(modelType, out contentMetadata))
                 return true;
 
-            if (!IsContent(contentType.GetTypeInfo()))
+            if (!TypeIsContent(modelType.GetTypeInfo()))
                 return false;
 
             ContentMetadataProvider baseMetadata = null;
-            if (contentType.BaseType != null)
-                TryRegisterType(contentType.BaseType, out baseMetadata);
+            if (modelType.BaseType != null)
+                TryRegisterContentType(modelType.BaseType, out baseMetadata);
 
-            contentMetadata = new ContentMetadataProvider(this, contentType, baseMetadata);
+            contentMetadata = new ContentMetadataProvider(this, modelType, baseMetadata);
 
             var index = metadataProviders.Count;
             metadataProviders.Add(contentMetadata);
-            contentTypes.Add(contentType, index);
+            contentTypes.Add(modelType, index);
             contentNames.Add(contentMetadata.Name.ToLower(), index);
 
             return true;
         }
 
-        public static bool IsContent(TypeInfo typeInfo)
+        public static bool TypeIsContent(TypeInfo typeInfo)
         {
             if (!typeInfo.IsClass || !typeInfo.IsPublic || typeInfo.ContainsGenericParameters || !typeInfo.IsDefined(typeof(ContentTypeAttribute), false))
                 return false;

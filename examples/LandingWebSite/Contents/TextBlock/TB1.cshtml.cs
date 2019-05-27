@@ -2,7 +2,7 @@
 
 namespace LandingWebSite.Contents.TextBlock
 {
-    [ContentType(Title = "Текст")]
+    [ContentType(Title = "Только текст", IsGroup = true)]
     public class TB1 : TextBlockContent
     {
     }

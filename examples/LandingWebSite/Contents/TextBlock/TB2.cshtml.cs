@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages;
-using BrandUp.Pages.Content;
+﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents.TextBlock
@@ -9,7 +8,5 @@ namespace LandingWebSite.Contents.TextBlock
     {
         [Text]
         public string Header { get; set; }
-        [Image]
-        public ImageValue Background { get; set; }
     }
 }

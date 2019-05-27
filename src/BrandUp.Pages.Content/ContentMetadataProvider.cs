@@ -29,8 +29,8 @@ namespace BrandUp.Pages.Content
             ModelType = modelType;
             BaseMetadata = baseMetadata;
 
-            var contentModelAttribute = modelType.GetCustomAttribute<ContentTypeAttribute>(false);
-            if (contentModelAttribute == null)
+            var contentTypeAttribute = modelType.GetCustomAttribute<ContentTypeAttribute>(false);
+            if (contentTypeAttribute == null)
                 throw new ArgumentException($"Для типа модели контента \"{modelType}\" не определён атрибут {nameof(ContentTypeAttribute)}.");
 
             if (!modelType.IsAbstract)
@@ -46,9 +46,15 @@ namespace BrandUp.Pages.Content
             if (baseMetadata != null)
                 baseMetadata.derivedContents.Add(this);
 
-            Name = contentModelAttribute.Name ?? GetTypeName(modelType);
-            Title = contentModelAttribute.Title ?? Name;
-            Description = contentModelAttribute.Description;
+            Name = contentTypeAttribute.Name ?? GetTypeName(modelType);
+            Title = contentTypeAttribute.Title ?? Name;
+            Description = contentTypeAttribute.Description;
+
+            IsGroup = contentTypeAttribute.IsGroup;
+            if (IsGroup)
+            {
+
+            }
         }
 
         #region Properties
@@ -63,6 +69,7 @@ namespace BrandUp.Pages.Content
         public IEnumerable<FieldProviderAttribute> Fields => fields;
         public bool IsAbstract => ModelType.IsAbstract;
         public bool IsDefinedTitleField => Title != null;
+        public bool IsGroup { get; }
 
         #endregion
 
