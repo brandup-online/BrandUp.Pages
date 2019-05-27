@@ -3,6 +3,7 @@
   "name": "asp.net",
   "private": true,
   "devDependencies": {
+    "acorn": "^6.1.1",
     "aspnet-webpack": "^3.0.0",
     "awesome-typescript-loader": "^5.2.1",
     "css-loader": "^1.0.1",
@@ -14,16 +15,15 @@
     "tslint": "^5.16.0",
     "typescript": "^3.4.5",
     "url-loader": "^1.1.2",
-    "webpack": "^4.31.0",
+    "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-middleware": "^3.7.0",
     "webpack-dev-server": "^3.2.1",
-    "webpack-hot-middleware": "^2.25.0",
-    "acorn": "^6.1.1"
+    "webpack-hot-middleware": "^2.25.0"
   },
   "dependencies": {
-    "brandup-ui": "^1.0.21",
-    "brandup-pages-ckeditor": "../../ui/brandup-pages-ckeditor"
+    "brandup-pages-ckeditor": "../../ui/brandup-pages-ckeditor",
+    "brandup-ui": "^1.0.22"
   },
   "scripts": {
     "build": "webpack -p --progress --config webpack.config.js",

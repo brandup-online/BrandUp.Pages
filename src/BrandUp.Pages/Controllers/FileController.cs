@@ -50,7 +50,7 @@ namespace BrandUp.Pages.Controllers
 
                 using (var fileStream = await fileService.ReadFileAsync(fileId))
                 using (var tempFileStream = System.IO.File.OpenWrite(imageTempPath))
-                    imageResizer.Resize(fileStream, width, height, tempFileStream);
+                    await imageResizer.Resize(fileStream, width, height, tempFileStream);
 
                 return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
             }
