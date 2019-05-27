@@ -127,6 +127,29 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         else if (typeof file === "string") {
             let url = <string>file;
             console.log(url);
+
+            this.form.queue.request({
+                url: `/brandup.pages/content/image/url`,
+                urlParams: {
+                    editId: this.form.editId,
+                    path: this.form.contentPath,
+                    field: this.name,
+                    url: url
+                },
+                method: "POST",
+                success: (data: ImageFieldValue, status: number) => {
+                    switch (status) {
+                        case 200:
+                            this.setValue(data);
+
+                            this.valueElem.classList.remove("uploading");
+
+                            break;
+                        default:
+                            throw "";
+                    }
+                }
+            });
         }
         else {
             this.valueElem.classList.remove("uploading");
