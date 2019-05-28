@@ -170,6 +170,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\dist\" />
+    <Folder Include="_client\svg\" />
     <Folder Include="_temp\images\" />
   </ItemGroup>
 

@@ -18,7 +18,7 @@ namespace LandingWebSite.Contents.BannerBlock
         [Text(IsRequired = true), Title]
         public string Header { get; set; }
 
-        [Text]
+        [Text(AllowMultiline = true)]
         public string SubHeader { get; set; }
 
         [HyperLink]

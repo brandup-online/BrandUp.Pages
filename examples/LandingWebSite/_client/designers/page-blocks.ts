@@ -1,12 +1,12 @@
 ﻿import { ModelDesigner } from "../brandup.pages/content/designer/model";
 import { DOM } from "brandup-ui";
 import "./page-blocks.less";
-import iconRefresh from "../svg/page-blocks-refresh.svg";
-import iconSettings from "../svg/page-blocks-settings.svg";
-import iconDelete from "../svg/page-blocks-delete.svg";
-import iconUp from "../svg/page-blocks-up.svg";
-import iconDown from "../svg/page-blocks-down.svg";
-import iconAdd from "../svg/page-blocks-add.svg";
+import iconRefresh from "./svg/page-blocks-refresh.svg";
+import iconSettings from "./svg/page-blocks-settings.svg";
+import iconDelete from "./svg/page-blocks-delete.svg";
+import iconUp from "./svg/page-blocks-up.svg";
+import iconDown from "./svg/page-blocks-down.svg";
+import iconAdd from "./svg/page-blocks-add.svg";
 
 export class PageBlocksDesigner extends ModelDesigner {
     get typeName(): string { return "BrandUpPages.PageBlocksDesigner"; }
