@@ -1,4 +1,4 @@
-﻿import { ModelDesigner } from "../pages/content/designer/model";
+﻿import { ModelDesigner } from "../brandup.pages/content/designer/model";
 import { DOM } from "brandup-ui";
 import "./page-blocks.less";
 import iconRefresh from "../svg/page-blocks-refresh.svg";

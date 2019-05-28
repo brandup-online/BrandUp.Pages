@@ -1,5 +1,5 @@
-﻿import { AppClientModel } from "./pages/typings/website";
-import { Application } from "./pages/app";
+﻿import { AppClientModel } from "./brandup.pages/typings/website";
+import { Application } from "./brandup.pages/app";
 import "./styles.less";
 
 export interface LandingWebSiteModel extends AppClientModel {
@@ -7,7 +7,6 @@ export interface LandingWebSiteModel extends AppClientModel {
 
 Application.setup<LandingWebSiteModel>({
     configure: (builder) => {
-        builder.addPageType("content-page", () => import("./pages/pages/page"));
         builder.addScript("BB1", () => import("./contents/BB1"));
     }
 }, (app) => {

@@ -1,10 +1,11 @@
-﻿import { UIElement, DOM, UIControl } from "brandup-ui";
+﻿import { UIElement, DOM, UIControl, AjaxQueue } from "brandup-ui";
 import { PageClientModel, PageNavState, IPage, IApplication } from "../typings/website";
 
 class Page<TModel extends PageClientModel> extends UIElement implements IPage {
     readonly app: IApplication;
     readonly nav: PageNavState;
     readonly model: TModel;
+    readonly queue: AjaxQueue;
     private __destroyCallbacks: Array<() => void> = [];
     private __scripts: Array<UIElement> = [];
 
@@ -14,6 +15,7 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         this.app = app;
         this.nav = nav;
         this.model = model;
+        this.queue = new AjaxQueue();
         this.setElement(element);
 
         if (this.model.cssClass) {
@@ -77,6 +79,8 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
             this.__destroyCallbacks.map((f) => { f(); });
             this.__destroyCallbacks = null;
         }
+
+        this.queue.destroy();
         
         super.destroy();
     }

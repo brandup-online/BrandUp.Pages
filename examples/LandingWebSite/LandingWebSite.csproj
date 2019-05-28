@@ -15,43 +15,43 @@
   <ItemGroup>
     <None Remove="_client\contents\BB1.ts" />
     <None Remove="_client\designers\page-blocks.ts" />
-    <None Remove="_client\pages\admin\page.ts" />
-    <None Remove="_client\pages\admin\website.ts" />
-    <None Remove="_client\pages\content\content.ts" />
-    <None Remove="_client\pages\content\designer\base.ts" />
-    <None Remove="_client\pages\content\designer\html.ts" />
-    <None Remove="_client\pages\content\designer\image.ts" />
-    <None Remove="_client\pages\content\designer\model.ts" />
-    <None Remove="_client\pages\content\designer\page.ts" />
-    <None Remove="_client\pages\content\designer\text.ts" />
-    <None Remove="_client\pages\content\field\hyperlink.ts" />
-    <None Remove="_client\pages\content\field\pages.ts" />
-    <None Remove="_client\pages\content\html.ts" />
-    <None Remove="_client\pages\content\image.js.map" />
-    <None Remove="_client\pages\content\image.ts" />
-    <None Remove="_client\pages\content\provider\text.ts" />
-    <None Remove="_client\pages\content\text.ts" />
-    <None Remove="_client\pages\dialogs\dialog-delete.ts" />
-    <None Remove="_client\pages\dialogs\dialog-form.ts" />
-    <None Remove="_client\pages\dialogs\dialog-list.ts" />
-    <None Remove="_client\pages\dialogs\dialog-select-content-type.ts" />
-    <None Remove="_client\pages\dialogs\dialog.ts" />
-    <None Remove="_client\pages\dialogs\page-browser.ts" />
-    <None Remove="_client\pages\dialogs\page-collection-create.ts" />
-    <None Remove="_client\pages\dialogs\page-collection-delete.ts" />
-    <None Remove="_client\pages\dialogs\page-collection-list.ts" />
-    <None Remove="_client\pages\dialogs\page-collection-update.ts" />
-    <None Remove="_client\pages\dialogs\page-create.ts" />
-    <None Remove="_client\pages\dialogs\page-delete.ts" />
-    <None Remove="_client\pages\dialogs\page-edit.ts" />
-    <None Remove="_client\pages\dialogs\page-list.ts" />
-    <None Remove="_client\pages\dialogs\page-publish.ts" />
-    <None Remove="_client\pages\form\combobox.ts" />
-    <None Remove="_client\pages\form\field.ts" />
-    <None Remove="_client\pages\form\textbox.ts" />
-    <None Remove="_client\pages\pages\content.ts" />
-    <None Remove="_client\pages\typings\content.d.ts" />
-    <None Remove="_client\pages\typings\models.d.ts" />
+    <None Remove="_client\brandup.pages\admin\page.ts" />
+    <None Remove="_client\brandup.pages\admin\website.ts" />
+    <None Remove="_client\brandup.pages\content\content.ts" />
+    <None Remove="_client\brandup.pages\content\designer\base.ts" />
+    <None Remove="_client\brandup.pages\content\designer\html.ts" />
+    <None Remove="_client\brandup.pages\content\designer\image.ts" />
+    <None Remove="_client\brandup.pages\content\designer\model.ts" />
+    <None Remove="_client\brandup.pages\content\designer\page.ts" />
+    <None Remove="_client\brandup.pages\content\designer\text.ts" />
+    <None Remove="_client\brandup.pages\content\field\hyperlink.ts" />
+    <None Remove="_client\brandup.pages\content\field\pages.ts" />
+    <None Remove="_client\brandup.pages\content\html.ts" />
+    <None Remove="_client\brandup.pages\content\image.js.map" />
+    <None Remove="_client\brandup.pages\content\image.ts" />
+    <None Remove="_client\brandup.pages\content\provider\text.ts" />
+    <None Remove="_client\brandup.pages\content\text.ts" />
+    <None Remove="_client\brandup.pages\dialogs\dialog-delete.ts" />
+    <None Remove="_client\brandup.pages\dialogs\dialog-form.ts" />
+    <None Remove="_client\brandup.pages\dialogs\dialog-list.ts" />
+    <None Remove="_client\brandup.pages\dialogs\dialog-select-content-type.ts" />
+    <None Remove="_client\brandup.pages\dialogs\dialog.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-browser.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-collection-create.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-collection-delete.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-collection-list.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-collection-update.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-create.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-delete.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-edit.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-list.ts" />
+    <None Remove="_client\brandup.pages\dialogs\page-publish.ts" />
+    <None Remove="_client\brandup.pages\form\combobox.ts" />
+    <None Remove="_client\brandup.pages\form\field.ts" />
+    <None Remove="_client\brandup.pages\form\textbox.ts" />
+    <None Remove="_client\brandup.pages\pages\content.ts" />
+    <None Remove="_client\brandup.pages\typings\content.d.ts" />
+    <None Remove="_client\brandup.pages\typings\models.d.ts" />
     <None Remove="_client\root.ts" />
     <None Remove="_client\typings\svg.d.ts" />
   </ItemGroup>
@@ -75,42 +75,42 @@
   <ItemGroup>
     <TypeScriptCompile Include="_client\contents\BB1.ts" />
     <TypeScriptCompile Include="_client\designers\page-blocks.ts" />
-    <TypeScriptCompile Include="_client\pages\admin\page.ts" />
-    <TypeScriptCompile Include="_client\pages\admin\website.ts" />
-    <TypeScriptCompile Include="_client\pages\content\designer\model.ts" />
-    <TypeScriptCompile Include="_client\pages\content\designer\base.ts" />
-    <TypeScriptCompile Include="_client\pages\content\designer\html.ts" />
-    <TypeScriptCompile Include="_client\pages\content\designer\image.ts" />
-    <TypeScriptCompile Include="_client\pages\content\designer\page.ts" />
-    <TypeScriptCompile Include="_client\pages\content\designer\text.ts" />
-    <TypeScriptCompile Include="_client\pages\content\field\image.ts" />
-    <TypeScriptCompile Include="_client\pages\content\field\html.ts" />
-    <TypeScriptCompile Include="_client\pages\content\field\model.ts" />
-    <TypeScriptCompile Include="_client\pages\content\field\hyperlink.ts" />
-    <TypeScriptCompile Include="_client\pages\content\field\pages.ts" />
-    <TypeScriptCompile Include="_client\pages\content\field\text.ts" />
-    <TypeScriptCompile Include="_client\pages\content\provider\text.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\dialog-delete.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\dialog-form.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\dialog-list.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\dialog-select-content-type.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\dialog.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-browser.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-collection-update.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-collection-delete.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-collection-create.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-collection-list.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-edit.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-create.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-delete.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-list.ts" />
-    <TypeScriptCompile Include="_client\pages\dialogs\page-publish.ts" />
-    <TypeScriptCompile Include="_client\pages\form\combobox.ts" />
-    <TypeScriptCompile Include="_client\pages\form\field.ts" />
-    <TypeScriptCompile Include="_client\pages\form\textbox.ts" />
-    <TypeScriptCompile Include="_client\pages\pages\content.ts" />
-    <TypeScriptCompile Include="_client\pages\typings\content.d.ts" />
-    <TypeScriptCompile Include="_client\pages\typings\models.d.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\admin\page.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\admin\website.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\designer\model.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\designer\base.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\designer\html.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\designer\image.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\designer\page.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\designer\text.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\field\image.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\field\html.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\field\model.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\field\hyperlink.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\field\pages.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\field\text.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\content\provider\text.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\dialog-delete.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\dialog-form.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\dialog-list.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\dialog-select-content-type.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\dialog.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-browser.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-collection-update.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-collection-delete.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-collection-create.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-collection-list.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-edit.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-create.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-delete.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-list.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-publish.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\form\combobox.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\form\field.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\form\textbox.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\pages\content.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\typings\content.d.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\typings\models.d.ts" />
     <TypeScriptCompile Include="_client\root.ts" />
     <TypeScriptCompile Include="_client\typings\svg.d.ts" />
   </ItemGroup>
@@ -153,16 +153,16 @@
 
 
   <ItemGroup>
-    <None Update="_client\pages\content\field\image.js">
+    <None Update="_client\brandup.pages\content\field\image.js">
       <DependentUpon>image.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\content\field\html.js">
+    <None Update="_client\brandup.pages\content\field\html.js">
       <DependentUpon>html.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\content\field\model.js">
+    <None Update="_client\brandup.pages\content\field\model.js">
       <DependentUpon>model.ts</DependentUpon>
     </None>
-    <None Update="_client\pages\dialogs\page-collection-update.js">
+    <None Update="_client\brandup.pages\dialogs\page-collection-update.js">
       <DependentUpon>page-collection-update.ts</DependentUpon>
     </None>
   </ItemGroup>
