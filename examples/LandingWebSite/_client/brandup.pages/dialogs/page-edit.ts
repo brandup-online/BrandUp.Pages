@@ -1,5 +1,5 @@
 ﻿import { DialogOptions, Dialog } from "./dialog";
-import { DOM, AjaxQueue } from "brandup-ui";
+import { DOM, AjaxQueue, AjaxRequestOptions } from "brandup-ui";
 import { IContentForm, IContentField, PageContentForm } from "../typings/content";
 import { TextContent } from "../content/field/text";
 import { HtmlContent } from "../content/field/html";
@@ -14,19 +14,20 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     private navElem: HTMLElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IContentField } = {};
-    readonly queue: AjaxQueue;
+    private __modelPath: string;
+    private __queue: AjaxQueue;
     readonly editId: string;
-    readonly contentPath: string;
 
-    constructor(editId: string, contentPath?: string, options?: DialogOptions) {
+    constructor(editId: string, modelPath?: string, options?: DialogOptions) {
         super(options);
 
         this.editId = editId;
-        this.contentPath = contentPath ? contentPath : "";
-        this.queue = new AjaxQueue();
+        this.__modelPath = modelPath ? modelPath : "";
     }
 
     get typeName(): string { return "BrandUpPages.PageEditDialog"; }
+    get modelPath(): string { return this.__modelPath; }
+    get queue(): AjaxQueue { return this.__queue; }
 
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-form");
@@ -42,10 +43,27 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         this.setHeader("Контент страницы");
 
         this.__loadForm();
+
+        this.registerCommand("navigate", (elem: HTMLElement) => {
+            let path = elem.getAttribute("data-path");
+            this.navigate(path);
+        });
     }
     private __loadForm() {
-        this.queue.request({
-            urlParams: { handler: "FormModel", contentPath: this.contentPath },
+        if (this.__queue)
+            this.__queue.destroy();
+        this.__queue = new AjaxQueue();
+
+        for (let fieldName in this.__fields) {
+            let field = this.__fields[fieldName];
+            field.destroy();
+        }
+
+        DOM.empty(this.__fieldsElem);
+        this.__fields = {};
+
+        this.__queue.request({
+            urlParams: { handler: "FormModel", modelPath: this.__modelPath },
             method: "GET",
             success: (data: PageContentForm, status: number) => {
                 if (status !== 200) {
@@ -72,7 +90,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             if (path.index >= 0)
                 title = `#${path.index + 1} ${title}`;
 
-            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", null, DOM.tag("span", {}, title)));
+            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path.modelPath }, title)));
 
             path = path.parent;
         }
@@ -135,6 +153,22 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         }
     }
 
+    navigate(modelPath: string) {
+        this.__modelPath = modelPath ? modelPath : "";
+
+        this.__loadForm();
+    }
+    request(field: IContentField, options: AjaxRequestOptions) {
+        if (!options.urlParams)
+            options.urlParams = {};
+
+        options.urlParams["editId"] = this.editId;
+        options.urlParams["path"] = this.modelPath;
+        options.urlParams["field"] = field.name;
+
+        this.__queue.request(options);
+    }
+
     validate(): boolean {
         return true;
     }
@@ -162,7 +196,6 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         field.render(containerElem);
 
         this.__fieldsElem.appendChild(containerElem);
-
         this.__fields[field.name.toLowerCase()] = field;
     }
 
@@ -171,13 +204,18 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 
     destroy() {
-        this.queue.destroy();
+        this.__queue.destroy();
+
+        for (let fieldName in this.__fields) {
+            let field = this.__fields[fieldName];
+            field.destroy();
+        }
 
         super.destroy();
     }
 }
 
-export var editPage = (editId: string, contentPath?: string) => {
-    let dialog = new PageEditDialog(editId, contentPath);
+export var editPage = (editId: string, modelPath?: string) => {
+    let dialog = new PageEditDialog(editId, modelPath);
     return dialog.open();
 };

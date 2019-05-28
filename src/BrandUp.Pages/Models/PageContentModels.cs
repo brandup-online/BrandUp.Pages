@@ -12,6 +12,7 @@ namespace BrandUp.Pages.Models
     public class PageContentPath
     {
         public PageContentPath Parent { get; set; }
+        public string ModelPath { get; set; }
         public string Name { get; set; }
         public string Title { get; set; }
         public int Index { get; set; }

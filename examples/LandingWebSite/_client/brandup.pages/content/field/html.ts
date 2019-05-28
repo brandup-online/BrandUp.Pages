@@ -83,13 +83,8 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
 
         var value = this.getValue();
 
-        this.form.queue.request({
+        this.form.request(this, {
             url: '/brandup.pages/content/html',
-            urlParams: {
-                editId: this.form.editId,
-                path: this.form.contentPath,
-                field: this.name
-            },
             method: "POST",
             type: "JSON",
             data: value ? value : "",

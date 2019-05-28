@@ -98,14 +98,9 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         if (file instanceof File) {
             let fileObject = <File>file;
 
-            this.form.queue.request({
+            this.form.request(this, {
                 url: `/brandup.pages/content/image`,
-                urlParams: {
-                    editId: this.form.editId,
-                    path: this.form.contentPath,
-                    field: this.name,
-                    fileName: file.name
-                },
+                urlParams: { fileName: file.name },
                 method: "POST",
                 data: fileObject,
                 success: (data: ImageFieldValue, status: number) => {
@@ -125,14 +120,9 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
             return;
         }
         else if (typeof file === "string") {
-            this.form.queue.request({
+            this.form.request(this, {
                 url: `/brandup.pages/content/image/url`,
-                urlParams: {
-                    editId: this.form.editId,
-                    path: this.form.contentPath,
-                    field: this.name,
-                    url: <string>file
-                },
+                urlParams: { url: <string>file },
                 method: "POST",
                 success: (data: ImageFieldValue, status: number) => {
                     switch (status) {

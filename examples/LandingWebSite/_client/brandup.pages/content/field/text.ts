@@ -13,13 +13,8 @@ export class TextContent extends Textbox implements IContentField {
     protected _onChanged() {
         super._onChanged();
 
-        this.form.queue.request({
+        this.form.request(this, {
             url: '/brandup.pages/content/text',
-            urlParams: {
-                editId: this.form.editId,
-                path: this.form.contentPath,
-                field: this.name
-            },
             method: "POST",
             type: "JSON",
             data: this.getValue(),

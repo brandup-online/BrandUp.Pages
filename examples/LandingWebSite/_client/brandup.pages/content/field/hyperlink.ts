@@ -43,12 +43,9 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.__urlValueInput.addEventListener("change", () => {
             this.__refreshUI();
 
-            this.form.queue.request({
+            this.form.request(this, {
                 url: `/brandup.pages/content/hyperlink/url`,
                 urlParams: {
-                    editId: this.form.editId,
-                    path: this.form.contentPath,
-                    field: this.name,
                     url: this.__urlValueInput.value
                 },
                 method: "POST",
@@ -195,12 +192,9 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
             this.__refreshUI();
 
-            this.form.queue.request({
+            this.form.request(this, {
                 url: `/brandup.pages/content/hyperlink/page`,
                 urlParams: {
-                    editId: this.form.editId,
-                    path: this.form.contentPath,
-                    field: this.name,
                     pageId: pageId
                 },
                 method: "POST",
@@ -283,6 +277,13 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             default:
                 throw "";
         }
+    }
+
+    destroy() {
+        if (this.__searchRequest)
+            this.__searchRequest.abort();
+        window.clearTimeout(this.__searchTimeout);
+        super.destroy();
     }
 }
 

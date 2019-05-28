@@ -160,14 +160,14 @@ namespace BrandUp.Pages
             return new OkObjectResult(result);
         }
 
-        public async Task<IActionResult> OnGetFormModelAsync([FromQuery]string contentPath)
+        public async Task<IActionResult> OnGetFormModelAsync([FromQuery]string modelPath)
         {
             if (editSession == null)
                 return BadRequest();
-            if (contentPath == null)
-                contentPath = string.Empty;
+            if (modelPath == null)
+                modelPath = string.Empty;
 
-            var contentContext = ContentContext.Navigate(contentPath);
+            var contentContext = ContentContext.Navigate(modelPath);
             if (contentContext == null)
                 return BadRequest();
 
@@ -177,7 +177,8 @@ namespace BrandUp.Pages
                 {
                     Name = contentContext.Explorer.Metadata.Name,
                     Title = contentContext.Explorer.Metadata.Title,
-                    Index = contentContext.Explorer.Index
+                    Index = contentContext.Explorer.Index,
+                    ModelPath = contentContext.Explorer.ModelPath
                 }
             };
 
@@ -189,7 +190,8 @@ namespace BrandUp.Pages
                 {
                     Name = explorer.Metadata.Name,
                     Title = explorer.Metadata.Title,
-                    Index = explorer.Index
+                    Index = explorer.Index,
+                    ModelPath = explorer.ModelPath
                 };
 
                 explorer = explorer.Parent;

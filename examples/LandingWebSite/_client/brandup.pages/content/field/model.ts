@@ -4,7 +4,6 @@ import { DOM } from "brandup-ui";
 import "./model.less";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
-import { editPage } from "../../dialogs/page-edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 
 export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions> implements IContentField {
@@ -31,14 +30,16 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             let itemElem = elem.closest("[content-path-index]");
             let itemIndex = itemElem.getAttribute("content-path-index");
-            let contentPath = `${this.name}[${itemIndex}]`;
+            let modelPath = `${this.name}[${itemIndex}]`;
 
-            if (this.form.contentPath)
-                contentPath = this.form.contentPath + "." + contentPath;
+            if (this.form.modelPath)
+                modelPath = this.form.modelPath + "." + modelPath;
 
-            editPage(this.form.editId, contentPath).then(() => {
-                this.__refreshItem(itemElem);
-            });
+            this.form.navigate(modelPath);
+
+            //editPage(this.form.editId, contentPath).then(() => {
+            //    this.__refreshItem(itemElem);
+            //});
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             let itemElem = elem.closest("[content-path-index]");
@@ -47,14 +48,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             itemElem.remove();
             this._refreshBlockIndexes();
 
-            this.form.queue.request({
+            this.form.request(this, {
                 url: '/brandup.pages/content/model',
-                urlParams: {
-                    editId: this.form.editId,
-                    path: this.form.contentPath,
-                    field: this.name,
-                    itemIndex: itemIndex.toString()
-                },
+                urlParams: { itemIndex: itemIndex.toString() },
                 method: "DELETE",
                 success: (data: string, status: number) => {
                     if (status === 200) {
@@ -104,15 +100,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                     if (sourceElem) {
                         elem.insertAdjacentElement("afterend", sourceElem);
 
-                        this.form.queue.request({
+                        this.form.request(this, {
                             url: '/brandup.pages/content/model/move',
-                            urlParams: {
-                                editId: this.form.editId,
-                                path: this.form.contentPath,
-                                field: this.name,
-                                itemIndex: sourceIndex,
-                                newIndex: destIndex
-                            },
+                            urlParams: { itemIndex: sourceIndex, newIndex: destIndex },
                             method: "POST",
                             success: (data: ModelFieldFormValue, status: number) => {
                                 if (status === 200) {
@@ -185,14 +175,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
     private __refreshItem(elem: Element) {
         let itemIndex = parseInt(elem.getAttribute("content-path-index"));
 
-        this.form.queue.request({
+        this.form.request(this, {
             url: '/brandup.pages/content/model/data',
-            urlParams: {
-                editId: this.form.editId,
-                path: this.form.contentPath,
-                field: this.name,
-                itemIndex: itemIndex.toString()
-            },
+            urlParams: { itemIndex: itemIndex.toString() },
             method: "GET",
             success: (data: ContentModel, status: number) => {
                 if (status === 200) {
@@ -206,14 +191,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
     }
     private __addItem(itemType: string) {
-        this.form.queue.request({
+        this.form.request(this, {
             url: '/brandup.pages/content/model',
-            urlParams: {
-                editId: this.form.editId,
-                path: this.form.contentPath,
-                field: this.name,
-                itemType: itemType
-            },
+            urlParams: { itemType: itemType },
             method: "PUT",
             success: (data: ModelFieldFormValue, status: number) => {
                 if (status === 200) {
@@ -223,13 +203,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
     }
     private __refreshItems() {
-        this.form.queue.request({
+        this.form.request(this, {
             url: '/brandup.pages/content/model',
-            urlParams: {
-                editId: this.form.editId,
-                path: this.form.contentPath,
-                field: this.name
-            },
             method: "GET",
             success: (data: ModelFieldFormValue, status: number) => {
                 if (status === 200) {

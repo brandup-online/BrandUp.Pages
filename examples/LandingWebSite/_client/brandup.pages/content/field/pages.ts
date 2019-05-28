@@ -112,14 +112,9 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                 pageUrl: pageUrl
             });
 
-            this.form.queue.request({
+            this.form.request(this, {
                 url: `/brandup.pages/content/pages`,
-                urlParams: {
-                    editId: this.form.editId,
-                    path: this.form.contentPath,
-                    field: this.name,
-                    pageCollectionId: pageCollectionId
-                },
+                urlParams: { pageCollectionId: pageCollectionId },
                 method: "POST",
                 success: (data: PagesFieldFormValue, status: number) => {
                     switch (status) {
@@ -161,6 +156,13 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             this.element.classList.add("has-value");
         else
             this.element.classList.remove("has-value");
+    }
+
+    destroy() {
+        if (this.__searchRequest)
+            this.__searchRequest.abort();
+        window.clearTimeout(this.__searchTimeout);
+        super.destroy();
     }
 }
 

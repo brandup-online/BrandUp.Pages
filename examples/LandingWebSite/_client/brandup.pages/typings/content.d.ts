@@ -1,10 +1,12 @@
-﻿import { AjaxQueue } from "brandup-ui";
+﻿import { AjaxQueue, AjaxRequestOptions } from "brandup-ui";
 
 export interface IContentForm {
     editId: string;
-    contentPath: string;
+    modelPath: string;
     queue: AjaxQueue;
 
+    request(field: IContentField, options: AjaxRequestOptions);
+    navigate(modelPath: string);
     getField(name: string): IContentField;
 }
 
@@ -16,6 +18,7 @@ export interface IContentField {
     hasValue(): boolean;
     setErrors(errors: Array<string>);
     render(containr: HTMLElement);
+    destroy();
 }
 
 export interface IPageDesigner {
@@ -49,6 +52,7 @@ interface PageContentPath {
     name: string;
     title: string;
     index: number;
+    modelPath: string;
 }
 
 interface ContentFieldModel {
