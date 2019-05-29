@@ -32,11 +32,11 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.setElement(document.body);
 
-        this.__createEvent("pageNavigating", { cancelable: true, bubbles: true, scoped: false });
-        this.__createEvent("pageNavigated", { cancelable: false, bubbles: true, scoped: false });
-        this.__createEvent("pageLoading", { cancelable: false, bubbles: true, scoped: false });
-        this.__createEvent("pageLoaded", { cancelable: false, bubbles: true, scoped: false });
-        this.__createEvent("pageContentLoaded", { cancelable: false, bubbles: true, scoped: false });
+        this.defineEvent("pageNavigating", { cancelable: true, bubbles: true });
+        this.defineEvent("pageNavigated", { cancelable: false, bubbles: true });
+        this.defineEvent("pageLoading", { cancelable: false, bubbles: true });
+        this.defineEvent("pageLoaded", { cancelable: false, bubbles: true });
+        this.defineEvent("pageContentLoaded", { cancelable: false, bubbles: true });
 
         this.linkClickFunc = Utility.createDelegate(this, this.__onClickAppLink);
     }
@@ -159,7 +159,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     }
     
     private __refreshNavigation(options: NavigationOptions) {
-        var isCancelled = this.__raiseEvent("pageNavigating", options);
+        var isCancelled = this.raiseEvent("pageNavigating", options);
         console.log(isCancelled);
         if (!isCancelled)
             return;
@@ -208,7 +208,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
                         document.title = pageModel.title ? pageModel.title : "";
 
-                        this.__raiseEvent("pageNavigated", pageState);
+                        this.raiseEvent("pageNavigated", pageState);
 
                         this.__renderPage(pageState, pageModel, true);
 
@@ -235,7 +235,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             this.page = null;
         }
 
-        this.__raiseEvent("pageLoading");
+        this.raiseEvent("pageLoading");
 
         if (needLoadContent)
             this.__loadContent(pageState, pageModel);
@@ -262,7 +262,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
                         this.__loadPageScript(pageState, pageModel);
 
-                        this.__raiseEvent("pageContentLoaded");
+                        this.raiseEvent("pageContentLoaded");
 
                         break;
                     }
@@ -293,7 +293,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         document.body.classList.remove("app-state-loading");
         document.body.classList.add("app-state-loaded");
 
-        this.__raiseEvent("pageLoaded");
+        this.raiseEvent("pageLoaded");
     }
 
     private __onPopState(event: PopStateEvent) {

@@ -76,7 +76,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             let t = <Element>e.target;
-            if (!t.closest(".pages")) {
+            if (!t.closest(".pages") && this.element) {
                 this.element.classList.remove("inputing");
                 document.body.removeEventListener("click", this.__closeMenuFunc, false);
             }
@@ -161,7 +161,10 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
     destroy() {
         if (this.__searchRequest)
             this.__searchRequest.abort();
+
         window.clearTimeout(this.__searchTimeout);
+        document.body.removeEventListener("click", this.__closeMenuFunc, false);
+
         super.destroy();
     }
 }

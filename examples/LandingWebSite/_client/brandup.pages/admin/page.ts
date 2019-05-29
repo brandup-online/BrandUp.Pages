@@ -9,9 +9,11 @@ import iconSave from "../svg/toolbar-button-save.svg";
 import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
 import { PageDesigner } from "../content/designer/page";
+import { NavigationOptions } from "../typings/website";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
+    private __pageNavFunc: (e: CustomEvent) => void;
 
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
 
@@ -68,9 +70,8 @@ export class PageToolbar extends UIElement {
 
             this.__designer = new PageDesigner(page);
 
-            window.addEventListener("pageNavigating", (e: CustomEvent) => {
-                if (cancelNav) {
-                    alert("cancel nav");
+            this.__pageNavFunc = (e: CustomEvent<NavigationOptions>) => {
+                if (cancelNav && e.detail.pushState) {
                     e.cancelBubble = true;
                     e.stopPropagation();
                     e.preventDefault();
@@ -80,7 +81,9 @@ export class PageToolbar extends UIElement {
                 }
 
                 cancelNav = true;
-            });
+            };
+
+            window.addEventListener("pageNavigating", this.__pageNavFunc, false);
         }
         else {
             if (page.model.status !== "Published") {
@@ -183,6 +186,7 @@ export class PageToolbar extends UIElement {
         }
 
         this.element.remove();
+        window.removeEventListener("pageNavigating", this.__pageNavFunc, false);
 
         super.destroy();
     }

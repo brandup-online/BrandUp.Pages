@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "brandup-pages-ckeditor": "../../ui/brandup-pages-ckeditor",
-    "brandup-ui": "^1.0.22"
+    "brandup-ui": "^1.0.23"
   },
   "scripts": {
     "build": "webpack -p --progress --config webpack.config.js",

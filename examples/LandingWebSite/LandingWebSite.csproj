@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="_client\svg\**" />
+    <Content Remove="_client\svg\**" />
+    <EmbeddedResource Remove="_client\svg\**" />
+    <None Remove="_client\svg\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="package-lock.json" />
   </ItemGroup>
 
@@ -170,7 +177,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\dist\" />
-    <Folder Include="_client\svg\" />
     <Folder Include="_temp\images\" />
   </ItemGroup>
 

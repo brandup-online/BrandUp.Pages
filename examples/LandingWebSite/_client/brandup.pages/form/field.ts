@@ -14,11 +14,11 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     protected _onRender() {
         this.element.classList.add("website-form-field");
 
-        this.__createEvent("changed", { bubbles: true, cancelable: false });
+        this.defineEvent("changed", { bubbles: true, cancelable: false });
     }
 
     protected raiseChanged() {
-        this.__raiseEvent("changed", {
+        this.raiseEvent("changed", {
             field: this,
             value: this.getValue()
         });

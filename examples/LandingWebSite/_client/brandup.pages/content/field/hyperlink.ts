@@ -122,14 +122,14 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
         this.__closeTypeMenuFunc = (e: MouseEvent) => {
             let t = <Element>e.target;
-            if (!t.closest(".hyperlink-menu")) {
+            if (!t.closest(".hyperlink-menu") && this.element) {
                 this.element.classList.remove("opened-types");
                 document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
             }
         };
         this.__closePageMenuFunc = (e: MouseEvent) => {
             let t = <Element>e.target;
-            if (!t.closest(".hyperlink")) {
+            if (!t.closest(".hyperlink") && this.element) {
                 this.element.classList.remove("inputing");
                 this.element.classList.remove("opened-pages");
                 document.body.removeEventListener("click", this.__closePageMenuFunc, false);
@@ -282,7 +282,11 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
     destroy() {
         if (this.__searchRequest)
             this.__searchRequest.abort();
+
         window.clearTimeout(this.__searchTimeout);
+        document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+        document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+
         super.destroy();
     }
 }
