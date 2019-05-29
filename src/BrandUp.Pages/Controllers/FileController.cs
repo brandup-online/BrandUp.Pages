@@ -28,6 +28,24 @@ namespace BrandUp.Pages.Controllers
                 System.IO.Directory.CreateDirectory(filesTempPath);
         }
 
+        [HttpGet("_file/{fileId}")]
+        public async Task<IActionResult> Index(Guid fileId)
+        {
+            var file = await fileService.FindFileByIdAsync(fileId);
+            if (file == null)
+                return NotFound();
+
+            var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}");
+            if (!System.IO.File.Exists(fileTempPath))
+            {
+                using (var fileStream = await fileService.ReadFileAsync(fileId))
+                using (var tempFileStream = System.IO.File.OpenWrite(fileTempPath))
+                    await fileStream.CopyToAsync(tempFileStream);
+            }
+
+            return new FileStreamResult(System.IO.File.OpenRead(fileTempPath), file.ContentType);
+        }
+
         [HttpGet("_image/{fileId}_{width}_{height}.jpg")]
         public async Task<IActionResult> Image(Guid fileId, int width = 0, int height = 0)
         {

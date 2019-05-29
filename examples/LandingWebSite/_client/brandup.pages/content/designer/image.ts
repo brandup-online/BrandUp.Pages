@@ -17,8 +17,8 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         let textInput: HTMLInputElement;
         elem.appendChild(menuElem = DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
             DOM.tag("ul", { class: "field-designer-popup" }, [
-                DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "open-editor" }, "Редактор")),
-                DOM.tag("li", { class: "split" }),
+                //DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "open-editor" }, "Редактор")),
+                //DOM.tag("li", { class: "split" }),
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "upload-file" }, "Загрузить с компьютера"))
             ]),
             this.__button = DOM.tag("button", null, iconUpload),
