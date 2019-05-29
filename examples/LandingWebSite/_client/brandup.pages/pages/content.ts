@@ -11,15 +11,7 @@ class ContentPage extends Page<ContentPageModel>
     }
     protected onRenderContent() {
         if (this.app.navigation.enableAdministration) {
-            import("../admin/page").then(d => {
-                this.attachDestroyElement(new d.PageToolbar(this));
-            });
-
-            if (this.model.editId) {
-                import("../content/designer/page").then(d => {
-                    new d.PageDesigner(this);
-                });
-            }
+            import("../admin/page").then(d => { new d.PageToolbar(this) });
         }
     }
 }

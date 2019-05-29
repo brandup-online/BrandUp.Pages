@@ -17,8 +17,6 @@ export class PageDesigner implements IPageDesigner {
     private __accentedField: IContentFieldDesigner = null;
 
     constructor(page: ContentPage) {
-        page.attachDestroyFunc(() => { this.destroy(); }); 
-
         this.page = page;
         this.editId = page.model.editId;
 

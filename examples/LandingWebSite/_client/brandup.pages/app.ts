@@ -32,11 +32,11 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.setElement(document.body);
 
-        this.__createEvent("pageNavigating", { cancelable: false, bubbles: false, scoped: false });
-        this.__createEvent("pageNavigated", { cancelable: false, bubbles: false, scoped: false });
-        this.__createEvent("pageLoading", { cancelable: false, bubbles: false, scoped: false });
-        this.__createEvent("pageLoaded", { cancelable: false, bubbles: false, scoped: false });
-        this.__createEvent("pageContentLoaded", { cancelable: false, bubbles: false, scoped: false });
+        this.__createEvent("pageNavigating", { cancelable: true, bubbles: true, scoped: false });
+        this.__createEvent("pageNavigated", { cancelable: false, bubbles: true, scoped: false });
+        this.__createEvent("pageLoading", { cancelable: false, bubbles: true, scoped: false });
+        this.__createEvent("pageLoaded", { cancelable: false, bubbles: true, scoped: false });
+        this.__createEvent("pageContentLoaded", { cancelable: false, bubbles: true, scoped: false });
 
         this.linkClickFunc = Utility.createDelegate(this, this.__onClickAppLink);
     }
@@ -72,9 +72,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.__renderPage(pageState, initNav.page, false);
     }
-    load() {
-
-    }
+    load() { }
     destroy() {
         document.body.removeEventListener("click", this.linkClickFunc, false);
     }
@@ -161,6 +159,11 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     }
     
     private __refreshNavigation(options: NavigationOptions) {
+        var isCancelled = this.__raiseEvent("pageNavigating", options);
+        console.log(isCancelled);
+        if (!isCancelled)
+            return;
+
         let { url, pushState } = options;
 
         this.__navCounter++;
@@ -168,8 +171,6 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.element.classList.remove("app-state-loaded");
         this.element.classList.add("app-state-loading");
-
-        this.__raiseEvent("pageNavigating", options);
 
         this.request({
             url: url,

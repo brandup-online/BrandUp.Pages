@@ -8,12 +8,17 @@ import iconPublish from "../svg/toolbar-button-publish.svg";
 import iconSave from "../svg/toolbar-button-save.svg";
 import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
+import { PageDesigner } from "../content/designer/page";
 
 export class PageToolbar extends UIElement {
+    private __designer: PageDesigner;
+
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
 
     constructor(page: ContentPage) {
         super();
+
+        page.attachDestroyFunc(() => { this.destroy(); }); 
 
         var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
         let isLoading = false;
@@ -22,7 +27,9 @@ export class PageToolbar extends UIElement {
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-content" }, iconSettings));
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-commit" }, iconSave));
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-discard" }, iconDiscard));
-            
+
+            let cancelNav = true;
+
             this.registerCommand("bp-content", () => {
                 editPage(page.model.editId).then(() => {
                     page.app.reload();
@@ -37,6 +44,7 @@ export class PageToolbar extends UIElement {
                     urlParams: { handler: "CommitEdit" },
                     method: "POST",
                     success: (data: string, status: number) => {
+                        cancelNav = false;
                         page.app.nav({ url: data, pushState: false });
                         isLoading = false;
                     }
@@ -51,10 +59,27 @@ export class PageToolbar extends UIElement {
                     urlParams: { handler: "DiscardEdit" },
                     method: "POST",
                     success: (data: string, status: number) => {
+                        cancelNav = false;
                         page.app.nav({ url: data, pushState: false });
                         isLoading = false;
                     }
                 });
+            });
+
+            this.__designer = new PageDesigner(page);
+
+            window.addEventListener("pageNavigating", (e: CustomEvent) => {
+                if (cancelNav) {
+                    alert("cancel nav");
+                    e.cancelBubble = true;
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                else {
+                    e.cancelBubble = false;
+                }
+
+                cancelNav = true;
             });
         }
         else {
@@ -152,6 +177,11 @@ export class PageToolbar extends UIElement {
     }
 
     destroy() {
+        if (this.__designer) {
+            this.__designer.destroy();
+            this.__designer = null;
+        }
+
         this.element.remove();
 
         super.destroy();
