@@ -43,10 +43,15 @@ export class PageToolbar extends UIElement {
                 isLoading = true;
 
                 page.app.request({
-                    urlParams: { handler: "CommitEdit" },
+                    url: "/brandup.pages/page/content/commit",
+                    urlParams: { editId: page.model.editId },
                     method: "POST",
                     success: (data: string, status: number) => {
                         cancelNav = false;
+
+                        if (status !== 200)
+                            throw "";
+
                         page.app.nav({ url: data, pushState: false });
                         isLoading = false;
                     }
@@ -58,10 +63,15 @@ export class PageToolbar extends UIElement {
                 isLoading = true;
 
                 page.app.request({
-                    urlParams: { handler: "DiscardEdit" },
+                    url: "/brandup.pages/page/content/discard",
+                    urlParams: { editId: page.model.editId },
                     method: "POST",
                     success: (data: string, status: number) => {
                         cancelNav = false;
+
+                        if (status !== 200)
+                            throw "";
+
                         page.app.nav({ url: data, pushState: false });
                         isLoading = false;
                     }
@@ -105,10 +115,14 @@ export class PageToolbar extends UIElement {
                 isLoading = true;
 
                 page.app.request({
-                    urlParams: { handler: "BeginEdit" },
+                    url: "/brandup.pages/page/content/begin",
+                    urlParams: { pageId: page.model.id },
                     method: "POST",
                     success: (data: BeginPageEditResult, status: number) => {
                         isLoading = false;
+
+                        if (status !== 200)
+                            throw "";
 
                         if (data.currentDate) {
                             let popup = DOM.tag("div", { class: "bp-toolbar-popup" }, [
@@ -140,10 +154,15 @@ export class PageToolbar extends UIElement {
                 this.setPopup(null);
 
                 page.app.request({
-                    urlParams: { handler: "BeginEdit", force: "true" },
+                    url: "/brandup.pages/page/content/begin",
+                    urlParams: { pageId: page.model.id, force: "true" },
                     method: "POST",
                     success: (data: BeginPageEditResult, status: number) => {
                         isLoading = false;
+
+                        if (status !== 200)
+                            throw "";
+
                         page.app.nav({ url: data.url, pushState: false });
                     }
                 });

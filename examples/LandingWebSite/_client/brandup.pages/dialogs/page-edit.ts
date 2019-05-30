@@ -62,8 +62,11 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         DOM.empty(this.__fieldsElem);
         this.__fields = {};
 
+        this.setLoading(true);
+
         this.__queue.request({
-            urlParams: { handler: "FormModel", modelPath: this.__modelPath },
+            url: "/brandup.pages/page/content/form",
+            urlParams: { editId: this.editId, modelPath: this.__modelPath },
             method: "GET",
             success: (data: PageContentForm, status: number) => {
                 if (status !== 200) {
@@ -72,6 +75,8 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                 }
 
                 this.__renderForm(data);
+
+                this.setLoading(false);
             }
         });
     }

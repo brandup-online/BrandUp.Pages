@@ -1,11 +1,9 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
@@ -127,118 +125,6 @@ namespace BrandUp.Pages
 
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
             ParentPageId = await PageService.GetParentPageIdAsync(page);
-        }
-
-        #endregion
-
-        #region Handler methods
-
-        public async Task<IActionResult> OnPostBeginEditAsync([FromQuery]bool force, [FromServices]IPageContentService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
-        {
-            if (editSession != null)
-                return BadRequest();
-
-            var result = new Models.BeginPageEditResult();
-
-            var currentEdit = await pageEditingService.FindEditByUserAsync(page, HttpContext.RequestAborted);
-            if (currentEdit != null)
-            {
-                if (force)
-                {
-                    await pageEditingService.DiscardEditAsync(currentEdit, HttpContext.RequestAborted);
-                    currentEdit = null;
-                }
-                else
-                    result.CurrentDate = currentEdit.CreatedDate;
-            }
-
-            if (currentEdit == null)
-                currentEdit = await pageEditingService.BeginEditAsync(page, HttpContext.RequestAborted);
-
-            result.Url = await pageLinkGenerator.GetUrlAsync(currentEdit, HttpContext.RequestAborted);
-
-            return new OkObjectResult(result);
-        }
-
-        public async Task<IActionResult> OnGetFormModelAsync([FromQuery]string modelPath)
-        {
-            if (editSession == null)
-                return BadRequest();
-            if (modelPath == null)
-                modelPath = string.Empty;
-
-            var contentContext = ContentContext.Navigate(modelPath);
-            if (contentContext == null)
-                return BadRequest();
-
-            var formModel = new Models.PageContentForm
-            {
-                Path = new Models.PageContentPath
-                {
-                    Name = contentContext.Explorer.Metadata.Name,
-                    Title = contentContext.Explorer.Metadata.Title,
-                    Index = contentContext.Explorer.Index,
-                    ModelPath = contentContext.Explorer.ModelPath
-                }
-            };
-
-            var path = formModel.Path;
-            var explorer = contentContext.Explorer.Parent;
-            while (explorer != null)
-            {
-                path.Parent = new Models.PageContentPath
-                {
-                    Name = explorer.Metadata.Name,
-                    Title = explorer.Metadata.Title,
-                    Index = explorer.Index,
-                    ModelPath = explorer.ModelPath
-                };
-
-                explorer = explorer.Parent;
-                path = path.Parent;
-            }
-
-            var fields = contentContext.Explorer.Metadata.Fields.ToList();
-
-            foreach (var field in fields)
-            {
-                formModel.Fields.Add(new Models.ContentFieldModel
-                {
-                    Type = field.Type,
-                    Name = field.Name,
-                    Title = field.Title,
-                    Options = field.GetFormOptions(contentContext.Services)
-                });
-
-                var modelValue = field.GetModelValue(contentContext.Content);
-                var formValue = await field.GetFormValueAsync(modelValue, contentContext.Services);
-
-                formModel.Values.Add(field.Name, formValue);
-            }
-
-            return new OkObjectResult(formModel);
-        }
-
-        public async Task<IActionResult> OnPostCommitEditAsync([FromServices]IPageContentService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
-        {
-            if (editSession == null)
-                return BadRequest();
-
-            await pageEditingService.CommitEditAsync(editSession);
-            editSession = null;
-
-            return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(page));
-        }
-
-        public async Task<IActionResult> OnPostDiscardEditAsync([FromServices]IPageContentService pageEditingService, [FromServices]IPageLinkGenerator pageLinkGenerator)
-        {
-            if (editSession == null)
-                return BadRequest();
-
-            await pageEditingService.DiscardEditAsync(editSession);
-            editSession = null;
-
-            return new OkObjectResult(await pageLinkGenerator.GetUrlAsync(page));
         }
 
         #endregion
