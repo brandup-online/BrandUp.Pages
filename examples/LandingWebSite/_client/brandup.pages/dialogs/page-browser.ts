@@ -1,13 +1,13 @@
 ﻿import { DialogOptions } from "./dialog";
 import { ListDialog } from "./dialog-list";
-import { DOM, ajaxRequest } from "brandup-ui";
+import { DOM } from "brandup-ui";
 import { createPage } from "./page-create";
 import { deletePage } from "./page-delete";
 import { listPageCollection } from "./page-collection-list";
 import { createPageCollection } from "./page-collection-create";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
-    readonly pageId: string;
+    private __pageId: string;
     private collectionId: string = null;
     private navElem: HTMLElement;
     private tabsElem: HTMLElement;
@@ -16,14 +16,24 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     constructor(pageId: string, options?: DialogOptions) {
         super(options);
 
-        this.pageId = pageId;
+        this.__pageId = pageId;
     }
 
+    get pageId(): string { return this.__pageId; }
     get typeName(): string { return "BrandUpPages.PageBrowserDialog"; }
 
     protected _onRenderContent() {
         super._onRenderContent();
 
+        this.setHeader("Страницы");
+        this.setNotes("Просмотр и управление страницами.");
+
+        this.registerCommand("nav", (elem) => {
+            let pageId = elem.getAttribute("data-page-id");
+            this.__pageId = pageId;
+            this.collectionId = null;
+            this.refresh();
+        });
         this.registerCommand("item-create", () => {
             if (!this.collectionId)
                 return;
@@ -81,15 +91,12 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         return `/brandup.pages/page/list`;
     }
     protected _buildUrlParams(urlParams: { [key: string]: string; }) {
-        if (this.pageId)
-            urlParams["pageId"] = this.pageId;
+        if (this.__pageId)
+            urlParams["pageId"] = this.__pageId;
 
         urlParams["collectionId"] = this.collectionId;
     }
     protected _buildList(model: PageListModel) {
-        this.setHeader("Страницы");
-        this.setNotes("Просмотр и управление страницами.");
-
         if (this.__createCollElem) {
             this.__createCollElem.remove();
             this.__createCollElem = null;
@@ -107,10 +114,11 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             DOM.empty(this.navElem);
         }
 
-        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", null, "root")));
+        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav" }, "root")));
         if (model.parents && model.parents.length) {
             for (let i = 0; i < model.parents.length; i++) {
-                this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", {}, model.parents[i])));
+                let pagePath = model.parents[i];
+                this.navElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, pagePath.header)));
             }
         }
 
@@ -121,7 +129,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
 
         let colId = this.collectionId;
         if (model.collections.length) {
-            this.tabsElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "collection-sesttings" }, "настройки")));
+            this.tabsElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "collection-sesttings", class: "secondary", title: "коллекций страниц" }, "коллекции")));
 
             if (!colId)
                 colId = model.collections[0].id;
@@ -130,7 +138,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             colId = null;
 
             this.__itemsElem.insertAdjacentElement("beforebegin", this.__createCollElem = DOM.tag("div", { class: "empty" }, [
-                DOM.tag("div", { class: "text" }, "Для страницы не созрано коллекций страниц."),
+                DOM.tag("div", { class: "text" }, "Для страницы не создано коллекций страниц."),
                 DOM.tag("div", { class: "buttons" }, DOM.tag("button", { class: "bp-button", "data-command": "create-collection" }, "Создать коллекцию"))
             ]));
         }
@@ -141,7 +149,10 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         return item.id;
     }
     protected _renderItemContent(item: PageModel, contentElem: HTMLElement) {
-        contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("a", { href: "", "data-command": "item-open" }, item.title)));
+        contentElem.appendChild(DOM.tag("div", { class: "title" }, [
+            DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": item.id }, item.title),
+            DOM.tag("div", { class: "text" }, item.url)
+        ]));
         contentElem.appendChild(DOM.tag("div", { class: `status ${item.status.toLowerCase()}` }, item.status));
     }
     protected _renderItemMenu(item: PageModel, menuElem: HTMLElement) {
@@ -158,8 +169,14 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
 }
 
 interface PageListModel {
-    parents: Array<string>;
+    parents: Array<PagePathModel>;
     collections: Array<PageCollectionModel>;
+}
+
+interface PagePathModel {
+    id: string;
+    header: string;
+    url: string;
 }
 
 export var browserPage = (pageId: string) => {

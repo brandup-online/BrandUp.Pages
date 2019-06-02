@@ -1,10 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BrandUp.Pages.Models
 {
     public class PageListModel
     {
-        public List<string> Parents { get; set; }
+        public List<PagePathModel> Parents { get; set; }
         public List<PageCollectionModel> Collections { get; set; }
+    }
+
+    public class PagePathModel
+    {
+        public Guid Id { get; set; }
+        public string Header { get; set; }
+        public string Url { get; set; }
     }
 }

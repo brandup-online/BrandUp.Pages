@@ -16,13 +16,13 @@ export class WebSiteToolbar extends UIElement {
         var buttons: Array<HTMLElement> = [];
 
         if (isContentPage && (<ContentPage>page).model.parentPageId) {
-            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-back" }, iconBack));
+            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-back", title: "Перейти к родительской странице" }, iconBack));
         }
 
-        buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-collections" }, iconList));
+        buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-collections", title: "Страницы этого уровня" }, iconList));
 
         if (isContentPage) {
-            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-collections2" }, iconTree));
+            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-collections2", title: "Дочерние страницы" }, iconTree));
         }
 
         var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);

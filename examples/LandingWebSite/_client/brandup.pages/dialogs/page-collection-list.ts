@@ -21,6 +21,9 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
 
     protected _onRenderContent() {
         super._onRenderContent();
+
+        this.setHeader("Коллекции страниц");
+        this.setNotes("Просмотр и управление коллекциями страниц.");
         
         this.registerCommand("item-create", () => {
             createPageCollection(this.pageId).then((createdItem: PageCollectionModel) => {
@@ -60,9 +63,6 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
             urlParams["pageId"] = this.pageId;
     }
     protected _buildList(model: PageCollectionListModel) {
-        this.setHeader("Коллекции страниц");
-        this.setNotes("Просмотр и управление коллекциями страниц.");
-
         if (!this.navElem) {
             this.navElem = DOM.tag("ol", { class: "nav" })
             this.content.insertAdjacentElement("afterbegin", this.navElem);

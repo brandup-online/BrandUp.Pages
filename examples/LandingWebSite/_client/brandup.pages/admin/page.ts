@@ -26,9 +26,9 @@ export class PageToolbar extends UIElement {
         let isLoading = false;
 
         if (page.model.editId) {
-            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-content" }, iconSettings));
-            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-commit" }, iconSave));
-            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-discard" }, iconDiscard));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-content", title: "Редактор контента" }, iconSettings));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-commit", title: "Применить изменения к странице" }, iconSave));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-discard", title: "Отменить изменения" }, iconDiscard));
 
             let cancelNav = true;
 
@@ -107,7 +107,7 @@ export class PageToolbar extends UIElement {
             }
 
             //toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-seo" }, iconSeo));
-            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-edit" }, iconEdit));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-edit", title: "Редактировать контент страницы" }, iconEdit));
 
             this.registerCommand("bp-edit", () => {
                 if (isLoading)

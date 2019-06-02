@@ -25,6 +25,8 @@ export class PageDesigner implements IPageDesigner {
         this.__rootElem.classList.add("page-designer");
 
         this.render();
+
+        document.body.classList.add("bp-state-design");
     }
 
     accentField(field: IContentFieldDesigner) {
@@ -101,5 +103,7 @@ export class PageDesigner implements IPageDesigner {
             this.__fields[key].destroy();
         }
         this.__fields = null;
+
+        document.body.classList.remove("bp-state-design");
     }
 }

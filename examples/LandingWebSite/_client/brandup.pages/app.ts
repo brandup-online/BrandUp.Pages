@@ -169,8 +169,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.__navCounter++;
         var navSequence = this.__navCounter;
 
-        this.element.classList.remove("app-state-loaded");
-        this.element.classList.add("app-state-loading");
+        this.element.classList.remove("bp-state-loaded");
+        this.element.classList.add("bp-state-loading");
 
         this.request({
             url: url,
@@ -290,8 +290,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     private __createPage(pageType: any, pageState: PageNavState, pageModel: PageClientModel) {
         this.page = new pageType(this, pageState, pageModel, this.__contentBodyElem);
         
-        document.body.classList.remove("app-state-loading");
-        document.body.classList.add("app-state-loaded");
+        document.body.classList.remove("bp-state-loading");
+        document.body.classList.add("bp-state-loaded");
 
         this.raiseEvent("pageLoaded");
     }
@@ -366,7 +366,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         }
 
         if (window.hasOwnProperty("appInitOptions")) {
-            document.body.classList.add("app-state-loading");
+            document.body.classList.add("bp-state-loading");
 
             let appModel = <TModel>window["appInitOptions"];
             let app = new Application<TModel>(appModel, options);

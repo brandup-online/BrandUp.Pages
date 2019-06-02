@@ -21,6 +21,8 @@
         display: flex;
         flex-flow: row nowrap;
         align-items: center;
+        opacity: 0.9;
+        transition: all ease 80ms;
 
         & .content {
             flex: 1 1 auto;
@@ -29,38 +31,54 @@
             flex-flow: row nowrap;
             align-items: center;
             cursor: default;
+            font-size: 16px;
+            line-height: 24px;
 
             & .title {
-                font-size: 16px;
-                line-height: 24px;
-                font-weight: 600;
                 flex: 1 1 100%;
-                width: 100%;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
+                display: flex;
+                flex-flow: column nowrap;
+                align-items: flex-start;
 
-                & a {
+                & a,
+                & span {
+                    display: block;
                     text-decoration: none;
+                    max-width: 100%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    font-weight: 600;
+                }
+
+                & .text {
+                    font-size: 12px;
+                    line-height: 16px;
+                    color: #aaa;
                 }
             }
 
             & .status {
-                padding-left: 30px;
+                flex: 0 0 auto;
+                margin-left: 20px;
+                color: #fff;
+                padding: 0 10px;
+                font-size: 12px;
+                border-radius: 2px;
 
                 &.published {
-                    color: green;
+                    background: green;
                 }
 
                 &.draft {
-                    color: orange;
+                    background: orange;
                 }
             }
         }
 
         & .menu {
             position: relative;
-            padding-left: 30px;
+            padding-left: 20px;
 
             & button {
                 box-sizing: border-box;
@@ -128,10 +146,12 @@
 
         &:hover {
             background: #eee;
+            opacity: 1;
         }
 
         &.opened-menu {
             background: #eee;
+            opacity: 1;
 
             & .menu {
                 & button {
