@@ -122,7 +122,6 @@ namespace BrandUp.Pages.Repositories
         {
             return Task.FromResult(pageHierarhy.HasPages(ownCollectionId));
         }
-
         public Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(page.Id, out int index))
@@ -137,6 +136,39 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
+        public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            var p = (Page)page;
+            return Task.FromResult(p.SeoTitle);
+        }
+        public Task SetPageTitleAsync(IPage page, string title, CancellationToken cancellationToken = default)
+        {
+            var p = (Page)page;
+            p.SeoTitle = title;
+            return Task.CompletedTask;
+        }
+        public Task<string> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            var p = (Page)page;
+            return Task.FromResult(p.SeoDescription);
+        }
+        public Task SetPageDescriptionAsync(IPage page, string description, CancellationToken cancellationToken = default)
+        {
+            var p = (Page)page;
+            p.SeoDescription = description;
+            return Task.CompletedTask;
+        }
+        public Task<string[]> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            var p = (Page)page;
+            return Task.FromResult(p.SeoKeywords);
+        }
+        public Task SetPageKeywordsAsync(IPage page, string[] keywords, CancellationToken cancellationToken = default)
+        {
+            var p = (Page)page;
+            p.SeoKeywords = keywords;
+            return Task.CompletedTask;
+        }
 
         private class Page : IPage
         {
@@ -149,6 +181,9 @@ namespace BrandUp.Pages.Repositories
             public int ContentVersion { get; set; } = 1;
             public bool IsPublished => Status == PageStatus.Published;
             private PageStatus Status { get; set; }
+            public string SeoTitle { get; set; }
+            public string SeoDescription { get; set; }
+            public string[] SeoKeywords { get; set; }
 
             public Page(Guid id, string typeName, Guid collectionId)
             {

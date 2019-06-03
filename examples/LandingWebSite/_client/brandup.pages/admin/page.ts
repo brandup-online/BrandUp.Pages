@@ -10,6 +10,7 @@ import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
 import { PageDesigner } from "../content/designer/page";
 import { NavigationOptions } from "../typings/website";
+import { seoPage } from "../dialogs/page-seo";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
@@ -106,7 +107,7 @@ export class PageToolbar extends UIElement {
                 });
             }
 
-            //toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-seo" }, iconSeo));
+            toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-seo", title: "Параметры индексирования страницы" }, iconSeo));
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-edit", title: "Редактировать контент страницы" }, iconEdit));
 
             this.registerCommand("bp-edit", () => {
@@ -141,6 +142,11 @@ export class PageToolbar extends UIElement {
                             page.app.nav({ url: data.url, pushState: false });
                     }
                 });
+            });
+            this.registerCommand("bp-seo", () => {
+                seoPage(page.model.id).then(() => {
+                    page.app.reload();
+                })
             });
 
             this.registerCommand("continue-edit", (elem: HTMLElement) => {

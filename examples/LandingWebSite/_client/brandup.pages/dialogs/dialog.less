@@ -154,7 +154,7 @@
     }
 
     &-header {
-        display: none;
+        display: flex;
         flex: 0 0 72px;
         flex-flow: row nowrap;
         align-items: center;
@@ -238,14 +238,23 @@
         flex-flow: column nowrap;
         padding: 30px 35px;
         color: red;
-    }
 
-    &.has-header {
+        & ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            & li {
+                padding: 5px;
+                margin: 0;
+            }
+        }
+    }
+    /*&.has-header {
         & .bp-dialog-header {
             display: flex;
         }
-    }
-
+    }*/
     &.has-notes,
     &.has-actions {
         & .bp-dialog-footer {

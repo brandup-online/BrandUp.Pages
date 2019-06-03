@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\brandup.pages\dialogs\page-seo.ts" />
     <None Remove="_client\contents\BB1.ts" />
     <None Remove="_client\designers\page-blocks.ts" />
     <None Remove="_client\brandup.pages\admin\page.ts" />
@@ -80,6 +81,7 @@
 
 
   <ItemGroup>
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-seo.ts" />
     <TypeScriptCompile Include="_client\contents\BB1.ts" />
     <TypeScriptCompile Include="_client\designers\page-blocks.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\admin\page.ts" />

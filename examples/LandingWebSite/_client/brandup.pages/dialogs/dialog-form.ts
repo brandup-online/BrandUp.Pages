@@ -157,7 +157,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         }
         
         if (state && state.errors && state.errors.hasOwnProperty("")) {
-            alert(state.errors[""]);
+            this.setError(state.errors[""]);
         }
     }
 

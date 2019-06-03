@@ -299,5 +299,51 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 }
             }
         }
+
+        public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            return Task.FromResult(pageDocument.Seo?.Title);
+        }
+        public Task SetPageTitleAsync(IPage page, string title, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            if (pageDocument.Seo == null)
+                pageDocument.Seo = new PageSeoDocument();
+
+            pageDocument.Seo.Title = title;
+
+            return Task.CompletedTask;
+        }
+        public Task<string> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            return Task.FromResult(pageDocument.Seo?.Description);
+        }
+        public Task SetPageDescriptionAsync(IPage page, string description, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            if (pageDocument.Seo == null)
+                pageDocument.Seo = new PageSeoDocument();
+
+            pageDocument.Seo.Description = description;
+
+            return Task.CompletedTask;
+        }
+        public Task<string[]> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            return Task.FromResult(pageDocument.Seo?.Keywords);
+        }
+        public Task SetPageKeywordsAsync(IPage page, string[] keywords, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            if (pageDocument.Seo == null)
+                pageDocument.Seo = new PageSeoDocument();
+
+            pageDocument.Seo.Keywords = keywords;
+
+            return Task.CompletedTask;
+        }
     }
 }

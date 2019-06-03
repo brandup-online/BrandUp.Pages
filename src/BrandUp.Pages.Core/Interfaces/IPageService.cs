@@ -22,6 +22,15 @@ namespace BrandUp.Pages.Interfaces
         Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default);
         Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default);
         Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default);
+        Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default);
+        Task UpdatePageSeoOptionsAsync(IPage page, PageSeoOptions seoOptions, CancellationToken cancellationToken = default);
+    }
+
+    public class PageSeoOptions
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string[] Keywords { get; set; }
     }
 
     public interface IPage

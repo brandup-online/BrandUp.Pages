@@ -21,6 +21,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string Header { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public PageStatus Status { get; set; }
+        public PageSeoDocument Seo { get; set; }
         public bool IsPublished { get => Status == PageStatus.Published; }
 
         Task IPage.SetUrlAsync(string urlPath)
@@ -36,6 +37,13 @@ namespace BrandUp.Pages.MongoDb.Documents
     {
         Draft,
         Published
+    }
+
+    public class PageSeoDocument
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string[] Keywords { get; set; }
     }
 
     public class PageDocumentContextType : MongoDB.MongoDbCollectionContext<PageDocument>

@@ -1,4 +1,4 @@
-﻿import { UIControl, DOM } from "brandup-ui";
+﻿import { UIControl, DOM, Utility } from "brandup-ui";
 import "./dialog.less";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";
@@ -64,14 +64,7 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
     }
 
     setHeader(html: string) {
-        if (html) {
-            this.headerTitleElem.innerHTML = html;
-            this.element.classList.add("has-header");
-        }
-        else {
-            this.headerTitleElem.innerText = "";
-            this.element.classList.remove("has-header");
-        }
+        this.headerTitleElem.innerHTML = html ? html : "";
     }
     setNotes(html: string) {
         if (html) {
@@ -98,10 +91,19 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
         this.element.classList.add("has-actions");
     }
 
-    setError(title: string, notes?: string) {
+    setError(message: string | Array<string>) {
         this.element.classList.add("has-error");
 
-        this.__errorElem = DOM.tag("div", { class: "bp-dialog-error" }, title);
+        let list = DOM.tag("ul");
+        if (Utility.isArray(message)) {
+            for (let i = 0; i < message.length; i++) {
+                list.appendChild(DOM.tag("li", null, message[i]));
+            }
+        }
+        else
+            list.appendChild(DOM.tag("li", null, message));
+
+        this.__errorElem = DOM.tag("div", { class: "bp-dialog-error" }, list);
 
         this.content.insertAdjacentElement("beforebegin", this.__errorElem);
     }

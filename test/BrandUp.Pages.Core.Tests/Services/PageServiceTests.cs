@@ -228,6 +228,60 @@ namespace BrandUp.Pages.Services
             Assert.False(publishResult.Succeeded);
         }
 
+        [Fact]
+        public async Task GetPageSeoOptions()
+        {
+            var page = await pageService.FindPageByPathAsync("test");
+            var seo = await pageService.GetPageSeoOptionsAsync(page);
+
+            Assert.NotNull(seo);
+            Assert.Null(seo.Title);
+            Assert.Null(seo.Description);
+            Assert.Null(seo.Keywords);
+        }
+
+        [Fact]
+        public async Task UpdatePageSeoOptions_Title()
+        {
+            var page = await pageService.FindPageByPathAsync("test");
+            await pageService.UpdatePageSeoOptionsAsync(page, new PageSeoOptions { Title = "test" });
+
+            var seo = await pageService.GetPageSeoOptionsAsync(page);
+
+            Assert.NotNull(seo);
+            Assert.Equal("test", seo.Title);
+            Assert.Null(seo.Description);
+            Assert.Null(seo.Keywords);
+        }
+
+        [Fact]
+        public async Task UpdatePageSeoOptions_Description()
+        {
+            var page = await pageService.FindPageByPathAsync("test");
+            await pageService.UpdatePageSeoOptionsAsync(page, new PageSeoOptions { Description = "test" });
+
+            var seo = await pageService.GetPageSeoOptionsAsync(page);
+
+            Assert.NotNull(seo);
+            Assert.Null(seo.Title);
+            Assert.Equal("test", seo.Description);
+            Assert.Null(seo.Keywords);
+        }
+
+        [Fact]
+        public async Task UpdatePageSeoOptions_Keywords()
+        {
+            var page = await pageService.FindPageByPathAsync("test");
+            await pageService.UpdatePageSeoOptionsAsync(page, new PageSeoOptions { Keywords = new string[] { "test" } });
+
+            var seo = await pageService.GetPageSeoOptionsAsync(page);
+
+            Assert.NotNull(seo);
+            Assert.Null(seo.Title);
+            Assert.Null(seo.Description);
+            Assert.Contains("test", seo.Keywords);
+        }
+
         #endregion
     }
 }

@@ -12,6 +12,11 @@ export class PageCreateDialog extends FormDialog<PageCreateForm, PageCreateValue
     }
 
     get typeName(): string { return "BrandUpPages.PageCreateDialog"; }
+    protected _onRenderContent() {
+        super._onRenderContent();
+
+        this.setHeader("Параметры новой страницы");
+    }
     protected _getSaveButtonTitle(): string {
         return "Создать";
     }
@@ -22,8 +27,6 @@ export class PageCreateDialog extends FormDialog<PageCreateForm, PageCreateValue
         urlParams["collectionId"] = this.collectionId;
     }
     protected _buildForm(model: PageCreateForm) {
-        this.setHeader("Параметры новой страницы");
-
         this.addTextBox("Header", "Название", { placeholder: "Введите название новой страницы" });
         this.addComboBox("PageType", "Тип страницы", { placeholder: "Выберите тип новой страницы" }, model.pageTypes);
     }
