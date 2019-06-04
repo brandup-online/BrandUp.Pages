@@ -9,6 +9,8 @@ namespace BrandUp.Pages.Models
         public string BaseUrl { get; set; }
         public AntiforgeryModel Antiforgery { get; set; }
         public NavigationClientModel Nav { get; set; }
+        [JsonExtensionData]
+        public Dictionary<string, object> Data { get; set; }
     }
 
     public class AntiforgeryModel

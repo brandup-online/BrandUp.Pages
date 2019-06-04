@@ -6,8 +6,9 @@ namespace BrandUp.Pages
 {
     public interface IPageNavigationProvider
     {
-        Task OnInitializeAsync(CancellationToken cancellationToken = default);
-        Task BuildNavigationModelAsync(Dictionary<string, object> data, CancellationToken cancellationToken = default);
-        Task BuildPageModelAsync(Dictionary<string, object> data, CancellationToken cancellationToken = default);
+        Task InitializeAsync(CancellationToken cancellationToken = default);
+        Task BuildApplicationClientDataAsync(Dictionary<string, object> clientData, CancellationToken cancellationToken = default);
+        Task BuildNavigationClientDataAsync(Dictionary<string, object> clientData, CancellationToken cancellationToken = default);
+        Task BuildPageClientDataAsync(Dictionary<string, object> clientData, CancellationToken cancellationToken = default);
     }
 }

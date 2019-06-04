@@ -31,12 +31,11 @@ namespace BrandUp.Pages
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
-            pageNavigationProvider = HttpContext.RequestServices.GetService<IPageNavigationProvider>();
-
-            if (pageNavigationProvider != null)
-                await pageNavigationProvider.OnInitializeAsync(HttpContext.RequestAborted);
-
             await OnInitializeAsync(context);
+
+            pageNavigationProvider = HttpContext.RequestServices.GetService<IPageNavigationProvider>();
+            if (pageNavigationProvider != null)
+                await pageNavigationProvider.InitializeAsync(HttpContext.RequestAborted);
 
             if (Request.Query.ContainsKey("_content"))
                 renderOnlyContent = true;
@@ -48,7 +47,7 @@ namespace BrandUp.Pages
 
         public async Task<IActionResult> OnGetNavigationAsync()
         {
-            var navModel = await GetNavigationModelAsync();
+            var navModel = await GetNavigationClientModelAsync();
 
             return new OkObjectResult(navModel);
         }
@@ -66,7 +65,39 @@ namespace BrandUp.Pages
             if (renderOnlyContent)
                 page.Layout = null;
         }
-        internal async Task<Models.NavigationClientModel> GetNavigationModelAsync(CancellationToken cancellationToken = default)
+        internal async Task<Models.AppClientModel> GetAppClientModelAsync(CancellationToken cancellationToken = default)
+        {
+            var httpContext = HttpContext;
+            var httpRequest = httpContext.Request;
+
+            var appClientModel = new Models.AppClientModel
+            {
+                BaseUrl = httpRequest.PathBase.HasValue ? httpRequest.PathBase.Value : "/",
+                Data = new Dictionary<string, object>()
+            };
+
+            var antiforgery = httpContext.RequestServices.GetService<IAntiforgery>();
+            if (antiforgery != null)
+            {
+                var antiforgeryToken = antiforgery.GetAndStoreTokens(httpContext);
+
+                appClientModel.Antiforgery = new Models.AntiforgeryModel
+                {
+                    HeaderName = antiforgeryToken.HeaderName,
+                    FormFieldName = antiforgeryToken.FormFieldName
+                };
+            }
+
+            appClientModel.Nav = await GetNavigationClientModelAsync(cancellationToken);
+
+            await OnBuildApplicationClientDataAsync(appClientModel.Data, cancellationToken);
+
+            if (pageNavigationProvider != null)
+                await pageNavigationProvider.BuildApplicationClientDataAsync(appClientModel.Data, cancellationToken);
+
+            return appClientModel;
+        }
+        private async Task<Models.NavigationClientModel> GetNavigationClientModelAsync(CancellationToken cancellationToken = default)
         {
             var httpContext = HttpContext;
             var httpRequest = httpContext.Request;
@@ -105,16 +136,16 @@ namespace BrandUp.Pages
                 navModel.ValidationToken = antiforgeryTokenSet.RequestToken;
             }
 
-            await OnBuildNavigationClientData(navModel.Data, cancellationToken);
+            await OnBuildNavigationClientDataAsync(navModel.Data, cancellationToken);
 
             if (pageNavigationProvider != null)
-                await pageNavigationProvider.BuildNavigationModelAsync(navModel.Data, cancellationToken);
+                await pageNavigationProvider.BuildNavigationClientDataAsync(navModel.Data, cancellationToken);
 
-            navModel.Page = await GetClientModelAsync(cancellationToken);
+            navModel.Page = await GetPageClientModelAsync(cancellationToken);
 
             return navModel;
         }
-        internal async Task<Models.PageClientModel> GetClientModelAsync(CancellationToken cancellationToken = default)
+        private async Task<Models.PageClientModel> GetPageClientModelAsync(CancellationToken cancellationToken = default)
         {
             var model = new Models.PageClientModel
             {
@@ -144,10 +175,10 @@ namespace BrandUp.Pages
                 model.Data.Add(name, value);
             }
 
-            await OnBuildPageClientData(model.Data, cancellationToken);
+            await OnBuildPageClientDataAsync(model.Data, cancellationToken);
 
             if (pageNavigationProvider != null)
-                await pageNavigationProvider.BuildPageModelAsync(model.Data, cancellationToken);
+                await pageNavigationProvider.BuildPageClientDataAsync(model.Data, cancellationToken);
 
             return model;
         }
@@ -156,11 +187,15 @@ namespace BrandUp.Pages
         {
             return Task.CompletedTask;
         }
-        protected virtual Task OnBuildNavigationClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
+        protected virtual Task OnBuildApplicationClientDataAsync(IDictionary<string, object> data, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
-        protected virtual Task OnBuildPageClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
+        protected virtual Task OnBuildNavigationClientDataAsync(IDictionary<string, object> data, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+        protected virtual Task OnBuildPageClientDataAsync(IDictionary<string, object> data, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
@@ -26,38 +24,11 @@ namespace BrandUp.Pages.TagHelpers
             {
                 if (ViewContext.ViewData.Model is AppPageModel appPageModel)
                 {
-                    var appClientModel = await GetAppClientModelAsync(appPageModel);
+                    var appClientModel = await appPageModel.GetAppClientModelAsync(ViewContext.HttpContext.RequestAborted);
 
                     output.PreContent.AppendHtml("<script type=\"text/javascript\">var appInitOptions = " + jsonHelper.Serialize(appClientModel) + "</script>");
                 }
             }
-        }
-
-        private async Task<Models.AppClientModel> GetAppClientModelAsync(AppPageModel appPageModel)
-        {
-            var httpContext = ViewContext.HttpContext;
-            var httpRequest = httpContext.Request;
-
-            var appClientModel = new Models.AppClientModel
-            {
-                BaseUrl = httpRequest.PathBase.HasValue ? httpRequest.PathBase.Value : "/"
-            };
-
-            var antiforgery = httpContext.RequestServices.GetService<IAntiforgery>();
-            if (antiforgery != null)
-            {
-                var antiforgeryToken = antiforgery.GetAndStoreTokens(httpContext);
-
-                appClientModel.Antiforgery = new Models.AntiforgeryModel
-                {
-                    HeaderName = antiforgeryToken.HeaderName,
-                    FormFieldName = antiforgeryToken.FormFieldName
-                };
-            }
-
-            appClientModel.Nav = await appPageModel.GetNavigationModelAsync();
-
-            return appClientModel;
         }
     }
 }
