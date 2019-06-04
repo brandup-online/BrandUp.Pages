@@ -17,7 +17,7 @@ namespace BrandUp.Pages
     public abstract class AppPageModel : PageModel, IContentPageModel
     {
         private bool renderOnlyContent = false;
-        private readonly IDictionary<string, object> clientModel = new Dictionary<string, object>();
+        private IPageNavigationProvider pageNavigationProvider;
 
         #region IContentPageModel members
 
@@ -31,6 +31,11 @@ namespace BrandUp.Pages
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
+            pageNavigationProvider = HttpContext.RequestServices.GetService<IPageNavigationProvider>();
+
+            if (pageNavigationProvider != null)
+                await pageNavigationProvider.OnInitializeAsync(HttpContext.RequestAborted);
+
             await OnInitializeAsync(context);
 
             if (Request.Query.ContainsKey("_content"))
@@ -56,10 +61,6 @@ namespace BrandUp.Pages
 
         #endregion
 
-        protected virtual Task OnInitializeAsync(PageHandlerExecutingContext context)
-        {
-            return Task.CompletedTask;
-        }
         public void RenderPage(Microsoft.AspNetCore.Mvc.Razor.IRazorPage page)
         {
             if (renderOnlyContent)
@@ -90,7 +91,7 @@ namespace BrandUp.Pages
                 IsAuthenticated = httpContext.User.Identity.IsAuthenticated,
                 Url = requestUrl,
                 Query = new Dictionary<string, StringValues>(httpRequest.Query),
-                Page = await GetClientModelAsync(cancellationToken)
+                Data = new Dictionary<string, object>()
             };
             navModel.Query.Remove("handler");
 
@@ -103,6 +104,13 @@ namespace BrandUp.Pages
                 var antiforgeryTokenSet = antiforgery.GetTokens(httpContext);
                 navModel.ValidationToken = antiforgeryTokenSet.RequestToken;
             }
+
+            await OnBuildNavigationClientData(navModel.Data, cancellationToken);
+
+            if (pageNavigationProvider != null)
+                await pageNavigationProvider.BuildNavigationModelAsync(navModel.Data, cancellationToken);
+
+            navModel.Page = await GetClientModelAsync(cancellationToken);
 
             return navModel;
         }
@@ -136,11 +144,23 @@ namespace BrandUp.Pages
                 model.Data.Add(name, value);
             }
 
-            await OnBuildClientData(model.Data, cancellationToken);
+            await OnBuildPageClientData(model.Data, cancellationToken);
+
+            if (pageNavigationProvider != null)
+                await pageNavigationProvider.BuildPageModelAsync(model.Data, cancellationToken);
 
             return model;
         }
-        protected virtual Task OnBuildClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
+
+        protected virtual Task OnInitializeAsync(PageHandlerExecutingContext context)
+        {
+            return Task.CompletedTask;
+        }
+        protected virtual Task OnBuildNavigationClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+        protected virtual Task OnBuildPageClientData(IDictionary<string, object> data, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }

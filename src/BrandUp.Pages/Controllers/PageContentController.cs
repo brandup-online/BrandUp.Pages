@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -115,6 +116,42 @@ namespace BrandUp.Pages.Controllers
             }
 
             return Ok(formModel);
+        }
+
+        [HttpGet("changeType")]
+        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery]Guid editId, [FromQuery]string modelPath, [FromQuery]string modelType, [FromServices]IContentMetadataManager contentMetadataManager, [FromServices]Views.IViewLocator viewLocator)
+        {
+            if (modelType == null)
+                return BadRequest();
+
+            var editSession = await pageContentService.FindEditByIdAsync(editId);
+            if (editSession == null)
+                return BadRequest();
+
+            var page = await pageService.FindPageByIdAsync(editSession.PageId);
+            if (page == null)
+                return BadRequest();
+
+            if (modelPath == null)
+                modelPath = string.Empty;
+
+            var newModelType = contentMetadataManager.GetMetadata(modelType);
+
+            var pageContent = await pageContentService.GetContentAsync(editSession);
+            var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContent);
+
+            var contentExplorer = pageContentExplorer.Navigate(modelPath);
+            if (contentExplorer == null)
+                return BadRequest();
+
+            contentExplorer.Field.ChangeType(contentExplorer.Model, modelType);
+
+            var newItem = newModelType.CreateModelInstance();
+            var view = viewLocator.FindView(newModelType.ModelType);
+            if (view != null && view.DefaultModelData != null)
+                newItem = newModelType.ConvertDictionaryToContentModel(view.DefaultModelData);
+
+            return Ok();
         }
 
         [HttpPost("commit")]

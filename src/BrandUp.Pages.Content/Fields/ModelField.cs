@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Content.Fields
 
         public string AddText { get; set; }
 
-        #region  IListField members
+        #region  IModelField members
 
         public ContentMetadataProvider ValueContentMetadata { get; private set; }
         public bool IsListValue { get; private set; }
@@ -32,6 +32,10 @@ namespace BrandUp.Pages.Content.Fields
             }
             else
                 return value;
+        }
+        public object ChangeType(object value, string newTypeName)
+        {
+            return null;
         }
 
         #endregion
@@ -198,6 +202,7 @@ namespace BrandUp.Pages.Content.Fields
         bool IsListValue { get; }
         object Navigate(object value, int index);
         ContentMetadataProvider ValueContentMetadata { get; }
+        object ChangeType(object value, string newTypeName);
     }
 
     public class ModelFieldFormOptions

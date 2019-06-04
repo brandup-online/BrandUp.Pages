@@ -37,6 +37,14 @@ namespace BrandUp.Pages.Builder
             return builder;
         }
 
+        public static IPagesBuilder AddNavigationProvider<T>(this IPagesBuilder builder)
+            where T : class, IPageNavigationProvider
+        {
+            builder.Services.AddTransient<IPageNavigationProvider, T>();
+
+            return builder;
+        }
+
         public static IPagesBuilder AddImageResizer<T>(this IPagesBuilder builder)
             where T : class, Images.IImageResizer
         {

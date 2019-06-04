@@ -13,7 +13,14 @@ namespace LandingWebSite.Infrastructure
         {
             using (Image<Rgba32> image = Image.Load(imageStream))
             {
-                image.Mutate(x => x.Resize(new ResizeOptions { Mode = ResizeMode.Crop, Size = new SixLabors.Primitives.Size(width, height) }));
+                var resizeOptions = new ResizeOptions
+                {
+                    Mode = ResizeMode.Crop,
+                    Size = new SixLabors.Primitives.Size(width, height),
+                    //CenterCoordinates = new List<float> { 5000, 5000 }
+                };
+
+                image.Mutate(x => x.Resize(resizeOptions));
                 image.SaveAsJpeg(output, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder() { Quality = 65, Subsample = SixLabors.ImageSharp.Formats.Jpeg.JpegSubsample.Ratio444 });
             }
 

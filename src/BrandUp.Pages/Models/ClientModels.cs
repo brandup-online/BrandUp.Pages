@@ -25,6 +25,8 @@ namespace BrandUp.Pages.Models
         public IDictionary<string, StringValues> Query { get; set; }
         public string ValidationToken { get; set; }
         public PageClientModel Page { get; set; }
+        [JsonExtensionData]
+        public Dictionary<string, object> Data { get; set; }
     }
 
     public class PageClientModel
