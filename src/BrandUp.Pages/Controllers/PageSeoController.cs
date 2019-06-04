@@ -70,11 +70,11 @@ namespace BrandUp.Pages.Controllers
             {
                 foreach (var word in values.Keywords.Split(",", StringSplitOptions.RemoveEmptyEntries))
                 {
-                    var n = word.Trim();
-                    if (string.IsNullOrEmpty(n))
+                    var normalizeWord = word.Trim();
+                    if (string.IsNullOrEmpty(normalizeWord))
                         continue;
 
-                    keywords.Add(word);
+                    keywords.Add(normalizeWord);
                 }
             }
 

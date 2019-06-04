@@ -12,6 +12,7 @@ namespace BrandUp.Pages
     {
         private IPage page;
         private IPageEdit editSession;
+        private PageSeoOptions pageSeo;
 
         #region Properties
 
@@ -33,7 +34,9 @@ namespace BrandUp.Pages
 
         #region AppPageModel members
 
-        public override string Title => PageMetadata.GetPageHeader(PageContent);
+        public override string Title => !string.IsNullOrEmpty(pageSeo.Title) ? pageSeo.Title : PageMetadata.GetPageHeader(PageContent);
+        public override string Description => pageSeo.Description;
+        public override string Keywords => pageSeo.Keywords != null ? string.Join(",", pageSeo.Keywords) : null;
         public override string ScriptName => "content";
         protected override async Task OnInitializeAsync(PageHandlerExecutingContext context)
         {
@@ -109,22 +112,24 @@ namespace BrandUp.Pages
                 }
             }
 
-            PageMetadata = await PageService.GetPageTypeAsync(page);
+            PageMetadata = await PageService.GetPageTypeAsync(page, HttpContext.RequestAborted);
+
+            pageSeo = await PageService.GetPageSeoOptionsAsync(page, HttpContext.RequestAborted);
 
             if (editSession != null)
             {
                 var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageContentService>();
-                PageContent = await pageEditingService.GetContentAsync(editSession);
+                PageContent = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
             }
             else
-                PageContent = await PageService.GetPageContentAsync(page);
+                PageContent = await PageService.GetPageContentAsync(page, HttpContext.RequestAborted);
             if (PageContent == null)
                 throw new InvalidOperationException();
 
             ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices, editSession != null);
 
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
-            ParentPageId = await PageService.GetParentPageIdAsync(page);
+            ParentPageId = await PageService.GetParentPageIdAsync(page, HttpContext.RequestAborted);
         }
 
         #endregion

@@ -6,6 +6,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@Model.Title</title>
+    @if (Model.Description != null)
+    {
+        <meta name="description" content="@Model.Description" />
+    }
+    @if (Model.Keywords != null)
+    {
+        <meta name="keywords" content="@Model.Keywords" />
+    }
 </head>
 <body>
     <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
