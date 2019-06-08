@@ -29,7 +29,7 @@ export class PageSeoDialog extends FormDialog<PageSeoForm, PageSeoValues, PageMo
     protected _buildForm(model: PageSeoForm) {
         this.addTextBox("Title", "Заголовок страницы", { });
         this.addTextBox("Description", "Описание страницы", { });
-        this.addTextBox("Keywords", "Ключевые слова", { });
+        this.addStringArray("Keywords", "Ключевые слова", { placeholder: "Введите ключевое слово" });
     }
 }
 

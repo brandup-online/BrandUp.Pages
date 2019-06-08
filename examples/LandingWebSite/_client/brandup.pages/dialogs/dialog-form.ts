@@ -3,6 +3,7 @@ import { DOM, AjaxQueue } from "brandup-ui";
 import { Field } from "../form/field";
 import { TextboxOptions, Textbox } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
+import { StringArrayFieldOptions, StringArrayField } from "../form/string-array";
 import "./dialog-form.less";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
@@ -211,6 +212,10 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         this.addField(title, field);
 
         field.addItems(items);
+    }
+    protected addStringArray(name: string, title: string, options: StringArrayFieldOptions) {
+        var field = new StringArrayField(name, options);
+        this.addField(title, field);
     }
 
     protected abstract _getSaveButtonTitle(): string;

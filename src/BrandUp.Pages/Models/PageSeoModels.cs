@@ -13,7 +13,6 @@ namespace BrandUp.Pages.Models
         public string Title { get; set; }
         [MaxLength(255)]
         public string Description { get; set; }
-        [MaxLength(255)]
-        public string Keywords { get; set; }
+        public string[] Keywords { get; set; }
     }
 }

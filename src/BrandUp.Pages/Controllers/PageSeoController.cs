@@ -54,8 +54,8 @@ namespace BrandUp.Pages.Controllers
 
             formModel.Values.Title = seoOptions.Title;
             formModel.Values.Description = seoOptions.Description;
-            if (seoOptions.Keywords != null)
-                formModel.Values.Keywords = string.Join(", ", seoOptions.Keywords);
+            if (seoOptions.Keywords != null && seoOptions.Keywords.Length > 0)
+                formModel.Values.Keywords = seoOptions.Keywords;
         }
 
         protected override Task OnChangeValueAsync(string field, PageSeoValues values)
@@ -66,9 +66,9 @@ namespace BrandUp.Pages.Controllers
         protected override async Task<PageModel> OnCommitAsync(PageSeoValues values)
         {
             var keywords = new List<string>();
-            if (!string.IsNullOrEmpty(values.Keywords))
+            if (values.Keywords != null)
             {
-                foreach (var word in values.Keywords.Split(",", StringSplitOptions.RemoveEmptyEntries))
+                foreach (var word in values.Keywords)
                 {
                     var normalizeWord = word.Trim();
                     if (string.IsNullOrEmpty(normalizeWord))

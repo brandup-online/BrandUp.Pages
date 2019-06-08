@@ -1,6 +1,6 @@
-﻿@import "../../vars.less";
+﻿@import "../vars.less";
 
-.website-form-field.content {
+.website-form-field.string-array {
     position: relative;
     border-bottom: solid 1px #eee;
 
@@ -33,6 +33,17 @@
                 cursor: move;
             }
 
+            & input {
+                display: block;
+                width: 100%;
+                flex: 0 1 100%;
+                border: 0;
+                padding: 0 10px 0 0;
+                background: none;
+                box-sizing: border-box;
+                outline: none;
+            }
+
             & a.title {
                 flex: 0 1 100%;
                 display: block;
@@ -44,19 +55,12 @@
                 padding-right: 10px;
             }
 
-            & .type {
-                color: #aaa;
-                padding-right: 10px;
-                white-space: nowrap;
-                flex: 0 0 auto;
-            }
-
             & ul {
                 flex: 0 0 auto;
                 list-style: none;
                 padding: 0;
                 margin: 0;
-                display: flex;
+                display: none;
                 flex-flow: row nowrap;
 
                 & li {
@@ -81,6 +85,12 @@
                 }
             }
 
+            &.has-value {
+                & ul {
+                    display: flex;
+                }
+            }
+
             &.new {
                 & .index {
                     cursor: default;
@@ -95,5 +105,8 @@
                 }
             }
         }
+    }
+
+    &.has-value {
     }
 }
