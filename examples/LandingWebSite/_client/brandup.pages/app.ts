@@ -13,6 +13,10 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     private linkClickFunc: () => void;
     private __builder: ApplicationBuilder;
     private __requestVerificationToken: HTMLInputElement;
+    private __progressElem: HTMLElement;
+    private __progressInterval: number;
+    private __progressTimeout: number;
+    private __progressStart: number;
 
     protected constructor(model: TModel, options: AppSetupOptions) {
         super();
@@ -69,6 +73,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         }
 
         document.body.addEventListener("click", this.linkClickFunc, false);
+        document.body.appendChild(this.__progressElem = DOM.tag("div", { class: "bp-page-loader" }));
 
         this.__renderPage(pageState, initNav.page, false);
     }
@@ -171,6 +176,17 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.element.classList.remove("bp-state-loaded");
         this.element.classList.add("bp-state-loading");
+
+        window.clearTimeout(this.__progressTimeout);
+        window.clearInterval(this.__progressInterval);
+
+        this.__progressStart = Date.now();
+        var pw = 0;
+        this.__progressInterval = window.setInterval(() => {
+            this.__progressElem.style.display = "block";
+            this.__progressElem.style.width = pw + "%";
+            pw++;
+        }, 20);
 
         this.request({
             url: url,
@@ -292,6 +308,19 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         
         document.body.classList.remove("bp-state-loading");
         document.body.classList.add("bp-state-loaded");
+
+        var d = 300 - (Date.now() - this.__progressStart);
+        if (d < 0)
+            d = 0;
+
+        this.__progressTimeout = window.setTimeout(() => {
+            window.clearInterval(this.__progressInterval);
+            this.__progressElem.style.width = "100%";
+
+            this.__progressTimeout = window.setTimeout(() => {
+                this.__progressElem.style.display = "none";
+            }, 200);
+        }, d);
 
         this.raiseEvent("pageLoaded");
     }
