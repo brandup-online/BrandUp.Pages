@@ -1,7 +1,5 @@
 ﻿@import "../vars.less";
 
-@Dialog-List-ChangedItem-Background: #ffff95;
-
 .bp-dialog-panel {
     position: fixed;
     left: 0;
@@ -13,6 +11,8 @@
     visibility: hidden;
     display: block;
     overflow: hidden;
+    opacity: 0;
+    transition: opacity ease 150ms, visibility ease 150ms;
 }
 
 .bp-dialog {
@@ -250,11 +250,7 @@
             }
         }
     }
-    /*&.has-header {
-        & .bp-dialog-header {
-            display: flex;
-        }
-    }*/
+
     &.has-notes,
     &.has-actions {
         & .bp-dialog-footer {
@@ -302,7 +298,9 @@
 body {
     &.website-state-showdialog {
         & .bp-dialog-panel {
+            transition: opacity ease 150ms;
             visibility: visible;
+            opacity: 1;
         }
     }
 }
@@ -318,15 +316,3 @@ body {
 @-moz-keyframes cms-dialog-show { 0% { opacity: 0; } 100% { opacity: 1; } }
 @-webkit-keyframes cms-dialog-show { 0% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes cms-dialog-show { 0% { opacity: 0; } 100% { opacity: 1; } }
-
-@-moz-keyframes bp-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
-@-webkit-keyframes bp-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
-@keyframes bp-dialog-changeditem { 0% { background: @Dialog-List-ChangedItem-Background; } 70% { background: @Dialog-List-ChangedItem-Background; } 100% { background: none; } }
-
-@-moz-keyframes bp-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
-@-webkit-keyframes bp-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes bp-dialog-inserteditem { 0% { opacity: 0; } 100% { opacity: 1; } }
-
-@-moz-keyframes bp-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
-@-webkit-keyframes bp-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
-@keyframes bp-dialog-deleteditem { 0% { opacity: 1; } 80% { opacity: 0; } 100% { opacity: 0; visibility: hidden; display: none; } }
