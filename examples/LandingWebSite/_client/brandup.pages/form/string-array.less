@@ -30,7 +30,7 @@
                 flex: 0 0 auto;
                 width: 30px;
                 color: #a0a0a0;
-                cursor: move;
+                cursor: default;
             }
 
             & input {
@@ -86,22 +86,12 @@
             }
 
             &.has-value {
+                & .index {
+                    cursor: move;
+                }
+
                 & ul {
                     display: flex;
-                }
-            }
-
-            &.new {
-                & .index {
-                    cursor: default;
-                }
-
-                & a.title {
-                    opacity: 0.7;
-
-                    &:hover {
-                        opacity: 1;
-                    }
                 }
             }
         }

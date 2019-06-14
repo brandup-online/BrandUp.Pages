@@ -71,9 +71,11 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
         this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
             let target = <Element>e.target;
-            if (target.hasAttribute("content-path-index")) {
+            let itemElem = target.closest("[content-path-index]");
+            if (itemElem) {
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData("content-path-index", target.getAttribute('content-path-index'));
+                e.dataTransfer.setData("content-path-index", itemElem.getAttribute('content-path-index'));
+                e.dataTransfer.setDragImage(itemElem, 0, 0);
                 return true;
             }
             e.stopPropagation();
@@ -98,7 +100,12 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
                     let sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
                     if (sourceElem) {
-                        elem.insertAdjacentElement("afterend", sourceElem);
+                        if (destIndex < sourceIndex) {
+                            elem.insertAdjacentElement("beforebegin", sourceElem);
+                        }
+                        else {
+                            elem.insertAdjacentElement("afterend", sourceElem);
+                        }
 
                         this.form.request(this, {
                             url: '/brandup.pages/content/model/move',
@@ -146,8 +153,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         ]));
     }
     private __createItemElem(item: ContentModel, index: number) {
-        let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString(), draggable: "true" }, [
-            DOM.tag("div", { class: "index", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
+        let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString() }, [
+            DOM.tag("div", { class: "index", draggable: "true", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),
             DOM.tag("div", { class: "type" }, item.type.title),
             DOM.tag("ul", null, [

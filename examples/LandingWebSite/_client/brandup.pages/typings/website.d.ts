@@ -39,6 +39,7 @@ export interface IApplication {
     navigate(target: any);
     nav(options: NavigationOptions);
     script(name: string): Promise<{ default: any }>;
+    renderPage(html: string);
 }
 
 export interface NavigationOptions {

@@ -162,7 +162,20 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             return;
         return scriptPromise;
     }
-    
+    renderPage(html: string) {
+        var navState = this.page.nav;
+        var pageModel = this.page.model;
+
+        this.page.destroy();
+        this.page = null;
+
+        DOM.empty(this.__contentBodyElem);
+        this.__contentBodyElem.insertAdjacentHTML("afterbegin", html ? html : "");
+        Application.nodeScriptReplace(this.__contentBodyElem);
+
+        this.__loadPageScript(navState, pageModel);
+    }
+
     private __refreshNavigation(options: NavigationOptions) {
         var isCancelled = this.raiseEvent("pageNavigating", options);
         console.log(isCancelled);
