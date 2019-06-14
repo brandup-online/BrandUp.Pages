@@ -13,11 +13,13 @@ export class TextContent extends Textbox implements IContentField {
     protected _onChanged() {
         super._onChanged();
 
+        var value = this.getValue();
+
         this.form.request(this, {
             url: '/brandup.pages/content/text',
             method: "POST",
             type: "JSON",
-            data: this.getValue(),
+            data: value ? value : "",
             success: (data: string, status: number) => {
                 if (status === 200) {
                     this.setValue(data);
