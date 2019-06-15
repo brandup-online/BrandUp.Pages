@@ -143,6 +143,12 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                 return;
             }
 
+            if (this.element.classList.contains("opened-pages")) {
+                this.element.classList.remove("inputing");
+                this.element.classList.remove("opened-pages");
+                document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+            }
+
             this.element.classList.add("opened-types")
             document.body.addEventListener("mousedown", this.__closeTypeMenuFunc, false);
         });

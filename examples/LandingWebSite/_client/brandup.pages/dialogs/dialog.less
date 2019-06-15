@@ -13,6 +13,10 @@
     overflow: hidden;
     opacity: 0;
     transition: opacity ease 150ms, visibility ease 150ms;
+
+    @media all and (max-width: 800px) {
+        transition: none;
+    }
 }
 
 .bp-dialog {
@@ -100,6 +104,11 @@
             font-weight: 600;
             text-decoration: none;
             color: @Text-Color;
+            display: block;
+            white-space: nowrap;
+            max-width: 120px;
+            text-overflow: ellipsis;
+            overflow: hidden;
 
             &:before {
                 content: '.';
@@ -293,6 +302,14 @@
             background: rgba(255,255,255,0.7);
         }
     }
+
+    @media all and (max-width: 800px) {
+        width: 100%;
+
+        &.opened {
+            animation-name: none;
+        }
+    }
 }
 
 body {
@@ -301,6 +318,14 @@ body {
             transition: opacity ease 150ms;
             visibility: visible;
             opacity: 1;
+        }
+
+        @media all and (max-width: 800px) {
+            overflow: hidden;
+
+            & .bp-dialog-panel {
+                transition: none;
+            }
         }
     }
 }
