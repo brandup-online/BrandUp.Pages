@@ -9,6 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<FakePageHierarhyRepository>();
 
+            services.AddSingleton<IPageEditorRepository, FakePageEditorRepository>();
             services.AddSingleton<IPageRepository, FakePageRepositiry>();
             services.AddSingleton<IPageCollectionRepository, FakePageCollectionRepositiry>();
             services.AddSingleton<IPageContentRepository, FakePageContentRepository>();

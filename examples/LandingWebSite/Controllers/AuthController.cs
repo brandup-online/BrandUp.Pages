@@ -15,7 +15,8 @@ namespace LandingWebSite.Controllers
             var principal = new ClaimsPrincipal();
             principal.AddIdentity(new ClaimsIdentity(new List<Claim> {
                 new Claim(ClaimTypes.NameIdentifier, "test"),
-                new Claim(ClaimTypes.Name, "test")
+                new Claim(ClaimTypes.Name, "test"),
+                new Claim(ClaimTypes.Email, "test@test.ru")
             }, CookieAuthenticationDefaults.AuthenticationScheme));
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);

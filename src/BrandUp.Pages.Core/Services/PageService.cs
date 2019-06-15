@@ -229,6 +229,33 @@ namespace BrandUp.Pages.Services
             var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
             return pageCollection.PageId;
         }
+        public async Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            var result = new PageSeoOptions
+            {
+                Title = await pageRepositiry.GetPageTitleAsync(page, cancellationToken),
+                Description = await pageRepositiry.GetPageDescriptionAsync(page, cancellationToken),
+                Keywords = await pageRepositiry.GetPageKeywordsAsync(page, cancellationToken)
+            };
+
+            return result;
+        }
+        public async Task UpdatePageSeoOptionsAsync(IPage page, PageSeoOptions seoOptions, CancellationToken cancellationToken = default)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+            if (seoOptions == null)
+                throw new ArgumentNullException(nameof(seoOptions));
+
+            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title);
+            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description);
+            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords);
+
+            await pageRepositiry.UpdatePageAsync(page, cancellationToken);
+        }
 
         private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
         {
@@ -246,35 +273,6 @@ namespace BrandUp.Pages.Services
                 header = pageMetadataProvider.Title;
 
             pageMetadataProvider.SetPageHeader(contentModel, header);
-        }
-
-        public async Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default)
-        {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-
-            var result = new PageSeoOptions
-            {
-                Title = await pageRepositiry.GetPageTitleAsync(page, cancellationToken),
-                Description = await pageRepositiry.GetPageDescriptionAsync(page, cancellationToken),
-                Keywords = await pageRepositiry.GetPageKeywordsAsync(page, cancellationToken)
-            };
-
-            return result;
-        }
-
-        public async Task UpdatePageSeoOptionsAsync(IPage page, PageSeoOptions seoOptions, CancellationToken cancellationToken = default)
-        {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-            if (seoOptions == null)
-                throw new ArgumentNullException(nameof(seoOptions));
-
-            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title);
-            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description);
-            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords);
-
-            await pageRepositiry.UpdatePageAsync(page, cancellationToken);
         }
     }
 }
