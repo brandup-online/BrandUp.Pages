@@ -31,7 +31,7 @@ interface ContentModel {
     type: ContentTypeModel;
 }
 
-interface ContentEditorModel {
+interface PageEditorModel {
     id: string;
     email: string;
 }

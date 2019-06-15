@@ -1,10 +1,10 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui";
-import { assignContentEditor } from "./assign";
-import { deleteContentEditor } from "./delete";
+import { assignPageEditor } from "./assign";
+import { deletePageEditor } from "./delete";
 
-export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorModel> {
+export class PageEditorListDialog extends ListDialog<EditorListModel, PageEditorModel> {
     readonly pageId: string;
     private __isModified: boolean = false;
 
@@ -14,22 +14,22 @@ export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorM
         this.pageId = pageId;
     }
 
-    get typeName(): string { return "BrandUpPages.EditorListDialog"; }
+    get typeName(): string { return "BrandUpPages.PageEditorListDialog"; }
 
     protected _onRenderContent() {
         super._onRenderContent();
 
-        this.setHeader("Редакторы контента");
-        this.setNotes("Просмотр и управление редакторами контента.");
+        this.setHeader("Редакторы страниц");
+        this.setNotes("Просмотр и управление редакторами страниц.");
 
         this.registerCommand("item-create", () => {
-            assignContentEditor().then(() => {
+            assignPageEditor().then(() => {
                 this.loadItems();
             });
         });
 
         this.registerItemCommand("item-delete", (id) => {
-            deleteContentEditor(id).then(() => {
+            deletePageEditor(id).then(() => {
                 this.loadItems();
             });
         });
@@ -49,13 +49,13 @@ export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorM
     }
     protected _buildList(model: EditorListModel) {
     }
-    protected _getItemId(item: ContentEditorModel): string {
+    protected _getItemId(item: PageEditorModel): string {
         return item.id;
     }
-    protected _renderItemContent(item: ContentEditorModel, contentElem: HTMLElement) {
+    protected _renderItemContent(item: PageEditorModel, contentElem: HTMLElement) {
         contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("span", {}, item.email)));
     }
-    protected _renderItemMenu(item: ContentEditorModel, menuElem: HTMLElement) {
+    protected _renderItemMenu(item: PageEditorModel, menuElem: HTMLElement) {
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
     }
     protected _renderEmpty(container: HTMLElement) {
@@ -69,7 +69,7 @@ export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorM
 interface EditorListModel {
 }
 
-export var listContentEditor = () => {
-    let dialog = new EditorListDialog(null);
+export var listPageEditor = () => {
+    let dialog = new PageEditorListDialog(null);
     return dialog.open();
 };

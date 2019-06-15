@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Administration;
+﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages.Controllers.Editors
 {
     [Route("brandup.pages/editor/list", Name = "BrandUp.Pages.Editor.List"), Administration.Administration]
-    public class EditorListController : ListController<EditorListModel, ContentEditorModel, IContentEditor, string>
+    public class PageEditorListController : ListController<EditorListModel, PageEditorModel, IPageEditor, string>
     {
-        readonly ContentEditorManager contentEditorManager;
+        readonly IPageEditorService contentEditorManager;
 
-        public EditorListController(ContentEditorManager contentEditorManager)
+        public PageEditorListController(IPageEditorService contentEditorManager)
         {
             this.contentEditorManager = contentEditorManager ?? throw new ArgumentNullException(nameof(contentEditorManager));
         }
@@ -35,20 +35,20 @@ namespace BrandUp.Pages.Controllers.Editors
             return value;
         }
 
-        protected override Task<IEnumerable<IContentEditor>> OnGetItemsAsync(int offset, int limit)
+        protected override Task<IEnumerable<IPageEditor>> OnGetItemsAsync(int offset, int limit)
         {
             var items = contentEditorManager.ContentEditors.Skip(offset).Take(limit);
-            return Task.FromResult<IEnumerable<IContentEditor>>(items);
+            return Task.FromResult<IEnumerable<IPageEditor>>(items);
         }
 
-        protected override Task<IContentEditor> OnGetItemAsync(string id)
+        protected override Task<IPageEditor> OnGetItemAsync(string id)
         {
             return contentEditorManager.FindByIdAsync(id);
         }
 
-        protected override Task<ContentEditorModel> OnGetItemModelAsync(IContentEditor item)
+        protected override Task<PageEditorModel> OnGetItemModelAsync(IPageEditor item)
         {
-            var model = new ContentEditorModel
+            var model = new PageEditorModel
             {
                 Id = item.Id,
                 CreatedDate = item.CreatedDate,

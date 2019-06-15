@@ -7,18 +7,18 @@ namespace BrandUp.Pages.Models
     {
     }
 
-    public class ContentEditorModel
+    public class PageEditorModel
     {
         public string Id { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Email { get; set; }
     }
 
-    public class ContentEditorAssignForm : FormModel<ContentEditorAssignValues>
+    public class PageEditorAssignForm : FormModel<PageEditorAssignValues>
     {
     }
 
-    public class ContentEditorAssignValues
+    public class PageEditorAssignValues
     {
         [Required(AllowEmptyStrings = false), EmailAddress]
         public string Email { get; set; }

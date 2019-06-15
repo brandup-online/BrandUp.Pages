@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Administration;
+﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/editor/assign", Name = "BrandUp.Pages.Editor.Assign"), Administration.Administration]
-    public class EditorAssignController : FormController<ContentEditorAssignForm, ContentEditorAssignValues, ContentEditorModel>
+    public class PageEditorAssignController : FormController<PageEditorAssignForm, PageEditorAssignValues, PageEditorModel>
     {
         #region Fields
 
-        private readonly ContentEditorManager contentEditorManager;
+        private readonly IPageEditorService contentEditorManager;
 
         #endregion
 
-        public EditorAssignController(ContentEditorManager contentEditorManager)
+        public PageEditorAssignController(IPageEditorService contentEditorManager)
         {
             this.contentEditorManager = contentEditorManager ?? throw new ArgumentNullException(nameof(contentEditorManager));
         }
@@ -26,15 +26,15 @@ namespace BrandUp.Pages.Controllers
         {
             return Task.CompletedTask;
         }
-        protected override Task OnBuildFormAsync(ContentEditorAssignForm formModel)
+        protected override Task OnBuildFormAsync(PageEditorAssignForm formModel)
         {
             return Task.CompletedTask;
         }
-        protected override Task OnChangeValueAsync(string field, ContentEditorAssignValues values)
+        protected override Task OnChangeValueAsync(string field, PageEditorAssignValues values)
         {
             return Task.CompletedTask;
         }
-        protected override async Task<ContentEditorModel> OnCommitAsync(ContentEditorAssignValues values)
+        protected override async Task<PageEditorModel> OnCommitAsync(PageEditorAssignValues values)
         {
             var assignResult = await contentEditorManager.AssignEditorAsync(values.Email, HttpContext.RequestAborted);
             if (!assignResult.Succeeded)
@@ -50,13 +50,13 @@ namespace BrandUp.Pages.Controllers
 
         #region Helper methods
 
-        private ContentEditorModel GetContentEditorModel(IContentEditor contentEditor)
+        private PageEditorModel GetContentEditorModel(IPageEditor pageEditor)
         {
-            return new ContentEditorModel
+            return new PageEditorModel
             {
-                Id = contentEditor.Id,
-                CreatedDate = contentEditor.CreatedDate,
-                Email = contentEditor.Email
+                Id = pageEditor.Id,
+                CreatedDate = pageEditor.CreatedDate,
+                Email = pageEditor.Email
             };
         }
 

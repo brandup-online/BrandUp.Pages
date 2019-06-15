@@ -1,7 +1,7 @@
 ﻿import { DialogOptions } from "../dialog";
 import { DeleteDialog } from "../dialog-delete";
 
-class ContentEditorDeleteDialog extends DeleteDialog<PageCollectionModel> {
+class PageEditorDeleteDialog extends DeleteDialog<PageCollectionModel> {
     readonly editorId: string;
 
     constructor(editorId: string, options?: DialogOptions) {
@@ -10,7 +10,7 @@ class ContentEditorDeleteDialog extends DeleteDialog<PageCollectionModel> {
         this.editorId = editorId;
     }
 
-    get typeName(): string { return "BrandUpPages.ContentEditorDeleteDialog"; }
+    get typeName(): string { return "BrandUpPages.PageEditorDeleteDialog"; }
 
     protected _onRenderContent() {
         this.setHeader("Удаление редактора");
@@ -27,7 +27,7 @@ class ContentEditorDeleteDialog extends DeleteDialog<PageCollectionModel> {
     }
 }
 
-export var deleteContentEditor = (editorId: string) => {
-    let dialog = new ContentEditorDeleteDialog(editorId);
+export var deletePageEditor = (editorId: string) => {
+    let dialog = new PageEditorDeleteDialog(editorId);
     return dialog.open();
 };

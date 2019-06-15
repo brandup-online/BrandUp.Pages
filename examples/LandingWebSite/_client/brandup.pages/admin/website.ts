@@ -1,12 +1,12 @@
 ﻿import { UIElement, DOM, ajaxRequest } from "brandup-ui";
 import Page from "../pages/page";
 import ContentPage from "../pages/content";
+import { browserPage } from "../dialogs/pages/browser";
+import { listPageEditor } from "../dialogs/editors/list";
 import iconBack from "../svg/toolbar-button-back.svg";
 import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
-import { browserPage } from "../dialogs/pages/browser";
-import { listContentEditor } from "../dialogs/editors/list";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -33,7 +33,7 @@ export class WebSiteToolbar extends UIElement {
         var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);
 
         toolbarElem.appendChild(DOM.tag("div", { class: "bp-toolbar-menu" }, [
-            DOM.tag("a", { href: "", "data-command": "bp-editors" }, "Редакторы контента"),
+            DOM.tag("a", { href: "", "data-command": "bp-editors" }, "Редакторы страниц"),
             DOM.tag("a", { href: "", "data-command": "bp-recyclebin" }, "Корзина")
         ]))
 
@@ -79,7 +79,7 @@ export class WebSiteToolbar extends UIElement {
 
         this.registerCommand("bp-editors", () => {
             toolbarElem.classList.remove("opened-menu");
-            listContentEditor();
+            listPageEditor();
         });
 
         this.__closeMenuFunc = (e: MouseEvent) => {

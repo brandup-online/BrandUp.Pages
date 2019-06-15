@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Administration;
+﻿using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/editor"), ApiController, Administration.Administration]
-    public class ContentEditorController : ControllerBase
+    public class PageEditorController : ControllerBase
     {
-        private readonly ContentEditorManager contentEditorManager;
+        private readonly IPageEditorService contentEditorManager;
 
-        public ContentEditorController(ContentEditorManager contentEditorManager)
+        public PageEditorController(IPageEditorService contentEditorManager)
         {
             this.contentEditorManager = contentEditorManager ?? throw new ArgumentNullException(nameof(contentEditorManager));
         }
@@ -19,11 +19,11 @@ namespace BrandUp.Pages.Controllers
         [HttpGet, Route("{id}", Name = "BrandUp.Pages.Editor.Get")]
         public async Task<IActionResult> GetAsync([FromRoute]string id)
         {
-            var pageCollection = await contentEditorManager.FindByIdAsync(id);
-            if (pageCollection == null)
+            var pageEditor = await contentEditorManager.FindByIdAsync(id);
+            if (pageEditor == null)
                 return NotFound();
 
-            var model = GetItemModel(pageCollection);
+            var model = GetItemModel(pageEditor);
 
             return Ok(model);
         }
@@ -31,10 +31,10 @@ namespace BrandUp.Pages.Controllers
         [HttpGet, Route("", Name = "BrandUp.Pages.Editor.Items")]
         public IActionResult List()
         {
-            var result = new List<Models.ContentEditorModel>();
+            var result = new List<Models.PageEditorModel>();
 
-            var collections = contentEditorManager.ContentEditors;
-            foreach (var pageCollection in collections)
+            var pageEditors = contentEditorManager.ContentEditors;
+            foreach (var pageCollection in pageEditors)
                 result.Add(GetItemModel(pageCollection));
 
             return Ok(result);
@@ -45,20 +45,20 @@ namespace BrandUp.Pages.Controllers
         {
             var contentEditor = await contentEditorManager.FindByIdAsync(id);
             if (contentEditor == null)
-                return WithResult(Result.Failed($"Not found content editor with id \"{id}\"."));
+                return WithResult(Result.Failed($"Not found page editor with id \"{id}\"."));
 
             var deleteResult = await contentEditorManager.DeleteAsync(contentEditor, HttpContext.RequestAborted);
 
             return WithResult(deleteResult);
         }
 
-        private Models.ContentEditorModel GetItemModel(IContentEditor contentEditor)
+        private Models.PageEditorModel GetItemModel(IPageEditor pageEditor)
         {
-            return new Models.ContentEditorModel
+            return new Models.PageEditorModel
             {
-                Id = contentEditor.Id,
-                CreatedDate = contentEditor.CreatedDate,
-                Email = contentEditor.Email
+                Id = pageEditor.Id,
+                CreatedDate = pageEditor.CreatedDate,
+                Email = pageEditor.Email
             };
         }
         private IActionResult WithResult(Result result)

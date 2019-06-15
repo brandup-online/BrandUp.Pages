@@ -28,14 +28,15 @@ namespace BrandUp.Pages.Builder
             services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
 
             services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
-
-            services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
-            services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
+            services.AddScoped<IPageEditorService, PageEditorService>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<IPageContentService, PageContentService>();
+
+            services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
+            services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
+
             services.AddScoped<Files.FileService>();
-            services.AddScoped<Administration.ContentEditorManager>();
         }
     }
 }
