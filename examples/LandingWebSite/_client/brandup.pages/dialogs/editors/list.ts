@@ -1,6 +1,7 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui";
+import { assignContentEditor } from "./assign";
 
 export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorModel> {
     readonly pageId: string;
@@ -19,6 +20,12 @@ export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorM
 
         this.setHeader("Редакторы контента");
         this.setNotes("Просмотр и управление редакторами контента.");
+
+        this.registerCommand("item-create", () => {
+            assignContentEditor().then(() => {
+                this.refresh();
+            });
+        });
     }
 
     protected _onClose() {

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace BrandUp.Pages.Controllers.Editors
 {
     [Route("brandup.pages/editor/list", Name = "BrandUp.Pages.Editor.List"), Administration.Administration]
-    public class EditorListController : ListController<EditorListModel, ContentEditorModel, ContentEditor, Guid>
+    public class EditorListController : ListController<EditorListModel, ContentEditorModel, IContentEditor, string>
     {
         readonly ContentEditorManager contentEditorManager;
 
@@ -30,23 +30,23 @@ namespace BrandUp.Pages.Controllers.Editors
             return Task.CompletedTask;
         }
 
-        protected override Guid ParseId(string value)
+        protected override string ParseId(string value)
         {
-            return Guid.Parse(value);
+            return value;
         }
 
-        protected override Task<IEnumerable<ContentEditor>> OnGetItemsAsync(int offset, int limit)
+        protected override Task<IEnumerable<IContentEditor>> OnGetItemsAsync(int offset, int limit)
         {
             var items = contentEditorManager.ContentEditors.Skip(offset).Take(limit);
-            return Task.FromResult<IEnumerable<ContentEditor>>(items);
+            return Task.FromResult<IEnumerable<IContentEditor>>(items);
         }
 
-        protected override Task<ContentEditor> OnGetItemAsync(Guid id)
+        protected override Task<IContentEditor> OnGetItemAsync(string id)
         {
             return contentEditorManager.FindByIdAsync(id);
         }
 
-        protected override Task<ContentEditorModel> OnGetItemModelAsync(ContentEditor item)
+        protected override Task<ContentEditorModel> OnGetItemModelAsync(IContentEditor item)
         {
             var model = new ContentEditorModel
             {

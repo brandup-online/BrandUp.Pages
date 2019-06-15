@@ -1,4 +1,3 @@
-using BrandUp.Pages.Administration;
 using BrandUp.Pages.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,13 +7,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace LandingWebSite
 {
@@ -66,8 +60,7 @@ namespace LandingWebSite
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
                 .AddMongoDb<Models.WebSiteDbContext>()
-                .AddImageResizer<Infrastructure.ImageResizer>()
-                .AddContenteEditorStore<ContentEditorStore>(ServiceLifetime.Singleton);
+                .AddImageResizer<Infrastructure.ImageResizer>();
 
             services
                 .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
@@ -105,36 +98,6 @@ namespace LandingWebSite
             app.UseStaticFiles();
 
             app.UseMvc();
-        }
-    }
-
-
-
-    public class ContentEditorStore : BrandUp.Pages.Administration.IContentEditorStore
-    {
-        readonly List<ContentEditor> items = new List<ContentEditor>();
-        readonly Dictionary<Guid, int> ids = new Dictionary<Guid, int>();
-
-        public ContentEditorStore()
-        {
-            Add(new ContentEditor(Guid.NewGuid(), "test@test.ru"));
-        }
-
-        private void Add(ContentEditor contentEditor)
-        {
-            var index = items.Count;
-
-            items.Add(contentEditor);
-            ids.Add(contentEditor.Id, index);
-        }
-
-        public IQueryable<ContentEditor> ContentEditors => items.AsQueryable();
-        public Task<ContentEditor> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            if (!ids.TryGetValue(id, out int index))
-                return Task.FromResult<ContentEditor>(null);
-
-            return Task.FromResult(items[index]);
         }
     }
 }

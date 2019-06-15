@@ -14,28 +14,41 @@ namespace BrandUp.Pages.Administration
             this.store = store ?? throw new ArgumentNullException(nameof(store));
         }
 
-        public IQueryable<ContentEditor> ContentEditors => store.ContentEditors;
-        public Task<ContentEditor> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public IQueryable<IContentEditor> ContentEditors => store.ContentEditors;
+        public async Task<Result<IContentEditor>> AssignEditorAsync(string email, CancellationToken cancellationToken = default)
+        {
+            if (email == null)
+                throw new ArgumentNullException(nameof(email));
+
+            var existEditor = await FindByEmailAsync(email, cancellationToken);
+            if (existEditor != null)
+                return Result<IContentEditor>.Failed("Редактор с таким e-mail уже назначен.");
+
+            await store.AssignEditorAsync(email, cancellationToken);
+
+            return Result<IContentEditor>.Success(await store.FindByEmailAsync(email, cancellationToken));
+        }
+        public Task<IContentEditor> FindByIdAsync(string id, CancellationToken cancellationToken = default)
         {
             return store.FindByIdAsync(id, cancellationToken);
         }
-    }
-
-    public class ContentEditor
-    {
-        public Guid Id { get; }
-        public string Email { get; }
-
-        public ContentEditor(Guid id, string email)
+        public Task<IContentEditor> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            Id = id;
-            Email = email ?? throw new ArgumentNullException(nameof(email));
+            return store.FindByEmailAsync(email, cancellationToken);
         }
     }
 
     public interface IContentEditorStore
     {
-        IQueryable<ContentEditor> ContentEditors { get; }
-        Task<ContentEditor> FindByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        IQueryable<IContentEditor> ContentEditors { get; }
+        Task AssignEditorAsync(string email, CancellationToken cancellationToken = default);
+        Task<IContentEditor> FindByIdAsync(string id, CancellationToken cancellationToken = default);
+        Task<IContentEditor> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
+    }
+
+    public interface IContentEditor
+    {
+        string Id { get; }
+        string Email { get; }
     }
 }
