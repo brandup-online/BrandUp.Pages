@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\brandup.pages\dialogs\editors\list.ts" />
     <None Remove="_client\brandup.pages\dialogs\page-seo.ts" />
     <None Remove="_client\brandup.pages\form\string-array.ts" />
     <None Remove="_client\contents\BB1.ts" />
@@ -82,6 +83,7 @@
 
 
   <ItemGroup>
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\editors\list.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\page-seo.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\form\string-array.ts" />
     <TypeScriptCompile Include="_client\contents\BB1.ts" />

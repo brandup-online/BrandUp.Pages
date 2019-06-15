@@ -35,6 +35,12 @@
     height: 50px;
     display: flex;
     flex-flow: row nowrap;
+
+    &.opened-menu {
+        & .bp-toolbar-menu {
+            display: block;
+        }
+    }
 }
 
 .bp-toolbar-right {
@@ -66,6 +72,25 @@ button.bp-toolbar-button {
     &:focus,
     &:active {
         opacity: 1;
+    }
+}
+
+.bp-toolbar-menu {
+    display: none;
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    width: 200px;
+    background: #FFFFFF;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    padding: 10px 0;
+
+    & a {
+        display: block;
+        padding: 10px 20px;
+        color: @Text-Color;
+        text-decoration: none;
     }
 }
 

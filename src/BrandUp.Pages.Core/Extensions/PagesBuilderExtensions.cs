@@ -11,5 +11,21 @@ namespace BrandUp.Pages.Builder
             builder.Services.AddSingleton<IContentTypeLocator>(new AssemblyContentTypeResolver(assemblies));
             return builder;
         }
+
+        public static IPagesBuilder AddContenteEditorStore<T>(this IPagesBuilder builder, ServiceLifetime serviceLifetime)
+            where T : Administration.IContentEditorStore
+        {
+            builder.Services.Add(new ServiceDescriptor(typeof(Administration.IContentEditorStore), typeof(T), serviceLifetime));
+
+            return builder;
+        }
+
+        public static IPagesBuilder AddAdministrationManager<T>(this IPagesBuilder builder, ServiceLifetime serviceLifetime)
+            where T : Administration.IAdministrationManager
+        {
+            builder.Services.Add(new ServiceDescriptor(typeof(Administration.IAdministrationManager), typeof(T), serviceLifetime));
+
+            return builder;
+        }
     }
 }

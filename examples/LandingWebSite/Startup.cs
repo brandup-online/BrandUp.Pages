@@ -1,3 +1,4 @@
+using BrandUp.Pages.Administration;
 using BrandUp.Pages.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +8,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.WebEncoders;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,7 +66,8 @@ namespace LandingWebSite
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
                 .AddMongoDb<Models.WebSiteDbContext>()
-                .AddImageResizer<Infrastructure.ImageResizer>();
+                .AddImageResizer<Infrastructure.ImageResizer>()
+                .AddContenteEditorStore<ContentEditorStore>(ServiceLifetime.Singleton);
 
             services
                 .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
@@ -76,7 +81,7 @@ namespace LandingWebSite
 
             services.AddMigrations(typeof(Startup).Assembly);
             services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationStore, _migrations.MigrationStore>();
-            services.AddHostedService<MigrationService>();
+            services.AddHostedService<_migrations.MigrationService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -103,23 +108,33 @@ namespace LandingWebSite
         }
     }
 
-    public class MigrationService : Microsoft.Extensions.Hosting.IHostedService
+
+
+    public class ContentEditorStore : BrandUp.Pages.Administration.IContentEditorStore
     {
-        private readonly BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor;
+        readonly List<ContentEditor> items = new List<ContentEditor>();
+        readonly Dictionary<Guid, int> ids = new Dictionary<Guid, int>();
 
-        public MigrationService(BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor)
+        public ContentEditorStore()
         {
-            this.migrationExecutor = migrationExecutor ?? throw new System.ArgumentNullException(nameof(migrationExecutor));
+            Add(new ContentEditor(Guid.NewGuid(), "test@test.ru"));
         }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+        private void Add(ContentEditor contentEditor)
         {
-            await migrationExecutor.UpAsync(cancellationToken);
+            var index = items.Count;
+
+            items.Add(contentEditor);
+            ids.Add(contentEditor.Id, index);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public IQueryable<ContentEditor> ContentEditors => items.AsQueryable();
+        public Task<ContentEditor> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            if (!ids.TryGetValue(id, out int index))
+                return Task.FromResult<ContentEditor>(null);
+
+            return Task.FromResult(items[index]);
         }
     }
 }

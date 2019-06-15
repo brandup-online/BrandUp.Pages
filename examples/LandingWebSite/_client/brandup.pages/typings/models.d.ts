@@ -31,6 +31,11 @@ interface ContentModel {
     type: ContentTypeModel;
 }
 
+interface ContentEditorModel {
+    id: string;
+    email: string;
+}
+
 interface Result {
     succeeded: boolean;
     errors: Array<string>;
