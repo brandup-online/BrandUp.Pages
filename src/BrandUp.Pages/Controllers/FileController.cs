@@ -46,7 +46,7 @@ namespace BrandUp.Pages.Controllers
             return new FileStreamResult(System.IO.File.OpenRead(fileTempPath), file.ContentType);
         }
 
-        [HttpGet("_image/{fileId}_{width}_{height}.jpg")]
+        [HttpGet("_image/{fileId}_{width}_{height}.jpg"), ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client, NoStore = false)]
         public async Task<IActionResult> Image(Guid fileId, int width = 0, int height = 0)
         {
             var file = await fileService.FindFileByIdAsync(fileId);
