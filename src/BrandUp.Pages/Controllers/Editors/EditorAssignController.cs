@@ -55,6 +55,7 @@ namespace BrandUp.Pages.Controllers
             return new ContentEditorModel
             {
                 Id = contentEditor.Id,
+                CreatedDate = contentEditor.CreatedDate,
                 Email = contentEditor.Email
             };
         }

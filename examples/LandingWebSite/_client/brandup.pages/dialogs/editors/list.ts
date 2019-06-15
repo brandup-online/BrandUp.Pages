@@ -2,6 +2,7 @@
 import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui";
 import { assignContentEditor } from "./assign";
+import { deleteContentEditor } from "./delete";
 
 export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorModel> {
     readonly pageId: string;
@@ -23,7 +24,13 @@ export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorM
 
         this.registerCommand("item-create", () => {
             assignContentEditor().then(() => {
-                this.refresh();
+                this.loadItems();
+            });
+        });
+
+        this.registerItemCommand("item-delete", (id) => {
+            deleteContentEditor(id).then(() => {
+                this.loadItems();
             });
         });
     }
@@ -62,7 +69,7 @@ export class EditorListDialog extends ListDialog<EditorListModel, ContentEditorM
 interface EditorListModel {
 }
 
-export var listEditor = () => {
+export var listContentEditor = () => {
     let dialog = new EditorListDialog(null);
     return dialog.open();
 };

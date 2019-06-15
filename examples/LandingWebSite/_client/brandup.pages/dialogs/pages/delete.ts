@@ -1,5 +1,5 @@
-﻿import { DeleteDialog } from "./dialog-delete";
-import { DialogOptions } from "./dialog";
+﻿import { DeleteDialog } from "../dialog-delete";
+import { DialogOptions } from "../dialog";
 
 export class PageDeleteDialog extends DeleteDialog<PageModel> {
     readonly pageId: string;

@@ -1,5 +1,5 @@
-﻿import { DialogOptions } from "./dialog";
-import { DeleteDialog } from "./dialog-delete";
+﻿import { DialogOptions } from "../dialog";
+import { DeleteDialog } from "../dialog-delete";
 
 class PageCollectionDeleteDialog extends DeleteDialog<PageCollectionModel> {
     readonly collectionId: string;

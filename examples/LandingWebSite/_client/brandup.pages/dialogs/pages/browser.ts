@@ -1,10 +1,10 @@
-﻿import { DialogOptions } from "./dialog";
-import { ListDialog } from "./dialog-list";
+﻿import { DialogOptions } from "../dialog";
+import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui";
-import { createPage } from "./page-create";
-import { deletePage } from "./page-delete";
-import { listPageCollection } from "./page-collection-list";
-import { createPageCollection } from "./page-collection-create";
+import { createPage } from "./create";
+import { createPageCollection } from "../collections/create";
+import { deletePage } from "./delete";
+import { listPageCollection } from "../collections/list";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     private __pageId: string;

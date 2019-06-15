@@ -1,13 +1,13 @@
-﻿import { DialogOptions, Dialog } from "./dialog";
+﻿import { DialogOptions, Dialog } from "../dialog";
 import { DOM, AjaxQueue, AjaxRequestOptions } from "brandup-ui";
-import { IContentForm, IContentField, PageContentForm } from "../typings/content";
-import { TextContent } from "../content/field/text";
-import { HtmlContent } from "../content/field/html";
-import { ImageContent } from "../content/field/image";
-import { ModelField } from "../content/field/model";
-import { HyperLinkContent } from "../content/field/hyperlink";
-import { PagesContent } from "../content/field/pages";
-import "./dialog-form.less";
+import { IContentForm, IContentField, PageContentForm } from "../../typings/content";
+import { TextContent } from "../../content/field/text";
+import { HtmlContent } from "../../content/field/html";
+import { ImageContent } from "../../content/field/image";
+import { ModelField } from "../../content/field/model";
+import { HyperLinkContent } from "../../content/field/hyperlink";
+import { PagesContent } from "../../content/field/pages";
+import "../dialog-form.less";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;

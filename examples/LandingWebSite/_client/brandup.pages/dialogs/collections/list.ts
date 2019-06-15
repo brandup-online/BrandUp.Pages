@@ -1,9 +1,8 @@
-﻿import { DialogOptions } from "./dialog";
-import { createPageCollection } from "./page-collection-create";
-import { deletePageCollection } from "./page-collection-delete";
-import { updatePageCollection } from "./page-collection-update";
-import { ListDialog } from "./dialog-list";
-import { listPage } from "./page-list";
+﻿import { DialogOptions } from "../dialog";
+import { createPageCollection } from "./create";
+import { deletePageCollection } from "./delete";
+import { updatePageCollection } from "./update";
+import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui";
 
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {
@@ -42,9 +41,6 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
                 this.loadItems();
                 this.__isModified = true;
             });
-        });
-        this.registerItemCommand("page-list", (pageCollectionId: string) => {
-            listPage(pageCollectionId);
         });
     }
 
@@ -85,8 +81,6 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
         contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("span", { }, item.title)));
     }
     protected _renderItemMenu(item: PageCollectionModel, menuElem: HTMLElement) {
-        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "page-list" }, "View pages")]));
-        menuElem.appendChild(DOM.tag("li", { class: "split" }));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-update" }, "Edit")]));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
     }

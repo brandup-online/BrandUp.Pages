@@ -5,8 +5,8 @@ import iconBack from "../svg/toolbar-button-back.svg";
 import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
-import { browserPage } from "../dialogs/page-browser";
-import { listEditor } from "../dialogs/editors/list";
+import { browserPage } from "../dialogs/pages/browser";
+import { listContentEditor } from "../dialogs/editors/list";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -79,7 +79,7 @@ export class WebSiteToolbar extends UIElement {
 
         this.registerCommand("bp-editors", () => {
             toolbarElem.classList.remove("opened-menu");
-            listEditor();
+            listContentEditor();
         });
 
         this.__closeMenuFunc = (e: MouseEvent) => {

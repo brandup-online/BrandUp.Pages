@@ -1,11 +1,11 @@
 ﻿import { FieldDesigner } from "./base";
 import { DOM } from "brandup-ui";
-import { editPage } from "../../dialogs/page-edit";
+import { editPage } from "../../dialogs/pages/edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import "./model.less";
 
 export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
-    get typeName(): string { return "BrandUpPages.ContentDesigner"; }
+    get typeName(): string { return "BrandUpPages.ModelDesigner"; }
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("content-designer");

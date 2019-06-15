@@ -51,6 +51,7 @@ namespace BrandUp.Pages.Controllers.Editors
             var model = new ContentEditorModel
             {
                 Id = item.Id,
+                CreatedDate = item.CreatedDate,
                 Email = item.Email
             };
 

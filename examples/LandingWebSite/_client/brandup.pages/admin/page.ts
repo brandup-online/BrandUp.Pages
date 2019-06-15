@@ -1,16 +1,16 @@
 ﻿import { UIElement, DOM } from "brandup-ui";
 import ContentPage from "../pages/content";
-import { editPage } from "../dialogs/page-edit";
-import { publishPage } from "../dialogs/page-publish";
+import { PageDesigner } from "../content/designer/page";
+import { NavigationOptions } from "../typings/website";
+import { editPage } from "../dialogs/pages/edit";
+import { publishPage } from "../dialogs/pages/publish";
+import { seoPage } from "../dialogs/pages/seo";
 import iconDiscard from "../svg/toolbar-button-discard.svg";
 import iconEdit from "../svg/toolbar-button-edit.svg";
 import iconPublish from "../svg/toolbar-button-publish.svg";
 import iconSave from "../svg/toolbar-button-save.svg";
 import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
-import { PageDesigner } from "../content/designer/page";
-import { NavigationOptions } from "../typings/website";
-import { seoPage } from "../dialogs/page-seo";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;

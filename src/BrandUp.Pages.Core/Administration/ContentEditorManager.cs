@@ -36,6 +36,12 @@ namespace BrandUp.Pages.Administration
         {
             return store.FindByEmailAsync(email, cancellationToken);
         }
+        public async Task<Result> DeleteAsync(IContentEditor contentEditor, CancellationToken cancellationToken = default)
+        {
+            await store.DeleteAsync(contentEditor, cancellationToken);
+
+            return Result.Success;
+        }
     }
 
     public interface IContentEditorStore
@@ -44,11 +50,13 @@ namespace BrandUp.Pages.Administration
         Task AssignEditorAsync(string email, CancellationToken cancellationToken = default);
         Task<IContentEditor> FindByIdAsync(string id, CancellationToken cancellationToken = default);
         Task<IContentEditor> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
+        Task DeleteAsync(IContentEditor contentEditor, CancellationToken cancellationToken = default);
     }
 
     public interface IContentEditor
     {
         string Id { get; }
+        DateTime CreatedDate { get; }
         string Email { get; }
     }
 }
