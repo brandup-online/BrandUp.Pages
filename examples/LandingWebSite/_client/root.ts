@@ -27,4 +27,12 @@ Application.setup<LandingWebSiteModel>({
             }
         })
     });
+
+    app.registerCommand("toggle-app-menu", () => {
+        document.body.classList.toggle("website-state-show-appmenu");
+    });
+
+    window.addEventListener("pageNavigated", () => {
+        document.body.classList.remove("website-state-show-appmenu");
+    });
 });

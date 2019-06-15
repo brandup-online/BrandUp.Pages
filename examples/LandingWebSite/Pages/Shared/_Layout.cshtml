@@ -36,12 +36,37 @@
                     {
                         <li><a href="#" data-command="signin">Sign in</a></li>
                     }
+                    <li class="menu">
+                        <a href="" data-command="toggle-app-menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+                                <path d="M 0 7.5 L 0 12.5 L 50 12.5 L 50 7.5 L 0 7.5 z M 0 22.5 L 0 27.5 L 50 27.5 L 50 22.5 L 0 22.5 z M 0 37.5 L 0 42.5 L 50 42.5 L 50 37.5 L 0 37.5 z"></path>
+                            </svg>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>
         <main id="page-content" role="main" class="content-width app-content">
             @RenderBody()
         </main>
+    </div>
+    <div class="app-menu">
+        <div class="close" data-command="toggle-app-menu"></div>
+        <div class="content">
+            <ul class="menu">
+                <li><a asp-page-path="/">Home</a></li>
+                <li><a asp-page-path="/news">News</a></li>
+                <li><a asp-page="/about" class="applink">About</a></li>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li><a href="#" data-command="signout">Sign out</a></li>
+                }
+                else
+                {
+                    <li><a href="#" data-command="signin">Sign in</a></li>
+                }
+            </ul>
+        </div>
     </div>
 </body>
 </html>
