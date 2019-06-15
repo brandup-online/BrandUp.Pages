@@ -21,9 +21,11 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
                 //DOM.tag("li", { class: "split" }),
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "upload-file" }, "Загрузить с компьютера"))
             ]),
-            this.__button = DOM.tag("button", null, iconUpload),
+            this.__button = DOM.tag("button", { title: "Управление картинкой" }, iconUpload),
             textInput = <HTMLInputElement>DOM.tag("input", { type: "text" })
         ]));
+
+        elem.appendChild(DOM.tag("div", { class: "bp-elem image-designer-progress" }));
 
         this.__fileInputElem = <HTMLInputElement>DOM.tag("input", { type: "file" })
         this.__fileInputElem.addEventListener("change", () => {
@@ -170,8 +172,4 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             this.element.classList.remove("uploading");
         }
     }
-}
-
-class ImageEditor {
-
 }

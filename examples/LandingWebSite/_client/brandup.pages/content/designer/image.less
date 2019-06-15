@@ -19,38 +19,6 @@
         visibility: visible;
     }
 
-    &-menu {
-        position: absolute;
-        bottom: 15px;
-        right: 15px;
-        z-index: 500;
-        opacity: 0;
-        transition: opacity ease 120ms;
-
-        & button {
-            padding: 9px;
-            margin: 0;
-            box-sizing: border-box;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: solid 1px rgba(0,0,0,0.2);
-            border-radius: 2px;
-            outline: none;
-
-            & svg {
-                fill: @Text-Color;
-                width: 12px;
-                height: 12px;
-            }
-        }
-
-        &:hover {
-            opacity: 1 !important;
-        }
-    }
-
     & ul {
         top: auto;
         bottom: 40px;
@@ -89,6 +57,15 @@
     }
 
     &.uploading {
+        & .image-designer-menu {
+            & button {
+                display: none;
+            }
+        }
+
+        & .image-designer-progress {
+            display: block;
+        }
     }
 
     &.draging {
@@ -103,5 +80,69 @@
         & ul {
             display: block;
         }
+    }
+}
+
+.image-designer-menu {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    z-index: 500;
+    opacity: 0;
+    transition: opacity ease 120ms;
+
+    & button {
+        width: 30px;
+        height: 30px;
+        margin: 0;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: solid 1px rgba(0,0,0,0.2);
+        border-radius: 2px;
+        outline: none;
+        background: #fff;
+
+        & svg {
+            fill: @Text-Color;
+            width: 12px;
+            height: 12px;
+        }
+    }
+
+    &:hover {
+        opacity: 1 !important;
+    }
+}
+
+.image-designer-progress {
+    display: none;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    z-index: 500;
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    border: solid 1px rgba(0,0,0,0.2);
+    border-radius: 2px;
+
+    &:before {
+        content: '';
+        box-sizing: border-box;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 18px;
+        height: 18px;
+        margin-top: -9px;
+        margin-left: -9px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: @Accent-Color;
+        border-bottom-color: @Accent-Color;
+        animation: bp-spinner .8s ease infinite;
     }
 }

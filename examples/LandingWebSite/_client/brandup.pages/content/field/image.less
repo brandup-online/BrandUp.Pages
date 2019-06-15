@@ -70,6 +70,34 @@
         }
 
         &.uploading {
+            & span {
+                display: none;
+            }
+
+            & button {
+                display: none;
+            }
+
+            &:before {
+                background: rgba(0,0,0,0.5) !important;
+            }
+
+            &:after {
+                content: '';
+                box-sizing: border-box;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 18px;
+                height: 18px;
+                margin-top: -9px;
+                margin-left: -9px;
+                border-radius: 50%;
+                border: 2px solid transparent;
+                border-top-color: @Main-Color;
+                border-bottom-color: @Main-Color;
+                animation: bp-spinner .8s ease infinite;
+            }
         }
     }
 
