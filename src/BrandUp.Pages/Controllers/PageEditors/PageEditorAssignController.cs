@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Identity;
 using BrandUp.Pages.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/editor/assign", Name = "BrandUp.Pages.Editor.Assign"), Administration.Administration]
+    [Route("brandup.pages/editor/assign", Name = "BrandUp.Pages.Editor.Assign"), Filters.Administration]
     public class PageEditorAssignController : FormController<PageEditorAssignForm, PageEditorAssignValues, PageEditorModel>
     {
         #region Fields
 
-        private readonly IPageEditorService contentEditorManager;
+        readonly Identity.IUserProvider userProvider;
 
         #endregion
 
-        public PageEditorAssignController(IPageEditorService contentEditorManager)
+        public PageEditorAssignController(IUserProvider userProvider)
         {
-            this.contentEditorManager = contentEditorManager ?? throw new ArgumentNullException(nameof(contentEditorManager));
+            this.userProvider = userProvider ?? throw new ArgumentNullException(nameof(userProvider));
         }
 
         #region FormController members
@@ -36,26 +36,32 @@ namespace BrandUp.Pages.Controllers
         }
         protected override async Task<PageEditorModel> OnCommitAsync(PageEditorAssignValues values)
         {
-            var assignResult = await contentEditorManager.AssignEditorAsync(values.Email, HttpContext.RequestAborted);
+            var user = await userProvider.FindUserByNameAsync(values.Email, HttpContext.RequestAborted);
+            if (user == null)
+            {
+                AddErrors(nameof(values.Email), "Пользователь не найден.");
+                return null;
+            }
+
+            var assignResult = await userProvider.AssignUserAsync(user, HttpContext.RequestAborted);
             if (!assignResult.Succeeded)
             {
                 AddErrors(assignResult);
                 return null;
             }
 
-            return GetContentEditorModel(assignResult.Data);
+            return GetPageEditorModelAsync(user);
         }
 
         #endregion
 
         #region Helper methods
 
-        private PageEditorModel GetContentEditorModel(IPageEditor pageEditor)
+        private PageEditorModel GetPageEditorModelAsync(IUserInfo pageEditor)
         {
             return new PageEditorModel
             {
                 Id = pageEditor.Id,
-                CreatedDate = pageEditor.CreatedDate,
                 Email = pageEditor.Email
             };
         }

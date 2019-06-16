@@ -21,7 +21,7 @@ namespace BrandUp.Pages.Url
                 options.DefaultPagePath = "Home";
             })
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .AddFakeRepositories();
+                .AddFakes();
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();

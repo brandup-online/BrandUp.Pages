@@ -11,6 +11,5 @@ namespace BrandUp.Pages.MongoDb
         IMongoCollection<Documents.PageEditDocument> PageEditSessions { get; }
         IMongoCollection<Documents.PageRecyclebinDocument> PageRecyclebin { get; }
         IMongoCollection<Documents.PageUrlDocument> PageUrls { get; }
-        IMongoCollection<Documents.PageEditorDocument> ContentEditors { get; }
     }
 }

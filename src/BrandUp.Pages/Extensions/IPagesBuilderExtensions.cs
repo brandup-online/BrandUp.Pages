@@ -33,8 +33,6 @@ namespace BrandUp.Pages.Builder
 
             services.AddTransient<ITagHelperComponent, TagHelpers.EmbeddingTagHelperComponent>();
 
-            builder.AddAdministrationManager<Administration.DefaultAdministrationManager>(ServiceLifetime.Transient);
-
             return builder;
         }
 

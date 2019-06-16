@@ -36,8 +36,8 @@ namespace BrandUp.Pages.TagHelpers
                 throw new InvalidOperationException();
             Field = textField;
 
-            var administrationManager = contentContext.Services.GetRequiredService<Administration.IAdministrationManager>();
-            var isAdmin = await administrationManager.CheckAsync();
+            var accessProvider = contentContext.Services.GetRequiredService<Identity.IAccessProvider>();
+            var isAdmin = await accessProvider.CheckAccessAsync();
             if (isAdmin)
             {
                 var fieldModel = new Models.ContentFieldModel

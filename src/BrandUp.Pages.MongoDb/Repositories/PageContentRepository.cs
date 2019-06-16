@@ -36,11 +36,12 @@ namespace BrandUp.Pages.MongoDb.Repositories
         {
             var pageContent = await (await contentDocuments.FindAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
 
-            var createdDat = DateTime.UtcNow;
+            var createdDate = DateTime.UtcNow;
             var document = new PageEditDocument
             {
                 Id = Guid.NewGuid(),
-                CreatedDate = createdDat,
+                CreatedDate = createdDate,
+                Version = 1,
                 PageId = page.Id,
                 UserId = userId,
                 Content = pageContent.Data
@@ -51,7 +52,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return new PageEdit
             {
                 Id = document.Id,
-                CreatedDate = createdDat,
+                CreatedDate = createdDate,
                 PageId = document.PageId,
                 UserId = document.UserId
             };

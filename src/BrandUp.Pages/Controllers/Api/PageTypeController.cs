@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.Controllers
 {
-    [ApiController, Administration.Administration]
+    [ApiController, Filters.Administration]
     public class PageTypeController : ControllerBase
     {
         private readonly IPageMetadataManager pageMetadataManager;

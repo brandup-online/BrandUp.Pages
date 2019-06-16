@@ -14,7 +14,7 @@ namespace LandingWebSite._migrations
     {
         private readonly IMongoCollection<MigrationVersionDocument> collection;
 
-        public MigrationStore(Models.WebSiteDbContext dbContext)
+        public MigrationStore(Models.AppDbContext dbContext)
         {
             collection = dbContext.Migrations;
         }

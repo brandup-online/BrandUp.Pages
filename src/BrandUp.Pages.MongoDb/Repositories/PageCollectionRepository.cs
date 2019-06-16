@@ -24,6 +24,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
+                Version = 1,
                 Title = title,
                 PageTypeName = pageTypeName,
                 SortMode = sortMode,

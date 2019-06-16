@@ -1,41 +1,39 @@
-﻿using BrandUp.Pages.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/editor"), ApiController, Administration.Administration]
+    [Route("brandup.pages/editor"), ApiController, Filters.Administration]
     public class PageEditorController : ControllerBase
     {
-        private readonly IPageEditorService contentEditorManager;
+        readonly Identity.IUserProvider userProvider;
 
-        public PageEditorController(IPageEditorService contentEditorManager)
+        public PageEditorController(Identity.IUserProvider userProvider)
         {
-            this.contentEditorManager = contentEditorManager ?? throw new ArgumentNullException(nameof(contentEditorManager));
+            this.userProvider = userProvider ?? throw new ArgumentNullException(nameof(userProvider));
         }
 
         [HttpGet, Route("{id}", Name = "BrandUp.Pages.Editor.Get")]
         public async Task<IActionResult> GetAsync([FromRoute]string id)
         {
-            var pageEditor = await contentEditorManager.FindByIdAsync(id);
-            if (pageEditor == null)
+            var user = await userProvider.FindUserByIdAsync(id, HttpContext.RequestAborted);
+            if (user == null)
                 return NotFound();
 
-            var model = GetItemModel(pageEditor);
+            var model = await GetItemModelAsync(user);
 
             return Ok(model);
         }
 
         [HttpGet, Route("", Name = "BrandUp.Pages.Editor.Items")]
-        public IActionResult List()
+        public async Task<IActionResult> ListAsync()
         {
             var result = new List<Models.PageEditorModel>();
 
-            var pageEditors = contentEditorManager.ContentEditors;
-            foreach (var pageCollection in pageEditors)
-                result.Add(GetItemModel(pageCollection));
+            foreach (var user in await userProvider.GetAssignedUsersAsync(HttpContext.RequestAborted))
+                result.Add(await GetItemModelAsync(user));
 
             return Ok(result);
         }
@@ -43,22 +41,23 @@ namespace BrandUp.Pages.Controllers
         [HttpDelete, Route("{id}", Name = "BrandUp.Pages.Editor.Delete")]
         public async Task<IActionResult> DeleteAsync([FromRoute]string id)
         {
-            var contentEditor = await contentEditorManager.FindByIdAsync(id);
-            if (contentEditor == null)
-                return WithResult(Result.Failed($"Not found page editor with id \"{id}\"."));
+            var user = await userProvider.FindUserByIdAsync(id, HttpContext.RequestAborted);
+            if (user == null)
+                return NotFound();
 
-            var deleteResult = await contentEditorManager.DeleteAsync(contentEditor, HttpContext.RequestAborted);
+            var deleteResult = await userProvider.DeleteAsync(user, HttpContext.RequestAborted);
 
             return WithResult(deleteResult);
         }
 
-        private Models.PageEditorModel GetItemModel(IPageEditor pageEditor)
+        private async Task<Models.PageEditorModel> GetItemModelAsync(Identity.IUserInfo pageEditor)
         {
+            var userInfo = await userProvider.FindUserByIdAsync(pageEditor.Email);
+
             return new Models.PageEditorModel
             {
                 Id = pageEditor.Id,
-                CreatedDate = pageEditor.CreatedDate,
-                Email = pageEditor.Email
+                Email = userInfo?.Email
             };
         }
         private IActionResult WithResult(Result result)

@@ -1,11 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Administration
+namespace BrandUp.Pages.Identity
 {
-    public class FakeAdministrationManager : IAdministrationManager
+    public class FakeAccessProvider : IAccessProvider
     {
-        public Task<bool> CheckAsync(CancellationToken cancellationToken = default)
+        public Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult(true);
         }

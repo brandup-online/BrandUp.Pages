@@ -1,21 +1,20 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Identity;
 using BrandUp.Pages.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers.Editors
 {
-    [Route("brandup.pages/editor/list", Name = "BrandUp.Pages.Editor.List"), Administration.Administration]
-    public class PageEditorListController : ListController<EditorListModel, PageEditorModel, IPageEditor, string>
+    [Route("brandup.pages/editor/list", Name = "BrandUp.Pages.Editor.List"), Filters.Administration]
+    public class PageEditorListController : ListController<EditorListModel, PageEditorModel, IUserInfo, string>
     {
-        readonly IPageEditorService contentEditorManager;
+        readonly IUserProvider userProvider;
 
-        public PageEditorListController(IPageEditorService contentEditorManager)
+        public PageEditorListController(IUserProvider userProvider)
         {
-            this.contentEditorManager = contentEditorManager ?? throw new ArgumentNullException(nameof(contentEditorManager));
+            this.userProvider = userProvider ?? throw new ArgumentNullException(nameof(userProvider));
         }
 
         #region ListController members
@@ -35,27 +34,23 @@ namespace BrandUp.Pages.Controllers.Editors
             return value;
         }
 
-        protected override Task<IEnumerable<IPageEditor>> OnGetItemsAsync(int offset, int limit)
+        protected override async Task<IEnumerable<IUserInfo>> OnGetItemsAsync(int offset, int limit)
         {
-            var items = contentEditorManager.ContentEditors.Skip(offset).Take(limit);
-            return Task.FromResult<IEnumerable<IPageEditor>>(items);
+            return await userProvider.GetAssignedUsersAsync();
         }
 
-        protected override Task<IPageEditor> OnGetItemAsync(string id)
+        protected override Task<IUserInfo> OnGetItemAsync(string id)
         {
-            return contentEditorManager.FindByIdAsync(id);
+            return userProvider.FindUserByIdAsync(id);
         }
 
-        protected override Task<PageEditorModel> OnGetItemModelAsync(IPageEditor item)
+        protected override Task<PageEditorModel> OnGetItemModelAsync(IUserInfo item)
         {
-            var model = new PageEditorModel
+            return Task.FromResult(new PageEditorModel
             {
                 Id = item.Id,
-                CreatedDate = item.CreatedDate,
                 Email = item.Email
-            };
-
-            return Task.FromResult(model);
+            });
         }
 
         #endregion

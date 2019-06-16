@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/collection/list", Name = "BrandUp.Pages.Collection.List"), Administration.Administration]
+    [Route("brandup.pages/collection/list", Name = "BrandUp.Pages.Collection.List"), Filters.Administration]
     public class PageCollectionListController : ListController<PageCollectionListModel, PageCollectionModel, IPageCollection, Guid>
     {
         readonly IPageService pageService;

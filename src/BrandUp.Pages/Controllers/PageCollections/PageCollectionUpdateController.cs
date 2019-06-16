@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/collection/{id}/update", Name = "BrandUp.Pages.Collection.Update"), Administration.Administration]
+    [Route("brandup.pages/collection/{id}/update", Name = "BrandUp.Pages.Collection.Update"), Filters.Administration]
     public class PageCollectionUpdateController : FormController<PageCollectionUpdateForm, PageCollectionUpdateValues, PageCollectionModel>
     {
         #region Fields

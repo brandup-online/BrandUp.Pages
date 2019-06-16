@@ -34,6 +34,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = pageId,
                 CreatedDate = DateTime.UtcNow,
+                Version = 1,
                 OwnCollectionId = сollectionId,
                 TypeName = typeName,
                 Header = pageHeader,

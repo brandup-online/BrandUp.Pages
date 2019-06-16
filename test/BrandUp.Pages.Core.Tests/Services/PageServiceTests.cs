@@ -28,7 +28,7 @@ namespace BrandUp.Pages.Services
                 options.DefaultPageHeader = DefaultPageHeader;
             })
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .AddFakeRepositories();
+                .AddFakes();
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();

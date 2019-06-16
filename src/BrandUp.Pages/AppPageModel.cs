@@ -126,8 +126,8 @@ namespace BrandUp.Pages
             };
             navModel.Query.Remove("handler");
 
-            var administrationManager = httpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
-            navModel.EnableAdministration = await administrationManager.CheckAsync(cancellationToken);
+            var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
+            navModel.EnableAdministration = await accessProvider.CheckAccessAsync(cancellationToken);
 
             var antiforgery = httpContext.RequestServices.GetService<IAntiforgery>();
             if (antiforgery != null)

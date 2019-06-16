@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/page/create", Name = "BrandUp.Pages.Page.Create"), Administration.Administration]
+    [Route("brandup.pages/page/create", Name = "BrandUp.Pages.Page.Create"), Filters.Administration]
     public class PageCreateController : FormController<PageCreateForm, PageCreateValues, PageModel>
     {
         private readonly IPageService pageService;

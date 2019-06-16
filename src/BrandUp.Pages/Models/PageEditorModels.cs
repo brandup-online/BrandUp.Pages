@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BrandUp.Pages.Models
 {
@@ -10,7 +9,6 @@ namespace BrandUp.Pages.Models
     public class PageEditorModel
     {
         public string Id { get; set; }
-        public DateTime CreatedDate { get; set; }
         public string Email { get; set; }
     }
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/page/content"), Administration.Administration]
+    [Route("brandup.pages/page/content"), Filters.Administration]
     public class PageContentController : Controller
     {
         readonly IPageService pageService;

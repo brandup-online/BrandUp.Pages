@@ -65,9 +65,9 @@ namespace BrandUp.Pages
                     return;
                 }
 
-                var administrationManager = HttpContext.RequestServices.GetRequiredService<Administration.IAdministrationManager>();
+                var accessProvider = HttpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
 
-                if (!await administrationManager.CheckAsync() || await administrationManager.GetUserIdAsync() != editSession.UserId)
+                if (!await accessProvider.CheckAccessAsync() || await accessProvider.GetUserIdAsync() != editSession.UserId)
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 

@@ -1,6 +1,7 @@
 using BrandUp.Pages.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -54,13 +55,31 @@ namespace LandingWebSite
 
             #endregion
 
-            services.AddMongoDbContext<Models.WebSiteDbContext>(Configuration.GetSection("MongoDb"));
+            services.AddMongoDbContext<Models.AppDbContext>(Configuration.GetSection("MongoDb"));
 
             services.AddPages()
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-                .AddMongoDb<Models.WebSiteDbContext>()
-                .AddImageResizer<Infrastructure.ImageResizer>();
+                .AddMongoDb<Models.AppDbContext>()
+                .AddImageResizer<Infrastructure.ImageResizer>()
+                .AddUserProvider<Identity.PageEditorProvider>(ServiceLifetime.Scoped)
+                .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped);
+
+            #region Identity
+
+            services.AddIdentity<Identity.IdentityUser, Identity.IdentityRole>((options) =>
+            {
+                options.SignIn.RequireConfirmedEmail = false;
+                options.User.RequireUniqueEmail = true;
+            })
+                .AddDefaultTokenProviders()
+                .AddClaimsPrincipalFactory<Identity.UserClaimsPrincipalFactory>()
+                .AddUserStore<Identity.UserStore<Identity.IdentityUser>>()
+                .AddRoleStore<Identity.RoleStore<Identity.IdentityRole>>();
+
+            #endregion
+
+            #region Authentication members
 
             services
                 .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
@@ -71,6 +90,8 @@ namespace LandingWebSite
                     options.SlidingExpiration = true;
                     options.ReturnUrlParameter = "returnUrl";
                 });
+
+            #endregion
 
             services.AddMigrations(typeof(Startup).Assembly);
             services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationStore, _migrations.MigrationStore>();

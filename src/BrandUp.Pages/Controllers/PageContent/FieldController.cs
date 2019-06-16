@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/content/[controller]"), ApiController]
+    [Route("brandup.pages/content/[controller]"), ApiController, Filters.Administration]
     public abstract class FieldController<TField> : Controller, IAsyncActionFilter
         where TField : class, IFieldProvider
     {

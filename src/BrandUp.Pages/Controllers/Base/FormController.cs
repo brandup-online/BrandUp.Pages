@@ -73,6 +73,14 @@ namespace BrandUp.Pages.Controllers
             foreach (var error in errors)
                 ModelState.AddModelError(string.Empty, error);
         }
+        protected void AddErrors(string fieldName, params string[] errors)
+        {
+            if (fieldName == null)
+                throw new ArgumentNullException(nameof(fieldName));
+
+            foreach (var error in errors)
+                ModelState.AddModelError(fieldName, error);
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]

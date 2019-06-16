@@ -1,14 +1,18 @@
 ﻿using BrandUp.MongoDB;
 using BrandUp.Pages.MongoDb.Documents;
+using LandingWebSite.Identity;
 using MongoDB.Driver;
 
 namespace LandingWebSite.Models
 {
-    public class WebSiteDbContext : MongoDbContext, BrandUp.Pages.MongoDb.IPagesDbContext
+    public class AppDbContext : MongoDbContext, BrandUp.Pages.MongoDb.IPagesDbContext
     {
-        public WebSiteDbContext(MongoDbContextOptions options) : base(options) { }
+        public AppDbContext(MongoDbContextOptions options) : base(options) { }
 
         public IMongoCollection<_migrations.MigrationVersionDocument> Migrations => GetCollection<_migrations.MigrationVersionDocument>();
+
+        public IMongoCollection<IdentityUser> Users => GetCollection<IdentityUser>();
+        public IMongoCollection<IdentityRole> Roles => GetCollection<IdentityRole>();
 
         #region IPagesDbContext members
 
@@ -18,7 +22,6 @@ namespace LandingWebSite.Models
         public IMongoCollection<PageEditDocument> PageEditSessions => GetCollection<PageEditDocument>();
         public IMongoCollection<PageRecyclebinDocument> PageRecyclebin => GetCollection<PageRecyclebinDocument>();
         public IMongoCollection<PageUrlDocument> PageUrls => GetCollection<PageUrlDocument>();
-        public IMongoCollection<PageEditorDocument> ContentEditors => GetCollection<PageEditorDocument>();
 
         #endregion
     }

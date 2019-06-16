@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
-    [Route("brandup.pages/page/seo", Name = "BrandUp.Pages.Page.Seo"), Administration.Administration]
+    [Route("brandup.pages/page/seo", Name = "BrandUp.Pages.Page.Seo"), Filters.Administration]
     public class PageSeoController : FormController<PageSeoForm, PageSeoValues, PageModel>
     {
         private readonly IPageService pageService;
