@@ -25,7 +25,6 @@ namespace BrandUp.Pages.Controllers
 
             return Ok(formModel);
         }
-
         [HttpGet, Route("item")]
         public async Task<IActionResult> GetItemsAsync()
         {
@@ -51,7 +50,6 @@ namespace BrandUp.Pages.Controllers
 
             return Ok(result);
         }
-
         [HttpGet("item/{id}")]
         public async Task<IActionResult> GetItemsAsync([FromRoute]string id)
         {
@@ -69,6 +67,29 @@ namespace BrandUp.Pages.Controllers
             var itemModel = await OnGetItemModelAsync(item);
             return Ok(itemModel);
         }
+        [HttpPost, Route("sort")]
+        public async Task<IActionResult> SortAsync([FromQuery]string sourceId, [FromQuery]string destId, [FromQuery]ListItemSortPosition destPosition)
+        {
+            await OnInitializeAsync();
+
+            if (!ModelState.IsValid)
+                return ValidationProblem();
+
+            var sId = ParseId(sourceId);
+            var dId = ParseId(destId);
+
+            var sourceItem = await OnGetItemAsync(sId);
+            if (sourceItem == null)
+                return BadRequest();
+
+            var destItem = await OnGetItemAsync(dId);
+            if (destItem == null)
+                return BadRequest();
+
+            await OnSortAsync(sourceItem, destItem, destPosition);
+
+            return Ok();
+        }
 
         protected abstract Task OnInitializeAsync();
         protected abstract Task OnBuildListAsync(TListModel listModel);
@@ -76,6 +97,10 @@ namespace BrandUp.Pages.Controllers
         protected abstract Task<IEnumerable<TItem>> OnGetItemsAsync(int offset, int limit);
         protected abstract Task<TItem> OnGetItemAsync(TId id);
         protected abstract Task<TItemModel> OnGetItemModelAsync(TItem item);
+        protected virtual Task OnSortAsync(TItem sourceItem, TItem destItem, ListItemSortPosition position)
+        {
+            return Task.CompletedTask;
+        }
 
         protected void AddErrors(IResult result)
         {
@@ -90,5 +115,11 @@ namespace BrandUp.Pages.Controllers
             foreach (var error in errors)
                 ModelState.AddModelError(string.Empty, error);
         }
+    }
+
+    public enum ListItemSortPosition
+    {
+        After,
+        Before
     }
 }

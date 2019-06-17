@@ -96,6 +96,7 @@ namespace BrandUp.Pages.Repositories
             public string PageTypeName { get; }
             public Guid? PageId { get; }
             public PageSortMode SortMode { get; set; }
+            public bool CustomSorting { get; set; }
 
             public PageCollection(Guid id, string title, string pageTypeName, Guid? pageId)
             {
@@ -113,6 +114,11 @@ namespace BrandUp.Pages.Repositories
             void IPageCollection.SetTitle(string newTitle)
             {
                 Title = newTitle ?? throw new ArgumentNullException(nameof(newTitle));
+            }
+
+            public void SetCustomSorting(bool enabledCustomSorting)
+            {
+                CustomSorting = enabledCustomSorting;
             }
         }
     }

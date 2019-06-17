@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageRepository : IPageRepository
     {
-        readonly IMongoCollection<PageDocument> documents;
+        readonly IMongoCollection<PageDocument> pageDocuments;
         readonly IMongoCollection<PageContentDocument> contentDocuments;
         readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments;
         readonly IMongoCollection<PageEditDocument> editDocuments;
@@ -19,7 +20,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public PageRepository(IPagesDbContext dbContext)
         {
-            documents = dbContext.Pages;
+            pageDocuments = dbContext.Pages;
             contentDocuments = dbContext.Contents;
             recyclebinDocuments = dbContext.PageRecyclebin;
             editDocuments = dbContext.PageEditSessions;
@@ -57,13 +58,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Path = pageDocument.UrlPath
             };
 
-            using (var session = await documents.Database.Client.StartSessionAsync())
+            using (var session = await pageDocuments.Database.Client.StartSessionAsync())
             {
                 session.StartTransaction();
 
                 try
                 {
-                    await documents.InsertOneAsync(pageDocument, cancellationToken: cancellationToken);
+                    await pageDocuments.InsertOneAsync(pageDocument, cancellationToken: cancellationToken);
                     await contentDocuments.InsertOneAsync(contentDocument, cancellationToken: cancellationToken);
                     await urlDocuments.InsertOneAsync(urlDocument, cancellationToken: cancellationToken);
 
@@ -81,7 +82,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var cursor = await documents.Find(it => it.Id == id).ToCursorAsync(cancellationToken);
+            var cursor = await pageDocuments.Find(it => it.Id == id).ToCursorAsync(cancellationToken);
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
@@ -96,7 +97,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (!urlDocument.PageId.HasValue)
                 return null;
 
-            var cursor = await documents.Find(it => it.Id == urlDocument.PageId).ToCursorAsync(cancellationToken);
+            var cursor = await pageDocuments.Find(it => it.Id == urlDocument.PageId).ToCursorAsync(cancellationToken);
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
@@ -124,18 +125,26 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (!options.IncludeDrafts)
                 filters.Add(Builders<PageDocument>.Filter.Eq(it => it.Status, PageStatus.Published));
 
-            var findDefinition = documents.Find(Builders<PageDocument>.Filter.And(filters));
-            var sorting = options.Sorting ?? PageSortMode.FirstOld;
-            switch (options.Sorting.Value)
+            var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.And(filters));
+            var sortDirection = options.SortDirection ?? PageSortMode.FirstOld;
+
+            if (options.CustomSorting.HasValue && options.CustomSorting.Value)
             {
-                case PageSortMode.FirstOld:
-                    findDefinition.SortBy(it => it.CreatedDate);
-                    break;
-                case PageSortMode.FirstNew:
-                    findDefinition.SortByDescending(it => it.CreatedDate);
-                    break;
-                default:
-                    throw new ArgumentException("Недопустимый тип сортировки.");
+                findDefinition.SortBy(it => it.Order);
+            }
+            else
+            {
+                switch (sortDirection)
+                {
+                    case PageSortMode.FirstOld:
+                        findDefinition.SortBy(it => it.CreatedDate);
+                        break;
+                    case PageSortMode.FirstNew:
+                        findDefinition.SortByDescending(it => it.CreatedDate);
+                        break;
+                    default:
+                        throw new ArgumentException("Недопустимый тип сортировки.");
+                }
             }
 
             if (options.Pagination != null)
@@ -150,7 +159,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var findDefinition = documents.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false }));
+            var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false }));
 
             if (pagination != null)
             {
@@ -164,7 +173,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<bool> HasPagesAsync(Guid сollectionId, CancellationToken cancellationToken = default)
         {
-            var count = await documents.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId, cancellationToken: cancellationToken);
+            var count = await pageDocuments.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId, cancellationToken: cancellationToken);
             return count > 0;
         }
         public async Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
@@ -184,13 +193,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
-            using (var session = await documents.Database.Client.StartSessionAsync(cancellationToken: cancellationToken))
+            using (var session = await pageDocuments.Database.Client.StartSessionAsync(cancellationToken: cancellationToken))
             {
                 session.StartTransaction();
 
                 try
                 {
-                    var pageUpdateResult = await documents.UpdateOneAsync(it => it.Id == pageId, Builders<PageDocument>.Update
+                    var pageUpdateResult = await pageDocuments.UpdateOneAsync(it => it.Id == pageId, Builders<PageDocument>.Update
                         .Set(it => it.Header, title), cancellationToken: cancellationToken);
                     if (pageUpdateResult.MatchedCount != 1)
                         throw new InvalidOperationException();
@@ -216,7 +225,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var curVersion = pageDocument.Version;
             pageDocument.Version++;
 
-            using (var session = await documents.Database.Client.StartSessionAsync())
+            using (var session = await pageDocuments.Database.Client.StartSessionAsync())
             {
                 session.StartTransaction();
 
@@ -233,7 +242,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                             throw new InvalidOperationException("Не удалось изменить url страницы.");
                     }
 
-                    var replaceResult = await documents.ReplaceOneAsync(it => it.Id == page.Id && it.Version == curVersion, pageDocument);
+                    var replaceResult = await pageDocuments.ReplaceOneAsync(it => it.Id == page.Id && it.Version == curVersion, pageDocument);
                     if (replaceResult.MatchedCount != 1)
                         throw new InvalidOperationException("Не удалось изменить документ страницы.");
 
@@ -253,7 +262,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var curVersion = pageDocument.Version;
             pageDocument.Version++;
 
-            using (var session = await documents.Database.Client.StartSessionAsync())
+            using (var session = await pageDocuments.Database.Client.StartSessionAsync())
             {
                 session.StartTransaction();
 
@@ -276,7 +285,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                     };
                     await recyclebinDocuments.InsertOneAsync(recycleBinDocument, new InsertOneOptions(), cancellationToken);
 
-                    var pageDeleteResult = await documents.DeleteOneAsync(it => it.Id == page.Id && it.Version == curVersion, cancellationToken);
+                    var pageDeleteResult = await pageDocuments.DeleteOneAsync(it => it.Id == page.Id && it.Version == curVersion, cancellationToken);
                     if (pageDeleteResult.DeletedCount != 1)
                         throw new InvalidOperationException("Не удалось удалить документ страницы.");
 
@@ -345,6 +354,105 @@ namespace BrandUp.Pages.MongoDb.Repositories
             pageDocument.Seo.Keywords = keywords;
 
             return Task.CompletedTask;
+        }
+        public async Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
+        {
+            var pages = await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { IncludeDrafts = true }, cancellationToken);
+
+            using (var session = await pageDocuments.Database.Client.StartSessionAsync())
+            {
+                session.StartTransaction();
+
+                try
+                {
+                    var i = 0;
+                    foreach (var p in pages)
+                    {
+                        if (p.Id == page.Id)
+                            continue;
+                        else if ((beforePage != null && p.Id == beforePage.Id) || (beforePage == null && i == 0))
+                        {
+                            await UpdateOrderAsync(page, i, cancellationToken);
+
+                            i++;
+
+                            if (beforePage != null)
+                            {
+                                await UpdateOrderAsync(beforePage, i, cancellationToken);
+                                continue;
+                            }
+                        }
+
+                        await UpdateOrderAsync(p, i, cancellationToken);
+
+                        i++;
+                    }
+
+                    await session.CommitTransactionAsync(cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    await session.AbortTransactionAsync(cancellationToken);
+
+                    throw ex;
+                }
+            }
+        }
+        public async Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
+        {
+            var pages = (await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { IncludeDrafts = true }, cancellationToken)).ToList();
+
+            using (var session = await pageDocuments.Database.Client.StartSessionAsync())
+            {
+                session.StartTransaction();
+
+                try
+                {
+                    var i = 0;
+                    foreach (var p in pages)
+                    {
+                        if (p.Id == page.Id)
+                            continue;
+                        else if (afterPage != null && p.Id == afterPage.Id)
+                        {
+                            await UpdateOrderAsync(afterPage, i, cancellationToken);
+                            i++;
+                            await UpdateOrderAsync(page, i, cancellationToken);
+                            continue;
+                        }
+
+                        await UpdateOrderAsync(p, i, cancellationToken);
+
+                        i++;
+                    }
+
+                    if (afterPage == null)
+                    {
+                        await UpdateOrderAsync(page, i, cancellationToken);
+                    }
+
+                    await session.CommitTransactionAsync(cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    await session.AbortTransactionAsync(cancellationToken);
+
+                    throw ex;
+                }
+            }
+        }
+
+        async Task UpdateOrderAsync(IPage page, int order, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+
+            pageDocument.Order = order;
+
+            var updateDefinition = Builders<PageDocument>.Update.Set(it => it.Order, order);
+
+            var updateResult = await pageDocuments.UpdateOneAsync(it => it.Id == page.Id, updateDefinition, new UpdateOptions(), cancellationToken);
+            if (updateResult.MatchedCount != 1)
+                throw new Exception();
         }
     }
 }

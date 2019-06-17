@@ -24,6 +24,8 @@ namespace BrandUp.Pages.Interfaces
         Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default);
         Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default);
         Task UpdatePageSeoOptionsAsync(IPage page, PageSeoOptions seoOptions, CancellationToken cancellationToken = default);
+        Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default);
+        Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default);
     }
 
     public class PageSeoOptions
@@ -55,7 +57,8 @@ namespace BrandUp.Pages.Interfaces
     public class GetPagesOptions
     {
         public Guid CollectionId { get; set; }
-        public PageSortMode? Sorting { get; set; }
+        public PageSortMode? SortDirection { get; set; }
+        public bool? CustomSorting { get; set; }
         public bool IncludeDrafts { get; set; }
         public PagePaginationOptions Pagination { get; set; }
 

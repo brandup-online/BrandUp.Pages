@@ -169,6 +169,14 @@ namespace BrandUp.Pages.Repositories
             p.SeoKeywords = keywords;
             return Task.CompletedTask;
         }
+        public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+        public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
 
         private class Page : IPage
         {

@@ -24,6 +24,25 @@
         opacity: 0.9;
         transition: all ease 80ms;
 
+        & .sort {
+            flex: 0 0 16px;
+            margin-right: 15px;
+            cursor: move;
+
+            & svg {
+                fill: #bbb;
+                display: block;
+                width: 16px;
+                height: 16px;
+            }
+
+            &:hover {
+                & svg {
+                    fill: #bfbfbf;
+                }
+            }
+        }
+
         & .content {
             flex: 1 1 auto;
             position: relative;

@@ -23,6 +23,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public PageStatus Status { get; set; }
         public PageSeoDocument Seo { get; set; }
         public bool IsPublished { get => Status == PageStatus.Published; }
+        public int Order { get; set; }
 
         Task IPage.SetUrlAsync(string urlPath)
         {

@@ -52,7 +52,28 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+
+            if (collection.CustomSorting)
+            {
+                switch (collection.SortMode)
+                {
+                    case PageSortMode.FirstNew:
+                        {
+                            await UpPagePositionAsync(page, null, cancellationToken);
+                            break;
+                        }
+                    case PageSortMode.FirstOld:
+                        {
+                            await DownPagePositionAsync(page, null, cancellationToken);
+                            break;
+                        }
+                    default:
+                        throw new Exception();
+                }
+            }
+
+            return page;
         }
         public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default)
         {
@@ -77,7 +98,28 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            return await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+
+            if (collection.CustomSorting)
+            {
+                switch (collection.SortMode)
+                {
+                    case PageSortMode.FirstNew:
+                        {
+                            await UpPagePositionAsync(page, null, cancellationToken);
+                            break;
+                        }
+                    case PageSortMode.FirstOld:
+                        {
+                            await DownPagePositionAsync(page, null, cancellationToken);
+                            break;
+                        }
+                    default:
+                        throw new Exception();
+                }
+            }
+
+            return page;
         }
         public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
@@ -118,8 +160,11 @@ namespace BrandUp.Pages.Services
             if (collection == null)
                 throw new InvalidOperationException();
 
-            if (!options.Sorting.HasValue)
-                options.Sorting = collection.SortMode;
+            if (!options.SortDirection.HasValue)
+                options.SortDirection = collection.SortMode;
+
+            if (!options.CustomSorting.HasValue)
+                options.CustomSorting = collection.CustomSorting;
 
             return await pageRepositiry.GetPagesAsync(options, cancellationToken);
         }
@@ -255,6 +300,14 @@ namespace BrandUp.Pages.Services
             await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords);
 
             await pageRepositiry.UpdatePageAsync(page, cancellationToken);
+        }
+        public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
+        {
+            return pageRepositiry.UpPagePositionAsync(page, beforePage, cancellationToken);
+        }
+        public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
+        {
+            return pageRepositiry.DownPagePositionAsync(page, afterPage, cancellationToken);
         }
 
         private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)

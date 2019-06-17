@@ -25,8 +25,10 @@ namespace BrandUp.Pages.Interfaces
         string PageTypeName { get; }
         Guid? PageId { get; }
         PageSortMode SortMode { get; }
+        bool CustomSorting { get; }
 
         void SetTitle(string newTitle);
         void SetSortModel(PageSortMode sortMode);
+        void SetCustomSorting(bool enabledCustomSorting);
     }
 }

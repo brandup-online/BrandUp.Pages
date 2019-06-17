@@ -18,6 +18,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public PageSortMode SortMode { get; set; }
         [BsonIgnoreIfNull, BsonRepresentation(BsonType.String)]
         public Guid? PageId { get; set; }
+        public bool CustomSorting { get; set; }
 
         void IPageCollection.SetSortModel(PageSortMode sortMode)
         {
@@ -26,6 +27,10 @@ namespace BrandUp.Pages.MongoDb.Documents
         void IPageCollection.SetTitle(string newTitle)
         {
             Title = newTitle ?? throw new ArgumentNullException(nameof(newTitle));
+        }
+        public void SetCustomSorting(bool enabledCustomSorting)
+        {
+            CustomSorting = enabledCustomSorting;
         }
     }
 

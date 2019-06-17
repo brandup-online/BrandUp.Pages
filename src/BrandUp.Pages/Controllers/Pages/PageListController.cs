@@ -110,6 +110,19 @@ namespace BrandUp.Pages.Controllers
             };
         }
 
+        protected override async Task OnSortAsync(IPage sourceItem, IPage destItem, ListItemSortPosition position)
+        {
+            switch (position)
+            {
+                case ListItemSortPosition.Before:
+                    await pageService.UpPagePositionAsync(sourceItem, destItem);
+                    break;
+                case ListItemSortPosition.After:
+                    await pageService.DownPagePositionAsync(sourceItem, destItem);
+                    break;
+            }
+        }
+
         #endregion
 
         private async Task<PageCollectionModel> GetPageCollectionModelAsync(IPageCollection pageCollection)

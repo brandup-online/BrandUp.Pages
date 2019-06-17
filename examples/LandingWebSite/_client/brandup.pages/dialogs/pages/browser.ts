@@ -17,6 +17,8 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         super(options);
 
         this.__pageId = pageId;
+
+        this.setSorting(true);
     }
 
     get pageId(): string { return this.__pageId; }
