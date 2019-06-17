@@ -11,7 +11,7 @@ namespace BrandUp.Pages.Url
 
     public class PageUrlPathGenerator : IPageUrlPathGenerator
     {
-        private static readonly Regex TranslitRegex = new Regex(@"(?<1>[а-яё])|(?<2>[\s_-])|(?<3>[^a-z\\d])", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TranslitRegex = new Regex(@"(?<1>[а-яё])|(?<2>[\s_-])|(?<3>[^\w])", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
         private static readonly string[] TranslitChars = new string[] { "yo", "a", "b", "v", "g", "d", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "c", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya" };
         private static readonly char[] TrimChars = new char[] { '-' };
         private static readonly Regex NormalizeRegex = new Regex(@"(?<1>[-]{2,})", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
@@ -47,9 +47,9 @@ namespace BrandUp.Pages.Url
                 else if (match.Groups[2].Success)
                     return "-";
                 else if (match.Groups[3].Success)
-                    return match.Value;
+                    return "-";
 
-                return string.Empty;
+                return match.Value;
             });
 
             result = result.Trim(TrimChars).ToLower();

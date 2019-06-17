@@ -58,6 +58,10 @@ namespace BrandUp.Pages.Url
         [InlineData("привет__привет", "privet-privet")]
         [InlineData("Привет", "privet")]
         [InlineData("ПРИВЕТ", "privet")]
+        [InlineData("ПРИВЕТ-", "privet")]
+        [InlineData("ПРИВЕТ_", "privet")]
+        [InlineData("ПРИВЕТ%", "privet")]
+        [InlineData(@"привет%!@#$%^&*()_+=-~`\?/", "privet")]
         public async Task Generate(string input, string result)
         {
             var urlPath = await pageUrlPathGenerator.GenerateAsync(new Page(input));
