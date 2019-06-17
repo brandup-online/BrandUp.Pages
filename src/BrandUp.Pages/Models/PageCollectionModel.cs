@@ -14,6 +14,7 @@ namespace BrandUp.Pages.Models
         public string PageType { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public PageSortMode Sort { get; set; }
+        public bool CustomSorting { get; set; }
         public string PageUrl { get; set; }
     }
 }

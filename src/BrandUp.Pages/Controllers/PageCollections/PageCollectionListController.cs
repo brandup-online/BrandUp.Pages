@@ -98,6 +98,7 @@ namespace BrandUp.Pages.Controllers
                 Title = item.Title,
                 PageType = item.PageTypeName,
                 Sort = item.SortMode,
+                CustomSorting = item.CustomSorting,
                 PageUrl = pageUrl
             };
         }

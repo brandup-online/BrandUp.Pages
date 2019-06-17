@@ -42,29 +42,28 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
         this.__loadList();
 
-        if (this.__enableSorting) {
-            this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
-                let target = <Element>e.target;
-                let itemElem = target.closest("[data-index]");
-                if (itemElem) {
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData("data-id", itemElem.getAttribute("data-id"));
-                    e.dataTransfer.setData("data-index", itemElem.getAttribute("data-index"));
-                    e.dataTransfer.setDragImage(itemElem, 0, 0);
-                    return true;
-                }
-                e.stopPropagation();
-                e.preventDefault();
-                return false;
-            }, false);
-            this.__itemsElem.addEventListener("dragenter", (e: DragEvent) => {
-                e.preventDefault();
+        this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
+            let target = <Element>e.target;
+            let itemElem = target.closest("[data-index]");
+            if (itemElem) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData("data-id", itemElem.getAttribute("data-id"));
+                e.dataTransfer.setData("data-index", itemElem.getAttribute("data-index"));
+                e.dataTransfer.setDragImage(itemElem, 0, 0);
                 return true;
-            });
-            this.__itemsElem.addEventListener("dragover", (e: DragEvent) => {
-                e.preventDefault();
-            });
-            this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
+            }
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+        }, false);
+        this.__itemsElem.addEventListener("dragenter", (e: DragEvent) => {
+            e.preventDefault();
+            return true;
+        });
+        this.__itemsElem.addEventListener("dragover", (e: DragEvent) => {
+            e.preventDefault();
+        });
+        this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
                 let target = <Element>e.target;
                 var sourceId = e.dataTransfer.getData("data-id");
                 var sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
@@ -121,7 +120,6 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
                 e.stopPropagation();
                 return false;
             });
-        }
     }
 
     private __refreshIndexes() {

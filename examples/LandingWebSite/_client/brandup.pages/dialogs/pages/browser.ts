@@ -74,6 +74,14 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
 
         this.collectionId = collectionId;
 
+        for (let i = 0; i < this.__model.collections.length; i++) {
+            let collection = this.__model.collections[i];
+            if (collection.id == collectionId) {
+                this.setSorting(collection.customSorting);
+                break;
+            }
+        }
+
         if (this.collectionId) {
             let tabItem = DOM.queryElement(this.tabsElem, `a[data-value="${this.collectionId}"]`);
             if (tabItem)
