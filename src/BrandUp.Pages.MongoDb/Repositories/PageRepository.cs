@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -129,18 +130,16 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var sortDirection = options.SortDirection ?? PageSortMode.FirstOld;
 
             if (options.CustomSorting.HasValue && options.CustomSorting.Value)
-            {
-                findDefinition.SortBy(it => it.Order);
-            }
+                findDefinition = findDefinition.SortBy(it => it.Order);
             else
             {
                 switch (sortDirection)
                 {
                     case PageSortMode.FirstOld:
-                        findDefinition.SortBy(it => it.CreatedDate);
+                        findDefinition = findDefinition.SortBy(it => it.CreatedDate);
                         break;
                     case PageSortMode.FirstNew:
-                        findDefinition.SortByDescending(it => it.CreatedDate);
+                        findDefinition = findDefinition.SortByDescending(it => it.CreatedDate);
                         break;
                     default:
                         throw new ArgumentException("Недопустимый тип сортировки.");
@@ -149,8 +148,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             if (options.Pagination != null)
             {
-                findDefinition.Skip(options.Pagination.Skip);
-                findDefinition.Limit(options.Pagination.Limit);
+                findDefinition = findDefinition
+                    .Skip(options.Pagination.Skip)
+                    .Limit(options.Pagination.Limit);
             }
 
             var cursor = await findDefinition.ToCursorAsync(cancellationToken);
@@ -309,7 +309,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 }
             }
         }
-
         public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
@@ -357,7 +356,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
         {
-            var pages = await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { IncludeDrafts = true }, cancellationToken);
+            var pages = await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { CustomSorting = true, IncludeDrafts = true }, cancellationToken);
 
             using (var session = await pageDocuments.Database.Client.StartSessionAsync())
             {
@@ -366,21 +365,27 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 try
                 {
                     var i = 0;
+
+                    if (beforePage == null)
+                    {
+                        await UpdateOrderAsync(page, 0, cancellationToken);
+
+                        i = 1;
+                    }
+
                     foreach (var p in pages)
                     {
                         if (p.Id == page.Id)
                             continue;
-                        else if ((beforePage != null && p.Id == beforePage.Id) || (beforePage == null && i == 0))
+                        else if (beforePage != null && p.Id == beforePage.Id)
                         {
                             await UpdateOrderAsync(page, i, cancellationToken);
-
                             i++;
 
-                            if (beforePage != null)
-                            {
-                                await UpdateOrderAsync(beforePage, i, cancellationToken);
-                                continue;
-                            }
+                            await UpdateOrderAsync(beforePage, i, cancellationToken);
+                            i++;
+
+                            continue;
                         }
 
                         await UpdateOrderAsync(p, i, cancellationToken);
@@ -400,7 +405,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
         {
-            var pages = (await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { IncludeDrafts = true }, cancellationToken)).ToList();
+            var pages = (await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { CustomSorting = true, IncludeDrafts = true }, cancellationToken)).ToList();
 
             using (var session = await pageDocuments.Database.Client.StartSessionAsync())
             {
@@ -417,7 +422,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
                         {
                             await UpdateOrderAsync(afterPage, i, cancellationToken);
                             i++;
+
                             await UpdateOrderAsync(page, i, cancellationToken);
+                            i++;
+
                             continue;
                         }
 
@@ -453,6 +461,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var updateResult = await pageDocuments.UpdateOneAsync(it => it.Id == page.Id, updateDefinition, new UpdateOptions(), cancellationToken);
             if (updateResult.MatchedCount != 1)
                 throw new Exception();
+
+            Debug.WriteLine($"{page.Header} - {order}");
         }
     }
 }

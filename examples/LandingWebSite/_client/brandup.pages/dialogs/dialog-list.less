@@ -12,6 +12,7 @@
         flex: 1 1 100%;
         padding: 0;
         overflow: auto;
+        width: 100%;
     }
 
     & .item {
@@ -23,6 +24,8 @@
         align-items: center;
         opacity: 0.9;
         transition: all ease 80ms;
+        box-sizing: border-box;
+        width: 100%;
 
         & .sort {
             flex: 0 0 16px;
@@ -54,7 +57,7 @@
             line-height: 24px;
 
             & .title {
-                flex: 1 1 100%;
+                flex: 1 1 auto;
                 display: flex;
                 flex-flow: column nowrap;
                 align-items: flex-start;
@@ -63,9 +66,8 @@
                 & span {
                     display: block;
                     text-decoration: none;
-                    max-width: 100%;
+                    width: 100%;
                     overflow: hidden;
-                    white-space: nowrap;
                     text-overflow: ellipsis;
                     font-weight: 600;
                 }
@@ -96,8 +98,10 @@
         }
 
         & .menu {
+            flex: 0 0 44px;
             position: relative;
             padding-left: 20px;
+            box-sizing: border-box;
 
             & button {
                 box-sizing: border-box;

@@ -72,8 +72,6 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
                     let destId = elem.getAttribute("data-id");
                     let destIndex = parseInt(elem.getAttribute("data-index"));
                     if (destIndex !== sourceIndex) {
-                        console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
-
                         let sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                         if (sourceElem) {
                             let destPosition: string;
@@ -85,6 +83,9 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
                                 elem.insertAdjacentElement("afterend", sourceElem);
                                 destPosition = "after";
                             }
+
+                            console.log(`Source: ${sourceIndex}; Dest: ${destIndex}; Position: ${destPosition}`);
+                            console.log(`Source: ${sourceId}; Dest: ${destId}; Position: ${destPosition}`);
 
                             this.__refreshIndexes();
 
@@ -111,6 +112,8 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
                                         this.setError("Error loading items.");
                                         return;
                                     }
+
+                                    this.loadItems();
                                 }
                             });
                         }
