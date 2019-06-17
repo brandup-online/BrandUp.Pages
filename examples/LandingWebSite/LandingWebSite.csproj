@@ -188,7 +188,6 @@
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\dist\" />
     <Folder Include="_temp\images\" />
   </ItemGroup>
 

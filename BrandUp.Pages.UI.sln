@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.572
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "brandup-pages-ckeditor", "ui\brandup-pages-ckeditor\brandup-pages-ckeditor.njsproj", "{E7D7B55B-00B2-430A-9862-1213B2E628B3}"
 EndProject
