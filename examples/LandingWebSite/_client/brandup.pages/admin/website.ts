@@ -7,6 +7,7 @@ import iconBack from "../svg/toolbar-button-back.svg";
 import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
+import { listContentType } from "../dialogs/content-types/list";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -34,7 +35,9 @@ export class WebSiteToolbar extends UIElement {
 
         toolbarElem.appendChild(DOM.tag("div", { class: "bp-toolbar-menu" }, [
             DOM.tag("a", { href: "", "data-command": "bp-editors" }, "Редакторы страниц"),
-            DOM.tag("a", { href: "", "data-command": "bp-recyclebin" }, "Корзина")
+            DOM.tag("a", { href: "", "data-command": "bp-content-types" }, "Типы контента"),
+            //DOM.tag("a", { href: "", "data-command": "bp-page-types" }, "Типы страниц"),
+            //DOM.tag("a", { href: "", "data-command": "bp-recyclebin" }, "Корзина")
         ]))
 
         document.body.appendChild(toolbarElem);
@@ -80,6 +83,11 @@ export class WebSiteToolbar extends UIElement {
         this.registerCommand("bp-editors", () => {
             toolbarElem.classList.remove("opened-menu");
             listPageEditor();
+        });
+
+        this.registerCommand("bp-content-types", () => {
+            toolbarElem.classList.remove("opened-menu");
+            listContentType();
         });
 
         this.__closeMenuFunc = (e: MouseEvent) => {

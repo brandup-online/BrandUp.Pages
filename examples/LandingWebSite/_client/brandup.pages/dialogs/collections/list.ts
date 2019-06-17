@@ -81,8 +81,8 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
         contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("span", { }, item.title)));
     }
     protected _renderItemMenu(item: PageCollectionModel, menuElem: HTMLElement) {
-        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-update" }, "Edit")]));
-        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
+        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-update" }, "Редактировать")]));
+        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Удалить")]));
     }
     protected _renderEmpty(container: HTMLElement) {
         container.innerText = "Коллекций не создано.";

@@ -13,8 +13,11 @@ namespace LandingWebSite.Contents.BannerBlock
     }
 
     [ContentType]
-    public abstract class BB1_ItemBase : BannerContent
+    public abstract class BB1_ItemBase
     {
+        [Image]
+        public ImageValue Image { get; set; }
+
         [Text(IsRequired = true), Title]
         public string Header { get; set; }
 

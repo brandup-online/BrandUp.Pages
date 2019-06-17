@@ -156,9 +156,9 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         contentElem.appendChild(DOM.tag("div", { class: `status ${item.status.toLowerCase()}` }, item.status));
     }
     protected _renderItemMenu(item: PageModel, menuElem: HTMLElement) {
-        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-open" }, "Open")]));
+        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-open" }, "Открыть")]));
         menuElem.appendChild(DOM.tag("li", { class: "split" }));
-        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Delete")]));
+        menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Удалить")]));
     }
     protected _renderEmpty(container: HTMLElement) {
         container.innerText = "Страниц не создано.";

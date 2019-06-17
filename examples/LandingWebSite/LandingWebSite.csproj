@@ -24,6 +24,7 @@
     <None Remove="_client\brandup.pages\dialogs\collections\delete.ts" />
     <None Remove="_client\brandup.pages\dialogs\collections\list.ts" />
     <None Remove="_client\brandup.pages\dialogs\collections\update.ts" />
+    <None Remove="_client\brandup.pages\dialogs\content-types\list.ts" />
     <None Remove="_client\brandup.pages\dialogs\editors\assign.ts" />
     <None Remove="_client\brandup.pages\dialogs\editors\delete.ts" />
     <None Remove="_client\brandup.pages\dialogs\editors\list.ts" />
@@ -88,6 +89,7 @@
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\collections\delete.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\collections\list.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\collections\update.ts" />
+    <TypeScriptCompile Include="_client\brandup.pages\dialogs\content-types\list.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\editors\list.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\editors\assign.ts" />
     <TypeScriptCompile Include="_client\brandup.pages\dialogs\editors\delete.ts" />
