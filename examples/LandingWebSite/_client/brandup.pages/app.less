@@ -35,17 +35,37 @@
     height: 50px;
     display: flex;
     flex-flow: row nowrap;
+    z-index: 500;
+    box-shadow: 2px 2px 20px rgba(0,0,0,0.4);
 
     &.opened-menu {
         & .bp-toolbar-menu {
             display: block;
         }
     }
+
+    @media all and (max-width: 800px) {
+        left: 20px;
+        bottom: 20px;
+    }
+
+    @media all and (max-width: 400px) {
+        left: 10px;
+        bottom: 10px;
+    }
 }
 
 .bp-toolbar-right {
     left: auto;
     right: 30px;
+
+    @media all and (max-width: 800px) {
+        right: 20px;
+    }
+
+    @media all and (max-width: 400px) {
+        right: 10px;
+    }
 }
 
 button.bp-toolbar-button {

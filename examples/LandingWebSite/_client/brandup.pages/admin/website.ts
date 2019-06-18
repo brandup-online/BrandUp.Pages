@@ -17,6 +17,8 @@ export class WebSiteToolbar extends UIElement {
     constructor(page: Page<any>) {
         super();
 
+        document.body.classList.add("bp-state-toolbars");
+
         var isContentPage = page instanceof ContentPage;
         var buttons: Array<HTMLElement> = [];
 
