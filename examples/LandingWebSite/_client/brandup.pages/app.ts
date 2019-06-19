@@ -373,6 +373,12 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                 return true;
         }
 
+        if (elem.hasAttribute("target")) {
+            let target = elem.getAttribute("target");
+            if (target === "_blank")
+                return true;
+        }
+
         e.preventDefault();
         e.stopPropagation();
         e.returnValue = false;

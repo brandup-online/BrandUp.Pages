@@ -98,6 +98,16 @@ namespace BrandUp.Pages
                         context.Result = NotFound();
                         return;
                     }
+
+                    if (!page.IsPublished)
+                    {
+                        var accessProvider = HttpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
+                        if (!await accessProvider.CheckAccessAsync())
+                        {
+                            context.Result = NotFound();
+                            return;
+                        }
+                    }
                 }
                 else
                 {
