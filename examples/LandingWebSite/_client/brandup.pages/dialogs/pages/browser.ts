@@ -5,6 +5,7 @@ import { createPage } from "./create";
 import { createPageCollection } from "../collections/create";
 import { deletePage } from "./delete";
 import { listPageCollection } from "../collections/list";
+import iconClose from "../../svg/list-item-add.svg";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     private __pageId: string;
@@ -160,8 +161,8 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     }
     protected _renderItemContent(item: PageModel, contentElem: HTMLElement) {
         contentElem.appendChild(DOM.tag("div", { class: "title" }, [
-            DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": item.id }, item.title),
-            DOM.tag("div", { class: "text" }, item.url)
+            DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": item.id, title: item.title }, item.title),
+            DOM.tag("div", { class: "text", title: item.url }, item.url)
         ]));
         contentElem.appendChild(DOM.tag("div", { class: `status ${item.status.toLowerCase()}` }, item.status));
     }
@@ -174,7 +175,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         container.innerText = "Страниц не создано.";
     }
     protected _renderNewItem(containerElem: HTMLElement) {
-        containerElem.appendChild(DOM.tag("a", { href: "", "data-command": "item-create" }, "Новая страница"));
+        containerElem.appendChild(DOM.tag("a", { href: "", "data-command": "item-create" }, [iconClose, "Новая страница"]));
     }
 }
 

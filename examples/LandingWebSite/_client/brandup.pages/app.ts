@@ -183,6 +183,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             return;
 
         let { url, pushState } = options;
+        if (!url)
+            url = this.model.baseUrl;
 
         this.__navCounter++;
         var navSequence = this.__navCounter;
@@ -245,11 +247,11 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                     }
                     case 404:
                     case 500: {
-                        location.href = options.url;
+                        location.href = url;
                         break;
                     }
                     case 401 /* Unauthorized */: {
-                        location.href = options.url;
+                        location.href = url;
                         break;
                     }
                     default:
