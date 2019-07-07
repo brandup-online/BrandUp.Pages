@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -7,7 +7,7 @@
     <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
     <Product>BrandUp.Pages</Product>
-    <LangVersion>7.2</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <Company>BrandUp.online</Company>
   </PropertyGroup>
 

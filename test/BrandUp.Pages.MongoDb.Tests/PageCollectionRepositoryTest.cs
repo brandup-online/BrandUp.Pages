@@ -17,9 +17,9 @@ namespace BrandUp.Pages.MongoDb.Tests
                 .AddMongoDbContext<PagesDbContext>(options =>
                 {
                     options.DatabaseName = "Test";
-                    options.UseFakeClientFactory();
                 })
-                .AddMongoDbContextExension<PagesDbContext, IPagesDbContext>();
+                .AddMongoDbContextExension<PagesDbContext, IPagesDbContext>()
+                .AddFakeMongoDbClientFactory();
 
             services.AddSingleton<PageCollectionRepository>();
 

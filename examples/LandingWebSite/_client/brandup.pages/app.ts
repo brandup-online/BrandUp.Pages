@@ -60,7 +60,10 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         var initNav = this.model.nav;
         var pageState: PageNavState = {
             url: initNav.url,
-            title: initNav.page.title
+            title: initNav.page.title,
+            path: initNav.path,
+            params: initNav.query,
+            hash: location.hash ? location.hash.substr(1) : null
         };
 
         this.__navigation = initNav;
@@ -69,7 +72,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             window.addEventListener("popstate", Utility.createDelegate(this, this.__onPopState));
             window.addEventListener("hashchange", Utility.createDelegate(this, this.__onHashChange));
 
-            window.history.replaceState(pageState, pageState.title, pageState.url);
+            window.history.replaceState(pageState, pageState.title, pageState.hash ? pageState.url + "#" + pageState.hash : pageState.url);
         }
 
         document.body.addEventListener("click", this.linkClickFunc, false);
@@ -150,41 +153,27 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         if (!url)
             url = this.model.baseUrl;
 
-        this.__refreshNavigation({ url: url, pushState: true });
+        this.nav({ url: url, pushState: true });
     }
     nav(options: NavigationOptions) {
-        this.__refreshNavigation(options);
-    }
-
-    script(name: string): Promise<{ default: any }> {
-        var scriptPromise = this.__builder.getScript(name);
-        if (!scriptPromise)
-            return;
-        return scriptPromise;
-    }
-    renderPage(html: string) {
-        var navState = this.page.nav;
-        var pageModel = this.page.model;
-
-        this.page.destroy();
-        this.page = null;
-
-        DOM.empty(this.__contentBodyElem);
-        this.__contentBodyElem.insertAdjacentHTML("afterbegin", html ? html : "");
-        Application.nodeScriptReplace(this.__contentBodyElem);
-
-        this.__loadPageScript(navState, pageModel);
-    }
-
-    private __refreshNavigation(options: NavigationOptions) {
         var isCancelled = this.raiseEvent("pageNavigating", options);
-        console.log(isCancelled);
-        if (!isCancelled)
+        if (!isCancelled) {
+            console.log("cancelled navigation");
             return;
+        }
 
-        let { url, pushState } = options;
-        if (!url)
-            url = this.model.baseUrl;
+        let { url, hash, pushState } = options;
+        if (!url) {
+            url = location.href;
+            if (url.lastIndexOf("#") > 0)
+                url = url.substr(0, url.lastIndexOf("#"));
+        }
+        if (!hash)
+            hash = null;
+        else {
+            if (hash.startsWith("#"))
+                hash = hash.substr(1);
+        }
 
         this.__navCounter++;
         var navSequence = this.__navCounter;
@@ -210,11 +199,15 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             success: (data: NavigationModel, status: number) => {
                 if (navSequence !== this.__navCounter)
                     return;
-                
+
                 switch (status) {
                     case 200: {
+                        var navUrl = data.url;
+                        if (hash)
+                            navUrl += "#" + hash;
+
                         if (this.__navigation.isAuthenticated != data.isAuthenticated) {
-                            location.href = data.url;
+                            location.href = navUrl;
                             return;
                         }
 
@@ -223,17 +216,24 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                         var pageModel = data.page;
                         var pageState: PageNavState = {
                             url: data.url,
-                            title: pageModel.title
+                            title: pageModel.title,
+                            path: data.path,
+                            params: data.query,
+                            hash: hash
                         };
 
+                        if (navUrl == location.href)
+                            pushState = false;
+
                         if (window.history && window.history.pushState) {
-                            if (pushState)
-                                window.history.pushState(pageState, pageState.title, data.url);
+                            if (pushState) {
+                                window.history.pushState(pageState, pageState.title, navUrl);
+                            }
                             else
-                                window.history.replaceState(pageState, pageState.title, data.url);
+                                window.history.replaceState(pageState, pageState.title, navUrl);
                         }
                         else {
-                            location.href = data.url;
+                            location.href = navUrl;
                             return;
                         }
 
@@ -260,6 +260,27 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             }
         });
     }
+
+    script(name: string): Promise<{ default: any }> {
+        var scriptPromise = this.__builder.getScript(name);
+        if (!scriptPromise)
+            return;
+        return scriptPromise;
+    }
+    renderPage(html: string) {
+        var navState = this.page.nav;
+        var pageModel = this.page.model;
+
+        this.page.destroy();
+        this.page = null;
+
+        DOM.empty(this.__contentBodyElem);
+        this.__contentBodyElem.insertAdjacentHTML("afterbegin", html ? html : "");
+        Application.nodeScriptReplace(this.__contentBodyElem);
+
+        this.__loadPageScript(navState, pageModel);
+    }
+
     private __renderPage(pageState: PageNavState, pageModel: PageClientModel, needLoadContent: boolean) {
         if (this.page) {
             this.page.destroy();
@@ -343,21 +364,42 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     private __onPopState(event: PopStateEvent) {
         event.preventDefault();
 
-        console.log("PopState " + location.href);
+        var url = location.href;
+        console.log("PopState: " + url);
+
+        if (url.lastIndexOf("#") > 0) {
+            let t = url.lastIndexOf("#");
+            let urlHash = url.substr(t + 1);
+            let urlWithoutHash = url.substr(0, t);
+
+            if (!event.state) {
+                console.log("PopState hash: " + urlHash);
+
+                var pageState: PageNavState = {
+                    url: url.substr(0, t),
+                    title: this.__navigation.page.title,
+                    path: this.__navigation.path,
+                    params: this.__navigation.query,
+                    hash: urlHash
+                };
+
+                window.history.replaceState(pageState, pageState.title, location.href);
+
+                return;
+            }
+            else {
+                var state = <PageNavState>event.state;
+                if (urlWithoutHash.toLowerCase() == this.__navigation.url.toLowerCase())
+                    return;
+            }
+        }
 
         if (event.state) {
             var state = <PageNavState>event.state;
-            this.__refreshNavigation({ url: state.url, pushState: false });
+            this.nav({ url: state.url, hash: state.hash, pushState: false });
 
             return;
         }
-
-        var initNav = this.model.nav;
-        var pageState: PageNavState = {
-            url: initNav.url,
-            title: initNav.page.title
-        };
-        window.history.replaceState(pageState, pageState.title, initNav.url);
     }
     private __onHashChange(e: HashChangeEvent) {
         console.log("HashChange to " + e.newURL);
@@ -451,18 +493,18 @@ export class ApplicationBuilder {
     private __scripts: { [key: string]: () => Promise<any> } = {};
 
     addPageType(name: string, importFunc: () => Promise<any>) {
-        this.__pageTypes[name] = importFunc;
+        this.__pageTypes[name.toLowerCase()] = importFunc;
     }
     getPageType(name: string): Promise<{ default: any }> {
-        var f = this.__pageTypes[name];
+        var f = this.__pageTypes[name.toLowerCase()];
         return f();
     }
 
     addScript(name: string, importFunc: () => Promise<any>) {
-        this.__scripts[name] = importFunc;
+        this.__scripts[name.toLowerCase()] = importFunc;
     }
     getScript(name: string): Promise<{ default: any }> {
-        var f = this.__scripts[name];
+        var f = this.__scripts[name.toLowerCase()];
         return f();
     }
 }

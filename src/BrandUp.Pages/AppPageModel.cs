@@ -102,13 +102,12 @@ namespace BrandUp.Pages
             var httpContext = HttpContext;
             var httpRequest = httpContext.Request;
             var requestUrl = httpRequest.GetDisplayUrl();
+            var requestUri = new Uri(requestUrl);
+            var baseUri = requestUri.GetComponents(UriComponents.Scheme | UriComponents.Host | UriComponents.Port | UriComponents.Path, UriFormat.UriEscaped);
 
             if (httpRequest.Query.ContainsKey("handler"))
             {
-                var uri = new Uri(requestUrl);
-                var baseUri = uri.GetComponents(UriComponents.Scheme | UriComponents.Host | UriComponents.Port | UriComponents.Path, UriFormat.UriEscaped);
-
-                var query = QueryHelpers.ParseQuery(uri.Query);
+                var query = QueryHelpers.ParseQuery(requestUri.Query);
                 query.Remove("handler");
                 var qb = new QueryBuilder();
                 foreach (var kv in query)
@@ -121,6 +120,7 @@ namespace BrandUp.Pages
             {
                 IsAuthenticated = httpContext.User.Identity.IsAuthenticated,
                 Url = requestUrl,
+                Path = requestUri.GetComponents(UriComponents.Path, UriFormat.UriEscaped),
                 Query = new Dictionary<string, StringValues>(httpRequest.Query),
                 Data = new Dictionary<string, object>()
             };

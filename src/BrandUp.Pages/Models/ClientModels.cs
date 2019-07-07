@@ -24,6 +24,7 @@ namespace BrandUp.Pages.Models
         public bool EnableAdministration { get; set; }
         public bool IsAuthenticated { get; set; }
         public string Url { get; set; }
+        public string Path { get; set; }
         public IDictionary<string, StringValues> Query { get; set; }
         public string ValidationToken { get; set; }
         public PageClientModel Page { get; set; }

@@ -41,6 +41,21 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
     }
     protected onRenderContent() { }
 
+    buildUrl(queryParams: { [key: string]: string; }): string {
+        var params: { [key: string]: string; } = {};
+        for (let k in this.nav.params) {
+            params[k] = this.nav.params[k];
+        }
+
+        if (queryParams) {
+            for (let k in queryParams) {
+                params[k] = queryParams[k];
+            }
+        }
+
+        return this.app.uri(this.nav.path, params);
+    }
+
     attachDestroyFunc(f: () => void) {
         this.__destroyCallbacks.push(f);
     }

@@ -3,6 +3,9 @@
 export interface PageNavState {
     url: string;
     title: string;
+    path: string;
+    hash: string;
+    params: { [key: string]: string; };
 }
 
 export interface AppClientModel {
@@ -20,6 +23,8 @@ export interface NavigationModel {
     enableAdministration: boolean;
     isAuthenticated: boolean,
     url: string;
+    path: string;
+    query: { [key: string]: string; };
     validationToken: string;
     page: PageClientModel;
 }
@@ -44,6 +49,7 @@ export interface IApplication {
 
 export interface NavigationOptions {
     url: string;
+    hash?: string;
     pushState: boolean;
 }
 
