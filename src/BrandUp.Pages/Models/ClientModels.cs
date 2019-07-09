@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace BrandUp.Pages.Models
@@ -25,7 +24,7 @@ namespace BrandUp.Pages.Models
         public bool IsAuthenticated { get; set; }
         public string Url { get; set; }
         public string Path { get; set; }
-        public IDictionary<string, StringValues> Query { get; set; }
+        public IDictionary<string, object> Query { get; set; }
         public string ValidationToken { get; set; }
         public PageClientModel Page { get; set; }
         [JsonExtensionData]

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -121,9 +120,19 @@ namespace BrandUp.Pages
                 IsAuthenticated = httpContext.User.Identity.IsAuthenticated,
                 Url = requestUrl,
                 Path = requestUri.GetComponents(UriComponents.Path, UriFormat.UriEscaped),
-                Query = new Dictionary<string, StringValues>(httpRequest.Query),
+                Query = new Dictionary<string, object>(),
                 Data = new Dictionary<string, object>()
             };
+
+            foreach (var kv in httpRequest.Query)
+            {
+                var value = kv.Value;
+                if (value.Count == 1)
+                    navModel.Query.Add(kv.Key, value[0]);
+                else if (value.Count > 1)
+                    navModel.Query.Add(kv.Key, value.ToArray());
+            }
+
             navModel.Query.Remove("handler");
 
             var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
