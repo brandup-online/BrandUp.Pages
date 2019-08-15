@@ -41,7 +41,7 @@ namespace BrandUp.Pages.TagHelpers
 
                 if (string.Equals(context.TagName, "head", StringComparison.OrdinalIgnoreCase))
                 {
-                    output.PostContent.AppendHtml($"    <title>\"{appPageModel.Title}\"</title>{Environment.NewLine}");
+                    output.PostContent.AppendHtml($"    <title>{appPageModel.Title}</title>{Environment.NewLine}");
 
                     if (!string.IsNullOrEmpty(appPageModel.Description))
                         output.PostContent.AppendHtml($"    <meta name=\"description\" content=\"{appPageModel.Description}\" />{Environment.NewLine}");
