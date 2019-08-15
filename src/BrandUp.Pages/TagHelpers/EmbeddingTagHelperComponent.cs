@@ -41,9 +41,12 @@ namespace BrandUp.Pages.TagHelpers
 
                 if (string.Equals(context.TagName, "head", StringComparison.OrdinalIgnoreCase))
                 {
+                    if (!string.IsNullOrEmpty(appPageModel.CanonicalLink))
+                        output.PostContent.AppendHtml($"    <link rel=\"canonical\" href=\"{appPageModel.CanonicalLink}\" />{Environment.NewLine}");
+
                     var appClientModel = await appPageModel.GetAppClientModelAsync(ViewContext.HttpContext.RequestAborted);
 
-                    output.PostContent.AppendHtml("<script type=\"text/javascript\">var appInitOptions = " + jsonHelper.Serialize(appClientModel) + "</script>");
+                    output.PostContent.AppendHtml($"    <script type=\"text/javascript\">var appInitOptions = {jsonHelper.Serialize(appClientModel)}</script>{Environment.NewLine}");
                 }
             }
         }

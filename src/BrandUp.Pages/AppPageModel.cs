@@ -25,6 +25,7 @@ namespace BrandUp.Pages
         public virtual string Keywords => null;
         public virtual string CssClass => null;
         public virtual string ScriptName => null;
+        public virtual string CanonicalLink => null;
 
         #endregion
 
@@ -161,6 +162,9 @@ namespace BrandUp.Pages
                 Title = Title,
                 CssClass = CssClass,
                 ScriptName = ScriptName,
+                CanonicalLink = CanonicalLink,
+                Description = Description,
+                Keywords = Keywords,
                 Data = new Dictionary<string, object>()
             };
 

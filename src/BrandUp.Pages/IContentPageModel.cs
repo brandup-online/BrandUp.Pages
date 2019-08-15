@@ -7,5 +7,6 @@
         string Keywords { get; }
         string CssClass { get; }
         string ScriptName { get; }
+        string CanonicalLink { get; }
     }
 }
