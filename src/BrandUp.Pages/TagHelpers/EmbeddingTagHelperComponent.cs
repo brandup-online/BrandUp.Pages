@@ -41,6 +41,14 @@ namespace BrandUp.Pages.TagHelpers
 
                 if (string.Equals(context.TagName, "head", StringComparison.OrdinalIgnoreCase))
                 {
+                    output.PostContent.AppendHtml($"    <title>\"{appPageModel.Title}\"</title>{Environment.NewLine}");
+
+                    if (!string.IsNullOrEmpty(appPageModel.Description))
+                        output.PostContent.AppendHtml($"    <meta name=\"description\" content=\"{appPageModel.Description}\" />{Environment.NewLine}");
+
+                    if (!string.IsNullOrEmpty(appPageModel.Keywords))
+                        output.PostContent.AppendHtml($"    <meta name=\"keywords\" content=\"{appPageModel.Keywords}\" />{Environment.NewLine}");
+
                     if (!string.IsNullOrEmpty(appPageModel.CanonicalLink))
                         output.PostContent.AppendHtml($"    <link rel=\"canonical\" href=\"{appPageModel.CanonicalLink}\" />{Environment.NewLine}");
 

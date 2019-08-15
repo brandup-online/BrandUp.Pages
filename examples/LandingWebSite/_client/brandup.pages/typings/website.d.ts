@@ -33,6 +33,9 @@ export interface PageClientModel {
     title: string;
     cssClass: string;
     scriptName: string;
+    canonicalLink: string;
+    description: string;
+    keywords: string;
 }
 
 export interface IApplication {
@@ -51,10 +54,13 @@ export interface NavigationOptions {
     url: string;
     hash?: string;
     pushState: boolean;
+    notRenderPage?: boolean;
+    success?: () => void;
 }
 
 export interface IPage {
     app: IApplication;
 
+    update(nav: PageNavState, model: any)
     refreshScripts();
 }

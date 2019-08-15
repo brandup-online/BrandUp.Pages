@@ -1,10 +1,10 @@
-﻿import { UIElement, DOM, UIControl, AjaxQueue } from "brandup-ui";
+﻿import { UIElement, DOM, AjaxQueue } from "brandup-ui";
 import { PageClientModel, PageNavState, IPage, IApplication } from "../typings/website";
 
 class Page<TModel extends PageClientModel> extends UIElement implements IPage {
+    private __nav: PageNavState;
+    private __model: TModel;
     readonly app: IApplication;
-    readonly nav: PageNavState;
-    readonly model: TModel;
     readonly queue: AjaxQueue;
     private __destroyCallbacks: Array<() => void> = [];
     private __scripts: Array<UIElement> = [];
@@ -13,14 +13,14 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         super();
 
         this.app = app;
-        this.nav = nav;
-        this.model = model;
+        this.__nav = nav;
+        this.__model = model;
         this.queue = new AjaxQueue();
         this.setElement(element);
 
-        if (this.model.cssClass) {
-            document.body.classList.add(this.model.cssClass);
-            this.attachDestroyFunc(() => { document.body.classList.remove(this.model.cssClass); });
+        if (this.__model.cssClass) {
+            document.body.classList.add(this.__model.cssClass);
+            this.attachDestroyFunc(() => { document.body.classList.remove(this.__model.cssClass); });
         }
 
         this.renderWebsiteToolbar();
@@ -30,7 +30,16 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         this.onRenderContent();
     }
 
-    get typeName(): string { return "BrandUpPages.Page" }
+    get typeName(): string { return "BrandUpPages.Page"; }
+    get nav(): PageNavState { return this.__nav; }
+    get model(): TModel { return this.__model; }
+
+    update(nav: PageNavState, model: TModel) {
+        this.__nav = nav;
+        this.__model = model;
+
+        this.onUpdate(nav, model);
+    }
 
     protected renderWebsiteToolbar() {
         if (this.app.navigation.enableAdministration) {
@@ -40,11 +49,12 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         }
     }
     protected onRenderContent() { }
+    protected onUpdate(nav: PageNavState, model: TModel) { }
 
-    buildUrl(queryParams: { [key: string]: string; }): string {
+    buildUrl(queryParams: { [key: string]: any; }): string {
         var params: { [key: string]: string; } = {};
-        for (let k in this.nav.params) {
-            params[k] = this.nav.params[k];
+        for (let k in this.__nav.params) {
+            params[k] = this.__nav.params[k];
         }
 
         if (queryParams) {
@@ -53,7 +63,7 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
             }
         }
 
-        return this.app.uri(this.nav.path, params);
+        return this.app.uri(this.__nav.path, params);
     }
 
     attachDestroyFunc(f: () => void) {
@@ -96,7 +106,7 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         }
 
         this.queue.destroy();
-        
+
         super.destroy();
     }
 }

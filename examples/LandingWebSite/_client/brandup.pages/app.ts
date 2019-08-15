@@ -11,6 +11,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     private options: AppSetupOptions;
     page: Page<PageClientModel> = null;
     private linkClickFunc: () => void;
+    private keyDownUpFunc: () => void;
     private __builder: ApplicationBuilder;
     private __requestVerificationToken: HTMLInputElement;
     private __progressElem: HTMLElement;
@@ -43,6 +44,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.defineEvent("pageContentLoaded", { cancelable: false, bubbles: true });
 
         this.linkClickFunc = Utility.createDelegate(this, this.__onClickAppLink);
+        this.keyDownUpFunc = Utility.createDelegate(this, this.__onKeyDownUp);
     }
 
     get typeName(): string { return "Application" }
@@ -67,7 +69,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         };
 
         this.__navigation = initNav;
-        
+
         if (window.history) {
             window.addEventListener("popstate", Utility.createDelegate(this, this.__onPopState));
             window.addEventListener("hashchange", Utility.createDelegate(this, this.__onHashChange));
@@ -76,6 +78,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         }
 
         document.body.addEventListener("click", this.linkClickFunc, false);
+        document.body.addEventListener("keydown", this.keyDownUpFunc, false);
+        document.body.addEventListener("keyup", this.keyDownUpFunc, false);
         document.body.appendChild(this.__progressElem = DOM.tag("div", { class: "bp-page-loader" }));
 
         this.__renderPage(pageState, initNav.page, false);
@@ -83,6 +87,8 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
     load() { }
     destroy() {
         document.body.removeEventListener("click", this.linkClickFunc, false);
+        document.body.removeEventListener("keydown", this.keyDownUpFunc, false);
+        document.body.removeEventListener("keyup", this.keyDownUpFunc, false);
     }
 
     request(options: AjaxRequestOptions) {
@@ -139,6 +145,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             throw new Error("target not set");
 
         var url: string = null;
+        var pushState = true;
         var targetElem: HTMLElement = null;
         if (Utility.isString(target))
             url = target;
@@ -148,12 +155,15 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                 url = targetElem.getAttribute("href");
             else
                 throw "Не удалось получить Url адрес для перехода.";
+
+            if (targetElem.hasAttribute("data-url-replace"))
+                pushState = false;
         }
 
         if (!url)
-            url = this.model.baseUrl;
+            url = location.href;
 
-        this.nav({ url: url, pushState: true });
+        this.nav({ url: url, pushState: pushState });
     }
     nav(options: NavigationOptions) {
         var isCancelled = this.raiseEvent("pageNavigating", options);
@@ -162,7 +172,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             return;
         }
 
-        let { url, hash, pushState } = options;
+        let { url, hash, pushState, notRenderPage } = options;
         if (!url) {
             url = location.href;
             if (url.lastIndexOf("#") > 0)
@@ -178,19 +188,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.__navCounter++;
         var navSequence = this.__navCounter;
 
-        this.element.classList.remove("bp-state-loaded");
-        this.element.classList.add("bp-state-loading");
-
-        window.clearTimeout(this.__progressTimeout);
-        window.clearInterval(this.__progressInterval);
-
-        this.__progressStart = Date.now();
-        var pw = 0;
-        this.__progressInterval = window.setInterval(() => {
-            this.__progressElem.style.display = "block";
-            this.__progressElem.style.width = pw + "%";
-            pw++;
-        }, 20);
+        this.__beginLoading();
 
         this.request({
             url: url,
@@ -214,7 +212,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                         this.__navigation = data;
 
                         var pageModel = data.page;
-                        var pageState: PageNavState = {
+                        var navState: PageNavState = {
                             url: data.url,
                             title: pageModel.title,
                             path: data.path,
@@ -227,10 +225,10 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
                         if (window.history && window.history.pushState) {
                             if (pushState) {
-                                window.history.pushState(pageState, pageState.title, navUrl);
+                                window.history.pushState(navState, navState.title, navUrl);
                             }
                             else
-                                window.history.replaceState(pageState, pageState.title, navUrl);
+                                window.history.replaceState(navState, navState.title, navUrl);
                         }
                         else {
                             location.href = navUrl;
@@ -239,9 +237,18 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
                         document.title = pageModel.title ? pageModel.title : "";
 
-                        this.raiseEvent("pageNavigated", pageState);
+                        this.raiseEvent("pageNavigated", navState);
 
-                        this.__renderPage(pageState, pageModel, true);
+                        if (options.success)
+                            options.success();
+
+                        if (!notRenderPage)
+                            this.__renderPage(navState, pageModel, true);
+                        else {
+                            this.page.update(navState, pageModel);
+
+                            this.__endLoading();
+                        }
 
                         break;
                     }
@@ -274,11 +281,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.page.destroy();
         this.page = null;
 
-        DOM.empty(this.__contentBodyElem);
-        this.__contentBodyElem.insertAdjacentHTML("afterbegin", html ? html : "");
-        Application.nodeScriptReplace(this.__contentBodyElem);
-
-        this.__loadPageScript(navState, pageModel);
+        this.__loadPageScript(navState, pageModel, html ? html : "", false);
     }
 
     private __renderPage(pageState: PageNavState, pageModel: PageClientModel, needLoadContent: boolean) {
@@ -292,7 +295,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         if (needLoadContent)
             this.__loadContent(pageState, pageModel);
         else
-            this.__loadPageScript(pageState, pageModel);
+            this.__loadPageScript(pageState, pageModel, null, true);
     }
     private __loadContent(pageState: PageNavState, pageModel: PageClientModel) {
         var navSequence = this.__navCounter;
@@ -306,13 +309,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
                 switch (status) {
                     case 200: {
-                        window.scrollTo(0, 0);
-
-                        DOM.empty(this.__contentBodyElem);
-                        this.__contentBodyElem.insertAdjacentHTML("afterbegin", data ? data : "");
-                        Application.nodeScriptReplace(this.__contentBodyElem);
-
-                        this.__loadPageScript(pageState, pageModel);
+                        this.__loadPageScript(pageState, pageModel, data ? data : "", true);
 
                         this.raiseEvent("pageContentLoaded");
 
@@ -330,18 +327,54 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             }
         });
     }
-    private __loadPageScript(pageState: PageNavState, pageModel: PageClientModel) {
+    private __loadPageScript(pageState: PageNavState, pageModel: PageClientModel, contentHtml: string, scrollToTop: boolean) {
         var pageScript = pageModel.scriptName;
         if (!pageScript)
             pageScript = this.options.defaultPageScript;
 
-        this.__builder.getPageType(pageScript).then((pageType) => {
-            this.__createPage(pageType.default, pageState, pageModel);
-        });
+        this.__builder.getPageType(pageScript)
+            .then((pageType) => {
+                if (contentHtml !== null) {
+                    if (scrollToTop)
+                        window.scrollTo(0, 0);
+
+                    DOM.empty(this.__contentBodyElem);
+                    this.__contentBodyElem.insertAdjacentHTML("afterbegin", contentHtml);
+                    Application.nodeScriptReplace(this.__contentBodyElem);
+                }
+
+                this.__createPage(pageType.default, pageState, pageModel);
+            })
+            .catch(() => {
+                location.reload();
+            });
     }
     private __createPage(pageType: any, pageState: PageNavState, pageModel: PageClientModel) {
         this.page = new pageType(this, pageState, pageModel, this.__contentBodyElem);
-        
+
+        this.__endLoading();
+
+        this.raiseEvent("pageLoaded");
+    }
+
+    private __beginLoading() {
+        this.__progressElem.style.width = "0%";
+        this.__progressElem.classList.add("show");
+
+        this.element.classList.remove("bp-state-loaded");
+        this.element.classList.add("bp-state-loading");
+
+        window.clearTimeout(this.__progressTimeout);
+        window.clearInterval(this.__progressInterval);
+
+        this.__progressStart = Date.now();
+        var pw = 0;
+        this.__progressInterval = window.setInterval(() => {
+            this.__progressElem.style.width = pw + "%";
+            pw++;
+        }, 20);
+    }
+    private __endLoading() {
         document.body.classList.remove("bp-state-loading");
         document.body.classList.add("bp-state-loaded");
 
@@ -353,13 +386,15 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             window.clearInterval(this.__progressInterval);
             this.__progressElem.style.width = "100%";
 
+            this.__progressElem.classList.remove("show");
+
             this.__progressTimeout = window.setTimeout(() => {
-                this.__progressElem.style.display = "none";
+                this.__progressElem.style.width = "0%";
             }, 200);
         }, d);
-
-        this.raiseEvent("pageLoaded");
     }
+
+    private _ctrlPressed: boolean = false;
 
     private __onPopState(event: PopStateEvent) {
         event.preventDefault();
@@ -417,6 +452,9 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
                 return true;
         }
 
+        if (this._ctrlPressed)
+            return true;
+
         if (elem.hasAttribute("target")) {
             let target = elem.getAttribute("target");
             if (target === "_blank")
@@ -430,6 +468,9 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.navigate(elem);
 
         return false;
+    }
+    private __onKeyDownUp(e: KeyboardEvent) {
+        this._ctrlPressed = e.ctrlKey;
     }
 
     static nodeScriptReplace(node: Node) {
