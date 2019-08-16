@@ -46,5 +46,12 @@ namespace BrandUp.Pages.Files
         {
             return repository.DeleteFileAsync(fileId, cancellationToken);
         }
+        public string GetFileExtension(IFile file)
+        {
+            if (file == null)
+                throw new ArgumentNullException(nameof(file));
+
+            return Path.GetExtension(file.Name);
+        }
     }
 }

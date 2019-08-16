@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
@@ -35,18 +36,30 @@ namespace BrandUp.Pages.Controllers
             if (file == null)
                 return NotFound();
 
+            DateTime cacheFileDate;
             var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}");
             if (!System.IO.File.Exists(fileTempPath))
             {
                 using (var fileStream = await fileService.ReadFileAsync(fileId))
                 using (var tempFileStream = System.IO.File.OpenWrite(fileTempPath))
                     await fileStream.CopyToAsync(tempFileStream);
+
+                cacheFileDate = System.IO.File.GetLastWriteTimeUtc(fileTempPath);
             }
+            else
+            {
+                cacheFileDate = System.IO.File.GetLastWriteTimeUtc(fileTempPath);
+
+                if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
+                    return StatusCode((int)HttpStatusCode.NotModified);
+            }
+
+            HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
 
             return new FileStreamResult(System.IO.File.OpenRead(fileTempPath), file.ContentType);
         }
 
-        [HttpGet("_image/{fileId}_{width}_{height}.jpg"), ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Client, NoStore = false)]
+        [HttpGet("_image/{fileId}_{width}_{height}.jpg")]
         public async Task<IActionResult> Image(Guid fileId, int width = 0, int height = 0)
         {
             var file = await fileService.FindFileByIdAsync(fileId);
@@ -59,27 +72,53 @@ namespace BrandUp.Pages.Controllers
                 height = 800;
             }
 
+            DateTime cacheFileDate;
             var imageResizer = HttpContext.RequestServices.GetService<Images.IImageResizer>();
             if (imageResizer != null)
             {
                 var imageTempPath = System.IO.Path.Combine(imagesTempPath, $"{fileId}-{width}-{height}.jpg");
                 if (System.IO.File.Exists(imageTempPath))
+                {
+                    cacheFileDate = System.IO.File.GetLastWriteTimeUtc(imageTempPath);
+
+                    if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
+                        return StatusCode((int)HttpStatusCode.NotModified);
+
+                    HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
+
                     return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
+                }
 
                 using (var fileStream = await fileService.ReadFileAsync(fileId))
                 using (var tempFileStream = System.IO.File.OpenWrite(imageTempPath))
                     await imageResizer.Resize(fileStream, width, height, tempFileStream);
 
+                cacheFileDate = System.IO.File.GetLastWriteTimeUtc(imageTempPath);
+                HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
+
                 return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
             }
 
-            var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}");
+            var fileExtension = fileService.GetFileExtension(file);
+
+            var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}{fileExtension}");
             if (!System.IO.File.Exists(fileTempPath))
             {
                 using (var fileStream = await fileService.ReadFileAsync(fileId))
                 using (var tempFileStream = System.IO.File.OpenWrite(fileTempPath))
                     await fileStream.CopyToAsync(tempFileStream);
+
+                cacheFileDate = System.IO.File.GetLastWriteTimeUtc(fileTempPath);
             }
+            else
+            {
+                cacheFileDate = System.IO.File.GetLastWriteTimeUtc(fileTempPath);
+
+                if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
+                    return StatusCode((int)HttpStatusCode.NotModified);
+            }
+
+            HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
 
             return new FileStreamResult(System.IO.File.OpenRead(fileTempPath), file.ContentType);
         }

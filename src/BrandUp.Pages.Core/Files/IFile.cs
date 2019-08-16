@@ -6,6 +6,7 @@ namespace BrandUp.Pages.Files
     {
         Guid Id { get; }
         string ContentType { get; }
+        string Name { get; }
         Guid PageId { get; }
     }
 }

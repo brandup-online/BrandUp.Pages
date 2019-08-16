@@ -11,7 +11,7 @@ namespace BrandUp.Pages.MongoDb.Documents
 
         public Guid Id { get; }
         public string ContentType { get => (string)Data["contentType"]; private set => Data["contentType"] = value; }
-        public string FileName { get => (string)Data["fileName"]; private set => Data["fileName"] = value; }
+        public string Name { get => (string)Data["fileName"]; private set => Data["fileName"] = value; }
         public Guid PageId { get => (Guid)Data["pageId"]; private set => Data["pageId"] = value; }
 
         public PageFileDocument(Guid pageId, string fileName, string contentType)
@@ -19,7 +19,7 @@ namespace BrandUp.Pages.MongoDb.Documents
             Data = new Dictionary<string, object>();
             Id = Guid.NewGuid();
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
-            FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
+            Name = fileName ?? throw new ArgumentNullException(nameof(fileName));
             PageId = pageId;
         }
         public PageFileDocument(GridFSFileInfo<Guid> fileInfo)
