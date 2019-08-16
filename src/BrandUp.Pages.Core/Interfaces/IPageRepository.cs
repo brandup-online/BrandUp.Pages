@@ -12,6 +12,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> FindPageByPathAsync(string path, CancellationToken cancellationToken = default);
         Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
+        Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<bool> HasPagesAsync(Guid сollectionId, CancellationToken cancellationToken = default);
         Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default);

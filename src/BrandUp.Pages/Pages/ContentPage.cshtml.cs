@@ -71,7 +71,7 @@ namespace BrandUp.Pages
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 
-                    context.Result = RedirectPermanent(await pageLinkGenerator.GetUrlAsync(page));
+                    context.Result = RedirectPermanent(await pageLinkGenerator.GetPathAsync(page));
                     return;
                 }
             }
@@ -112,7 +112,7 @@ namespace BrandUp.Pages
                 else
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
-                    var redirectUrl = await pageLinkGenerator.GetUrlAsync(url.Redirect.Path);
+                    var redirectUrl = await pageLinkGenerator.GetPathAsync(url.Redirect.Path);
 
                     if (url.Redirect.IsPermament)
                         context.Result = RedirectPermanent(redirectUrl);

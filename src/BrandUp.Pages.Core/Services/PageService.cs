@@ -168,6 +168,10 @@ namespace BrandUp.Pages.Services
 
             return await pageRepositiry.GetPagesAsync(options, cancellationToken);
         }
+        public Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default)
+        {
+            return pageRepositiry.GetPublishedPagesAsync(cancellationToken);
+        }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             if (title == null)

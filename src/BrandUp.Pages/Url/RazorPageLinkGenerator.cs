@@ -21,24 +21,41 @@ namespace BrandUp.Pages.Url
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
         }
 
-        public Task<string> GetUrlAsync(IPage page, CancellationToken cancellationToken = default)
+        public Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            string pageUrl;
-            string urlPath;
-            var httpContext = httpContextAccessor.HttpContext;
-            if (pageUrlHelper.IsDefaultUrlPath(page.UrlPath))
-                urlPath = string.Empty;
-            else
-                urlPath = pageUrlHelper.NormalizeUrlPath(page.UrlPath);
+            var urlPath = GetPagePath(page);
 
-            pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { url = urlPath });
+            var httpContext = httpContextAccessor.HttpContext;
+            var pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
         }
-        public Task<string> GetUrlAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
+
+        public Task<string> GetUriAsync(IPage page, CancellationToken cancellationToken = default)
+        {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+
+            var urlPath = GetPagePath(page);
+
+            var httpContext = httpContextAccessor.HttpContext;
+            var pageUrl = linkGenerator.GetUriByPage(httpContext, RazorPagePath, null, new { url = urlPath });
+
+            return Task.FromResult(pageUrl);
+        }
+
+        private string GetPagePath(IPage page)
+        {
+            if (pageUrlHelper.IsDefaultUrlPath(page.UrlPath))
+                return string.Empty;
+            else
+                return pageUrlHelper.NormalizeUrlPath(page.UrlPath);
+        }
+
+        public Task<string> GetPathAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
         {
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));
@@ -47,20 +64,45 @@ namespace BrandUp.Pages.Url
 
             return Task.FromResult(url);
         }
-        public Task<string> GetUrlAsync(string pagePath, CancellationToken cancellationToken = default)
+
+        public Task<string> GetUriAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
+        {
+            if (pageEditSession == null)
+                throw new ArgumentNullException(nameof(pageEditSession));
+
+            var url = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+
+            return Task.FromResult(url);
+        }
+
+        public Task<string> GetPathAsync(string pagePath, CancellationToken cancellationToken = default)
         {
             if (pagePath == null)
                 pagePath = string.Empty;
 
-            string urlPath;
-            if (pageUrlHelper.IsDefaultUrlPath(pagePath))
-                urlPath = string.Empty;
-            else
-                urlPath = pageUrlHelper.NormalizeUrlPath(pagePath);
-
+            var urlPath = NormalizePagePath(pagePath);
             var pageUrl = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
+        }
+
+        public Task<string> GetUriAsync(string pagePath, CancellationToken cancellationToken = default)
+        {
+            if (pagePath == null)
+                pagePath = string.Empty;
+
+            var urlPath = NormalizePagePath(pagePath);
+            var pageUrl = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { url = urlPath });
+
+            return Task.FromResult(pageUrl);
+        }
+
+        private string NormalizePagePath(string pagePath)
+        {
+            if (pageUrlHelper.IsDefaultUrlPath(pagePath))
+                return string.Empty;
+            else
+                return pageUrlHelper.NormalizeUrlPath(pagePath);
         }
     }
 }

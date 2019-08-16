@@ -9,7 +9,7 @@ namespace Microsoft.AspNetCore.Mvc
         public static async Task<string> PagePathAsync(this IUrlHelper urlHelper, string path)
         {
             var pageLinkGenerator = urlHelper.ActionContext.HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
-            return await pageLinkGenerator.GetUrlAsync(path);
+            return await pageLinkGenerator.GetPathAsync(path);
         }
     }
 }

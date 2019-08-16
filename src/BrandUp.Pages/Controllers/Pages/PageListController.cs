@@ -106,7 +106,7 @@ namespace BrandUp.Pages.Controllers
                 CreatedDate = item.CreatedDate,
                 Title = item.Header,
                 Status = item.IsPublished ? PageStatus.Published : PageStatus.Draft,
-                Url = await pageLinkGenerator.GetUrlAsync(item)
+                Url = await pageLinkGenerator.GetPathAsync(item)
             };
         }
 
@@ -131,7 +131,7 @@ namespace BrandUp.Pages.Controllers
             if (pageCollection.PageId.HasValue)
             {
                 IPage page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
-                pageUrl = await pageLinkGenerator.GetUrlAsync(page);
+                pageUrl = await pageLinkGenerator.GetPathAsync(page);
             }
 
             return new PageCollectionModel
@@ -152,7 +152,7 @@ namespace BrandUp.Pages.Controllers
             {
                 Id = page.Id,
                 Header = page.Header,
-                Url = await pageLinkGenerator.GetUrlAsync(page)
+                Url = await pageLinkGenerator.GetPathAsync(page)
             };
         }
     }

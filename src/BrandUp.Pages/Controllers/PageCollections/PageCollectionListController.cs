@@ -87,7 +87,7 @@ namespace BrandUp.Pages.Controllers
             if (item.PageId.HasValue)
             {
                 IPage page = await pageService.FindPageByIdAsync(item.PageId.Value);
-                pageUrl = await pageLinkGenerator.GetUrlAsync(page);
+                pageUrl = await pageLinkGenerator.GetPathAsync(page);
             }
 
             return new PageCollectionModel

@@ -24,7 +24,7 @@ namespace BrandUp.Pages.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            var pagePath = await pageLinkGenerator.GetUrlAsync(PagePath);
+            var pagePath = await pageLinkGenerator.GetPathAsync(PagePath);
 
             output.Attributes.SetAttribute("href", pagePath);
             output.AddClass("applink", htmlEncoder);

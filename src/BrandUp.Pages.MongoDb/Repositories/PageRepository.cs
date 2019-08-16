@@ -157,6 +157,20 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return cursor.ToEnumerable(cancellationToken);
         }
+        public async Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default)
+        {
+            var filters = new List<FilterDefinition<PageDocument>>
+            {
+                Builders<PageDocument>.Filter.Eq(it => it.Status, PageStatus.Published)
+            };
+
+            var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.And(filters));
+            findDefinition = findDefinition.SortBy(it => it.CreatedDate);
+
+            var cursor = await findDefinition.ToCursorAsync(cancellationToken);
+
+            return cursor.ToEnumerable(cancellationToken);
+        }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false }));

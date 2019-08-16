@@ -71,6 +71,10 @@ namespace BrandUp.Pages.Repositories
             var pages = pageHierarhy.OnGetPages(options.CollectionId);
             return Task.FromResult(pages);
         }
+        public Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult<IEnumerable<IPage>>(pages.Values.Where(it => it.IsPublished));
+        }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             var result = pages.Values.AsQueryable().Where(it => it.Header.Contains(title));

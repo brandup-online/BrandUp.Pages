@@ -49,7 +49,7 @@ namespace BrandUp.Pages.TagHelpers
                             return;
                         if (!page.IsPublished)
                             return;
-                        url = await pageLinkGenerator.GetUrlAsync(page);
+                        url = await pageLinkGenerator.GetPathAsync(page);
 
                         output.AddClass("applink", htmlEncoder);
 

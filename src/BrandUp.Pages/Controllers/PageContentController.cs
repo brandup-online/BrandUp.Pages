@@ -45,7 +45,7 @@ namespace BrandUp.Pages.Controllers
             if (currentEdit == null)
                 currentEdit = await pageContentService.BeginEditAsync(page, HttpContext.RequestAborted);
 
-            result.Url = await pageLinkGenerator.GetUrlAsync(currentEdit, HttpContext.RequestAborted);
+            result.Url = await pageLinkGenerator.GetPathAsync(currentEdit, HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -167,7 +167,7 @@ namespace BrandUp.Pages.Controllers
 
             await pageContentService.CommitEditAsync(editSession);
 
-            return Ok(await pageLinkGenerator.GetUrlAsync(page));
+            return Ok(await pageLinkGenerator.GetPathAsync(page));
         }
 
         [HttpPost("discard")]
@@ -183,7 +183,7 @@ namespace BrandUp.Pages.Controllers
 
             await pageContentService.DiscardEditAsync(editSession);
 
-            return Ok(await pageLinkGenerator.GetUrlAsync(page));
+            return Ok(await pageLinkGenerator.GetPathAsync(page));
         }
     }
 }
