@@ -8,6 +8,8 @@ namespace BrandUp.Pages.TagHelpers
 {
     public class EmbeddingTagHelperComponent : TagHelperComponent
     {
+        const string LoadingClass = "bp-state-loading";
+
         private readonly IJsonHelper jsonHelper;
 
         [HtmlAttributeNotBound, ViewContext]
@@ -24,19 +26,19 @@ namespace BrandUp.Pages.TagHelpers
             {
                 if (string.Equals(context.TagName, "body", StringComparison.OrdinalIgnoreCase))
                 {
+                    string cssClass = null;
+                    if (output.Attributes.TryGetAttribute("class", out TagHelperAttribute attribute))
+                        cssClass = (string)attribute.Value;
+
+                    if (!string.IsNullOrEmpty(cssClass))
+                        cssClass += " " + LoadingClass;
+                    else
+                        cssClass = LoadingClass;
+
                     if (!string.IsNullOrEmpty(appPageModel.CssClass))
-                    {
-                        string cssClass = null;
-                        if (output.Attributes.TryGetAttribute("class", out TagHelperAttribute attribute))
-                            cssClass = (string)attribute.Value;
+                        cssClass += " " + appPageModel.CssClass;
 
-                        if (!string.IsNullOrEmpty(cssClass))
-                            cssClass += " " + appPageModel.CssClass;
-                        else
-                            cssClass = appPageModel.CssClass;
-
-                        output.Attributes.SetAttribute("class", cssClass);
-                    }
+                    output.Attributes.SetAttribute("class", cssClass);
                 }
 
                 if (string.Equals(context.TagName, "head", StringComparison.OrdinalIgnoreCase))
