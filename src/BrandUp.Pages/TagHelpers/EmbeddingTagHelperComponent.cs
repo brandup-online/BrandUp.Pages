@@ -28,7 +28,7 @@ namespace BrandUp.Pages.TagHelpers
                 {
                     string cssClass = null;
                     if (output.Attributes.TryGetAttribute("class", out TagHelperAttribute attribute))
-                        cssClass = (string)attribute.Value;
+                        cssClass = attribute.Value.ToString();
 
                     if (!string.IsNullOrEmpty(cssClass))
                         cssClass += " " + LoadingClass;
