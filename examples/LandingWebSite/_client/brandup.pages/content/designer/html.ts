@@ -14,7 +14,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             elem.setAttribute("data-placeholder", this.options.placeholder);
 
         createEditor(elem, {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
+            toolbar: ['heading', '|', 'bold', 'italic', 'strikethrough', 'link', 'bulletedList', 'numberedList'],
             placeholder: this.options.placeholder
         }).then(editor => {
             this.__editor = editor;
@@ -37,7 +37,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
                 this.__editor.model.document.differ.reset();
                 this._onChanged();
             }
-            
+
             this.__refreshUI();
         });
     }

@@ -29,7 +29,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
             this.__value.setAttribute("data-placeholder", this.options.placeholder);
 
         createEditor(this.__value, {
-            toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
+            toolbar: ['heading', '|', 'bold', 'italic', 'strikethrough', 'link', 'bulletedList', 'numberedList'],
             placeholder: this.options.placeholder
         }).then(editor => {
             this.__editor = editor;
