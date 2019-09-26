@@ -1,20 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>BrandUp.Pages</RootNamespace>
     <Authors>Dmitry Kovyazin</Authors>
     <Product>BrandUp.Pages</Product>
     <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
-    <LangVersion>7.3</LangVersion>
     <Company>BrandUp.online</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

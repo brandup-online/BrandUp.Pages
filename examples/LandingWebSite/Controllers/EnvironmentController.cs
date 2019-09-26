@@ -28,7 +28,7 @@ namespace LandingWebSite.Controllers
                 DisplayName = ad.DisplayName
             }).ToList();
 
-            return Json(routes, new Newtonsoft.Json.JsonSerializerSettings { Formatting = Newtonsoft.Json.Formatting.Indented });
+            return Json(routes);
         }
 
         private class RouteModel

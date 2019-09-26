@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace BrandUp.Pages.Models
 {
@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Models
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Title { get; set; }
-        [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public PageStatus Status { get; set; }
         public string Url { get; set; }
     }

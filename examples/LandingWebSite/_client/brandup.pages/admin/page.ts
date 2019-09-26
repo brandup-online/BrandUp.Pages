@@ -21,7 +21,7 @@ export class PageToolbar extends UIElement {
     constructor(page: ContentPage) {
         super();
 
-        page.attachDestroyFunc(() => { this.destroy(); }); 
+        page.attachDestroyFunc(() => { this.destroy(); });
 
         var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
         let isLoading = false;
@@ -184,7 +184,7 @@ export class PageToolbar extends UIElement {
                 }
             };
         }
-        
+
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
     }

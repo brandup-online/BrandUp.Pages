@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Files;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
@@ -73,7 +74,7 @@ namespace BrandUp.Pages.Content.Fields
 
     public class ImageFieldFormValue
     {
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ImageValueType ValueType { get; set; }
         public string Value { get; set; }
         public string PreviewUrl { get; set; }

@@ -55,6 +55,7 @@ export interface NavigationOptions {
     hash?: string;
     pushState: boolean;
     notRenderPage?: boolean;
+    scrollToTop?: boolean;
     success?: () => void;
 }
 

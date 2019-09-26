@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using System.Globalization;
 using System.Text.Encodings.Web;
@@ -26,11 +26,8 @@ namespace LandingWebSite
         {
             #region Web
 
-            services
-                .AddMvc(options => { })
-                .AddRazorOptions(options => { })
-                .AddViewOptions(options => { })
-                .SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddRazorPages();
+            services.AddControllers();
 
             services.Configure<WebEncoderOptions>(options =>
             {
@@ -98,16 +95,17 @@ namespace LandingWebSite
             services.AddHostedService<_migrations.MigrationService>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
+#pragma warning disable CS0618 // Type or member is obsolete
                 app.UseWebpackDevMiddleware(new Microsoft.AspNetCore.SpaServices.Webpack.WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true
                 });
-
-                app.UseDeveloperExceptionPage();
+#pragma warning restore CS0618 // Type or member is obsolete
             }
             else
             {
@@ -115,10 +113,14 @@ namespace LandingWebSite
             }
 
             app.UseHttpsRedirection();
-            app.UseAuthentication();
             app.UseStaticFiles();
-
-            app.UseMvc();
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+            });
         }
     }
 }

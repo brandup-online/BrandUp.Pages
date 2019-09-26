@@ -15,7 +15,15 @@ class Page<TModel extends PageClientModel> extends UIElement implements IPage {
         this.app = app;
         this.__nav = nav;
         this.__model = model;
-        this.queue = new AjaxQueue();
+        this.queue = new AjaxQueue({
+            onPreRequest: (options) => {
+                if (!options.headers)
+                    options.headers = {};
+
+                if (app.model.antiforgery && options.method !== "GET" && options.method)
+                    options.headers[app.model.antiforgery.headerName] = app.navigation.validationToken;
+            }
+        });
         this.setElement(element);
 
         if (this.__model.cssClass) {

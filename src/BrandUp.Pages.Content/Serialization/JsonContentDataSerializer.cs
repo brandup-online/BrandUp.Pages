@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 namespace BrandUp.Pages.Content.Serialization
 {
@@ -12,19 +12,13 @@ namespace BrandUp.Pages.Content.Serialization
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            using (var stringWriter = new StringWriter())
+            return JsonSerializer.Serialize(data, new JsonSerializerOptions
             {
-                using (var jsonWriter = new JsonTextWriter(stringWriter))
-                {
-                    WriteDictionary(jsonWriter, data);
-                }
-
-                stringWriter.Flush();
-
-                return stringWriter.ToString();
-            }
+                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
         }
-        private static void WriteDictionary(JsonTextWriter writer, IDictionary<string, object> data)
+        private static void WriteDictionary(Utf8JsonWriter writer, IDictionary<string, object> data)
         {
             writer.WriteStartObject();
 
@@ -33,17 +27,45 @@ namespace BrandUp.Pages.Content.Serialization
                 writer.WritePropertyName(kv.Key);
 
                 var value = kv.Value;
-                if (value is IDictionary<string, object> valueDict)
+                if (value == null)
+                    writer.WriteNullValue();
+                else if (value is IDictionary<string, object> valueDict)
                     WriteDictionary(writer, valueDict);
                 else if (value is IList<IDictionary<string, object>> valueList)
                     WriteList(writer, valueList);
+                else if (value is string)
+                    writer.WriteStringValue((string)kv.Value);
+                else if (value is bool)
+                    writer.WriteBooleanValue((bool)kv.Value);
+                else if (value is short)
+                    writer.WriteNumberValue((short)kv.Value);
+                else if (value is int)
+                    writer.WriteNumberValue((int)kv.Value);
+                else if (value is long)
+                    writer.WriteNumberValue((long)kv.Value);
+                else if (value is float)
+                    writer.WriteNumberValue((float)kv.Value);
+                else if (value is decimal)
+                    writer.WriteNumberValue((decimal)kv.Value);
+                else if (value is double)
+                    writer.WriteNumberValue((double)kv.Value);
+                else if (value is ulong)
+                    writer.WriteNumberValue((ulong)kv.Value);
+                else if (value is uint)
+                    writer.WriteNumberValue((uint)kv.Value);
+                else if (value is DateTime)
+                    writer.WriteStringValue((DateTime)kv.Value);
+                else if (value is DateTimeOffset)
+                    writer.WriteStringValue((DateTimeOffset)kv.Value);
+                else if (value is Guid)
+                    writer.WriteStringValue((Guid)kv.Value);
                 else
-                    writer.WriteValue(kv.Value);
+                    writer.WriteStringValue(kv.Value.ToString());
             }
 
             writer.WriteEndObject();
         }
-        private static void WriteList(JsonTextWriter writer, IList<IDictionary<string, object>> data)
+        private static void WriteList(Utf8JsonWriter writer, IList<IDictionary<string, object>> data)
         {
             writer.WriteStartArray();
 
@@ -60,38 +82,25 @@ namespace BrandUp.Pages.Content.Serialization
             if (jsonData == null)
                 throw new ArgumentNullException(nameof(jsonData));
 
-            using (var stringReader = new StringReader(jsonData))
-            {
-                using (var jsonReader = new JsonTextReader(stringReader))
-                {
-                    if (!jsonReader.Read())
-                        throw new InvalidOperationException();
+            using var stringReader = new StringReader(jsonData);
+            ReadOnlySpan<byte> jsonUtf8 = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            var jsonReader = new Utf8JsonReader(jsonUtf8);
 
-                    return ReadDictionary(jsonReader);
-                }
-            }
+            if (!jsonReader.Read())
+                return null;
+
+            return ReadDictionary(ref jsonReader);
         }
         public static IDictionary<string, object> DeserializeFromStream(Stream stream)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            using (var stringReader = new StreamReader(stream))
-            {
-                using (var jsonReader = new JsonTextReader(stringReader))
-                {
-                    if (!jsonReader.Read())
-                        throw new InvalidOperationException();
-
-                    return ReadDictionary(jsonReader);
-                }
-            }
+            using var stringReader = new StreamReader(stream);
+            return DeserializeFromString(stringReader.ReadToEnd());
         }
-        private static IDictionary<string, object> ReadDictionary(JsonTextReader reader)
+        private static IDictionary<string, object> ReadDictionary(ref Utf8JsonReader reader)
         {
-            if (reader.TokenType != JsonToken.StartObject)
-                throw new InvalidOperationException();
-
             var dictionary = new SortedDictionary<string, object>();
 
             string fieldName = null;
@@ -99,51 +108,65 @@ namespace BrandUp.Pages.Content.Serialization
             {
                 switch (reader.TokenType)
                 {
-                    case JsonToken.PropertyName:
+                    case JsonTokenType.PropertyName:
                         {
-                            fieldName = (string)reader.Value;
+                            fieldName = reader.GetString();
                             break;
                         }
-                    case JsonToken.String:
-                    case JsonToken.Integer:
-                    case JsonToken.Float:
-                    case JsonToken.Date:
-                    case JsonToken.Boolean:
-                    case JsonToken.Bytes:
-                    case JsonToken.Null:
+                    case JsonTokenType.Null:
                         {
                             if (fieldName == null)
                                 throw new InvalidOperationException();
 
-                            dictionary.Add(fieldName, reader.Value);
+                            dictionary.Add(fieldName, null);
 
                             break;
                         }
-                    case JsonToken.StartObject:
+                    case JsonTokenType.True:
+                    case JsonTokenType.False:
                         {
                             if (fieldName == null)
                                 throw new InvalidOperationException();
 
-                            var dictValue = ReadDictionary(reader);
+                            dictionary.Add(fieldName, reader.GetBoolean());
+
+                            break;
+                        }
+                    case JsonTokenType.Number:
+                    case JsonTokenType.String:
+                        {
+                            if (fieldName == null)
+                                throw new InvalidOperationException();
+
+                            dictionary.Add(fieldName, reader.GetString());
+
+                            break;
+                        }
+                    case JsonTokenType.StartObject:
+                        {
+                            if (fieldName == null)
+                                throw new InvalidOperationException();
+
+                            var dictValue = ReadDictionary(ref reader);
                             dictionary.Add(fieldName, dictValue);
 
                             break;
                         }
-                    case JsonToken.StartArray:
+                    case JsonTokenType.StartArray:
                         {
                             if (fieldName == null)
                                 throw new InvalidOperationException();
 
-                            var listValue = ReadList(reader);
+                            var listValue = ReadList(ref reader);
                             dictionary.Add(fieldName, listValue);
 
                             break;
                         }
-                    case JsonToken.EndObject:
+                    case JsonTokenType.EndObject:
                         return dictionary;
-                    case JsonToken.EndArray:
+                    case JsonTokenType.EndArray:
                         throw new InvalidOperationException();
-                    case JsonToken.None:
+                    case JsonTokenType.None:
                         break;
                     default:
                         throw new InvalidOperationException();
@@ -152,19 +175,19 @@ namespace BrandUp.Pages.Content.Serialization
 
             return dictionary;
         }
-        private static IList<IDictionary<string, object>> ReadList(JsonTextReader reader)
+        private static IList<IDictionary<string, object>> ReadList(ref Utf8JsonReader reader)
         {
-            if (reader.TokenType != JsonToken.StartArray)
+            if (reader.TokenType != JsonTokenType.StartArray)
                 throw new InvalidOperationException();
 
             var list = new List<IDictionary<string, object>>();
 
             while (reader.Read())
             {
-                if (reader.TokenType == JsonToken.EndArray)
+                if (reader.TokenType == JsonTokenType.EndArray)
                     break;
 
-                var item = ReadDictionary(reader);
+                var item = ReadDictionary(ref reader);
                 list.Add(item);
             }
 

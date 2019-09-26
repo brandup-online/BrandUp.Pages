@@ -1,8 +1,7 @@
 ﻿using BrandUp.Pages.Interfaces;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BrandUp.Pages.Models
 {
@@ -17,7 +16,7 @@ namespace BrandUp.Pages.Models
         [Required(AllowEmptyStrings = false), MaxLength(150)]
         public string Title { get; set; }
         [Required]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public PageSortMode Sort { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
@@ -71,7 +72,7 @@ namespace BrandUp.Pages.Content.Fields
 
     public class HyperLinkFieldFormValue
     {
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public HyperLinkType ValueType { get; set; }
         public string Value { get; set; }
         public string PageTitle { get; set; }
