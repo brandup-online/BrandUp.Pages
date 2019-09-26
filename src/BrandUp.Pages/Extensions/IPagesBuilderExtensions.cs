@@ -12,15 +12,18 @@ namespace BrandUp.Pages.Builder
             return AddRazorContentPage(builder, options => { });
         }
 
-        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<RazorContentPageOptions> optionAction)
+        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<ContentPageOptions> optionAction)
         {
+            var contentPageOptions = new ContentPageOptions();
+            optionAction?.Invoke(contentPageOptions);
+
             var services = builder.Services;
 
             services.AddHttpContextAccessor();
 
             services.Configure<RazorPagesOptions>(options =>
             {
-                options.Conventions.AddPageRoute(Url.RazorPageLinkGenerator.RazorPagePath, "{**url}");
+                options.Conventions.AddPageRoute(contentPageOptions.ContentPageName, "{**url}");
             });
 
             services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();

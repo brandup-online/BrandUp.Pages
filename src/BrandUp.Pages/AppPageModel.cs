@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
-    public abstract class AppPageModel : PageModel, IContentPageModel
+    public abstract class AppPageModel : PageModel, IPageModel
     {
         private bool renderOnlyContent = false;
         private IPageNavigationProvider pageNavigationProvider;

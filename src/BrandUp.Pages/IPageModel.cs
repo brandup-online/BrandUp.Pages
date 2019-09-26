@@ -1,6 +1,6 @@
 ﻿namespace BrandUp.Pages
 {
-    public interface IContentPageModel
+    public interface IPageModel
     {
         string Title { get; }
         string Description { get; }

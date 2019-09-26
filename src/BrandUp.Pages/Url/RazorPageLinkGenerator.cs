@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,16 +10,18 @@ namespace BrandUp.Pages.Url
 {
     public class RazorPageLinkGenerator : IPageLinkGenerator
     {
-        public const string RazorPagePath = "/ContentPage";
-        private readonly LinkGenerator linkGenerator;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IPageUrlHelper pageUrlHelper;
+        //public const string RazorPagePath = "/ContentPage";
+        readonly LinkGenerator linkGenerator;
+        readonly IHttpContextAccessor httpContextAccessor;
+        readonly IPageUrlHelper pageUrlHelper;
+        readonly ContentPageOptions contentPageOptions;
 
-        public RazorPageLinkGenerator(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IPageUrlHelper pageUrlHelper)
+        public RazorPageLinkGenerator(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IPageUrlHelper pageUrlHelper, IOptions<ContentPageOptions> contentPageOptions)
         {
             this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
             this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
+            this.contentPageOptions = contentPageOptions?.Value ?? throw new ArgumentNullException(nameof(contentPageOptions.Value));
         }
 
         public Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default)
@@ -29,7 +32,7 @@ namespace BrandUp.Pages.Url
             var urlPath = GetPagePath(page);
 
             var httpContext = httpContextAccessor.HttpContext;
-            var pageUrl = linkGenerator.GetPathByPage(httpContext, RazorPagePath, null, new { url = urlPath });
+            var pageUrl = linkGenerator.GetPathByPage(httpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
         }
@@ -42,7 +45,7 @@ namespace BrandUp.Pages.Url
             var urlPath = GetPagePath(page);
 
             var httpContext = httpContextAccessor.HttpContext;
-            var pageUrl = linkGenerator.GetUriByPage(httpContext, RazorPagePath, null, new { url = urlPath });
+            var pageUrl = linkGenerator.GetUriByPage(httpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
         }
@@ -60,7 +63,7 @@ namespace BrandUp.Pages.Url
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));
 
-            var url = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+            var url = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { editId = pageEditSession.Id.ToString().ToLower() });
 
             return Task.FromResult(url);
         }
@@ -70,7 +73,7 @@ namespace BrandUp.Pages.Url
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));
 
-            var url = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+            var url = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { editId = pageEditSession.Id.ToString().ToLower() });
 
             return Task.FromResult(url);
         }
@@ -81,7 +84,7 @@ namespace BrandUp.Pages.Url
                 pagePath = string.Empty;
 
             var urlPath = NormalizePagePath(pagePath);
-            var pageUrl = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { url = urlPath });
+            var pageUrl = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
         }
@@ -92,7 +95,7 @@ namespace BrandUp.Pages.Url
                 pagePath = string.Empty;
 
             var urlPath = NormalizePagePath(pagePath);
-            var pageUrl = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, RazorPagePath, null, new { url = urlPath });
+            var pageUrl = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
 
             return Task.FromResult(pageUrl);
         }

@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <RazorLangVersion>2.1</RazorLangVersion>
     <Authors>Dmitry Kovyazin</Authors>
     <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+    <Product>BrandUp.Pages</Product>
     <Company>BrandUp.online</Company>
   </PropertyGroup>
 
