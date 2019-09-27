@@ -4,7 +4,6 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
@@ -24,14 +23,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         public PageSeoDocument Seo { get; set; }
         public bool IsPublished { get => Status == PageStatus.Published; }
         public int Order { get; set; }
-
-        Task IPage.SetUrlAsync(string urlPath)
-        {
-            UrlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
-            Status = PageStatus.Published;
-
-            return Task.CompletedTask;
-        }
     }
 
     public enum PageStatus

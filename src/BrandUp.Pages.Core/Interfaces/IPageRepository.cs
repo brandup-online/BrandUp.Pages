@@ -19,6 +19,7 @@ namespace BrandUp.Pages.Interfaces
         Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
         Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default);
         Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default);
+        Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default);
         Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default);
         Task SetPageTitleAsync(IPage page, string title, CancellationToken cancellationToken = default);
         Task<string> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default);

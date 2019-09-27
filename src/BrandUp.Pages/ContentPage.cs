@@ -10,6 +10,7 @@ namespace BrandUp.Pages
     public abstract class ContentPage<TModel> : RazorPage<TModel>
     {
         public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext;
+        public IPage Page => Content.Page;
 
         public Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference)
         {

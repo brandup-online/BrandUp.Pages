@@ -249,7 +249,7 @@ namespace BrandUp.Pages.Services
             if (await pageRepositiry.FindPageByPathAsync(urlPath) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
-            await page.SetUrlAsync(urlPath);
+            await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);
             await pageRepositiry.UpdatePageAsync(page, cancellationToken);
 
             return Result.Success;

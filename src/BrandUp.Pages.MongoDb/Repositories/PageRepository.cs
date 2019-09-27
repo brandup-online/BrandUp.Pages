@@ -323,6 +323,18 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 }
             }
         }
+        public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
+        {
+            if (urlPath == null)
+                throw new ArgumentNullException(nameof(urlPath));
+
+            var pageDocument = (PageDocument)page;
+
+            pageDocument.UrlPath = urlPath;
+            pageDocument.Status = PageStatus.Published;
+
+            return Task.CompletedTask;
+        }
         public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;

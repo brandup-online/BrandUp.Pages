@@ -45,8 +45,6 @@ namespace BrandUp.Pages.Interfaces
         string Header { get; set; }
         string UrlPath { get; }
         bool IsPublished { get; }
-
-        Task SetUrlAsync(string urlPath);
     }
 
     public enum PageSortMode

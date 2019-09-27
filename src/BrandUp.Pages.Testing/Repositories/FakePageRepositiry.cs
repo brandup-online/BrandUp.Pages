@@ -140,6 +140,18 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
+        public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
+        {
+            if (urlPath == null)
+                throw new ArgumentNullException(nameof(urlPath));
+
+            var pageDocument = (Page)page;
+
+            pageDocument.UrlPath = urlPath;
+            pageDocument.Status = PageStatus.Published;
+
+            return Task.CompletedTask;
+        }
         public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var p = (Page)page;
@@ -192,7 +204,7 @@ namespace BrandUp.Pages.Repositories
             public string Header { get; set; }
             public int ContentVersion { get; set; } = 1;
             public bool IsPublished => Status == PageStatus.Published;
-            private PageStatus Status { get; set; }
+            public PageStatus Status { get; set; }
             public string SeoTitle { get; set; }
             public string SeoDescription { get; set; }
             public string[] SeoKeywords { get; set; }
@@ -204,14 +216,6 @@ namespace BrandUp.Pages.Repositories
                 TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
                 OwnCollectionId = collectionId;
                 Status = PageStatus.Draft;
-            }
-
-            public Task SetUrlAsync(string urlPath)
-            {
-                Status = PageStatus.Published;
-                UrlPath = urlPath;
-
-                return Task.CompletedTask;
             }
         }
 
