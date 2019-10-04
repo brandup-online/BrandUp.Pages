@@ -66,10 +66,25 @@ namespace LandingWebSite.Identity
 
         #endregion
 
-        #region IDisposable members
+        #region IDisposable Support
 
-        public virtual void Dispose()
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
         {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
         }
 
         #endregion
