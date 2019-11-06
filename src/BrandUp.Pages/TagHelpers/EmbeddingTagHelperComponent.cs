@@ -29,28 +29,28 @@ namespace BrandUp.Pages.TagHelpers
                     output.PostContent.AppendHtml($"    <title>{appPageModel.Title}</title>{Environment.NewLine}");
 
                     if (!string.IsNullOrEmpty(appPageModel.Description))
-                        output.PostContent.AppendHtml($"    <meta name=\"description\" content=\"{appPageModel.Description}\" />{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <meta name=\"description\" content=\"{appPageModel.Description}\">{Environment.NewLine}");
 
                     if (!string.IsNullOrEmpty(appPageModel.Keywords))
-                        output.PostContent.AppendHtml($"    <meta name=\"keywords\" content=\"{appPageModel.Keywords}\" />{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <meta name=\"keywords\" content=\"{appPageModel.Keywords}\">{Environment.NewLine}");
 
                     if (!string.IsNullOrEmpty(appPageModel.CanonicalLink))
-                        output.PostContent.AppendHtml($"    <link rel=\"canonical\" href=\"{appPageModel.CanonicalLink}\" />{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <link rel=\"canonical\" href=\"{appPageModel.CanonicalLink}\">{Environment.NewLine}");
 
                     var og = appPageModel.OpenGraph;
                     if (og != null)
                     {
-                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Type}\" content=\"{og.Type}\" />{Environment.NewLine}");
-                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Image}\" content=\"{og.Image}\" />{Environment.NewLine}");
-                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Title}\" content=\"{og.Title}\" />{Environment.NewLine}");
-                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Url}\" content=\"{og.Url}\" />{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Type}\" content=\"{og.Type}\">{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Image}\" content=\"{og.Image}\">{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Title}\" content=\"{og.Title}\">{Environment.NewLine}");
+                        output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Url}\" content=\"{og.Url}\">{Environment.NewLine}");
                         if (og.Description != null)
                             output.PostContent.AppendHtml($"    <meta property=\"og:{OpenGraphProperties.Description}\" content=\"{og.Description}\" />{Environment.NewLine}");
                     }
 
                     var appClientModel = await appPageModel.GetAppClientModelAsync(ViewContext.HttpContext.RequestAborted);
 
-                    output.PostContent.AppendHtml($"    <script type=\"text/javascript\">var appInitOptions = {jsonHelper.Serialize(appClientModel)}</script>{Environment.NewLine}");
+                    output.PostContent.AppendHtml($"    <script>var appInitOptions = {jsonHelper.Serialize(appClientModel)}</script>{Environment.NewLine}");
                 }
 
                 if (string.Equals(context.TagName, "body", StringComparison.OrdinalIgnoreCase))
