@@ -26,6 +26,7 @@ export interface NavigationModel {
     path: string;
     query: { [key: string]: string; };
     validationToken: string;
+    state: string;
     page: PageClientModel;
 }
 

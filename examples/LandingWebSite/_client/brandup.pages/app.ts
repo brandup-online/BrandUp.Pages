@@ -194,14 +194,36 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.request({
             url: url,
+            method: "POST",
             urlParams: { _nav: "" },
-            type: "JSON",
-            success: (data: NavigationModel, status: number) => {
+            data: this.navigation.state ? this.navigation.state : "",
+            success: (data: NavigationModel, status: number, xhr: XMLHttpRequest) => {
                 if (navSequence !== this.__navCounter)
                     return;
 
                 switch (status) {
                     case 200: {
+                        let pageAction = xhr.getResponseHeader("Page-Action");
+                        if (pageAction) {
+                            switch (pageAction) {
+                                case "reset": {
+                                    location.href = url;
+                                    return;
+                                }
+                                default:
+                                    throw "";
+                            }
+                        }
+
+                        let redirectLocation = xhr.getResponseHeader("Page-Location");
+                        if (redirectLocation) {
+                            if (redirectLocation.startsWith("/"))
+                                this.navigate(redirectLocation);
+                            else
+                                location.href = redirectLocation;
+                            return;
+                        }
+
                         var navUrl = data.url;
                         if (hash)
                             navUrl += "#" + hash;
@@ -293,12 +315,21 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
         this.request({
             url: pageState.url,
             urlParams: { _content: "" },
-            success: (data: string, status: number) => {
+            success: (data: string, status: number, xhr: XMLHttpRequest) => {
                 if (navSequence !== this.__navCounter)
                     return;
 
                 switch (status) {
                     case 200: {
+                        let redirectLocation = xhr.getResponseHeader("Page-Location");
+                        if (redirectLocation) {
+                            if (redirectLocation.startsWith("/"))
+                                this.navigate(redirectLocation);
+                            else
+                                location.href = redirectLocation;
+                            return;
+                        }
+
                         this.__loadPageScript(pageState, pageModel, data ? data : "", scrollToTop);
 
                         this.raiseEvent("pageContentLoaded");

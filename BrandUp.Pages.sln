@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution", "_solution", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.Tests", "test\BrandUp.Pages.Tests\BrandUp.Pages.Tests.csproj", "{E8DD5E53-ACDA-4815-B015-D3474B1E7BC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrandUp.Pages.MongoDb.Tests", "test\BrandUp.Pages.MongoDb.Tests\BrandUp.Pages.MongoDb.Tests.csproj", "{701582C9-B9FC-4431-8100-EFF077030DA8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.MongoDb.Tests", "test\BrandUp.Pages.MongoDb.Tests\BrandUp.Pages.MongoDb.Tests.csproj", "{701582C9-B9FC-4431-8100-EFF077030DA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,7 +8,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +19,10 @@ namespace BrandUp.Pages
     public abstract class AppPageModel : PageModel, IPageModel
     {
         private IPageNavigationProvider pageNavigationProvider;
+        readonly static DateTime StartDate = DateTime.UtcNow;
 
         public AppPageRequestMode RequestMode { get; private set; } = AppPageRequestMode.Start;
+        public Dictionary<string, object> NavigationState { get; } = new Dictionary<string, object>();
 
         public OpenGraphModel OpenGraph { get; set; }
         public void SetOpenGraph(string type, string image, string title, string url, string description = null)
@@ -52,12 +57,77 @@ namespace BrandUp.Pages
 
         #endregion
 
+        // Временный код, для совместимости.
+        public async Task<IActionResult> OnGetNavigationAsync()
+        {
+            var navModel = await GetNavigationClientModelAsync();
+
+            return new OkObjectResult(navModel);
+        }
+
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
             if (Request.Query.ContainsKey("_content"))
                 RequestMode = AppPageRequestMode.Content;
             else if (Request.Query.ContainsKey("_nav"))
+            {
+                if (Request.Method != "POST")
+                {
+                    context.Result = BadRequest();
+                    return;
+                }
+
                 RequestMode = AppPageRequestMode.Navigation;
+
+                using var reader = new StreamReader(Request.Body);
+                var navStateData = await reader.ReadToEndAsync();
+                if (navStateData != null)
+                {
+                    var protectionProvider = HttpContext.RequestServices.GetRequiredService<IDataProtectionProvider>();
+                    var protector = protectionProvider.CreateProtector("BrandUp.Pages");
+                    var requestState = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(protector.Unprotect(navStateData));
+                    if (requestState != null)
+                    {
+                        foreach (var kv in requestState)
+                        {
+                            object val;
+                            switch (kv.Value.ValueKind)
+                            {
+                                case JsonValueKind.String:
+                                    val = kv.Value.GetString();
+                                    break;
+                                case JsonValueKind.False:
+                                case JsonValueKind.True:
+                                    val = kv.Value.GetBoolean();
+                                    break;
+                                case JsonValueKind.Null:
+                                    val = null;
+                                    break;
+                                case JsonValueKind.Number:
+                                    val = kv.Value.GetInt64();
+                                    break;
+                                default:
+                                    throw new InvalidOperationException();
+                            }
+
+                            NavigationState.Add(kv.Key, val);
+                        }
+
+                        if (NavigationState.TryGetValue("_start", out object startValue))
+                        {
+                            if ((long)startValue != StartDate.Ticks)
+                            {
+                                Response.Headers.Add("Page-Action", "reset");
+                                context.Result = new OkResult();
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                NavigationState.Add("_start", StartDate.Ticks);
+            }
 
             await OnInitializeAsync(context);
 
@@ -132,13 +202,29 @@ namespace BrandUp.Pages
                 requestUrl = baseUri + qb.ToQueryString();
             }
 
+            // Временный код, для совместимости.
+            if (httpRequest.Query.ContainsKey("handler") && httpRequest.Query["handler"] == "navigation")
+            {
+                var query = QueryHelpers.ParseQuery(requestUri.Query);
+                query.Remove("_nav");
+                var qb = new QueryBuilder();
+                foreach (var kv in query)
+                    qb.Add(kv.Key, (IEnumerable<string>)kv.Value);
+
+                requestUrl = baseUri + qb.ToQueryString();
+            }
+
+            var protectionProvider = HttpContext.RequestServices.GetRequiredService<IDataProtectionProvider>();
+            var protector = protectionProvider.CreateProtector("BrandUp.Pages");
+
             var navModel = new Models.NavigationClientModel
             {
                 IsAuthenticated = httpContext.User.Identity.IsAuthenticated,
                 Url = requestUrl,
                 Path = requestUri.GetComponents(UriComponents.Path, UriFormat.UriEscaped),
                 Query = new Dictionary<string, object>(),
-                Data = new Dictionary<string, object>()
+                Data = new Dictionary<string, object>(),
+                State = protector.Protect(JsonSerializer.Serialize(NavigationState))
             };
 
             foreach (var kv in httpRequest.Query)
