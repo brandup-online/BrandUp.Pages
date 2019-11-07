@@ -15,8 +15,9 @@ namespace BrandUp.Pages
 {
     public abstract class AppPageModel : PageModel, IPageModel
     {
-        private bool renderOnlyContent = false;
         private IPageNavigationProvider pageNavigationProvider;
+
+        public AppPageRequestMode RequestMode { get; private set; } = AppPageRequestMode.Start;
 
         public OpenGraphModel OpenGraph { get; set; }
         public void SetOpenGraph(string type, string image, string title, string url, string description = null)
@@ -53,38 +54,31 @@ namespace BrandUp.Pages
 
         public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
         {
+            if (Request.Query.ContainsKey("_content"))
+                RequestMode = AppPageRequestMode.Content;
+            else if (Request.Query.ContainsKey("_nav"))
+                RequestMode = AppPageRequestMode.Navigation;
+
             await OnInitializeAsync(context);
 
             pageNavigationProvider = HttpContext.RequestServices.GetService<IPageNavigationProvider>();
             if (pageNavigationProvider != null)
                 await pageNavigationProvider.InitializeAsync(HttpContext.RequestAborted);
 
-            if (Request.Query.ContainsKey("_content"))
-                renderOnlyContent = true;
+            if (RequestMode == AppPageRequestMode.Navigation)
+            {
+                var navModel = await GetNavigationClientModelAsync();
+
+                context.Result = new OkObjectResult(navModel);
+                return;
+            }
 
             await base.OnPageHandlerExecutionAsync(context, next);
         }
 
-        #region Handler methods
-
-        public async Task<IActionResult> OnGetNavigationAsync()
-        {
-            var navModel = await GetNavigationClientModelAsync();
-
-            return new OkObjectResult(navModel);
-        }
-        public IActionResult OnGetContent()
-        {
-            renderOnlyContent = true;
-
-            return Page();
-        }
-
-        #endregion
-
         public void RenderPage(Microsoft.AspNetCore.Mvc.Razor.IRazorPage page)
         {
-            if (renderOnlyContent)
+            if (RequestMode == AppPageRequestMode.Content)
                 page.Layout = null;
         }
         internal async Task<Models.AppClientModel> GetAppClientModelAsync(CancellationToken cancellationToken = default)
@@ -127,10 +121,10 @@ namespace BrandUp.Pages
             var requestUri = new Uri(requestUrl);
             var baseUri = requestUri.GetComponents(UriComponents.Scheme | UriComponents.Host | UriComponents.Port | UriComponents.Path, UriFormat.UriEscaped);
 
-            if (httpRequest.Query.ContainsKey("handler"))
+            if (httpRequest.Query.ContainsKey("_nav"))
             {
                 var query = QueryHelpers.ParseQuery(requestUri.Query);
-                query.Remove("handler");
+                query.Remove("_nav");
                 var qb = new QueryBuilder();
                 foreach (var kv in query)
                     qb.Add(kv.Key, (IEnumerable<string>)kv.Value);
@@ -156,7 +150,7 @@ namespace BrandUp.Pages
                     navModel.Query.Add(kv.Key, value.ToArray());
             }
 
-            navModel.Query.Remove("handler");
+            navModel.Query.Remove("_nav");
 
             var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
             navModel.EnableAdministration = await accessProvider.CheckAccessAsync(cancellationToken);
@@ -234,6 +228,13 @@ namespace BrandUp.Pages
         {
             return Task.CompletedTask;
         }
+    }
+
+    public enum AppPageRequestMode
+    {
+        Start,
+        Navigation,
+        Content
     }
 
     public class OpenGraphModel

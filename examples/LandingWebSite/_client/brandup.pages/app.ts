@@ -194,7 +194,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
 
         this.request({
             url: url,
-            urlParams: { handler: "navigation" },
+            urlParams: { _nav: "" },
             type: "JSON",
             success: (data: NavigationModel, status: number) => {
                 if (navSequence !== this.__navCounter)
