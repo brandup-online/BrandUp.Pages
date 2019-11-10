@@ -196,6 +196,7 @@ export class Application<TModel extends AppClientModel> extends UIElement implem
             url: url,
             method: "POST",
             urlParams: { _nav: "" },
+            type: "TEXT",
             data: this.navigation.state ? this.navigation.state : "",
             success: (data: NavigationModel, status: number, xhr: XMLHttpRequest) => {
                 if (navSequence !== this.__navCounter)
