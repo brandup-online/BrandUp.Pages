@@ -19,6 +19,11 @@ namespace LandingWebSite.Controllers
         [Produces("application/xml")]
         public async Task<IActionResult> SitemapXmlAsync([FromServices]IPageService pageService, [FromServices]IPageLinkGenerator pageLinkGenerator)
         {
+            if (pageService == null)
+                throw new ArgumentNullException(nameof(pageService));
+            if (pageLinkGenerator == null)
+                throw new ArgumentNullException(nameof(pageLinkGenerator));
+
             var request = Request;
 
             var dateNow = DateTime.Now.ToString("s");
