@@ -4,11 +4,11 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Content.Infrastructure
 {
-    public class AssemblyContentTypeResolver : IContentTypeLocator
+    public class AssemblyContentTypeLocator : IContentTypeLocator
     {
         private readonly IList<TypeInfo> types = new List<TypeInfo>();
 
-        public AssemblyContentTypeResolver(Assembly[] assemblies)
+        public AssemblyContentTypeLocator(Assembly[] assemblies)
         {
             if (assemblies == null)
                 throw new ArgumentNullException(nameof(assemblies));

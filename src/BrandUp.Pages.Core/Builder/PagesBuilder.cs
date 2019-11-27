@@ -36,6 +36,8 @@ namespace BrandUp.Pages.Builder
             services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
 
             services.AddScoped<Files.FileService>();
+
+            services.AddSingleton<Content.Infrastructure.IContentTypeLocator>(new Content.Infrastructure.EmptyContentTypeLocator());
         }
     }
 }

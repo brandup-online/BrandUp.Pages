@@ -1,4 +1,3 @@
-using BrandUp.Pages.Builder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -54,9 +53,9 @@ namespace LandingWebSite
 
             services.AddMongoDbContext<Models.AppDbContext>(Configuration.GetSection("MongoDb"));
 
-            services.AddPages()
-                //.AddRazorContentPage()
-                .AddContentTypesFromAssemblies(typeof(Startup).Assembly);
+            services.AddPages();
+            //.AddRazorContentPage()
+            //.AddContentTypesFromAssemblies(typeof(Startup).Assembly)
             //.AddMongoDb<Models.AppDbContext>()
             //.AddImageResizer<Infrastructure.ImageResizer>()
             //.AddUserProvider<Identity.PageEditorProvider>(ServiceLifetime.Scoped)

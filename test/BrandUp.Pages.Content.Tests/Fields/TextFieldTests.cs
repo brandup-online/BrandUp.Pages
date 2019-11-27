@@ -17,7 +17,7 @@ namespace BrandUp.Pages.Content.Fields
 
         Task IAsyncLifetime.InitializeAsync()
         {
-            var contentTypeResolver = new Infrastructure.AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
 
             var services = new ServiceCollection();
 

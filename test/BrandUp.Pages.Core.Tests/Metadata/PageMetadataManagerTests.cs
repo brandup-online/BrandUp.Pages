@@ -11,7 +11,7 @@ namespace BrandUp.Pages.Metadata
 
         public PageMetadataManagerTests()
         {
-            var contentTypeResolver = new AssemblyContentTypeResolver(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+            var contentTypeResolver = new AssemblyContentTypeLocator(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
             var contentMetadataManager = new ContentMetadataManager(contentTypeResolver);
 
             pageMetadataManager = new PageMetadataManager(contentMetadataManager);
