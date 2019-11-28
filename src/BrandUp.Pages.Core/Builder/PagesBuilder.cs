@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Identity;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Services;
@@ -38,6 +39,8 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<Files.FileService>();
 
             services.AddSingleton<Content.Infrastructure.IContentTypeLocator>(new Content.Infrastructure.EmptyContentTypeLocator());
+
+            services.AddSingleton<IAccessProvider, EmptyAccessProvider>();
         }
     }
 }
