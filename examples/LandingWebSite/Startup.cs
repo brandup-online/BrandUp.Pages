@@ -55,12 +55,12 @@ namespace LandingWebSite
             services.AddMongoDbContext<Models.AppDbContext>(Configuration.GetSection("MongoDb"));
 
             services.AddPages()
-                .AddRazorContentPage();
-            //.AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-            //.AddMongoDb<Models.AppDbContext>()
-            //.AddImageResizer<Infrastructure.ImageResizer>()
-            //.AddUserProvider<Identity.PageEditorProvider>(ServiceLifetime.Scoped)
-            //.AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped);
+                .AddRazorContentPage()
+                .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
+                .AddMongoDb<Models.AppDbContext>()
+                .AddImageResizer<Infrastructure.ImageResizer>()
+                .AddUserProvider<Identity.PageEditorProvider>(ServiceLifetime.Scoped)
+                .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped);
 
             #region Identity
 
