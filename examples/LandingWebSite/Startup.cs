@@ -1,4 +1,5 @@
 using BrandUp.Pages.Builder;
+using BrandUp.Website;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -53,6 +54,14 @@ namespace LandingWebSite
             #endregion
 
             services.AddMongoDbContext<Models.AppDbContext>(Configuration.GetSection("MongoDb"));
+
+            services
+                .AddWebsite(options =>
+                {
+                    options.MapConfiguration(Configuration);
+                })
+                .AddSingleWebsite("brandup.pages")
+                .AddWebsiteProvider<SubdomainWebsiteProvider>();
 
             services.AddPages()
                 .AddRazorContentPage()
@@ -115,10 +124,13 @@ namespace LandingWebSite
 
             //app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 
-            app.UseHttpsRedirection();
+            app.UseWebsite();
             app.UseStaticFiles();
+
             app.UseRouting();
+
             app.UseAuthentication();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();

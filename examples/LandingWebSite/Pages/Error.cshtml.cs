@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages;
+﻿using BrandUp.Website.Pages;
 
 namespace LandingWebSite.Pages
 {

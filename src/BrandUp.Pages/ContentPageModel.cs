@@ -1,14 +1,14 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
-using Microsoft.AspNetCore.Mvc.Filters;
+using BrandUp.Website.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
-    public sealed class ContentPageModel : AppPageModel
+    public sealed class ContentPageModel : Website.Pages.AppPageModel
     {
         private IPage page;
         private IPageEdit editSession;
@@ -38,7 +38,7 @@ namespace BrandUp.Pages
         public override string Description => pageSeo.Description;
         public override string Keywords => pageSeo.Keywords != null ? string.Join(",", pageSeo.Keywords) : null;
         public override string ScriptName => "content";
-        protected override async Task OnInitializeAsync(PageHandlerExecutingContext context)
+        protected override async Task OnPageRequestAsync(PageRequestContext context)
         {
             PageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
 

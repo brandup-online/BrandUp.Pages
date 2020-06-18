@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -33,16 +32,6 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<Views.IViewRenderService, Views.RazorViewRenderService>();
 
             services.Configure(optionAction);
-
-            services.AddTransient<ITagHelperComponent, TagHelpers.EmbeddingTagHelperComponent>();
-
-            return builder;
-        }
-
-        public static IPagesBuilder AddNavigationProvider<T>(this IPagesBuilder builder)
-            where T : class, IPageNavigationProvider
-        {
-            builder.Services.AddTransient<IPageNavigationProvider, T>();
 
             return builder;
         }

@@ -1,6 +1,5 @@
-﻿using BrandUp.Pages;
+﻿using BrandUp.Website.Pages;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using System.Threading.Tasks;
 
 namespace LandingWebSite.Pages
@@ -14,11 +13,11 @@ namespace LandingWebSite.Pages
         public override string CssClass => "about-page";
         public override string CanonicalLink => Url.Page("", null, null, Request.Scheme, Request.Host.Value, null);
 
-        protected override Task OnInitializeAsync(PageHandlerExecutingContext context)
+        protected override Task OnPageRequestAsync(PageRequestContext context)
         {
             SetOpenGraph("test", Title, Description);
 
-            return base.OnInitializeAsync(context);
+            return base.OnPageRequestAsync(context);
         }
     }
 }
