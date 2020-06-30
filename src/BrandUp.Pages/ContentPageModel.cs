@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
+using BrandUp.Website;
 using BrandUp.Website.Pages;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -21,13 +22,13 @@ namespace BrandUp.Pages
         public PageMetadataProvider PageMetadata { get; private set; }
         public object PageContent { get; private set; }
         public ContentContext ContentContext { get; private set; }
-        [ClientModel]
+        [ClientProperty]
         public Guid Id => page.Id;
-        [ClientModel]
+        [ClientProperty]
         public Guid? EditId => editSession?.Id;
-        [ClientModel]
+        [ClientProperty]
         public Models.PageStatus Status { get; private set; }
-        [ClientModel]
+        [ClientProperty]
         public Guid? ParentPageId { get; private set; }
 
         #endregion

@@ -61,7 +61,8 @@ namespace LandingWebSite
                     options.MapConfiguration(Configuration);
                 })
                 .AddSingleWebsite("brandup.pages")
-                .AddWebsiteProvider<SubdomainWebsiteProvider>();
+                .AddWebsiteProvider<SubdomainWebsiteProvider>()
+                .AddPageEvents<Pages.PageEvents>();
 
             services.AddPages()
                 .AddRazorContentPage()
