@@ -1,13 +1,18 @@
 ﻿import { host } from "brandup-ui-website";
 import "./styles.less";
 import { ajaxRequest } from "brandup-ui";
+import { ContentMiddleware } from "./brandup.pages/middleware";
 
 host.start({
     pageTypes: {
+        "content": () => import("./brandup.pages/pages/content"),
         "about": () => import("./pages/about")
+    },
+    scripts: {
+        "BB1": () => import("./contents/BB1")
     }
 }, (builder) => {
-        //builder.addScript("BB1", () => import("./contents/BB1"));
+        builder.useMiddleware(new ContentMiddleware());
     }, (app) => {
         app.registerCommand("signin", () => {
             ajaxRequest({

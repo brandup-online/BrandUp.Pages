@@ -426,6 +426,34 @@ main.app-content {
 }
 
 .bp-page-loader {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 0;
+	height: 2px;
+	z-index: 5000;
+	display: block;
+	opacity: 0;
+	visibility: collapse;
+	transition: visibility ease 300ms, opacity ease 300ms, width ease-in-out 100ms;
+
+	&.show {
+		opacity: 1;
+		transition: width ease-in-out 1700ms;
+		visibility: visible;
+	}
+
+	&.show2 {
+		transition: width ease-in-out 15000ms;
+	}
+
+	&.finish {
+		transition: width ease-in-out 180ms, opacity ease 300ms;
+		opacity: 0;
+	}
+}
+
+.bp-page-loader {
 	background: @Accent-Color;
 }
 

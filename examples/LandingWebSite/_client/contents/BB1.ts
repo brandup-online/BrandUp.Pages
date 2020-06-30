@@ -1,4 +1,4 @@
-﻿import { UIControl, UIElement } from "brandup-ui";
+﻿import { UIElement } from "brandup-ui";
 
 class BB1 extends UIElement {
     constructor(elem: HTMLElement) {

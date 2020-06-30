@@ -1,5 +1,5 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { ajaxRequest, DOM, AjaxQueue } from "brandup-ui";
+import { ajaxRequest, DOM, AjaxQueue, AjaxResponse } from "brandup-ui";
 import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 import iconSort from "../svg/list-item-sort.svg";
@@ -33,7 +33,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
-            const itemElem = (<HTMLElement>e.target).closest(".opened-menu");
+            const itemElem = (e.target as HTMLElement).closest(".opened-menu");
             if (!itemElem)
                 this.__hideItemMenu();
         };
@@ -43,8 +43,8 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
         this.__loadList();
 
         this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
-            let target = <Element>e.target;
-            let itemElem = target.closest("[data-index]");
+            const target = e.target as Element;
+            const itemElem = target.closest("[data-index]");
             if (itemElem) {
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData("data-id", itemElem.getAttribute("data-id"));
@@ -64,7 +64,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             e.preventDefault();
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
-            const target = <Element>e.target;
+            const target = e.target as Element;
             const sourceId = e.dataTransfer.getData("data-id");
             const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
             const elem = target.closest("[data-index]");
@@ -89,7 +89,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
                             this.__refreshIndexes();
 
-                            const urlParams: { [key: string]: string; } = {
+                            const urlParams: { [key: string]: string } = {
                                 sourceId: sourceId,
                                 destId: destId,
                                 destPosition: destPosition
@@ -105,10 +105,10 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
                                 url: url,
                                 urlParams: urlParams,
                                 method: "POST",
-                                success: (data: any, status: number) => {
+                                success: (response: AjaxResponse) => {
                                     this.setLoading(false);
 
-                                    if (status !== 200) {
+                                    if (response.status !== 200) {
                                         this.setError("Error loading items.");
                                         return;
                                     }
@@ -127,27 +127,26 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
     private __refreshIndexes() {
         for (let i = 0; i < this.__itemsElem.childElementCount; i++) {
-            let elem = this.__itemsElem.children.item(i);
+            const elem = this.__itemsElem.children.item(i);
             elem.setAttribute("data-index", i.toString());
         }
     }
     private __loadList() {
-        var urlParams: { [key: string]: string; } = {};
-
+        const urlParams: { [key: string]: string } = {};
         this._buildUrlParams(urlParams);
 
         this.setLoading(true);
 
-        this.queue.request({
+        this.queue.push({
             url: this._buildUrl(),
             urlParams: urlParams,
             method: "GET",
-            success: (data: any, status: number) => {
+            success: (response: AjaxResponse<TList>) => {
                 this.setLoading(false);
 
-                switch (status) {
+                switch (response.status) {
                     case 200: {
-                        this.__model = <TList>data;
+                        this.__model = response.data;
                         this._buildList(this.__model);
                         this.loadItems();
                         break;
@@ -178,33 +177,33 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
         this.setLoading(true);
 
-        var urlParams: { [key: string]: string; } = {};
+        const urlParams: { [key: string]: string } = {};
         this._buildUrlParams(urlParams);
 
         urlParams["offset"] = "0";
         urlParams["limit"] = "50";
 
-        var url = this._buildUrl();
+        let url = this._buildUrl();
         url += "/item";
 
         ajaxRequest({
             url: url,
             urlParams: urlParams,
-            success: (data: Array<TItem>, status: number) => {
+            success: (response: AjaxResponse<Array<TItem>>) => {
                 this.setLoading(false);
 
-                if (status !== 200) {
+                if (response.status !== 200) {
                     this.setError("Error loading items.");
                     return;
                 }
 
-                this.__renderItems(data);
+                this.__renderItems(response.data);
             }
         });
     }
     protected registerItemCommand(name: string, execute: (itemId: string, model: any, commandElem: HTMLElement) => void, canExecute?: (itemId: string, model: any, commandElem: HTMLElement) => boolean) {
         this.registerCommand(name, (elem: HTMLElement) => {
-            let item = this._findItemIdFromElement(elem);
+            const item = this._findItemIdFromElement(elem);
             if (item === null)
                 return;
 
@@ -213,7 +212,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             if (!canExecute)
                 return true;
 
-            let item = this._findItemIdFromElement(elem);
+                const item = this._findItemIdFromElement(elem);
             if (item === null)
                 return false;
 
@@ -221,7 +220,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
         });
     }
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {
-        let itemElem = elem.closest(".item[data-id]");
+        const itemElem = elem.closest(".item[data-id]");
         if (!itemElem)
             return null;
 
@@ -229,13 +228,13 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
     }
 
     private __renderItems(items: Array<TItem>) {
-        var fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
 
         if (items && items.length) {
             for (let i = 0; i < items.length; i++) {
-                let item = items[i];
-                let itemId = this._getItemId(item);
-                let itemElem = DOM.tag("div", { class: "item", "data-id": itemId, "data-index": i.toString() });
+                const item = items[i];
+                const itemId = this._getItemId(item);
+                const itemElem = DOM.tag("div", { class: "item", "data-id": itemId, "data-index": i.toString() });
 
                 itemElem["_model_"] = item;
 
@@ -245,7 +244,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             }
         }
         else {
-            let emptyContainer = DOM.tag("div", { class: "empty" });
+            const emptyContainer = DOM.tag("div", { class: "empty" });
             this._renderEmpty(emptyContainer);
             fragment.appendChild(emptyContainer);
         }
@@ -259,10 +258,9 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             this._renderNewItem(this.__newItemElem);
         }
     }
-    private __renderItem(itemId: string, item: TItem, elem: HTMLElement) {
-        var sortElem: HTMLElement;
-        var contentElem: HTMLElement;
-        var menuElem: HTMLElement;
+    private __renderItem(_itemId: string, item: TItem, elem: HTMLElement) {
+        let contentElem: HTMLElement;
+        let menuElem: HTMLElement;
 
         if (this.__enableSorting) {
             elem.appendChild(contentElem = DOM.tag("div", { class: "sort", draggable: "true", title: "Нажмите, чтобы перетащить" }, iconSort));
@@ -283,7 +281,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
     }
 
     protected abstract _buildUrl(): string;
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) { }
+    protected _buildUrlParams(_urlParams: { [key: string]: string }) { }
     protected abstract _buildList(model: TList);
     protected _allowLoadItems(): boolean { return true; }
     protected abstract _getItemId(item: TItem): string;

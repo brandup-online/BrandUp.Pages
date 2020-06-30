@@ -3,12 +3,16 @@
 class ContentPage extends Page<ContentPageModel> {
     get typeName(): string { return "BrandUpPages.ContentPage" }
 
-    protected renderWebsiteToolbar() {
-        //if (!this.model.editId)
-        //    super.renderWebsiteToolbar();
-    }
     protected onRenderContent() {
+        super.onRenderContent();
+
         if (this.nav.enableAdministration) {
+            if (!this.model.editId) {
+                import("../admin/website").then(d => {
+                    this.attachDestroyElement(new d.WebSiteToolbar(this));
+                });
+            }
+
             import("../admin/page").then(d => { new d.PageToolbar(this) });
         }
     }

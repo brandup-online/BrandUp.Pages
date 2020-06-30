@@ -80,7 +80,7 @@ namespace BrandUp.Pages.Views
                     tag.AddCssClass(itemRenderingContext.CssClass);
 
                 if (!string.IsNullOrEmpty(itemRenderingContext.ScriptName))
-                    tag.Attributes.Add("content-script", itemRenderingContext.ScriptName);
+                    tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
 
                 if (contentContext.Explorer.IsRoot)
                     tag.Attributes.Add("content-root", string.Empty);

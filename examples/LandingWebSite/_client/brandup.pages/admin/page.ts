@@ -30,7 +30,7 @@ export class PageToolbar extends UIElement {
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-commit", title: "Применить изменения к странице" }, iconSave));
             toolbarElem.appendChild(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-discard", title: "Отменить изменения" }, iconDiscard));
 
-            let cancelNav = true;
+            //let cancelNav = true;
 
             this.registerCommand("bp-content", () => {
                 editPage(page.model.editId).then(() => {
@@ -47,7 +47,7 @@ export class PageToolbar extends UIElement {
                     urlParams: { editId: page.model.editId },
                     method: "POST",
                     success: (response) => {
-                        cancelNav = false;
+                        //cancelNav = false;
 
                         if (response.status !== 200)
                             throw "";
@@ -67,7 +67,7 @@ export class PageToolbar extends UIElement {
                     urlParams: { editId: page.model.editId },
                     method: "POST",
                     success: (response) => {
-                        cancelNav = false;
+                        //cancelNav = false;
 
                         if (response.status !== 200)
                             throw "";
@@ -80,20 +80,20 @@ export class PageToolbar extends UIElement {
 
             this.__designer = new PageDesigner(page);
 
-            this.__pageNavFunc = (e: CustomEvent<NavigationOptions>) => {
-                if (cancelNav && e.detail.pushState) {
-                    e.cancelBubble = true;
-                    e.stopPropagation();
-                    e.preventDefault();
-                }
-                else {
-                    e.cancelBubble = false;
-                }
+            //this.__pageNavFunc = (e: CustomEvent<NavigationOptions>) => {
+            //    if (cancelNav && e.detail.pushState) {
+            //        e.cancelBubble = true;
+            //        e.stopPropagation();
+            //        e.preventDefault();
+            //    }
+            //    else {
+            //        e.cancelBubble = false;
+            //    }
 
-                cancelNav = true;
-            };
+            //    cancelNav = true;
+            //};
 
-            window.addEventListener("pageNavigating", this.__pageNavFunc, false);
+            //window.addEventListener("pageNavigating", this.__pageNavFunc, false);
         }
         else {
             if (page.model.status !== "Published") {
@@ -174,7 +174,7 @@ export class PageToolbar extends UIElement {
             });
 
             this.__closePopupFunc = (e: MouseEvent) => {
-                let t = <HTMLElement>e.target;
+                const t = e.target as HTMLElement;
 
                 if (!t.closest(".bp-toolbar-popup")) {
                     this.__popupElem.remove();
