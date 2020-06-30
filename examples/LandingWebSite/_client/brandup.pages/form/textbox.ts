@@ -13,10 +13,10 @@ export class Textbox extends Field<string, TextboxOptions> {
 
         this.element.classList.add("text");
 
-        this.__valueElem = <HTMLInputElement>DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true });
+        this.__valueElem = DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
         this.element.appendChild(this.__valueElem);
 
-        let placeholderElem = DOM.tag("div", { class: "placeholder" }, this.options.placeholder);
+        const placeholderElem = DOM.tag("div", { class: "placeholder" }, this.options.placeholder);
         placeholderElem.addEventListener("click", () => {
             this.__valueElem.focus();
         });
@@ -27,19 +27,19 @@ export class Textbox extends Field<string, TextboxOptions> {
 
             e.preventDefault();
 
-            var text = e.clipboardData.getData("text/plain");
+            const text = e.clipboardData.getData("text/plain");
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
         this.__valueElem.addEventListener("cut", () => {
             this.__isChanged = true;
         });
         this.__valueElem.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (!this.options.allowMultiline && e.keyCode == 13) {
+            if (!this.options.allowMultiline && e.keyCode === 13) {
                 e.preventDefault();
                 return false;
             }
         });
-        this.__valueElem.addEventListener("keyup", (e: KeyboardEvent) => {
+        this.__valueElem.addEventListener("keyup", () => {
             this.__isChanged = true;
         });
         this.__valueElem.addEventListener("focus", () => {
@@ -67,7 +67,7 @@ export class Textbox extends Field<string, TextboxOptions> {
     }
 
     getValue(): string {
-        var val = this.normalizeValue(this.__valueElem.innerText);
+        const val = this.normalizeValue(this.__valueElem.innerText);
         return val ? val : null;
     }
     setValue(value: string) {
@@ -80,7 +80,7 @@ export class Textbox extends Field<string, TextboxOptions> {
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var val = this.normalizeValue(this.__valueElem.innerText);
+        const val = this.normalizeValue(this.__valueElem.innerText);
         return val ? true : false;
     }
 

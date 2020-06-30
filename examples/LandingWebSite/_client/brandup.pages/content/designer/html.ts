@@ -1,6 +1,7 @@
 ﻿import { FieldDesigner } from "./base";
 import createEditor, { EditorInstance } from "brandup-pages-ckeditor";
 import "./html.less";
+import { AjaxResponse } from "brandup-ui";
 
 export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     private __isChanged: boolean;
@@ -43,7 +44,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     getValue(): string {
-        var data = this.__editor.data.get();
+        const data = this.__editor.data.get();
         return data ? data : null;
     }
     setValue(value: string) {
@@ -52,20 +53,20 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var value = this.normalizeValue(this.element.innerText);
+        const value = this.normalizeValue(this.element.innerText);
         if (!value)
             return false;
 
-        var val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
+        const val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
         return value && val ? true : false;
     }
 
     protected _onChanged() {
         this.__refreshUI();
 
-        var value = this.getValue();
+        const value = this.getValue();
 
-        this.page.queue.request({
+        this.page.queue.push({
             url: '/brandup.pages/content/html',
             urlParams: {
                 editId: this.page.editId,
@@ -75,9 +76,9 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (data: string, status: number) => {
-                if (status === 200) {
-                    this.setValue(data);
+            success: (response: AjaxResponse<string>) => {
+                if (response.status === 200) {
+                    this.setValue(response.data);
                 }
             }
         });

@@ -1,5 +1,5 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { DOM, AjaxQueue, AjaxRequestOptions } from "brandup-ui";
+import { DOM, AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui";
 import { IContentForm, IContentField, PageContentForm } from "../../typings/content";
 import { TextContent } from "../../content/field/text";
 import { HtmlContent } from "../../content/field/html";
@@ -32,7 +32,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-form");
 
-        this.content.appendChild(this.__formElem = <HTMLFormElement>DOM.tag("form", { method: "POST", class: "nopad" }));
+        this.content.appendChild(this.__formElem = DOM.tag("form", { method: "POST", class: "nopad" }) as HTMLFormElement);
         this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));
 
         this.__formElem.addEventListener("submit", (e: Event) => {
@@ -45,7 +45,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         this.__loadForm();
 
         this.registerCommand("navigate", (elem: HTMLElement) => {
-            let path = elem.getAttribute("data-path");
+            const path = elem.getAttribute("data-path");
             this.navigate(path);
         });
     }
@@ -54,8 +54,8 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             this.__queue.destroy();
         this.__queue = new AjaxQueue();
 
-        for (let fieldName in this.__fields) {
-            let field = this.__fields[fieldName];
+        for (const fieldName in this.__fields) {
+            const field = this.__fields[fieldName];
             field.destroy();
         }
 
@@ -64,17 +64,17 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         this.setLoading(true);
 
-        this.__queue.request({
+        this.__queue.push({
             url: "/brandup.pages/page/content/form",
             urlParams: { editId: this.editId, modelPath: this.__modelPath },
             method: "GET",
-            success: (data: PageContentForm, status: number) => {
-                if (status !== 200) {
+            success: (response: AjaxResponse<PageContentForm>) => {
+                if (response.status !== 200) {
                     this.setError("Не удалось загрузить форму.");
                     return;
                 }
 
-                this.__renderForm(data);
+                this.__renderForm(response.data);
 
                 this.setLoading(false);
             }
@@ -89,7 +89,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             DOM.empty(this.navElem);
         }
 
-        var path = model.path;
+        let path = model.path;
         while (path) {
             let title = path.title;
             if (path.index >= 0)
@@ -101,7 +101,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         }
 
         for (let i = 0; i < model.fields.length; i++) {
-            var fieldModel = model.fields[i];
+            const fieldModel = model.fields[i];
 
             switch (fieldModel.type.toLowerCase()) {
                 case "text": {
@@ -138,17 +138,17 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 
     private __applyModelState(state: ValidationProblemDetails) {
-        for (let key in this.__fields) {
-            let field = this.__fields[key];
+        for (const key in this.__fields) {
+            const field = this.__fields[key];
             field.setErrors(null);
         }
 
         if (state && state.errors) {
-            for (let key in state.errors) {
+            for (const key in state.errors) {
                 if (key === "")
                     continue;
 
-                let field = this.getField(key);
+                const field = this.getField(key);
                 field.setErrors(state.errors[key]);
             }
         }
@@ -163,7 +163,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         this.__loadForm();
     }
-    request(field: IContentField, options: AjaxRequestOptions) {
+    request(field: IContentField, options: AjaxRequest) {
         if (!options.urlParams)
             options.urlParams = {};
 
@@ -171,15 +171,15 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         options.urlParams["path"] = this.modelPath;
         options.urlParams["field"] = field.name;
 
-        this.__queue.request(options);
+        this.__queue.push(options);
     }
 
     validate(): boolean {
         return true;
     }
     setValues(values: { [key: string]: any }) {
-        for (var key in values) {
-            var field = this.getField(key);
+        for (const key in values) {
+            const field = this.getField(key);
             field.setValue(values[key]);
         }
     }
@@ -193,7 +193,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
-        var containerElem = DOM.tag("div", { class: "field" });
+        const containerElem = DOM.tag("div", { class: "field" });
 
         if (title)
             containerElem.appendChild(DOM.tag("label", { for: field.name }, title));
@@ -211,8 +211,8 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     destroy() {
         this.__queue.destroy();
 
-        for (let fieldName in this.__fields) {
-            let field = this.__fields[fieldName];
+        for (const fieldName in this.__fields) {
+            const field = this.__fields[fieldName];
             field.destroy();
         }
 
@@ -220,7 +220,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 }
 
-export var editPage = (editId: string, modelPath?: string) => {
-    let dialog = new PageEditDialog(editId, modelPath);
+export const editPage = (editId: string, modelPath?: string) => {
+    const dialog = new PageEditDialog(editId, modelPath);
     return dialog.open();
 };

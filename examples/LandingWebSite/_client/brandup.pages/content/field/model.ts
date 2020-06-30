@@ -1,6 +1,6 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui";
+import { DOM, AjaxResponse } from "brandup-ui";
 import "./model.less";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
@@ -28,8 +28,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.element.appendChild(this.__itemsElem);
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            let itemElem = elem.closest("[content-path-index]");
-            let itemIndex = itemElem.getAttribute("content-path-index");
+            const itemElem = elem.closest("[content-path-index]");
+            const itemIndex = itemElem.getAttribute("content-path-index");
             let modelPath = `${this.name}[${itemIndex}]`;
 
             if (this.form.modelPath)
@@ -42,8 +42,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             //});
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            let itemElem = elem.closest("[content-path-index]");
-            let itemIndex = parseInt(itemElem.getAttribute("content-path-index"));
+            const itemElem = elem.closest("[content-path-index]");
+            const itemIndex = parseInt(itemElem.getAttribute("content-path-index"));
 
             itemElem.remove();
             this._refreshBlockIndexes();
@@ -52,13 +52,10 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                 url: '/brandup.pages/content/model',
                 urlParams: { itemIndex: itemIndex.toString() },
                 method: "DELETE",
-                success: (data: string, status: number) => {
-                    if (status === 200) {
-                    }
-                }
+                success: () => { return; }
             });
         });
-        this.registerCommand("item-add", (elem: HTMLElement) => {
+        this.registerCommand("item-add", () => {
             if (this.options.itemTypes.length === 1) {
                 this.__addItem(this.options.itemTypes[0].name);
             }
@@ -70,8 +67,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
 
         this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
-            let target = <Element>e.target;
-            let itemElem = target.closest("[content-path-index]");
+            const target = e.target as Element;
+            const itemElem = target.closest("[content-path-index]");
             if (itemElem) {
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData("content-path-index", itemElem.getAttribute('content-path-index'));
@@ -90,15 +87,15 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             e.preventDefault();
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
-            let target = <Element>e.target;
-            var sourceIndex = e.dataTransfer.getData("content-path-index");
-            let elem = target.closest("[content-path-index]");
+            const target = e.target as Element;
+            const sourceIndex = e.dataTransfer.getData("content-path-index");
+            const elem = target.closest("[content-path-index]");
             if (elem) {
-                let destIndex = elem.getAttribute("content-path-index");
+                const destIndex = elem.getAttribute("content-path-index");
                 if (destIndex !== sourceIndex) {
                     console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
 
-                    let sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
+                    const sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {
                             elem.insertAdjacentElement("beforebegin", sourceElem);
@@ -111,9 +108,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                             url: '/brandup.pages/content/model/move',
                             urlParams: { itemIndex: sourceIndex, newIndex: destIndex },
                             method: "POST",
-                            success: (data: ModelFieldFormValue, status: number) => {
-                                if (status === 200) {
-                                    this.setValue(data);
+                            success: (response: AjaxResponse<ModelFieldFormValue>) => {
+                                if (response.status === 200) {
+                                    this.setValue(response.data);
                                 }
                             }
                         });
@@ -143,7 +140,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
         let i = 0
         for (i = 0; i < this.__value.items.length; i++) {
-            let item = this.__value.items[i];
+            const item = this.__value.items[i];
             this.__itemsElem.appendChild(this.__createItemElem(item, i));
         }
 
@@ -153,7 +150,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         ]));
     }
     private __createItemElem(item: ContentModel, index: number) {
-        let itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString() }, [
+        const itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString() }, [
             DOM.tag("div", { class: "index", draggable: "true", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),
             DOM.tag("div", { class: "type" }, item.type.title),
@@ -167,7 +164,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
     }
     private eachItems(f: (elem: Element, index: number) => void) {
         for (let i = 0; i < this.__itemsElem.children.length; i++) {
-            let itemElem = this.__itemsElem.children.item(i);
+            const itemElem = this.__itemsElem.children.item(i);
             if (!itemElem.hasAttribute("content-path-index"))
                 continue;
             f(itemElem, i);
@@ -180,17 +177,17 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
     }
     private __refreshItem(elem: Element) {
-        let itemIndex = parseInt(elem.getAttribute("content-path-index"));
+        const itemIndex = parseInt(elem.getAttribute("content-path-index"));
 
         this.form.request(this, {
             url: '/brandup.pages/content/model/data',
             urlParams: { itemIndex: itemIndex.toString() },
             method: "GET",
-            success: (data: ContentModel, status: number) => {
-                if (status === 200) {
-                    this.__value.items[itemIndex] = data;
+            success: (response: AjaxResponse<ContentModel>) => {
+                if (response.status === 200) {
+                    this.__value.items[itemIndex] = response.data;
 
-                    let newElem = this.__createItemElem(data, itemIndex);
+                    const newElem = this.__createItemElem(response.data, itemIndex);
                     elem.insertAdjacentElement("afterend", newElem);
                     elem.remove();
                 }
@@ -202,9 +199,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             url: '/brandup.pages/content/model',
             urlParams: { itemType: itemType },
             method: "PUT",
-            success: (data: ModelFieldFormValue, status: number) => {
-                if (status === 200) {
-                    this.setValue(data);
+            success: (response: AjaxResponse<ModelFieldFormValue>) => {
+                if (response.status === 200) {
+                    this.setValue(response.data);
                 }
             }
         });
@@ -213,9 +210,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.form.request(this, {
             url: '/brandup.pages/content/model',
             method: "GET",
-            success: (data: ModelFieldFormValue, status: number) => {
-                if (status === 200) {
-                    this.setValue(data);
+            success: (response: AjaxResponse<ModelFieldFormValue>) => {
+                if (response.status === 200) {
+                    this.setValue(response.data);
                 }
             }
         });

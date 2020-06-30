@@ -1,7 +1,6 @@
-﻿import { UIElement, DOM } from "brandup-ui";
+﻿import { UIElement, DOM, AjaxResponse } from "brandup-ui";
 import ContentPage from "../pages/content";
 import { PageDesigner } from "../content/designer/page";
-import { NavigationOptions } from "../typings/website";
 import { editPage } from "../dialogs/pages/edit";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
@@ -23,7 +22,7 @@ export class PageToolbar extends UIElement {
 
         page.attachDestroyFunc(() => { this.destroy(); });
 
-        var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
+        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
         let isLoading = false;
 
         if (page.model.editId) {
@@ -35,45 +34,45 @@ export class PageToolbar extends UIElement {
 
             this.registerCommand("bp-content", () => {
                 editPage(page.model.editId).then(() => {
-                    page.app.reload();
+                    page.website.app.reload();
                 });
             });
-            this.registerCommand("bp-commit", (elem: HTMLElement) => {
+            this.registerCommand("bp-commit", () => {
                 if (isLoading)
                     return;
                 isLoading = true;
 
-                page.app.request({
+                page.website.request({
                     url: "/brandup.pages/page/content/commit",
                     urlParams: { editId: page.model.editId },
                     method: "POST",
-                    success: (data: string, status: number) => {
+                    success: (response) => {
                         cancelNav = false;
 
-                        if (status !== 200)
+                        if (response.status !== 200)
                             throw "";
 
-                        page.app.nav({ url: data, pushState: false });
+                        page.website.nav({ url: response.data, replace: true });
                         isLoading = false;
                     }
-                });
+                }, true);
             });
-            this.registerCommand("bp-discard", (elem: HTMLElement) => {
+            this.registerCommand("bp-discard", () => {
                 if (isLoading)
                     return;
                 isLoading = true;
 
-                page.app.request({
+                page.website.request({
                     url: "/brandup.pages/page/content/discard",
                     urlParams: { editId: page.model.editId },
                     method: "POST",
-                    success: (data: string, status: number) => {
+                    success: (response) => {
                         cancelNav = false;
 
-                        if (status !== 200)
+                        if (response.status !== 200)
                             throw "";
 
-                        page.app.nav({ url: data, pushState: false });
+                        page.website.nav({ url: response.data, replace: true });
                         isLoading = false;
                     }
                 });
@@ -102,7 +101,7 @@ export class PageToolbar extends UIElement {
 
                 this.registerCommand("bp-publish", () => {
                     publishPage(page.model.id).then(result => {
-                        page.app.nav({ url: result.url, pushState: false });
+                        page.website.nav({ url: result.url, replace: true });
                     });
                 });
             }
@@ -115,21 +114,21 @@ export class PageToolbar extends UIElement {
                     return;
                 isLoading = true;
 
-                page.app.request({
+                page.website.request({
                     url: "/brandup.pages/page/content/begin",
                     urlParams: { pageId: page.model.id },
                     method: "POST",
-                    success: (data: BeginPageEditResult, status: number) => {
+                    success: (response: AjaxResponse<BeginPageEditResult>) => {
                         isLoading = false;
 
-                        if (status !== 200)
+                        if (response.status !== 200)
                             throw "";
 
-                        if (data.currentDate) {
-                            let popup = DOM.tag("div", { class: "bp-toolbar-popup" }, [
+                        if (response.data.currentDate) {
+                            const popup = DOM.tag("div", { class: "bp-toolbar-popup" }, [
                                 DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                                 DOM.tag("div", { class: "buttons" }, [
-                                    DOM.tag("button", { "data-command": "continue-edit", "data-value": data.url }, "Продолжить"),
+                                    DOM.tag("button", { "data-command": "continue-edit", "data-value": response.data.url }, "Продолжить"),
                                     DOM.tag("button", { "data-command": "restart-edit" }, "Начать заново")
                                 ])
                             ])
@@ -139,37 +138,37 @@ export class PageToolbar extends UIElement {
                             this.setPopup(popup);
                         }
                         else
-                            page.app.nav({ url: data.url, pushState: false });
+                            page.website.nav({ url: response.data.url, replace: true });
                     }
                 });
             });
             this.registerCommand("bp-seo", () => {
                 seoPage(page.model.id).then(() => {
-                    page.app.reload();
+                    page.website.app.reload();
                 })
             });
 
             this.registerCommand("continue-edit", (elem: HTMLElement) => {
                 this.setPopup(null);
 
-                let url = elem.getAttribute("data-value");
-                page.app.nav({ url: url, pushState: false });
+                const url = elem.getAttribute("data-value");
+                page.website.nav({ url: url, replace: true });
             });
 
-            this.registerCommand("restart-edit", (elem: HTMLElement) => {
+            this.registerCommand("restart-edit", () => {
                 this.setPopup(null);
 
-                page.app.request({
+                page.website.request({
                     url: "/brandup.pages/page/content/begin",
                     urlParams: { pageId: page.model.id, force: "true" },
                     method: "POST",
-                    success: (data: BeginPageEditResult, status: number) => {
+                    success: (response: AjaxResponse<BeginPageEditResult>) => {
                         isLoading = false;
 
-                        if (status !== 200)
+                        if (response.status !== 200)
                             throw "";
 
-                        page.app.nav({ url: data.url, pushState: false });
+                        page.website.nav({ url: response.data.url, replace: true });
                     }
                 });
             });

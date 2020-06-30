@@ -19,13 +19,13 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
         this.setHeader("Выберите тип контента");
 
         this.__types.map((type, index) => {
-            let itemElem = DOM.tag("a", { class: "item", href: "", "data-command": "select", "data-index": index }, type.title);
+            const itemElem = DOM.tag("a", { class: "item", href: "", "data-command": "select", "data-index": index }, type.title);
             this.content.appendChild(itemElem);
         });
 
         this.registerCommand("select", (elem: HTMLElement) => {
-            let index = parseInt(elem.getAttribute("data-index"));
-            let type = this.__types[index];
+            const index = parseInt(elem.getAttribute("data-index"));
+            const type = this.__types[index];
 
             this.resolve(type);
         });
@@ -34,7 +34,7 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
     }
 }
 
-export var selectContentType = (types: Array<ContentTypeModel>) => {
-    let dialog = new SelectContentTypeDialog(types);
+export const selectContentType = (types: Array<ContentTypeModel>) => {
+    const dialog = new SelectContentTypeDialog(types);
     return dialog.open();
 };

@@ -1,15 +1,15 @@
-﻿import { Dialog, DialogOptions } from "./dialog";
-import { DOM, ajaxRequest } from "brandup-ui";
+﻿import { Dialog } from "./dialog";
+import { DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
 import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     private __textElem: HTMLElement;
     private __errorsElem: HTMLElement;
     private __item: TItem;
-    
+
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-delete");
-        
+
         this.addAction("close", "Отмена");
         this.addAction("confirm", "Удалить", true);
 
@@ -22,7 +22,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
         this.__errorsElem = DOM.tag("div", { class: "errors" });
         this.content.appendChild(this.__errorsElem);
 
-        var urlParams: { [key: string]: string; } = {};
+        const urlParams: { [key: string]: string } = {};
 
         this._buildUrlParams(urlParams);
 
@@ -31,16 +31,16 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
             url: this._buildUrl(),
             urlParams: urlParams,
             method: "GET",
-            success: (data: TItem, status: number) => {
+            success: (response: AjaxResponse<TItem>) => {
                 this.setLoading(false);
 
-                switch (status) {
+                switch (response.status) {
                     case 404: {
                         this.setError("Данные для удаления не найдены.");
                         break;
                     }
                     case 200: {
-                        this.__item = data;
+                        this.__item = response.data;
                         break;
                     }
                     default:
@@ -53,7 +53,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     private __delete() {
         this.setLoading(true);
 
-        var urlParams: { [key: string]: string; } = {};
+        const urlParams: { [key: string]: string } = {};
 
         this._buildUrlParams(urlParams);
 
@@ -61,12 +61,12 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
             url: this._buildUrl(),
             urlParams: urlParams,
             method: "DELETE",
-            success: (data: any, status: number) => {
+            success: (response) => {
                 this.setLoading(false);
 
-                switch (status) {
+                switch (response.status) {
                     case 400: {
-                        this.__renderErrors((<Result>data).errors);
+                        this.__renderErrors((response.data as Result).errors);
                         break;
                     }
                     case 200: {
@@ -84,8 +84,8 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
         DOM.empty(this.__errorsElem);
 
         if (errors) {
-            var elem = DOM.tag("ul");
-            for (var i = 0; i < errors.length; i++) {
+            const elem = DOM.tag("ul");
+            for (let i = 0; i < errors.length; i++) {
                 elem.appendChild(DOM.tag("li", null, errors[i]));
             }
             this.__errorsElem.appendChild(elem);
@@ -94,5 +94,5 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
 
     protected abstract _getText(): string;
     protected abstract _buildUrl(): string;
-    protected abstract _buildUrlParams(urlParams: { [key: string]: string; });
+    protected abstract _buildUrlParams(urlParams: { [key: string]: string });
 }

@@ -1,6 +1,6 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM, ajaxRequest } from "brandup-ui";
+import { DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
 import iconArrow from "../../svg/combobox-arrow.svg";
 import "./hyperlink.less";
 
@@ -31,7 +31,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         super._onRender();
 
         this.element.classList.add("hyperlink");
-        
+
         this.element.appendChild(DOM.tag("div", { class: "value-type", "data-command": "open-types-menu" }, [
             this.__typeElem = DOM.tag("span", null, "Page"),
             iconArrow
@@ -39,7 +39,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.element.appendChild(this.__valueElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
         this.element.appendChild(this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }));
 
-        this.__urlValueInput = <HTMLInputElement>DOM.tag("input", { type: "text", class: "url" });
+        this.__urlValueInput = DOM.tag("input", { type: "text", class: "url" }) as HTMLInputElement;
         this.__urlValueInput.addEventListener("change", () => {
             this.__refreshUI();
 
@@ -49,10 +49,10 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                     url: this.__urlValueInput.value
                 },
                 method: "POST",
-                success: (data: HyperLinkFieldFormValue, status: number) => {
-                    switch (status) {
+                success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
+                    switch (response.status) {
                         case 200:
-                            this.setValue(data);
+                            this.setValue(response.data);
 
                             break;
                         default:
@@ -67,9 +67,9 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         });
         this.element.appendChild(this.__urlValueInput);
 
-        this.__pageValueInput = <HTMLInputElement>DOM.tag("input", { type: "text", class: "page" });
+        this.__pageValueInput = DOM.tag("input", { type: "text", class: "page" }) as HTMLInputElement;
         this.__pageValueInput.addEventListener("keyup", () => {
-            var title = this.__pageValueInput.value;
+            const title = this.__pageValueInput.value;
             if (!title || title.length < 3)
                 return;
 
@@ -86,14 +86,14 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                         title: title
                     },
                     method: "GET",
-                    success: (data: Array<PageModel>, status: number) => {
-                        switch (status) {
+                    success: (response: AjaxResponse<Array<PageModel>>) => {
+                        switch (response.status) {
                             case 200:
                                 DOM.empty(this.__searchElem);
 
-                                if (data.length) {
-                                    for (let i = 0; i < data.length; i++) {
-                                        let page = data[i];
+                                if (response.data.length) {
+                                    for (let i = 0; i < response.data.length; i++) {
+                                        const page = response.data[i];
 
                                         this.__searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
                                     }
@@ -110,7 +110,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             }, 500);
         });
         this.element.appendChild(this.__pageValueInput);
-        
+
         this.__typeMenuElem = DOM.tag("ul", { class: "hyperlink-menu types" }, [
             DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Page" }, "Page")),
             DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Url" }, "Url"))
@@ -121,14 +121,14 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.element.appendChild(this.__searchElem);
 
         this.__closeTypeMenuFunc = (e: MouseEvent) => {
-            let t = <Element>e.target;
+            const t = e.target as Element;
             if (!t.closest(".hyperlink-menu") && this.element) {
                 this.element.classList.remove("opened-types");
                 document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
             }
         };
         this.__closePageMenuFunc = (e: MouseEvent) => {
-            let t = <Element>e.target;
+            const t = e.target as Element;
             if (!t.closest(".hyperlink") && this.element) {
                 this.element.classList.remove("inputing");
                 this.element.classList.remove("opened-pages");
@@ -152,7 +152,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.element.classList.add("opened-types")
             document.body.addEventListener("mousedown", this.__closeTypeMenuFunc, false);
         });
-        this.registerCommand("begin-input", (elem: HTMLElement) => {
+        this.registerCommand("begin-input", () => {
             this.element.classList.add("inputing");
 
             switch (this.__type) {
@@ -178,8 +178,8 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             }
         });
         this.registerCommand("select-type", (elem: HTMLElement) => {
-            let type = <HyperLinkType>elem.getAttribute("data-value");
-            
+            const type = elem.getAttribute("data-value") as HyperLinkType;
+
             this.element.classList.remove("opened-types");
             document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
 
@@ -191,7 +191,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.element.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
-            let pageId = elem.getAttribute("data-value");
+            const pageId = elem.getAttribute("data-value");
             this.__pageValueInput.setAttribute("value-page-id", pageId);
             this.__valueElem.innerText = elem.innerText;
             this.__pageValueInput.value = elem.innerText;
@@ -204,10 +204,10 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                     pageId: pageId
                 },
                 method: "POST",
-                success: (data: HyperLinkFieldFormValue, status: number) => {
-                    switch (status) {
+                success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
+                    switch (response.status) {
                         case 200:
-                            this.setValue(data);
+                            this.setValue(response.data);
 
                             break;
                         default:
@@ -219,7 +219,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
         this.__refreshUI();
     }
-    
+
     getValue(): HyperLinkFieldFormValue { throw "Not implemented"; }
     setValue(value: HyperLinkFieldFormValue) {
         if (value) {

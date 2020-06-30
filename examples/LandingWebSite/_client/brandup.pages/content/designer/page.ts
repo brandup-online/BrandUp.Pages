@@ -35,8 +35,8 @@ export class PageDesigner implements IPageDesigner {
 
         this.__rootElem.classList.add("accented");
 
-        for (let key in this.__fields) {
-            let f = this.__fields[key];
+        for (const key in this.__fields) {
+            const f = this.__fields[key];
             if (f === field)
                 continue;
             f.element.classList.add("hide-ui");
@@ -48,8 +48,8 @@ export class PageDesigner implements IPageDesigner {
         if (this.__accentedField) {
             this.__rootElem.classList.remove("accented");
 
-            for (let key in this.__fields) {
-                let f = this.__fields[key];
+            for (const key in this.__fields) {
+                const f = this.__fields[key];
                 f.element.classList.remove("hide-ui");
             }
 
@@ -58,14 +58,14 @@ export class PageDesigner implements IPageDesigner {
     }
 
     render() {
-        var fieldElements = DOM.queryElements(this.__rootElem, "[content-field]");
+        const fieldElements = DOM.queryElements(this.__rootElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
-            let fieldElem = fieldElements.item(i);
+            const fieldElem = fieldElements.item(i);
             if (!fieldElem.hasAttribute("content-field-model") || !fieldElem.hasAttribute("content-designer") || fieldElem.classList.contains("field-designer"))
                 continue;
 
-            let designerName = fieldElem.getAttribute("content-designer");
-            let fieldModel = <ContentFieldModel>JSON.parse(fieldElem.getAttribute("content-field-model"));
+            const designerName = fieldElem.getAttribute("content-designer");
+            const fieldModel: ContentFieldModel = JSON.parse(fieldElem.getAttribute("content-field-model"));
             let fieldDesigner: IContentFieldDesigner;
             switch (designerName.toLowerCase()) {
                 case "text": {
@@ -99,7 +99,7 @@ export class PageDesigner implements IPageDesigner {
     }
 
     destroy() {
-        for (let key in this.__fields) {
+        for (const key in this.__fields) {
             this.__fields[key].destroy();
         }
         this.__fields = null;

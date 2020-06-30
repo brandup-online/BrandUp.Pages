@@ -10,7 +10,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
     readonly queue: AjaxQueue;
     private __closeItemMenuFunc: (e: MouseEvent) => void;
     protected __model: TList;
-    private __enableSorting: boolean = false;
+    private __enableSorting = false;
 
     constructor(options?: DialogOptions) {
         super(options);
@@ -24,16 +24,16 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-list");
-        
+
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.content.appendChild(this.__itemsElem);
-        
+
         this.registerCommand("item-open-menu", (el: HTMLElement) => {
             el.parentElement.parentElement.classList.add("opened-menu");
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
-            let itemElem = (<HTMLElement>e.target).closest(".opened-menu");
+            const itemElem = (<HTMLElement>e.target).closest(".opened-menu");
             if (!itemElem)
                 this.__hideItemMenu();
         };
@@ -64,15 +64,15 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             e.preventDefault();
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
-                let target = <Element>e.target;
-                var sourceId = e.dataTransfer.getData("data-id");
-                var sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
-                let elem = target.closest("[data-index]");
+            const target = <Element>e.target;
+            const sourceId = e.dataTransfer.getData("data-id");
+            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
+            const elem = target.closest("[data-index]");
                 if (elem) {
-                    let destId = elem.getAttribute("data-id");
-                    let destIndex = parseInt(elem.getAttribute("data-index"));
+                    const destId = elem.getAttribute("data-id");
+                    const destIndex = parseInt(elem.getAttribute("data-index"));
                     if (destIndex !== sourceIndex) {
-                        let sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
+                        const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                         if (sourceElem) {
                             let destPosition: string;
                             if (destIndex < sourceIndex) {
@@ -89,14 +89,14 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
                             this.__refreshIndexes();
 
-                            var urlParams: { [key: string]: string; } = {
+                            const urlParams: { [key: string]: string; } = {
                                 sourceId: sourceId,
                                 destId: destId,
                                 destPosition: destPosition
                             };
                             this._buildUrlParams(urlParams);
 
-                            var url = this._buildUrl();
+                            let url = this._buildUrl();
                             url += "/sort";
 
                             this.setLoading(true);
@@ -212,7 +212,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
         }, (elem: HTMLElement) => {
             if (!canExecute)
                 return true;
-            
+
             let item = this._findItemIdFromElement(elem);
             if (item === null)
                 return false;
@@ -227,7 +227,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
 
         return { id: itemElem.getAttribute("data-id"), model: itemElem["_model_"] };
     }
-    
+
     private __renderItems(items: Array<TItem>) {
         var fragment = document.createDocumentFragment();
 

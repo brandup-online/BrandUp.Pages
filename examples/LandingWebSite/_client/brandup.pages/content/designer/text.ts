@@ -19,21 +19,21 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
 
             e.preventDefault();
 
-            var text = e.clipboardData.getData("text/plain");
+            const text = e.clipboardData.getData("text/plain");
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
         elem.addEventListener("cut", () => {
             this.__isChanged = true;
         });
         elem.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (!this.options.allowMultiline && e.keyCode == 13) {
+            if (!this.options.allowMultiline && e.keyCode === 13) {
                 e.preventDefault();
                 return false;
             }
 
             this.__refreshUI();
         });
-        elem.addEventListener("keyup", (e: KeyboardEvent) => {
+        elem.addEventListener("keyup", () => {
             this.__isChanged = true;
         });
         elem.addEventListener("focus", () => {
@@ -57,7 +57,7 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     }
 
     getValue(): string {
-        var val = this.normalizeValue(this.element.innerText);
+        const val = this.normalizeValue(this.element.innerText);
         return val ? val : null;
     }
     setValue(value: string) {
@@ -70,22 +70,22 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var val = this.normalizeValue(this.element.innerText);
+        const val = this.normalizeValue(this.element.innerText);
         return val ? true : false;
     }
 
     protected _onChanged() {
         this.__refreshUI();
-        var value = this.getValue();
+        const value = this.getValue();
 
         this.request({
             url: '/brandup.pages/content/text',
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (data: string, status: number) => {
-                if (status === 200) {
-                    this.setValue(data);
+            success: (response) => {
+                if (response.status === 200) {
+                    this.setValue(response.data);
                 }
             }
         });

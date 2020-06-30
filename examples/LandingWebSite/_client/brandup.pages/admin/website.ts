@@ -1,5 +1,4 @@
-﻿import { UIElement, DOM, ajaxRequest } from "brandup-ui";
-import Page from "../pages/page";
+﻿import { UIElement, DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import { listPageEditor } from "../dialogs/editors/list";
@@ -8,6 +7,7 @@ import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
 import { listContentType } from "../dialogs/content-types/list";
+import { Page } from "brandup-ui-website";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -19,10 +19,10 @@ export class WebSiteToolbar extends UIElement {
 
         document.body.classList.add("bp-state-toolbars");
 
-        var isContentPage = page instanceof ContentPage;
-        var buttons: Array<HTMLElement> = [];
+        const isContentPage = page instanceof ContentPage;
+        const buttons: Array<HTMLElement> = [];
 
-        if (isContentPage && (<ContentPage>page).model.parentPageId) {
+        if (isContentPage && page.model.parentPageId) {
             buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-back", title: "Перейти к родительской странице" }, iconBack));
         }
 
@@ -33,7 +33,7 @@ export class WebSiteToolbar extends UIElement {
             buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-pages-child", title: "Дочерние страницы" }, iconTree));
         }
 
-        var toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);
+        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);
 
         toolbarElem.appendChild(DOM.tag("div", { class: "bp-toolbar-menu" }, [
             DOM.tag("a", { href: "", "data-command": "bp-editors" }, "Редакторы страниц"),
@@ -48,12 +48,12 @@ export class WebSiteToolbar extends UIElement {
         this.registerCommand("bp-back", () => {
             let parentPageId: string = null;
             if (isContentPage)
-                parentPageId = (<ContentPage>page).model.parentPageId;
+                parentPageId = page.model.parentPageId;
             if (parentPageId) {
                 ajaxRequest({
                     url: `/brandup.pages/page/${parentPageId}`,
-                    success: (pageModel: PageModel) => {
-                        page.app.navigate(pageModel.url);
+                    success: (response: AjaxResponse<PageModel>) => {
+                        page.website.nav({ url: response.data.url });
                     }
                 });
             }
@@ -62,14 +62,14 @@ export class WebSiteToolbar extends UIElement {
         this.registerCommand("bp-pages", () => {
             let parentPageId: string = null;
             if (isContentPage)
-                parentPageId = (<ContentPage>page).model.parentPageId;
+                parentPageId = page.model.parentPageId;
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-pages-child", () => {
             let parentPageId: string = null;
             if (isContentPage)
-                parentPageId = (<ContentPage>page).model.id;
+                parentPageId = page.model.id;
             browserPage(parentPageId);
         });
 
@@ -93,7 +93,7 @@ export class WebSiteToolbar extends UIElement {
         });
 
         this.__closeMenuFunc = (e: MouseEvent) => {
-            let target = <Element>e.target;
+            const target = e.target as Element;
             if (!target.closest(".bp-toolbar-menu")) {
                 toolbarElem.classList.remove("opened-menu");
                 document.body.removeEventListener("click", this.__closeMenuFunc);

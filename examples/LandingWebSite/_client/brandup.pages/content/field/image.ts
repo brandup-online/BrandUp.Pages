@@ -1,12 +1,12 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui";
+import { DOM, AjaxResponse } from "brandup-ui";
 import "./image.less";
 
 export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> implements IContentField {
     readonly form: IContentForm;
     private valueElem: HTMLElement;
-    private __isChanged: boolean = false;
+    private __isChanged = false;
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
 
@@ -23,12 +23,12 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
 
         this.element.classList.add("image");
 
-        this.valueElem = <HTMLInputElement>DOM.tag("div", { class: "value", "tabindex": 0 }, [
+        this.valueElem = DOM.tag("div", { class: "value", "tabindex": 0 }, [
             DOM.tag("span", null, "Выберите или перетащите суда файл с изображением"),
             DOM.tag("button", { "data-command": "select-file" }, [
                 "Выбрать файл"
             ]),
-            this.__fileInputElem = <HTMLInputElement>DOM.tag("input", { type: "file" })
+            this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement
         ]);
         this.element.appendChild(this.valueElem);
 
@@ -41,13 +41,13 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
             this.valueElem.focus();
         });
 
-        var dragleaveTime = 0;
-        this.valueElem.ondragover = (e: DragEvent) => {
+        let dragleaveTime = 0;
+        this.valueElem.ondragover = () => {
             clearTimeout(dragleaveTime);
             this.valueElem.classList.add("draging");
             return false;
         };
-        this.valueElem.ondragleave = (e: DragEvent) => {
+        this.valueElem.ondragleave = () => {
             dragleaveTime = window.setTimeout(() => { this.valueElem.classList.remove("draging"); }, 50);
             return false;
         };
@@ -57,7 +57,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
 
             this.valueElem.classList.remove("draging");
 
-            let file = e.dataTransfer.files.item(0);
+            const file = e.dataTransfer.files.item(0);
             if (!file.type)
                 return false;
 
@@ -80,7 +80,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
                 this.__uploadFile(e.clipboardData.files.item(0));
             }
             else if (e.clipboardData.types.indexOf("text/plain") >= 0) {
-                let url = e.clipboardData.getData("text");
+                const url = e.clipboardData.getData("text");
                 if (url && url.toLocaleLowerCase().startsWith("http"))
                     this.__uploadFile(url);
             }
@@ -96,17 +96,15 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         this.valueElem.classList.add("uploading");
 
         if (file instanceof File) {
-            let fileObject = <File>file;
-
             this.form.request(this, {
                 url: `/brandup.pages/content/image`,
                 urlParams: { fileName: file.name },
                 method: "POST",
-                data: fileObject,
-                success: (data: ImageFieldValue, status: number) => {
-                    switch (status) {
+                data: file,
+                success: (response: AjaxResponse<ImageFieldValue>) => {
+                    switch (response.status) {
                         case 200:
-                            this.setValue(data);
+                            this.setValue(response.data);
 
                             this.valueElem.classList.remove("uploading");
 
@@ -122,12 +120,12 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         else if (typeof file === "string") {
             this.form.request(this, {
                 url: `/brandup.pages/content/image/url`,
-                urlParams: { url: <string>file },
+                urlParams: { url: file },
                 method: "POST",
-                success: (data: ImageFieldValue, status: number) => {
-                    switch (status) {
+                success: (response: AjaxResponse<ImageFieldValue>) => {
+                    switch (response.status) {
                         case 200:
-                            this.setValue(data);
+                            this.setValue(response.data);
 
                             this.valueElem.classList.remove("uploading");
 

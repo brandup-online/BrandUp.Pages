@@ -1,5 +1,6 @@
 ﻿import { Textbox, TextboxOptions } from "../../form/textbox";
 import { IContentField, IContentForm } from "../../typings/content";
+import { AjaxResponse } from "brandup-ui";
 
 export class TextContent extends Textbox implements IContentField {
     readonly form: IContentForm;
@@ -13,16 +14,16 @@ export class TextContent extends Textbox implements IContentField {
     protected _onChanged() {
         super._onChanged();
 
-        var value = this.getValue();
+        const value = this.getValue();
 
         this.form.request(this, {
             url: '/brandup.pages/content/text',
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (data: string, status: number) => {
-                if (status === 200) {
-                    this.setValue(data);
+            success: (response: AjaxResponse<string>) => {
+                if (response.status === 200) {
+                    this.setValue(response.data);
                 }
                 else {
                     this.setErrors([ "error" ]);

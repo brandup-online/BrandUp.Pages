@@ -1,8 +1,8 @@
 ﻿import { FieldDesigner } from "./base";
-import { DOM } from "brandup-ui";
+import { DOM, AjaxResponse } from "brandup-ui";
 import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
-import { ImageFieldValue, ImageFieldOptions } from "../field/image";
+import { ImageFieldOptions } from "../field/image";
 
 export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     private __fileInputElem: HTMLInputElement;
@@ -13,27 +13,26 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     protected onRender(elem: HTMLElement) {
         elem.classList.add("image-designer");
 
-        let menuElem: HTMLElement;
         let textInput: HTMLInputElement;
-        elem.appendChild(menuElem = DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
+        elem.appendChild(DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
             DOM.tag("ul", { class: "field-designer-popup" }, [
                 //DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "open-editor" }, "Редактор")),
                 //DOM.tag("li", { class: "split" }),
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "upload-file" }, "Загрузить с компьютера"))
             ]),
             this.__button = DOM.tag("button", { title: "Управление картинкой" }, iconUpload),
-            textInput = <HTMLInputElement>DOM.tag("input", { type: "text" })
+            textInput = DOM.tag("input", { type: "text" }) as HTMLInputElement
         ]));
 
         elem.appendChild(DOM.tag("div", { class: "bp-elem image-designer-progress" }));
 
-        this.__fileInputElem = <HTMLInputElement>DOM.tag("input", { type: "file" })
+        this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement;
         this.__fileInputElem.addEventListener("change", () => {
             if (this.__fileInputElem.files.length === 0)
                 return;
 
             this.__uploadFile(this.__fileInputElem.files.item(0));
-            
+
             textInput.focus();
         });
 
@@ -44,7 +43,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
                 this.__uploadFile(e.clipboardData.files.item(0));
             }
             else if (e.clipboardData.types.indexOf("text/plain") >= 0) {
-                let url = e.clipboardData.getData("text");
+                const url = e.clipboardData.getData("text");
                 if (url && url.toLocaleLowerCase().startsWith("http"))
                     this.__uploadFile(url);
             }
@@ -56,7 +55,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         });
 
         this.__closeFunc = (e: MouseEvent) => {
-            let t = <Element>e.target;
+            const t = e.target as Element;
             if (!t.closest(".image-designer-menu"))
                 elem.classList.remove("opened-menu");
         };
@@ -80,7 +79,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             this.__fileInputElem.click();
         });
 
-        var dragleaveTime = 0;
+        let dragleaveTime = 0;
         elem.ondragover = () => {
             clearTimeout(dragleaveTime);
             elem.classList.add("draging");
@@ -96,7 +95,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
 
             elem.classList.remove("draging");
 
-            let file = e.dataTransfer.files.item(0);
+            const file = e.dataTransfer.files.item(0);
             if (!file.type)
                 return false;
 
@@ -120,8 +119,8 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     private __uploadFile(file: File | string) {
         this.element.classList.add("uploading");
 
-        let width = this.element.getAttribute("content-image-width");
-        let height = this.element.getAttribute("content-image-height");
+        const width = this.element.getAttribute("content-image-width");
+        const height = this.element.getAttribute("content-image-height");
 
         if (file instanceof File) {
             this.request({
@@ -132,11 +131,11 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
                     height: height
                 },
                 method: "POST",
-                data: <File>file,
-                success: (data: string, status: number) => {
-                    switch (status) {
+                data: file,
+                success: (response: AjaxResponse<string>) => {
+                    switch (response.status) {
                         case 200:
-                            this.element.style.backgroundImage = `url(${data})`;
+                            this.element.style.backgroundImage = `url(${response.data})`;
                             this.element.classList.remove("uploading");
 
                             break;
@@ -152,15 +151,15 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             this.request({
                 url: `/brandup.pages/content/image/url`,
                 urlParams: {
-                    url: <string>file,
+                    url: file,
                     width: width,
                     height: height
                 },
                 method: "POST",
-                success: (data: string, status: number) => {
-                    switch (status) {
+                success: (response: AjaxResponse<string>) => {
+                    switch (response.status) {
                         case 200:
-                            this.element.style.backgroundImage = `url(${data})`;
+                            this.element.style.backgroundImage = `url(${response.data})`;
                             break;
                     }
 

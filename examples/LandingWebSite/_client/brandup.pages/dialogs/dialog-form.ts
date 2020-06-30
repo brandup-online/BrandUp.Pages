@@ -23,8 +23,8 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-form");
-        
-        this.content.appendChild(this.__formElem = <HTMLFormElement>DOM.tag("form", { method: "POST" }));
+
+        this.content.appendChild(this.__formElem = DOM.tag("form", { method: "POST" }) as HTMLFormElement);
         this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));
 
         this.__formElem.addEventListener("submit", (e: Event) => {
@@ -44,26 +44,26 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
     }
 
     private __loadForm() {
-        var urlParams: { [key: string]: string; } = {};
+        const urlParams: { [key: string]: string; } = {};
 
         this._buildUrlParams(urlParams);
 
         this.setLoading(true);
 
-        this.queue.request({
+        this.queue.push({
             url: this._buildUrl(),
             urlParams: urlParams,
             method: "GET",
-            success: (data: any, status: number) => {
+            success: (response) => {
                 this.setLoading(false);
 
-                switch (status) {
+                switch (response.status) {
                     case 400: {
-                        this.__applyModelState(<ValidationProblemDetails>data);
+                        this.__applyModelState(response.data);
                         break;
                     }
                     case 200: {
-                        this.__model = <TForm>data;
+                        this.__model = response.data;
                         this._buildForm(this.__model);
                         this.setValues(this.__model.values);
 
@@ -84,7 +84,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         //};
 
         //this._buildUrlParams(urlParams);
-        
+
         //this.queue.request({
         //    url: this._buildUrl(),
         //    urlParams: urlParams,
@@ -110,29 +110,29 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         if (!this.__model || !this.validate())
             return;
 
-        var urlParams: { [key: string]: string; } = {};
+        const urlParams: { [key: string]: string; } = {};
 
         this._buildUrlParams(urlParams);
 
         this.setLoading(true);
 
-        this.queue.request({
+        this.queue.push({
             url: this._buildUrl(),
             urlParams: urlParams,
             method: "POST",
             type: "JSON",
             data: this.getValues(),
-            success: (data: any, status: number) => {
+            success: (response) => {
                 this.setLoading(false);
 
-                switch (status) {
+                switch (response.status) {
                     case 400: {
-                        this.__applyModelState(data);
+                        this.__applyModelState(response.data);
                         break;
                     }
                     case 201:
                     case 200: {
-                        this.resolve(data);
+                        this.resolve(response.data);
                         break;
                     }
                     default:
@@ -142,21 +142,21 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         });
     }
     private __applyModelState(state: ValidationProblemDetails) {
-        for (let key in this.__fields) {
-            let field = this.__fields[key];
+        for (const key in this.__fields) {
+            const field = this.__fields[key];
             field.setErrors(null);
         }
 
         if (state && state.errors) {
-            for (let key in state.errors) {
+            for (const key in state.errors) {
                 if (key === "")
                     continue;
 
-                let field = this.getField(key);
+                const field = this.getField(key);
                 field.setErrors(state.errors[key]);
             }
         }
-        
+
         if (state && state.errors && state.errors.hasOwnProperty("")) {
             this.setError(state.errors[""]);
         }
@@ -166,10 +166,10 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         return true;
     }
     getValues(): { [key: string]: any } {
-        var values: { [key: string]: any } = {};
+        const values: { [key: string]: any } = {};
 
-        for (var key in this.__fields) {
-            var field = this.__fields[key];
+        for (const key in this.__fields) {
+            const field = this.__fields[key];
 
             values[key] = field.getValue();
         }
@@ -177,8 +177,8 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         return values;
     }
     setValues(values: TValues) {
-        for (var key in values) {
-            var field = this.getField(key);
+        for (const key in values) {
+            const field = this.getField(key);
             field.setValue(values[key]);
         }
     }
@@ -192,7 +192,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
             throw `Field name "${field.name}" already exists.`;
 
-        var containerElem = DOM.tag("div", { class: "field" });
+        const containerElem = DOM.tag("div", { class: "field" });
 
         if (title)
             containerElem.appendChild(DOM.tag("label", { for: field.name }, title));
@@ -204,17 +204,17 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         this.__fields[field.name.toLowerCase()] = field;
     }
     protected addTextBox(name: string, title: string, options: TextboxOptions) {
-        var field = new Textbox(name, options);
+        const field = new Textbox(name, options);
         this.addField(title, field);
     }
     protected addComboBox(name: string, title: string, options: ComboBoxFieldOptions, items: Array<ComboBoxItem>) {
-        var field = new ComboBoxField(name, options);
+        const field = new ComboBoxField(name, options);
         this.addField(title, field);
 
         field.addItems(items);
     }
     protected addStringArray(name: string, title: string, options: StringArrayFieldOptions) {
-        var field = new StringArrayField(name, options);
+        const field = new StringArrayField(name, options);
         this.addField(title, field);
     }
 

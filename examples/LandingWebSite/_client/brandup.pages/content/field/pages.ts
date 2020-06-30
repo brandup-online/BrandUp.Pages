@@ -1,6 +1,6 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM, ajaxRequest } from "brandup-ui";
+import { DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
 import "./pages.less";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
@@ -25,13 +25,13 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
         this.element.classList.add("pages");
 
-        this.element.appendChild(this.inputElem = <HTMLInputElement>DOM.tag("input", { type: "text" }));
+        this.element.appendChild(this.inputElem = DOM.tag("input", { type: "text" }) as HTMLInputElement);
         this.element.appendChild(this.valueElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
         this.element.appendChild(DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }, this.options.placeholder));
         this.element.appendChild(this.searchElem = DOM.tag("ul", { class: "pages-menu" }));
 
         this.inputElem.addEventListener("keyup", () => {
-            var title = this.inputElem.value;
+            const title = this.inputElem.value;
             if (!title || title.length < 3)
                 return;
 
@@ -49,14 +49,14 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                         title: title
                     },
                     method: "GET",
-                    success: (data: Array<PageCollectionModel>, status: number) => {
-                        switch (status) {
+                    success: (response: AjaxResponse<Array<PageCollectionModel>>) => {
+                        switch (response.status) {
                             case 200:
                                 DOM.empty(this.searchElem);
 
-                                if (data.length) {
-                                    for (let i = 0; i < data.length; i++) {
-                                        let collection = data[i];
+                                if (response.data.length) {
+                                    for (let i = 0; i < response.data.length; i++) {
+                                        const collection = response.data[i];
 
                                         this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id, "data-url": collection.pageUrl }, collection.title + ": " + collection.pageUrl)));
                                     }
@@ -75,7 +75,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
         });
 
         this.__closeMenuFunc = (e: MouseEvent) => {
-            let t = <Element>e.target;
+            const t = e.target as Element;
             if (!t.closest(".pages") && this.element) {
                 this.element.classList.remove("inputing");
                 document.body.removeEventListener("click", this.__closeMenuFunc, false);
@@ -103,8 +103,8 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             this.element.classList.remove("inputing");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
-            let pageCollectionId = elem.getAttribute("data-value");
-            let pageUrl = elem.getAttribute("data-url");
+            const pageCollectionId = elem.getAttribute("data-value");
+            const pageUrl = elem.getAttribute("data-url");
 
             this.setValue({
                 id: pageCollectionId,
@@ -116,10 +116,10 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                 url: `/brandup.pages/content/pages`,
                 urlParams: { pageCollectionId: pageCollectionId },
                 method: "POST",
-                success: (data: PagesFieldFormValue, status: number) => {
-                    switch (status) {
+                success: (response: AjaxResponse<PagesFieldFormValue>) => {
+                    switch (response.status) {
                         case 200:
-                            this.setValue(data);
+                            this.setValue(response.data);
 
                             break;
                         default:

@@ -1,11 +1,11 @@
-﻿import { AjaxQueue, AjaxRequestOptions } from "brandup-ui";
+﻿import { AjaxQueue, AjaxRequest } from "brandup-ui";
 
 export interface IContentForm {
     editId: string;
     modelPath: string;
     queue: AjaxQueue;
 
-    request(field: IContentField, options: AjaxRequestOptions);
+    request(field: IContentField, options: AjaxRequest);
     navigate(modelPath: string);
     getField(name: string): IContentField;
 }

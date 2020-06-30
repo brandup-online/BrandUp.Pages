@@ -1,8 +1,7 @@
-﻿import Page from "../../brandup.pages/pages/page";
-import { PageClientModel } from "../../brandup.pages/typings/website";
+﻿import { Page, PageModel } from "brandup-ui-website";
 import { DOM } from "brandup-ui";
 
-class AboutPage extends Page<PageClientModel> {
+class AboutPage extends Page<PageModel> {
     get typeName(): string { return "AboutPage" }
 
     protected onRenderContent() {
