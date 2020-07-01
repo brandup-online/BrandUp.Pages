@@ -13,14 +13,14 @@ import iconSeo from "../svg/toolbar-button-seo.svg";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
-    private __pageNavFunc: (e: CustomEvent) => void;
+    //private __pageNavFunc: (e: CustomEvent) => void;
 
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
 
     constructor(page: ContentPage) {
         super();
 
-        page.attachDestroyFunc(() => { this.destroy(); });
+        //page.attachDestroyFunc(() => { this.destroy(); });
 
         const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
         let isLoading = false;
@@ -210,7 +210,7 @@ export class PageToolbar extends UIElement {
         }
 
         this.element.remove();
-        window.removeEventListener("pageNavigating", this.__pageNavFunc, false);
+        //window.removeEventListener("pageNavigating", this.__pageNavFunc, false);
 
         super.destroy();
     }

@@ -7,14 +7,14 @@ import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
 import { listContentType } from "../dialogs/content-types/list";
-import { Page } from "brandup-ui-website";
+import { Page, PageModel } from "brandup-ui-website";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
 
     get typeName(): string { return "BrandUpPages.WebSiteToolbar"; }
 
-    constructor(page: Page<any>) {
+    constructor(page: Page<PageModel>) {
         super();
 
         document.body.classList.add("bp-state-toolbars");

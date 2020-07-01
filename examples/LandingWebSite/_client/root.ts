@@ -6,7 +6,7 @@ import { ContentMiddleware } from "./brandup.pages/middleware";
 host.start({
     pageTypes: {
         "content": () => import("./brandup.pages/pages/content"),
-        "about": () => import("./pages/about")
+        "about": () => import("./pages/about/index")
     },
     scripts: {
         "BB1": () => import("./contents/BB1")
