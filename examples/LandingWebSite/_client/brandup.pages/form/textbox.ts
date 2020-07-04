@@ -54,7 +54,7 @@ export class Textbox extends Field<string, TextboxOptions> {
     }
 
     private __refreshUI() {
-        let hasVal = this.hasValue();
+        const hasVal = this.hasValue();
         if (hasVal)
             this.element.classList.add("has-value");
         else

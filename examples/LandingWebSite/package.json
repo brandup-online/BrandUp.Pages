@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "brandup-pages-ckeditor": "../brandup-pages-ckeditor",
-    "brandup-ui": "^1.1.5",
+    "brandup-ui": "^1.1.7",
     "brandup-ui-app": "^1.2.16",
     "brandup-ui-website": "^2.0.13"
   },

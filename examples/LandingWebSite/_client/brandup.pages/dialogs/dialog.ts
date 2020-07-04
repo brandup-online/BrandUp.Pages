@@ -1,9 +1,14 @@
-﻿import { UIControl, DOM, Utility } from "brandup-ui";
+﻿import { DOM, Utility } from "brandup-ui";
 import "./dialog.less";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";
+import { UIControl } from "../control";
 
-export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
+const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
+let currentDialog: Dialog = null;
+document.body.appendChild(dialogsPanelElem);
+
+export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     protected headerElem: HTMLElement;
     protected headerTitleElem: HTMLElement;
     protected footerElem: HTMLElement;
@@ -82,8 +87,8 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
         else
             this.element.classList.remove("loading");
     }
-    addAction(name: string, title: string, isAccent: boolean = false) {
-        var b = DOM.tag("button", { class: "button", "data-command": name }, title);
+    addAction(name: string, title: string, isAccent = false) {
+        const b = DOM.tag("button", { class: "button", "data-command": name }, title);
         if (isAccent)
             b.classList.add("accent");
         this.footerElem.appendChild(b);
@@ -94,7 +99,7 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
     setError(message: string | Array<string>) {
         this.element.classList.add("has-error");
 
-        let list = DOM.tag("ul");
+        const list = DOM.tag("ul");
         if (Utility.isArray(message)) {
             for (let i = 0; i < message.length; i++) {
                 list.appendChild(DOM.tag("li", null, message[i]));
@@ -151,13 +156,13 @@ export abstract class Dialog<TResult> extends UIControl<DialogOptions> {
 
         this.destroy();
     }
-    
+
     destroy() {
         if (this.__childDialog) {
             this.__childDialog.destroy();
             this.__childDialog = null;
         }
-        
+
         if (!this.__parentDialog) {
             currentDialog = null;
 
@@ -178,7 +183,3 @@ export interface DialogOptions {
     header?: string;
     notes?: string;
 }
-
-var dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
-var currentDialog: Dialog<any> = null;
-document.body.appendChild(dialogsPanelElem);

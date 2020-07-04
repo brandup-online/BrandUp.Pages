@@ -1,4 +1,5 @@
-﻿import { UIControl, DOM } from "brandup-ui";
+﻿import { DOM } from "brandup-ui";
+import { UIControl } from "../control";
 import "./field.less";
 
 export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
@@ -41,7 +42,7 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
 
         this.element.classList.add("has-errors");
         this.__errorsElem = DOM.tag("ul", { class: "field-errors" });
-        for (var i = 0; i < errors.length; i++)
+        for (let i = 0; i < errors.length; i++)
             this.__errorsElem.appendChild(DOM.tag("li", null, errors[i]));
         this.element.insertAdjacentElement("afterend", this.__errorsElem);
     }

@@ -14,14 +14,14 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         super._onRender();
 
         this.element.classList.add("string-array");
-        this.element.appendChild(this.__itemsElem = <HTMLInputElement>DOM.tag("div", { class: "items" }));
+        this.element.appendChild(this.__itemsElem = DOM.tag("div", { class: "items" }) as HTMLInputElement);
 
         this.__renderItems();
         this.__refreshUI();
 
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            let itemElem = elem.closest(".item");
-            let index = parseInt(itemElem.getAttribute("data-index"));
+            const itemElem = elem.closest(".item");
+            const index = parseInt(itemElem.getAttribute("data-index"));
 
             itemElem.remove();
             this.__items.splice(index, 1);
@@ -30,10 +30,10 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         });
 
         this.element.addEventListener("keyup", (e: Event) => {
-            let t = <HTMLInputElement>e.target;
-            let elem = t.closest(".item");
-            let index = parseInt(elem.getAttribute("data-index"));
-            let value = this.normalizeValue(t.value);
+            const t = e.target as HTMLInputElement;
+            const elem = t.closest(".item");
+            const index = parseInt(elem.getAttribute("data-index"));
+            const value = this.normalizeValue(t.value);
             if (value) {
                 elem.classList.add("has-value");
 
@@ -45,15 +45,15 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             else
                 elem.classList.remove("has-value");
 
-            if (index == this.__itemsElem.childElementCount - 1)
+            if (index === this.__itemsElem.childElementCount - 1)
                 this.__itemsElem.appendChild(this.__createItemElem("", index + 1));
         });
 
         this.element.addEventListener("change", (e: Event) => {
-            let t = <HTMLInputElement>e.target;
-            let elem = t.closest(".item");
-            let index = parseInt(elem.getAttribute("data-index"));
-            let value = this.normalizeValue(t.value);
+            const t = e.target as HTMLInputElement;
+            const elem = t.closest(".item");
+            const index = parseInt(elem.getAttribute("data-index"));
+            const value = this.normalizeValue(t.value);
 
             if (!value) {
                 elem.remove();
@@ -73,8 +73,8 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         //    }
         //});
         this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
-            let target = <Element>e.target;
-            let itemElem = target.closest("[data-index]");
+            const target = e.target as Element;
+            const itemElem = target.closest("[data-index]");
             if (itemElem && itemElem.classList.contains("has-value")) {
                 e.dataTransfer.effectAllowed = 'move';
                 e.dataTransfer.setData("data-index", itemElem.getAttribute('data-index'));
@@ -93,15 +93,15 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             e.preventDefault();
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
-            let target = <Element>e.target;
-            var sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
-            let elem = target.closest("[data-index]");
+            const target = e.target as Element;
+            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
+            const elem = target.closest("[data-index]");
             if (elem) {
-                let destIndex = parseInt(elem.getAttribute("data-index"));
+                const destIndex = parseInt(elem.getAttribute("data-index"));
                 if (destIndex !== sourceIndex) {
                     console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
 
-                    let sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
+                    const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {
                             elem.insertAdjacentElement("beforebegin", sourceElem);
@@ -110,7 +110,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
                             elem.insertAdjacentElement("afterend", sourceElem);
                         }
 
-                        let removed = this.__items.splice(sourceIndex, 1);
+                        const removed = this.__items.splice(sourceIndex, 1);
                         this.__items.splice(destIndex, 0, removed[0]);
 
                         this.__refreshIndexes();
@@ -129,15 +129,15 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         DOM.empty(this.__itemsElem);
 
         let i = 0;
-        for (let i = 0; i < this.__items.length; i++) {
-            let item = this.__items[i];
+        for (i = 0; i < this.__items.length; i++) {
+            const item = this.__items[i];
             this.__createItemElem(item, i);
         }
 
         this.__createItemElem("", i + 1);
     }
     private __createItemElem(item: string, index: number) {
-        let itemElem = DOM.tag("div", { class: "item", "data-index": index.toString() }, [
+        const itemElem = DOM.tag("div", { class: "item", "data-index": index.toString() }, [
             DOM.tag("div", { class: "index", draggable: "true", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
             DOM.tag("input", { type: "text", value: item, placeholder: this.options.placeholder ? this.options.placeholder : "" }),
             DOM.tag("ul", null, [
@@ -159,7 +159,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         this.raiseChanged();
     }
     private __refreshUI() {
-        let hasVal = this.hasValue();
+        const hasVal = this.hasValue();
         if (hasVal)
             this.element.classList.add("has-value");
         else
@@ -167,7 +167,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
     }
     private __refreshIndexes() {
         for (let i = 0; i < this.__itemsElem.childElementCount; i++) {
-            let elem = this.__itemsElem.children.item(i);
+            const elem = this.__itemsElem.children.item(i);
             elem.setAttribute("data-index", i.toString());
             DOM.getElementByClass(elem, "index").innerText = `#${i + 1}`;
         }
@@ -179,11 +179,11 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         return null;
     }
     setValue(value: Array<string>) {
-        var temp = new Array<string>();
+        const temp = new Array<string>();
 
         if (value) {
             for (let i = 0; i < value.length; i++) {
-                let item = value[i];
+                const item = value[i];
                 if (!item)
                     continue;
 

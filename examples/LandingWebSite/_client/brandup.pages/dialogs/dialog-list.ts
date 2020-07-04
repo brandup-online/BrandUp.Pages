@@ -4,7 +4,7 @@ import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 import iconSort from "../svg/list-item-sort.svg";
 
-export abstract class ListDialog<TList, TItem> extends Dialog<any> {
+export abstract class ListDialog<TList, TItem> extends Dialog {
     protected __itemsElem: HTMLElement;
     private __newItemElem: HTMLElement;
     readonly queue: AjaxQueue;
@@ -68,61 +68,61 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             const sourceId = e.dataTransfer.getData("data-id");
             const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
             const elem = target.closest("[data-index]");
-                if (elem) {
-                    const destId = elem.getAttribute("data-id");
-                    const destIndex = parseInt(elem.getAttribute("data-index"));
-                    if (destIndex !== sourceIndex) {
-                        const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
-                        if (sourceElem) {
-                            let destPosition: string;
-                            if (destIndex < sourceIndex) {
-                                elem.insertAdjacentElement("beforebegin", sourceElem);
-                                destPosition = "before";
-                            }
-                            else {
-                                elem.insertAdjacentElement("afterend", sourceElem);
-                                destPosition = "after";
-                            }
-
-                            console.log(`Source: ${sourceIndex}; Dest: ${destIndex}; Position: ${destPosition}`);
-                            console.log(`Source: ${sourceId}; Dest: ${destId}; Position: ${destPosition}`);
-
-                            this.__refreshIndexes();
-
-                            const urlParams: { [key: string]: string } = {
-                                sourceId: sourceId,
-                                destId: destId,
-                                destPosition: destPosition
-                            };
-                            this._buildUrlParams(urlParams);
-
-                            let url = this._buildUrl();
-                            url += "/sort";
-
-                            this.setLoading(true);
-
-                            ajaxRequest({
-                                url: url,
-                                urlParams: urlParams,
-                                method: "POST",
-                                success: (response: AjaxResponse) => {
-                                    this.setLoading(false);
-
-                                    if (response.status !== 200) {
-                                        this.setError("Error loading items.");
-                                        return;
-                                    }
-
-                                    this.loadItems();
-                                }
-                            });
+            if (elem) {
+                const destId = elem.getAttribute("data-id");
+                const destIndex = parseInt(elem.getAttribute("data-index"));
+                if (destIndex !== sourceIndex) {
+                    const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
+                    if (sourceElem) {
+                        let destPosition: string;
+                        if (destIndex < sourceIndex) {
+                            elem.insertAdjacentElement("beforebegin", sourceElem);
+                            destPosition = "before";
                         }
+                        else {
+                            elem.insertAdjacentElement("afterend", sourceElem);
+                            destPosition = "after";
+                        }
+
+                        console.log(`Source: ${sourceIndex}; Dest: ${destIndex}; Position: ${destPosition}`);
+                        console.log(`Source: ${sourceId}; Dest: ${destId}; Position: ${destPosition}`);
+
+                        this.__refreshIndexes();
+
+                        const urlParams: { [key: string]: string } = {
+                            sourceId: sourceId,
+                            destId: destId,
+                            destPosition: destPosition
+                        };
+                        this._buildUrlParams(urlParams);
+
+                        let url = this._buildUrl();
+                        url += "/sort";
+
+                        this.setLoading(true);
+
+                        ajaxRequest({
+                            url: url,
+                            urlParams: urlParams,
+                            method: "POST",
+                            success: (response: AjaxResponse) => {
+                                this.setLoading(false);
+
+                                if (response.status !== 200) {
+                                    this.setError("Error loading items.");
+                                    return;
+                                }
+
+                                this.loadItems();
+                            }
+                        });
                     }
                 }
+            }
 
-                e.stopPropagation();
-                return false;
-            });
+            e.stopPropagation();
+            return false;
+        });
     }
 
     private __refreshIndexes() {
@@ -212,7 +212,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog<any> {
             if (!canExecute)
                 return true;
 
-                const item = this._findItemIdFromElement(elem);
+            const item = this._findItemIdFromElement(elem);
             if (item === null)
                 return false;
 

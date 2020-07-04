@@ -19,17 +19,17 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
         this.element.appendChild(DOM.tag("i", null, iconArrow));
 
-        this.__valueElem = <HTMLInputElement>DOM.tag("div", { class: "value" });
+        this.__valueElem = DOM.tag("div", { class: "value" }) as HTMLInputElement;
         this.element.appendChild(this.__valueElem);
 
-        let placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "toggle" }, this.options.placeholder);
+        const placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "toggle" }, this.options.placeholder);
         this.element.appendChild(placeholderElem);
 
-        this.__itemsElem = <HTMLInputElement>DOM.tag("ul");
+        this.__itemsElem = DOM.tag("ul");
         this.element.appendChild(this.__itemsElem);
 
-        var isFocused = false;
-        var md = false;
+        let isFocused = false;
+        let md = false;
         this.addEventListener("focus", () => {
             isFocused = true;
         });
@@ -63,7 +63,7 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     }
 
     private __refreshUI() {
-        let hasVal = this.hasValue();
+        const hasVal = this.hasValue();
         if (hasVal)
             this.element.classList.add("has-value");
         else
@@ -75,7 +75,7 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     }
     addItems(items: Array<ComboBoxItem>) {
         if (items) {
-            for (var i = 0; i < items.length; i++)
+            for (let i = 0; i < items.length; i++)
                 this.addItem(items[i]);
         }
     }
@@ -89,9 +89,9 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
         return this.__value;
     }
     setValue(value: string) {
-        var text: string = "";
+        let text = "";
         if (value !== null) {
-            var itemElem = DOM.queryElement(this.__itemsElem, `li[data-value="${value}"]`);
+            const itemElem = DOM.queryElement(this.__itemsElem, `li[data-value="${value}"]`);
             if (!itemElem) {
                 this.setValue(null);
                 return;
@@ -108,8 +108,7 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
         this.__refreshUI();
     }
     hasValue(): boolean {
-        var val = this.__value;
-        return val ? true : false;
+        return this.__value ? true : false;
     }
 }
 export interface ComboBoxFieldOptions {
