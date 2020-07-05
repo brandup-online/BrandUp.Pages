@@ -25,7 +25,7 @@
     "brandup-pages-ckeditor": "../brandup-pages-ckeditor",
     "brandup-ui": "^1.1.7",
     "brandup-ui-app": "^1.2.16",
-    "brandup-ui-website": "^2.0.13"
+    "brandup-ui-website": "^2.0.19"
   },
   "scripts": {
     "build": "webpack -p --progress --config webpack.config.js",
