@@ -11,12 +11,12 @@ namespace LandingWebSite.Infrastructure
     {
         public Task Resize(Stream imageStream, int width, int height, Stream output)
         {
-            using (Image<Rgba32> image = Image.Load(imageStream))
+            using (Image<Rgba32> image = Image.Load<Rgba32>(imageStream))
             {
                 var resizeOptions = new ResizeOptions
                 {
                     Mode = ResizeMode.Crop,
-                    Size = new SixLabors.Primitives.Size(width, height),
+                    Size = new Size(width, height),
                     //CenterCoordinates = new List<float> { 5000, 5000 }
                 };
 
