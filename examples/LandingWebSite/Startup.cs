@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.Encodings.Web;
 using BrandUp.Pages.Builder;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Builder;
@@ -9,8 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
-using System.Globalization;
-using System.Text.Encodings.Web;
 
 namespace LandingWebSite
 {
@@ -108,15 +108,7 @@ namespace LandingWebSite
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-#pragma warning disable CS0618 // Type or member is obsolete
-                app.UseWebpackDevMiddleware(new Microsoft.AspNetCore.SpaServices.Webpack.WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true
-                });
-#pragma warning restore CS0618 // Type or member is obsolete
-            }
             else
             {
                 app.UseExceptionHandler("/error");
