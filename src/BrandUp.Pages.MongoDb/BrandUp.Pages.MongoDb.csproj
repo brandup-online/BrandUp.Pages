@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="BrandUp.MongoDB" Version="3.0.1" />
-    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.11.5" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.12.4" />
   </ItemGroup>
 
   <ItemGroup>
