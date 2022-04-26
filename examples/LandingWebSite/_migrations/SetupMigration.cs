@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace LandingWebSite._migrations
 {
-    [Migration("1.0.0", "CreateBasePages")]
-    public class Migration1 : IMigration
+    [Setup]
+    public class SetupMigration : IMigrationHandler
     {
         private readonly IPageCollectionService pageCollectionService;
         private readonly IPageMetadataManager pageMetadataManager;
         private readonly IPageService pageService;
 
-        public Migration1(IPageCollectionService pageCollectionService, IPageMetadataManager pageMetadataManager, IPageService pageService)
+        public SetupMigration(IPageCollectionService pageCollectionService, IPageMetadataManager pageMetadataManager, IPageService pageService)
         {
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));

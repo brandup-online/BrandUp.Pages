@@ -9,8 +9,6 @@ namespace LandingWebSite.Models
     {
         public AppDbContext(MongoDbContextOptions options) : base(options) { }
 
-        public IMongoCollection<_migrations.MigrationVersionDocument> Migrations => GetCollection<_migrations.MigrationVersionDocument>();
-
         public IMongoCollection<IdentityUser> Users => GetCollection<IdentityUser>();
         public IMongoCollection<IdentityRole> Roles => GetCollection<IdentityRole>();
 

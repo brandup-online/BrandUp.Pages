@@ -20,7 +20,7 @@ namespace LandingWebSite.Controllers
         }
 
         [HttpGet("signin")]
-        public async Task<IActionResult> SignIn()
+        public async Task<IActionResult> SignInAsync()
         {
             var user = await userManager.FindByEmailAsync("test@test.ru");
             if (user == null)
@@ -43,7 +43,7 @@ namespace LandingWebSite.Controllers
         }
 
         [HttpGet("signout")]
-        public async Task<IActionResult> SignOut()
+        public async Task<IActionResult> SignOutAsync()
         {
             await signInManager.SignOutAsync();
 

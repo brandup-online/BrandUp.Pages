@@ -21,7 +21,7 @@ namespace LandingWebSite.Infrastructure
                 };
 
                 image.Mutate(x => x.Resize(resizeOptions));
-                image.SaveAsJpeg(output, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder() { Quality = 65, Subsample = SixLabors.ImageSharp.Formats.Jpeg.JpegSubsample.Ratio444 });
+                image.SaveAsJpeg(output, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder() { Quality = 65 });
             }
 
             return Task.CompletedTask;

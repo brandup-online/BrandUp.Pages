@@ -1,7 +1,6 @@
-using System.Globalization;
-using System.Text.Encodings.Web;
 using BrandUp.Pages.Builder;
 using BrandUp.Website;
+using LandingWebSite._migrations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
+using System.Globalization;
+using System.Text.Encodings.Web;
 
 namespace LandingWebSite
 {
@@ -100,9 +101,12 @@ namespace LandingWebSite
 
             #endregion
 
-            services.AddMigrations(typeof(Startup).Assembly);
-            services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationStore, _migrations.MigrationStore>();
-            services.AddHostedService<_migrations.MigrationService>();
+            services.AddMigrations(options =>
+            {
+                options.AddAssembly(typeof(SetupMigration).Assembly);
+            });
+            services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationState, MigrationState>();
+            services.AddHostedService<MigrationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
