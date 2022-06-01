@@ -14,6 +14,8 @@ namespace BrandUp.Pages.MongoDb.Documents
         [BsonDateTimeOptions(Representation = BsonType.DateTime)]
         public DateTime CreatedDate { get; set; }
         [BsonRequired]
+        public string WebSiteId { get; set; }
+        [BsonRequired]
         public string Path { get; set; }
         [BsonRepresentation(BsonType.String)]
         public Guid? PageId { get; set; }
@@ -32,7 +34,7 @@ namespace BrandUp.Pages.MongoDb.Documents
     {
         protected override void OnSetupCollection(CancellationToken cancellationToken = default)
         {
-            var pathIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.Path);
+            var pathIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.WebSiteId).Ascending(it => it.Path);
             var pageIdIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.PageId);
 
             Collection.Indexes.CreateMany(new CreateIndexModel<PageUrlDocument>[] {

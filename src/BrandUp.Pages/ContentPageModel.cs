@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
-    public sealed class ContentPageModel : Website.Pages.AppPageModel
+    public sealed class ContentPageModel : AppPageModel
     {
         private IPage page;
         private IPageEdit editSession;

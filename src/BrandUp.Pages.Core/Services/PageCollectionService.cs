@@ -67,7 +67,7 @@ namespace BrandUp.Pages.Services
                     pageTypeNames.Add(derivedPageMetadata.Name);
             }
 
-            return repositiry.GetCollectionsAsync(pageTypeNames.ToArray(), title);
+            return repositiry.GetCollectionsAsync(webSiteId, pageTypeNames.ToArray(), title);
         }
 
         public async Task<Result> UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)

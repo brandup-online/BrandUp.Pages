@@ -21,6 +21,7 @@ namespace BrandUp.Pages.Interfaces
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }
+        string WebSiteId { get; }
         string Title { get; }
         string PageTypeName { get; }
         Guid? PageId { get; }

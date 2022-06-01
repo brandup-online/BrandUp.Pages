@@ -40,6 +40,7 @@ namespace BrandUp.Pages.Interfaces
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }
+        string WebSiteId { get; }
         string TypeName { get; }
         Guid OwnCollectionId { get; }
         string Header { get; set; }

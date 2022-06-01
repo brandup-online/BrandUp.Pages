@@ -52,7 +52,7 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepositiry.CreatePageAsync(collection.WebSiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -98,7 +98,7 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepositiry.CreatePageAsync(collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepositiry.CreatePageAsync(collection.WebSiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {

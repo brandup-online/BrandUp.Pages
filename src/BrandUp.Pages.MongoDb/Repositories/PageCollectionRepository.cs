@@ -18,12 +18,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
             documents = dbContext.PageCollections;
         }
 
-        public async Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
+        public async Task<IPageCollection> CreateCollectionAsync(string webSiteId, string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
         {
             var collection = new PageCollectionDocument
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
+                WebSiteId = webSiteId,
                 Version = 1,
                 Title = title,
                 PageTypeName = pageTypeName,

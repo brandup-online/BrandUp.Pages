@@ -11,6 +11,8 @@ namespace BrandUp.Pages.MongoDb.Documents
     public class PageCollectionDocument : Document, IPageCollection
     {
         [BsonRequired]
+        public string WebSiteId { get; set; }
+        [BsonRequired]
         public string Title { get; set; }
         [BsonRequired]
         public string PageTypeName { get; set; }
@@ -40,10 +42,12 @@ namespace BrandUp.Pages.MongoDb.Documents
         {
             var versionIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
             var textIndex = Builders<PageCollectionDocument>.IndexKeys.Text(it => it.Title).Text(it => it.PageTypeName);
+            var webSiteIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebSiteId);
 
             Collection.Indexes.CreateMany(new CreateIndexModel<PageCollectionDocument>[] {
                 new CreateIndexModel<PageCollectionDocument>(versionIndex, new CreateIndexOptions { Name = "Version", Unique = true }),
-                new CreateIndexModel<PageCollectionDocument>(textIndex, new CreateIndexOptions { Name = "TextSearch" })
+                new CreateIndexModel<PageCollectionDocument>(textIndex, new CreateIndexOptions { Name = "TextSearch" }),
+                new CreateIndexModel<PageCollectionDocument>(webSiteIndex, new CreateIndexOptions { Name = "WebSite" })
             });
 
             base.OnSetupCollection(cancellationToken);

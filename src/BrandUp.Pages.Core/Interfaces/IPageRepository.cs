@@ -7,13 +7,13 @@ namespace BrandUp.Pages.Interfaces
 {
     public interface IPageRepository
     {
-        Task<IPage> CreatePageAsync(Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
+        Task<IPage> CreatePageAsync(string webSiteId, Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<IPage> FindPageByPathAsync(string path, CancellationToken cancellationToken = default);
-        Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default);
+        Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
+        Task<PageUrlResult> FindPageUrlAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default);
-        Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
+        Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<bool> HasPagesAsync(Guid сollectionId, CancellationToken cancellationToken = default);
         Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default);
         Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
