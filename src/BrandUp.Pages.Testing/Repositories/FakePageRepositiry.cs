@@ -22,26 +22,26 @@ namespace BrandUp.Pages.Repositories
             this.pageHierarhy = pageHierarhy ?? throw new ArgumentNullException(nameof(pageHierarhy));
         }
 
-        public Task<IPage> CreatePageAsync(Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public Task<IPage> CreatePageAsync(string webSiteId, Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var pageId = Guid.NewGuid();
-            var page = new Page(pageId, typeName, ownCollectionId) { Header = title, UrlPath = pageId.ToString() };
+            var page = new Page(pageId, webSiteId, typeName, ownCollectionId) { Header = title, UrlPath = pageId.ToString() };
 
             pageIndex++;
             var index = pageIndex;
 
             pageIds.Add(page.Id, index);
             pageContents.Add(index, contentData);
-            pagePaths.Add(page.UrlPath.ToLower(), index);
+            pagePaths.Add(page.WebSiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
             pages.Add(pageIndex, page);
 
             pageHierarhy.OnAddPage(page);
 
             return Task.FromResult<IPage>(page);
         }
-        public Task<IPage> FindPageByPathAsync(string path, CancellationToken cancellationToken = default)
+        public Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
-            if (!pagePaths.TryGetValue(path.ToLower(), out int index))
+            if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
                 return Task.FromResult<IPage>(null);
 
             var page = pages[index];
@@ -57,9 +57,9 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
-        public Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default)
+        public Task<PageUrlResult> FindPageUrlAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
-            if (!pagePaths.TryGetValue(path.ToLower(), out int index))
+            if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
                 return Task.FromResult<PageUrlResult>(null);
 
             var page = pages[index];
@@ -71,13 +71,13 @@ namespace BrandUp.Pages.Repositories
             var pages = pageHierarhy.OnGetPages(options.CollectionId);
             return Task.FromResult(pages);
         }
-        public Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default)
+        public Task<IEnumerable<IPage>> GetPublishedPagesAsync(string websiteId, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IEnumerable<IPage>>(pages.Values.Where(it => it.IsPublished));
+            return Task.FromResult<IEnumerable<IPage>>(pages.Values.Where(it => it.WebSiteId == websiteId && it.IsPublished));
         }
-        public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
+        public Task<IEnumerable<IPage>> SearchPagesAsync(string websiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var result = pages.Values.AsQueryable().Where(it => it.Header.Contains(title));
+            var result = pages.Values.AsQueryable().Where(it => it.WebSiteId == websiteId && it.Header.Contains(title));
 
             if (pagination != null)
             {
@@ -135,8 +135,8 @@ namespace BrandUp.Pages.Repositories
 
             pages[index] = (Page)page;
 
-            pagePaths.Remove(oldPage.UrlPath.ToLower());
-            pagePaths.Add(page.UrlPath.ToLower(), index);
+            pagePaths.Remove(page.WebSiteId.ToLower() + ":" + oldPage.UrlPath.ToLower());
+            pagePaths.Add(page.WebSiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
 
             return Task.CompletedTask;
         }
@@ -198,6 +198,7 @@ namespace BrandUp.Pages.Repositories
         {
             public Guid Id { get; }
             public DateTime CreatedDate { get; set; }
+            public string WebSiteId { get; set; }
             public string TypeName { get; }
             public Guid OwnCollectionId { get; }
             public string UrlPath { get; set; }
@@ -209,10 +210,11 @@ namespace BrandUp.Pages.Repositories
             public string SeoDescription { get; set; }
             public string[] SeoKeywords { get; set; }
 
-            public Page(Guid id, string typeName, Guid collectionId)
+            public Page(Guid id, string webSiteId, string typeName, Guid collectionId)
             {
                 Id = id;
                 CreatedDate = DateTime.UtcNow;
+                WebSiteId = webSiteId;
                 TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
                 OwnCollectionId = collectionId;
                 Status = PageStatus.Draft;

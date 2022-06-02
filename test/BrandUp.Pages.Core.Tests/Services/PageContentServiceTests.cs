@@ -1,7 +1,9 @@
 ﻿using BrandUp.Pages.Builder;
 using BrandUp.Pages.ContentModels;
+using BrandUp.Pages.Helpers;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
@@ -26,6 +28,8 @@ namespace BrandUp.Pages.Services
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes();
 
+            services.AddSingleton<IWebsiteContext>(new TestWebsiteContext("test", "test"));
+
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
@@ -44,13 +48,13 @@ namespace BrandUp.Pages.Services
 
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
-            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("Test collection", pageType.Name, PageSortMode.FirstOld, null);
+            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
-            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(mainPage, "index");
             await pageRepository.UpdatePageAsync(mainPage);
 
-            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(testPage, "test");
             await pageRepository.UpdatePageAsync(testPage);
         }

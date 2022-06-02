@@ -9,15 +9,13 @@
 <body class="landing">
     <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
 
-    @Html.AntiForgeryToken()
-
     <div class="app">
         <nav class="app-top">
             <div class="content-width">
                 <a asp-page-path="/" class="logo">BrandUp.Pages</a>
                 <ul>
                     <li><a asp-page-path="/news">News</a></li>
-                    <li><a asp-page="/about" class="applink">About</a></li>
+                    <li><a asp-page="/about">About</a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li><a href="#" data-command="signout">Sign out</a></li>
@@ -36,7 +34,7 @@
                 </ul>
             </div>
         </nav>
-        <main id="page-content" role="main" class="content-width app-content">
+        <main role="main" class="content-width app-content" page-content>
             @RenderBody()
         </main>
     </div>
@@ -46,7 +44,7 @@
             <ul class="menu">
                 <li><a asp-page-path="/">Home</a></li>
                 <li><a asp-page-path="/news">News</a></li>
-                <li><a asp-page="/about" class="applink">About</a></li>
+                <li><a asp-page="/about">About</a></li>
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li><a href="#" data-command="signout">Sign out</a></li>

@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Website;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -9,15 +10,17 @@ namespace BrandUp.Pages.Services
 {
     public class PageCollectionService : IPageCollectionService
     {
-        private readonly IPageCollectionRepository repositiry;
-        private readonly IPageRepository pageRepositiry;
-        private readonly IPageMetadataManager pageMetadataManager;
+        readonly IPageCollectionRepository repositiry;
+        readonly IPageRepository pageRepositiry;
+        readonly IPageMetadataManager pageMetadataManager;
+        readonly IWebsiteContext websiteContext;
 
-        public PageCollectionService(IPageCollectionRepository repositiry, IPageRepository pageRepositiry, IPageMetadataManager pageMetadataManager)
+        public PageCollectionService(IPageCollectionRepository repositiry, IPageRepository pageRepositiry, IPageMetadataManager pageMetadataManager, IWebsiteContext websiteContext)
         {
             this.repositiry = repositiry ?? throw new ArgumentNullException(nameof(repositiry));
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
+            this.websiteContext = websiteContext ?? throw new ArgumentNullException(nameof(websiteContext));
         }
 
         public async Task<Result<IPageCollection>> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
@@ -32,7 +35,7 @@ namespace BrandUp.Pages.Services
                     return Result<IPageCollection>.Failed("Нельзя создать коллекцию страниц для страницы, которая не опубликована.");
             }
 
-            var collection = await repositiry.CreateCollectionAsync(title, pageTypeName, sortMode, pageId);
+            var collection = await repositiry.CreateCollectionAsync(websiteContext.Website.Id, title, pageTypeName, sortMode, pageId);
 
             return Result<IPageCollection>.Success(collection);
         }
@@ -42,12 +45,12 @@ namespace BrandUp.Pages.Services
             return repositiry.FindCollectiondByIdAsync(id);
         }
 
-        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId)
+        public Task<IEnumerable<IPageCollection>> ListCollectionsAsync(Guid? pageId = null)
         {
-            return repositiry.GetCollectionsAsync(pageId);
+            return repositiry.ListCollectionsAsync(websiteContext.Website.Id, pageId);
         }
 
-        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string pageTypeName, string title, bool includeDerivedTypes)
+        public Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string pageTypeName, string title = null, bool includeDerivedTypes = true)
         {
             if (pageTypeName == null)
                 throw new ArgumentNullException(nameof(pageTypeName));
@@ -67,7 +70,7 @@ namespace BrandUp.Pages.Services
                     pageTypeNames.Add(derivedPageMetadata.Name);
             }
 
-            return repositiry.GetCollectionsAsync(webSiteId, pageTypeNames.ToArray(), title);
+            return repositiry.FindCollectionsAsync(websiteContext.Website.Id, pageTypeNames.ToArray(), title);
         }
 
         public async Task<Result> UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)

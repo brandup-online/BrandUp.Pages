@@ -58,7 +58,7 @@ namespace BrandUp.Pages.Controllers
         {
             var result = new List<Models.PageCollectionModel>();
 
-            var collections = await pageCollectionService.GetCollectionsAsync(pageId);
+            var collections = await pageCollectionService.ListCollectionsAsync(pageId);
             foreach (var pageCollection in collections)
                 result.Add(await GetItemModelAsync(pageCollection));
 
@@ -73,7 +73,7 @@ namespace BrandUp.Pages.Controllers
 
             var result = new List<Models.PageCollectionModel>();
 
-            var collections = await pageCollectionService.GetCollectionsAsync(pageType, title, true);
+            var collections = await pageCollectionService.FindCollectionsAsync(pageType, title, true);
             foreach (var pageCollection in collections)
                 result.Add(await GetItemModelAsync(pageCollection));
 

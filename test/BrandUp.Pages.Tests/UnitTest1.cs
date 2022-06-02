@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace BrandUp.Pages.Tests
@@ -45,7 +44,6 @@ namespace BrandUp.Pages.Tests
         {
             builder.ConfigureTestServices(services =>
             {
-                services.AddPagesTesting();
             });
         }
     }

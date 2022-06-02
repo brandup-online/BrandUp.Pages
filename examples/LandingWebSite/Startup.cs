@@ -101,12 +101,16 @@ namespace LandingWebSite
 
             #endregion
 
+            #region Migrations
+
             services.AddMigrations(options =>
             {
                 options.AddAssembly(typeof(SetupMigration).Assembly);
             });
             services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationState, MigrationState>();
             services.AddHostedService<MigrationService>();
+
+            #endregion
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -118,8 +122,6 @@ namespace LandingWebSite
                 app.UseExceptionHandler("/error");
                 app.UseHsts();
             }
-
-            //app.UseStatusCodePagesWithReExecute("/error", "?code={0}");
 
             app.UseWebsite();
             app.UseStaticFiles();

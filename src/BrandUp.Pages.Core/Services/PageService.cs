@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Website;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace BrandUp.Pages.Services
         readonly IPageRepository pageRepositiry;
         readonly IPageCollectionRepository pageCollectionRepositiry;
         readonly IPageMetadataManager pageMetadataManager;
+        readonly IWebsiteContext websiteContext;
         readonly Url.IPageUrlHelper pageUrlHelper;
         readonly Views.IViewLocator viewLocator;
         readonly PagesOptions options;
@@ -21,6 +23,7 @@ namespace BrandUp.Pages.Services
             IPageRepository pageRepositiry,
             IPageCollectionRepository pageCollectionRepositiry,
             IPageMetadataManager pageMetadataManager,
+            IWebsiteContext websiteContext,
             Url.IPageUrlHelper pageUrlHelper,
             Views.IViewLocator viewLocator,
             IOptions<PagesOptions> options)
@@ -31,6 +34,7 @@ namespace BrandUp.Pages.Services
             this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
             this.pageCollectionRepositiry = pageCollectionRepositiry ?? throw new ArgumentNullException(nameof(pageCollectionRepositiry));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
+            this.websiteContext = websiteContext ?? throw new ArgumentNullException(nameof(websiteContext));
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
             this.viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
             this.options = options.Value;
@@ -134,7 +138,7 @@ namespace BrandUp.Pages.Services
             if (pagePath == string.Empty)
                 return GetDefaultPageAsync();
 
-            return pageRepositiry.FindPageByPathAsync(pagePath, cancellationToken);
+            return pageRepositiry.FindPageByPathAsync(websiteContext.Website.Id, pagePath, cancellationToken);
         }
         public Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default)
         {
@@ -145,11 +149,11 @@ namespace BrandUp.Pages.Services
             if (path == string.Empty)
                 path = pageUrlHelper.GetDefaultPagePath();
 
-            return pageRepositiry.FindPageUrlAsync(path, cancellationToken);
+            return pageRepositiry.FindPageUrlAsync(websiteContext.Website.Id, path, cancellationToken);
         }
         public Task<IPage> GetDefaultPageAsync(CancellationToken cancellationToken = default)
         {
-            return pageRepositiry.FindPageByPathAsync(pageUrlHelper.GetDefaultPagePath(), cancellationToken);
+            return pageRepositiry.FindPageByPathAsync(websiteContext.Website.Id, pageUrlHelper.GetDefaultPagePath(), cancellationToken);
         }
         public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
@@ -170,7 +174,7 @@ namespace BrandUp.Pages.Services
         }
         public Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default)
         {
-            return pageRepositiry.GetPublishedPagesAsync(cancellationToken);
+            return pageRepositiry.GetPublishedPagesAsync(websiteContext.Website.Id, cancellationToken);
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
@@ -181,7 +185,7 @@ namespace BrandUp.Pages.Services
             if (pagination == null)
                 throw new ArgumentNullException(nameof(pagination));
 
-            return pageRepositiry.SearchPagesAsync(title, pagination, cancellationToken);
+            return pageRepositiry.SearchPagesAsync(websiteContext.Website.Id, title, pagination, cancellationToken);
         }
         public Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default)
         {
@@ -246,7 +250,7 @@ namespace BrandUp.Pages.Services
             else
                 urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
 
-            if (await pageRepositiry.FindPageByPathAsync(urlPath) != null)
+            if (await pageRepositiry.FindPageByPathAsync(page.WebSiteId, urlPath) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
             await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);

@@ -28,20 +28,20 @@ namespace BrandUp.Pages.MongoDb.Repositories
             urlDocuments = dbContext.PageUrls;
         }
 
-        public async Task<IPage> CreatePageAsync(string webSiteId, Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
+            if (websiteId == null)
+                throw new ArgumentNullException(nameof(websiteId));
 
             var pageId = Guid.NewGuid();
-            webSiteId = webSiteId.ToLower();
+            websiteId = websiteId.ToLower();
 
             var pageDocument = new PageDocument
             {
                 Id = pageId,
                 CreatedDate = DateTime.UtcNow,
                 Version = 1,
-                WebSiteId = webSiteId,
+                WebSiteId = websiteId,
                 OwnCollectionId = сollectionId,
                 TypeName = typeName,
                 Header = pageHeader,
@@ -60,7 +60,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
-                WebSiteId = webSiteId,
+                WebSiteId = websiteId,
                 PageId = pageId,
                 Path = pageDocument.UrlPath
             };
@@ -166,10 +166,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return cursor.ToEnumerable(cancellationToken);
         }
-        public async Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<IPage>> GetPublishedPagesAsync(string websiteId, CancellationToken cancellationToken = default)
         {
             var filters = new List<FilterDefinition<PageDocument>>
             {
+                Builders<PageDocument>.Filter.Eq(it => it.WebSiteId, websiteId),
                 Builders<PageDocument>.Filter.Eq(it => it.Status, PageStatus.Published)
             };
 

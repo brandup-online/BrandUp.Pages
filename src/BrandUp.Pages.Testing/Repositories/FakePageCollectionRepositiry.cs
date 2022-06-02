@@ -19,10 +19,10 @@ namespace BrandUp.Pages.Repositories
             this.pageHierarhy = pageHierarhy ?? throw new ArgumentNullException(nameof(pageHierarhy));
         }
 
-        public Task<IPageCollection> CreateCollectionAsync(string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
+        public Task<IPageCollection> CreateCollectionAsync(string webSiteId, string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
         {
             var pageCollectionId = Guid.NewGuid();
-            var pageCollection = new PageCollection(pageCollectionId, title, pageTypeName, pageId)
+            var pageCollection = new PageCollection(pageCollectionId, webSiteId, title, pageTypeName, pageId)
             {
                 SortMode = sortMode
             };
@@ -44,9 +44,9 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPageCollection>(collections[index]);
         }
-        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId)
+        public Task<IEnumerable<IPageCollection>> ListCollectionsAsync(string webSiteId, Guid? pageId)
         {
-            var pageCollections = pageHierarhy.OnGetCollections(pageId);
+            var pageCollections = pageHierarhy.OnGetCollections(webSiteId, pageId);
             return Task.FromResult(pageCollections);
         }
         public Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
@@ -70,12 +70,15 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
-        public Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames, string title)
+        public Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string title)
         {
             var result = new List<IPageCollection>();
 
             foreach (var collection in collections.Values)
             {
+                if (!string.Equals(collection.WebSiteId, webSiteId, StringComparison.InvariantCultureIgnoreCase))
+                    continue;
+
                 if (pageTypeNames.Any(it => it.ToLower() == collection.PageTypeName.ToLower()))
                 {
                     if (title != null && !collection.Title.Contains(title))
@@ -92,16 +95,18 @@ namespace BrandUp.Pages.Repositories
         {
             public Guid Id { get; }
             public DateTime CreatedDate { get; set; }
+            public string WebSiteId { get; set; }
             public string Title { get; set; }
             public string PageTypeName { get; }
             public Guid? PageId { get; }
             public PageSortMode SortMode { get; set; }
             public bool CustomSorting { get; set; }
 
-            public PageCollection(Guid id, string title, string pageTypeName, Guid? pageId)
+            public PageCollection(Guid id, string webSiteId, string title, string pageTypeName, Guid? pageId)
             {
                 Id = id;
                 CreatedDate = DateTime.UtcNow;
+                WebSiteId = webSiteId;
                 Title = title;
                 PageTypeName = pageTypeName;
                 PageId = pageId;

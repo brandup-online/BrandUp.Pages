@@ -15,11 +15,21 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public PageCollectionRepository(IPagesDbContext dbContext)
         {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext));
+
             documents = dbContext.PageCollections;
         }
 
-        public async Task<IPageCollection> CreateCollectionAsync(string webSiteId, string title, string pageTypeName, PageSortMode sortMode, Guid? pageId)
+        public async Task<IPageCollection> CreateCollectionAsync(string webSiteId, string title, string pageTypeName, PageSortMode sortMode, Guid? pageId = null)
         {
+            if (webSiteId == null)
+                throw new ArgumentNullException(nameof(webSiteId));
+            if (title == null)
+                throw new ArgumentNullException(nameof(title));
+            if (pageTypeName == null)
+                throw new ArgumentNullException(nameof(pageTypeName));
+
             var collection = new PageCollectionDocument
             {
                 Id = Guid.NewGuid(),
@@ -44,31 +54,38 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return await cursor.SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<IPageCollection>> GetCollectionsAsync(Guid? pageId)
+        public async Task<IEnumerable<IPageCollection>> ListCollectionsAsync(string webSiteId, Guid? pageId = null)
         {
-            var cursor = await documents
-                .Find(it => it.PageId == pageId)
-                .ToCursorAsync();
-            return cursor.ToEnumerable();
+            if (webSiteId == null)
+                throw new ArgumentNullException(nameof(webSiteId));
+
+            if (pageId.HasValue)
+                return await (await documents.FindAsync(it => it.WebSiteId == webSiteId && it.PageId == pageId)).ToListAsync();
+            else
+                return await (await documents.FindAsync(it => it.WebSiteId == webSiteId && it.PageId == null)).ToListAsync();
         }
 
-        public async Task<IEnumerable<IPageCollection>> GetCollectionsAsync(string[] pageTypeNames, string title)
+        public async Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string title = null)
         {
-            var filters = new List<FilterDefinition<PageCollectionDocument>>
-            {
-                Builders<PageCollectionDocument>.Filter.Or(pageTypeNames.Select(it => Builders<PageCollectionDocument>.Filter.Eq(d => d.PageTypeName, it)))
-            };
+            if (webSiteId == null)
+                throw new ArgumentNullException(nameof(webSiteId));
+            if (pageTypeNames == null)
+                throw new ArgumentNullException(nameof(pageTypeNames));
+            if (!pageTypeNames.Any())
+                throw new ArgumentException("Require not empty.", nameof(pageTypeNames));
+
+            var filters = new List<FilterDefinition<PageCollectionDocument>> { Builders<PageCollectionDocument>.Filter.Eq(it => it.WebSiteId, webSiteId) };
+
+            if (pageTypeNames != null && pageTypeNames.Any())
+                filters.Add(Builders<PageCollectionDocument>.Filter.Or(pageTypeNames.Select(it => Builders<PageCollectionDocument>.Filter.Eq(d => d.PageTypeName, it))));
 
             if (!string.IsNullOrWhiteSpace(title))
                 filters.Add(Builders<PageCollectionDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false }));
 
             var filterDefinition = Builders<PageCollectionDocument>.Filter.And(filters);
 
-            var cursor = await documents
-                .Find(filterDefinition)
-                .ToCursorAsync();
-
-            return cursor.ToEnumerable();
+            var cursor = await documents.FindAsync(filterDefinition);
+            return await cursor.ToListAsync();
         }
 
         public async Task UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)

@@ -1,7 +1,9 @@
 ﻿using BrandUp.Pages.Builder;
 using BrandUp.Pages.ContentModels;
+using BrandUp.Pages.Helpers;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -30,6 +32,8 @@ namespace BrandUp.Pages.Services
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes();
 
+            services.AddSingleton<IWebsiteContext>(new TestWebsiteContext("test", "test"));
+
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
@@ -47,13 +51,13 @@ namespace BrandUp.Pages.Services
 
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
-            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("Test collection", pageType.Name, PageSortMode.FirstOld, null);
+            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
-            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(mainPage, "index");
             await pageRepository.UpdatePageAsync(mainPage);
 
-            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(testPage, "test");
             await pageRepository.UpdatePageAsync(testPage);
         }
@@ -122,7 +126,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreatePage_WithContentModel()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
 
             var page = await pageService.CreatePageAsync(pageCollection, new TestPageContent { Title = "title" });
 
@@ -135,7 +139,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreatePage_WithDefaultHeader()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
@@ -148,7 +152,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreatePage_WithSpecifyHeader()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name, "test");
@@ -187,7 +191,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task IsPublished_False()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 
@@ -198,7 +202,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task PublishPage()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 
@@ -210,7 +214,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task PublishPage_Fail_PageUrlExist()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 

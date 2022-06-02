@@ -66,7 +66,7 @@ namespace BrandUp.Pages.Controllers
                 listModel.Parents.Reverse();
             }
 
-            var collections = await pageCollectionService.GetCollectionsAsync(page?.Id);
+            var collections = await pageCollectionService.ListCollectionsAsync(page?.Id);
             foreach (var collection in collections)
                 listModel.Collections.Add(await GetPageCollectionModelAsync(collection));
         }

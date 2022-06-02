@@ -1,4 +1,5 @@
-﻿using BrandUp.MongoDB;
+﻿using BrandUp.Extensions.Migrations;
+using BrandUp.MongoDB;
 using BrandUp.Pages.Files;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Repositories;
@@ -28,6 +29,10 @@ namespace BrandUp.Pages.Builder
             where TContext : MongoDbContext, MongoDb.IPagesDbContext
         {
             builder.Services.AddMongoDbContextExension<TContext, MongoDb.IPagesDbContext>();
+            builder.Services.Configure<MigrationOptions>(options =>
+            {
+                options.AddAssembly(typeof(MongoDb._migrations.SetupMigration).Assembly);
+            });
 
             AddMongoDbRepositories(builder.Services);
 

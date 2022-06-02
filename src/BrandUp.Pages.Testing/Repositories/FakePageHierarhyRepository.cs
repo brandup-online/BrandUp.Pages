@@ -6,6 +6,7 @@ namespace BrandUp.Pages.Repositories
 {
     public class FakePageHierarhyRepository
     {
+        private readonly Dictionary<string, IList<IPageCollection>> collectionsByWebSites = new Dictionary<string, IList<IPageCollection>>();
         private readonly Dictionary<Guid, IList<IPageCollection>> collectionsByPages = new Dictionary<Guid, IList<IPageCollection>>();
         private readonly Dictionary<Guid, IList<IPage>> pagesByCollections = new Dictionary<Guid, IList<IPage>>();
 
@@ -16,15 +17,38 @@ namespace BrandUp.Pages.Repositories
 
         public void OnAddCollection(Guid? pageId, IPageCollection pageCollection)
         {
-            if (!collectionsByPages.TryGetValue(pageId ?? Guid.Empty, out IList<IPageCollection> pageCollections))
-                throw new InvalidOperationException();
-            pageCollections.Add(pageCollection);
+            if (pageId.HasValue)
+            {
+                if (!collectionsByPages.TryGetValue(pageId.Value, out IList<IPageCollection> pageCollectionsByPages))
+                    throw new InvalidOperationException();
+
+                pageCollectionsByPages.Add(pageCollection);
+            }
+            else
+            {
+                if (!collectionsByWebSites.TryGetValue(pageCollection.WebSiteId, out IList<IPageCollection> pageCollectionsByWebsites))
+                    collectionsByWebSites.Add(pageCollection.WebSiteId, pageCollectionsByWebsites = new List<IPageCollection>());
+
+                pageCollectionsByWebsites.Add(pageCollection);
+            }
+
             pagesByCollections.Add(pageCollection.Id, new List<IPage>());
         }
-        public IEnumerable<IPageCollection> OnGetCollections(Guid? pageId)
+        public IEnumerable<IPageCollection> OnGetCollections(string webSiteId, Guid? pageId)
         {
-            if (!collectionsByPages.TryGetValue(pageId ?? Guid.Empty, out IList<IPageCollection> pageCollections))
-                throw new InvalidOperationException();
+            IList<IPageCollection> pageCollections;
+
+            if (pageId.HasValue)
+            {
+                if (!collectionsByPages.TryGetValue(pageId.Value, out pageCollections))
+                    throw new InvalidOperationException();
+            }
+            else
+            {
+                if (!collectionsByWebSites.TryGetValue(webSiteId, out pageCollections))
+                    throw new InvalidOperationException();
+            }
+
             return pageCollections;
         }
         public void OnRemoveCollection(IPageCollection pageCollection)

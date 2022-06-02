@@ -73,7 +73,7 @@ namespace BrandUp.Pages.Controllers
 
         protected override Task<IEnumerable<IPageCollection>> OnGetItemsAsync(int offset, int limit)
         {
-            return pageCollectionService.GetCollectionsAsync(page?.Id);
+            return pageCollectionService.ListCollectionsAsync(page?.Id);
         }
 
         protected override Task<IPageCollection> OnGetItemAsync(Guid id)

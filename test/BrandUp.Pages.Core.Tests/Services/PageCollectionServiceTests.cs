@@ -1,7 +1,9 @@
 ﻿using BrandUp.Pages.Builder;
 using BrandUp.Pages.ContentModels;
+using BrandUp.Pages.Helpers;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +27,8 @@ namespace BrandUp.Pages.Services
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes();
 
+            services.AddSingleton<IWebsiteContext>(new TestWebsiteContext("test", "test"));
+
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
@@ -42,22 +46,20 @@ namespace BrandUp.Pages.Services
 
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
-            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("Test collection", pageType.Name, PageSortMode.FirstOld, null);
+            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
-            var mainPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(mainPage, "index");
             await pageRepository.UpdatePageAsync(mainPage);
 
-            var testPage = await pageRepository.CreatePageAsync(pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
             await pageRepository.SetUrlPathAsync(testPage, "test");
             await pageRepository.UpdatePageAsync(testPage);
         }
-        Task IAsyncLifetime.DisposeAsync()
+        async Task IAsyncLifetime.DisposeAsync()
         {
             serviceScope.Dispose();
-            serviceProvider.Dispose();
-
-            return Task.CompletedTask;
+            await serviceProvider.DisposeAsync();
         }
 
         #endregion
@@ -94,7 +96,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreateCollection_Fail_PageNotPublished()
         {
-            var parentPageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var parentPageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
             var page = await pageService.CreatePageAsync(parentPageCollection);
 
             var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, page.Id);
@@ -142,7 +144,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task DeleteCollection_Fail_HavePages()
         {
-            var pageCollection = (await pageCollectionService.GetCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
 
             var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
