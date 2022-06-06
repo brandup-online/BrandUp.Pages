@@ -34,7 +34,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
-                WebSiteId = webSiteId,
+                WebsiteId = webSiteId,
                 Version = 1,
                 Title = title,
                 PageTypeName = pageTypeName,
@@ -60,9 +60,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 throw new ArgumentNullException(nameof(webSiteId));
 
             if (pageId.HasValue)
-                return await (await documents.FindAsync(it => it.WebSiteId == webSiteId && it.PageId == pageId)).ToListAsync();
+                return await (await documents.FindAsync(it => it.WebsiteId == webSiteId && it.PageId == pageId)).ToListAsync();
             else
-                return await (await documents.FindAsync(it => it.WebSiteId == webSiteId && it.PageId == null)).ToListAsync();
+                return await (await documents.FindAsync(it => it.WebsiteId == webSiteId && it.PageId == null)).ToListAsync();
         }
 
         public async Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string title = null)
@@ -74,7 +74,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (!pageTypeNames.Any())
                 throw new ArgumentException("Require not empty.", nameof(pageTypeNames));
 
-            var filters = new List<FilterDefinition<PageCollectionDocument>> { Builders<PageCollectionDocument>.Filter.Eq(it => it.WebSiteId, webSiteId) };
+            var filters = new List<FilterDefinition<PageCollectionDocument>> { Builders<PageCollectionDocument>.Filter.Eq(it => it.WebsiteId, webSiteId) };
 
             if (pageTypeNames != null && pageTypeNames.Any())
                 filters.Add(Builders<PageCollectionDocument>.Filter.Or(pageTypeNames.Select(it => Builders<PageCollectionDocument>.Filter.Eq(d => d.PageTypeName, it))));

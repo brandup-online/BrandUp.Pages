@@ -9,7 +9,7 @@ namespace BrandUp.Pages.MongoDb.Documents
     public class PageCollectionDocument : Document, IPageCollection
     {
         [BsonRequired]
-        public string WebSiteId { get; set; }
+        public string WebsiteId { get; set; }
         [BsonRequired]
         public string Title { get; set; }
         [BsonRequired]

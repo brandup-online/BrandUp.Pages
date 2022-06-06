@@ -41,7 +41,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Id = pageId,
                 CreatedDate = DateTime.UtcNow,
                 Version = 1,
-                WebSiteId = websiteId,
+                WebsiteId = websiteId,
                 OwnCollectionId = сollectionId,
                 TypeName = typeName,
                 Header = pageHeader,
@@ -60,7 +60,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = DateTime.UtcNow,
-                WebSiteId = websiteId,
+                WebsiteId = websiteId,
                 PageId = pageId,
                 Path = pageDocument.UrlPath
             };
@@ -102,7 +102,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             webSiteId = webSiteId.ToLower();
 
-            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebSiteId == webSiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == webSiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
             if (urlDocument == null)
                 return null;
             if (!urlDocument.PageId.HasValue)
@@ -117,7 +117,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
-            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebSiteId == webSiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == webSiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
             if (urlDocument == null)
                 return null;
             if (urlDocument.PageId.HasValue)
@@ -170,7 +170,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         {
             var filters = new List<FilterDefinition<PageDocument>>
             {
-                Builders<PageDocument>.Filter.Eq(it => it.WebSiteId, websiteId),
+                Builders<PageDocument>.Filter.Eq(it => it.WebsiteId, websiteId),
                 Builders<PageDocument>.Filter.Eq(it => it.Status, PageStatus.Published)
             };
 
@@ -184,7 +184,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.And(
-                    Builders<PageDocument>.Filter.Eq(it => it.WebSiteId, webSiteId),
+                    Builders<PageDocument>.Filter.Eq(it => it.WebsiteId, webSiteId),
                     Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false })
                 ));
 
@@ -303,6 +303,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                     {
                         Id = page.Id,
                         CreatedDate = DateTime.UtcNow,
+                        WebsiteId = page.WebsiteId,
                         OwnCollectionId = page.OwnCollectionId,
                         TypeName = page.TypeName,
                         Header = page.Header,

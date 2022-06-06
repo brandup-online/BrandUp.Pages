@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace LandingWebSite.Controllers
 {
+    [Route("_env")]
     public class EnvironmentController : Controller
     {
         private readonly IActionDescriptorCollectionProvider actionDescriptorCollectionProvider;

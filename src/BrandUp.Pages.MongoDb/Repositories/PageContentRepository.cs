@@ -42,6 +42,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Id = Guid.NewGuid(),
                 CreatedDate = createdDate,
                 Version = 1,
+                WebsiteId = page.WebsiteId,
                 PageId = page.Id,
                 UserId = userId,
                 Content = pageContent.Data

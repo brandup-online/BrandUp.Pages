@@ -23,7 +23,7 @@ namespace BrandUp.Pages.MongoDb.Tests
             var page = await pageService.CreatePageAsync(pageCollection, pageContentType.Name, "test");
 
             Assert.NotNull(page);
-            Assert.Equal("test", page.WebSiteId);
+            Assert.Equal("test", page.WebsiteId);
             Assert.Equal(pageContentType.Name, page.TypeName);
             Assert.Equal("test", page.Header);
             Assert.Equal(pageCollection.Id, page.OwnCollectionId);
@@ -45,7 +45,7 @@ namespace BrandUp.Pages.MongoDb.Tests
             var page = await pageService.CreatePageAsync(pageCollection, new TestPageContent { Title = "test5" });
 
             Assert.NotNull(page);
-            Assert.Equal("test", page.WebSiteId);
+            Assert.Equal("test", page.WebsiteId);
             Assert.Equal(pageContentType.Name, page.TypeName);
             Assert.Equal("test5", page.Header);
             Assert.Equal(pageCollection.Id, page.OwnCollectionId);

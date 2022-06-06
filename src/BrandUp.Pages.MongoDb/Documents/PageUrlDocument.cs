@@ -12,7 +12,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         [BsonDateTimeOptions(Representation = BsonType.DateTime)]
         public DateTime CreatedDate { get; set; }
         [BsonRequired]
-        public string WebSiteId { get; set; }
+        public string WebsiteId { get; set; }
         [BsonRequired]
         public string Path { get; set; }
         [BsonRepresentation(BsonType.String)]

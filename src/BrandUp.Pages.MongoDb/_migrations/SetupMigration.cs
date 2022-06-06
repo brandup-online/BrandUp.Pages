@@ -38,10 +38,12 @@ namespace BrandUp.Pages.MongoDb._migrations
 
         async Task CreateIndexes_PageCollectionAsync()
         {
+            await dbContext.PageCollections.Indexes.DropAllAsync();
+
             var versionIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
-            var pageIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebSiteId).Ascending(it => it.PageId);
-            var pageTypeIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebSiteId).Ascending(it => it.PageTypeName);
-            var titleIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebSiteId).Text(it => it.Title).Text(it => it.PageTypeName);
+            var pageIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.PageId);
+            var pageTypeIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.PageTypeName);
+            var titleIndex = Builders<PageCollectionDocument>.IndexKeys.Ascending(it => it.WebsiteId).Text(it => it.Title).Text(it => it.PageTypeName);
 
             await ApplyIndexes(dbContext.PageCollections, new CreateIndexModel<PageCollectionDocument>[] {
                 new CreateIndexModel<PageCollectionDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
@@ -52,12 +54,14 @@ namespace BrandUp.Pages.MongoDb._migrations
         }
         async Task CreateIndexes_PageAsync()
         {
+            await dbContext.Pages.Indexes.DropAllAsync();
+
             var versionIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
-            var websiteIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebSiteId);
+            var websiteIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebsiteId);
             var collectionIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.OwnCollectionId);
             var statusIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.Status);
-            var urlIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebSiteId).Ascending(it => it.UrlPath);
-            var textIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebSiteId).Text(it => it.Header).Text(it => it.Seo.Title).Text(it => it.Seo.Description).Text(it => it.UrlPath);
+            var urlIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.UrlPath);
+            var textIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebsiteId).Text(it => it.Header).Text(it => it.Seo.Title).Text(it => it.Seo.Description).Text(it => it.UrlPath);
 
             await ApplyIndexes(dbContext.Pages, new CreateIndexModel<PageDocument>[] {
                 new CreateIndexModel<PageDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
@@ -70,8 +74,10 @@ namespace BrandUp.Pages.MongoDb._migrations
         }
         async Task CreateIndexes_PageUrlAsync()
         {
-            var pathIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.WebSiteId).Ascending(it => it.Path);
-            var websiteIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.WebSiteId);
+            await dbContext.PageUrls.Indexes.DropAllAsync();
+
+            var pathIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.Path);
+            var websiteIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.WebsiteId);
             var pageIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.PageId);
 
             await ApplyIndexes(dbContext.PageUrls, new CreateIndexModel<PageUrlDocument>[] {
@@ -82,20 +88,28 @@ namespace BrandUp.Pages.MongoDb._migrations
         }
         async Task CreateIndexes_PageEditAsync()
         {
+            await dbContext.PageEditSessions.Indexes.DropAllAsync();
+
             var versionIndex = Builders<PageEditDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
             var userIndex = Builders<PageEditDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.UserId);
+            var websiteIndex = Builders<PageEditDocument>.IndexKeys.Ascending(it => it.WebsiteId);
 
             await ApplyIndexes(dbContext.PageEditSessions, new CreateIndexModel<PageEditDocument>[] {
                 new CreateIndexModel<PageEditDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
-                new CreateIndexModel<PageEditDocument>(userIndex, new CreateIndexOptions { Name = "User" })
+                new CreateIndexModel<PageEditDocument>(userIndex, new CreateIndexOptions { Name = "User" }),
+                new CreateIndexModel<PageEditDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
             });
         }
         async Task CreateIndexes_PageRecyclebinAsync()
         {
+            await dbContext.PageRecyclebin.Indexes.DropAllAsync();
+
             var versionIndex = Builders<PageRecyclebinDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+            var websiteIndex = Builders<PageRecyclebinDocument>.IndexKeys.Ascending(it => it.WebsiteId);
 
             await ApplyIndexes(dbContext.PageRecyclebin, new CreateIndexModel<PageRecyclebinDocument>[] {
-                new CreateIndexModel<PageRecyclebinDocument>(versionIndex, new CreateIndexOptions { Name = "Version" })
+                new CreateIndexModel<PageRecyclebinDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
+                new CreateIndexModel<PageRecyclebinDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
             });
         }
 

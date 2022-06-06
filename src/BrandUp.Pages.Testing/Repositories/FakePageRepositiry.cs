@@ -32,7 +32,7 @@ namespace BrandUp.Pages.Repositories
 
             pageIds.Add(page.Id, index);
             pageContents.Add(index, contentData);
-            pagePaths.Add(page.WebSiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
+            pagePaths.Add(page.WebsiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
             pages.Add(pageIndex, page);
 
             pageHierarhy.OnAddPage(page);
@@ -73,11 +73,11 @@ namespace BrandUp.Pages.Repositories
         }
         public Task<IEnumerable<IPage>> GetPublishedPagesAsync(string websiteId, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IEnumerable<IPage>>(pages.Values.Where(it => it.WebSiteId == websiteId && it.IsPublished));
+            return Task.FromResult<IEnumerable<IPage>>(pages.Values.Where(it => it.WebsiteId == websiteId && it.IsPublished));
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string websiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            var result = pages.Values.AsQueryable().Where(it => it.WebSiteId == websiteId && it.Header.Contains(title));
+            var result = pages.Values.AsQueryable().Where(it => it.WebsiteId == websiteId && it.Header.Contains(title));
 
             if (pagination != null)
             {
@@ -135,8 +135,8 @@ namespace BrandUp.Pages.Repositories
 
             pages[index] = (Page)page;
 
-            pagePaths.Remove(page.WebSiteId.ToLower() + ":" + oldPage.UrlPath.ToLower());
-            pagePaths.Add(page.WebSiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
+            pagePaths.Remove(page.WebsiteId.ToLower() + ":" + oldPage.UrlPath.ToLower());
+            pagePaths.Add(page.WebsiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
 
             return Task.CompletedTask;
         }
@@ -198,7 +198,7 @@ namespace BrandUp.Pages.Repositories
         {
             public Guid Id { get; }
             public DateTime CreatedDate { get; set; }
-            public string WebSiteId { get; set; }
+            public string WebsiteId { get; set; }
             public string TypeName { get; }
             public Guid OwnCollectionId { get; }
             public string UrlPath { get; set; }
@@ -214,7 +214,7 @@ namespace BrandUp.Pages.Repositories
             {
                 Id = id;
                 CreatedDate = DateTime.UtcNow;
-                WebSiteId = webSiteId;
+                WebsiteId = webSiteId;
                 TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
                 OwnCollectionId = collectionId;
                 Status = PageStatus.Draft;

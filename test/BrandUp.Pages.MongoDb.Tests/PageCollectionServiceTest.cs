@@ -23,7 +23,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
             var pageCollection = createResult.Data;
             Assert.Null(pageCollection.PageId);
-            Assert.Equal("test", pageCollection.WebSiteId);
+            Assert.Equal("test", pageCollection.WebsiteId);
             Assert.Equal(pageContentType.Name, pageCollection.PageTypeName);
             Assert.Equal("test", pageCollection.Title);
             Assert.Equal(PageSortMode.FirstOld, pageCollection.SortMode);
@@ -48,7 +48,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
             var pageCollection = createCollectionResult.Data;
             Assert.Equal(page.Id, pageCollection.PageId);
-            Assert.Equal("test", pageCollection.WebSiteId);
+            Assert.Equal("test", pageCollection.WebsiteId);
             Assert.Equal(pageContentType.Name, pageCollection.PageTypeName);
             Assert.Equal("test2", pageCollection.Title);
             Assert.Equal(PageSortMode.FirstOld, pageCollection.SortMode);

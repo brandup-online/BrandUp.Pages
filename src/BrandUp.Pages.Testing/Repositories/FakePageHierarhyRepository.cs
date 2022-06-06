@@ -26,8 +26,8 @@ namespace BrandUp.Pages.Repositories
             }
             else
             {
-                if (!collectionsByWebSites.TryGetValue(pageCollection.WebSiteId, out IList<IPageCollection> pageCollectionsByWebsites))
-                    collectionsByWebSites.Add(pageCollection.WebSiteId, pageCollectionsByWebsites = new List<IPageCollection>());
+                if (!collectionsByWebSites.TryGetValue(pageCollection.WebsiteId, out IList<IPageCollection> pageCollectionsByWebsites))
+                    collectionsByWebSites.Add(pageCollection.WebsiteId, pageCollectionsByWebsites = new List<IPageCollection>());
 
                 pageCollectionsByWebsites.Add(pageCollection);
             }

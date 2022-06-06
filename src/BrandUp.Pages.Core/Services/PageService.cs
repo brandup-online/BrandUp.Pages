@@ -56,7 +56,7 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepositiry.CreatePageAsync(collection.WebSiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepositiry.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -102,7 +102,7 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepositiry.CreatePageAsync(collection.WebSiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepositiry.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -250,7 +250,7 @@ namespace BrandUp.Pages.Services
             else
                 urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
 
-            if (await pageRepositiry.FindPageByPathAsync(page.WebSiteId, urlPath) != null)
+            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
             await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);

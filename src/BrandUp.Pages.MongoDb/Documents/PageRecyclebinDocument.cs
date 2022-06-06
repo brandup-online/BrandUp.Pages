@@ -8,6 +8,8 @@ namespace BrandUp.Pages.MongoDb.Documents
     public class PageRecyclebinDocument : Document
     {
         [BsonRequired]
+        public string WebsiteId { get; set; }
+        [BsonRequired]
         public string TypeName { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid OwnCollectionId { get; set; }

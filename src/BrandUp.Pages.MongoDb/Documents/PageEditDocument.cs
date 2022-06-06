@@ -16,6 +16,8 @@ namespace BrandUp.Pages.MongoDb.Documents
     [MongoDB.Document(CollectionName = "BrandUpPages.edits")]
     public class PageEditDocument : Document
     {
+        [BsonRequired]
+        public string WebsiteId { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid PageId { get; set; }
         [BsonRequired]

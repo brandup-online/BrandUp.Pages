@@ -76,7 +76,7 @@ namespace BrandUp.Pages.Repositories
 
             foreach (var collection in collections.Values)
             {
-                if (!string.Equals(collection.WebSiteId, webSiteId, StringComparison.InvariantCultureIgnoreCase))
+                if (!string.Equals(collection.WebsiteId, webSiteId, StringComparison.InvariantCultureIgnoreCase))
                     continue;
 
                 if (pageTypeNames.Any(it => it.ToLower() == collection.PageTypeName.ToLower()))
@@ -95,7 +95,7 @@ namespace BrandUp.Pages.Repositories
         {
             public Guid Id { get; }
             public DateTime CreatedDate { get; set; }
-            public string WebSiteId { get; set; }
+            public string WebsiteId { get; set; }
             public string Title { get; set; }
             public string PageTypeName { get; }
             public Guid? PageId { get; }
@@ -106,7 +106,7 @@ namespace BrandUp.Pages.Repositories
             {
                 Id = id;
                 CreatedDate = DateTime.UtcNow;
-                WebSiteId = webSiteId;
+                WebsiteId = webSiteId;
                 Title = title;
                 PageTypeName = pageTypeName;
                 PageId = pageId;
