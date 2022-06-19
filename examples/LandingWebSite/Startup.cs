@@ -1,5 +1,6 @@
 using BrandUp.Pages.Builder;
 using BrandUp.Website;
+using BrandUp.Website.Infrastructure;
 using LandingWebSite._migrations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -62,7 +63,7 @@ namespace LandingWebSite
                     options.MapConfiguration(Configuration);
                 })
                 .AddSingleWebsite("brandup.pages")
-                .AddWebsiteProvider<SubdomainWebsiteProvider>()
+                .AddUrlMapProvider<SubdomainUrlMapProvider>()
                 .AddPageEvents<Pages.PageEvents>();
 
             services.AddPages()
