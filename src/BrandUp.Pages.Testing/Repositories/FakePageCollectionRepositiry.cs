@@ -94,8 +94,8 @@ namespace BrandUp.Pages.Repositories
         private class PageCollection : IPageCollection
         {
             public Guid Id { get; }
-            public DateTime CreatedDate { get; set; }
-            public string WebsiteId { get; set; }
+            public DateTime CreatedDate { get; }
+            public string WebsiteId { get; }
             public string Title { get; set; }
             public string PageTypeName { get; }
             public Guid? PageId { get; }

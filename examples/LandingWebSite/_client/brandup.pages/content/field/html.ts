@@ -1,14 +1,14 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import createEditor, { EditorInstance } from "brandup-pages-ckeditor";
 import { DOM } from "brandup-ui";
+import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 
 export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements IContentField {
     readonly form: IContentForm;
     private __isChanged: boolean;
     private __value: HTMLElement;
-    private __editor: EditorInstance;
+    private __editor: ContentEditor;
 
     constructor(form: IContentForm, name: string, options: HtmlFieldFormOptions) {
         super(name, options);
@@ -28,21 +28,19 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         if (this.options.placeholder)
             this.__value.setAttribute("data-placeholder", this.options.placeholder);
 
-        createEditor(this.__value, {
-            toolbar: ['heading', '|', 'bold', 'italic', 'strikethrough', 'link', 'bulletedList', 'numberedList'],
-            placeholder: this.options.placeholder
-        }).then(editor => {
-            this.__editor = editor;
+        ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
+            .then(editor => {
+                this.__editor = editor;
 
-            editor.model.document.on('change', () => {
-                if (editor.model.document.differ.hasDataChanges())
-                    this.__isChanged = true;
+                editor.model.document.on('change', () => {
+                    if (editor.model.document.differ.hasDataChanges())
+                        this.__isChanged = true;
+
+                    this.__refreshUI();
+                });
 
                 this.__refreshUI();
             });
-
-            this.__refreshUI();
-        });
 
         this.__value.addEventListener("focus", () => {
             this.__isChanged = false;

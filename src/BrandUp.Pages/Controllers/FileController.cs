@@ -11,14 +11,12 @@ namespace BrandUp.Pages.Controllers
     public class FileController : Controller
     {
         readonly FileService fileService;
-        readonly IHostingEnvironment hostingEnvironment;
         readonly string imagesTempPath;
         readonly string filesTempPath;
 
         public FileController(FileService fileService, IHostingEnvironment hostingEnvironment)
         {
             this.fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            this.hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
 
             imagesTempPath = System.IO.Path.Combine(hostingEnvironment.ContentRootPath, "_temp", "images");
             if (!System.IO.Directory.Exists(imagesTempPath))

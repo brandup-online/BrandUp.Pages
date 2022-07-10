@@ -12,6 +12,7 @@
     <Content Remove="_client\svg\**" />
     <EmbeddedResource Remove="_client\svg\**" />
     <None Remove="_client\svg\**" />
+    <TypeScriptCompile Remove="node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>

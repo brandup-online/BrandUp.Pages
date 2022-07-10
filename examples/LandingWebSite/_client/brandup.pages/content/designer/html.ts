@@ -1,11 +1,11 @@
 ﻿import { FieldDesigner } from "./base";
-import createEditor, { EditorInstance } from "brandup-pages-ckeditor";
+import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 import { AjaxResponse } from "brandup-ui";
 
 export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     private __isChanged: boolean;
-    private __editor: EditorInstance;
+    private __editor: ContentEditor;
 
     get typeName(): string { return "BrandUpPages.HtmlDesigner"; }
 
@@ -14,21 +14,19 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
         if (this.options.placeholder)
             elem.setAttribute("data-placeholder", this.options.placeholder);
 
-        createEditor(elem, {
-            toolbar: ['heading', '|', 'bold', 'italic', 'strikethrough', 'link', 'bulletedList', 'numberedList'],
-            placeholder: this.options.placeholder
-        }).then(editor => {
-            this.__editor = editor;
+        ContentEditor.create(elem, { placeholder: this.options.placeholder })
+            .then(editor => {
+                this.__editor = editor;
 
-            editor.model.document.on('change', () => {
-                if (editor.model.document.differ.hasDataChanges())
-                    this.__isChanged = true;
+                editor.model.document.on('change', () => {
+                    if (editor.model.document.differ.hasDataChanges())
+                        this.__isChanged = true;
+
+                    this.__refreshUI();
+                });
 
                 this.__refreshUI();
             });
-
-            this.__refreshUI();
-        });
 
         this.element.addEventListener("focus", () => {
             this.__isChanged = false;
