@@ -1,18 +1,18 @@
 ﻿import { host } from "brandup-ui-website";
-import "./styles.less";
 import { ajaxRequest } from "brandup-ui";
-import { ContentMiddleware } from "./brandup.pages/middleware";
+import { PagesMiddleware } from "brandup-pages-ui";
+import "./styles.less";
 
 host.start({
-    pageTypes: {
-        "content": () => import("./brandup.pages/pages/content"),
-        "about": () => import("./pages/about/index")
-    },
-    scripts: {
-        "BB1": () => import("./contents/BB1")
-    }
+    //pageTypes: {
+    //    //"content": () => import("./brandup.pages/pages/content"),
+    //    "about": () => import("./pages/about/index")
+    //},
+    //scripts: {
+    //    "BB1": () => import("./contents/BB1")
+    //}
 }, (builder) => {
-        builder.useMiddleware(new ContentMiddleware());
+        builder.useMiddleware(new PagesMiddleware());
     }, (app) => {
         app.registerCommand("signin", () => {
             ajaxRequest({
@@ -39,4 +39,4 @@ host.start({
         window.addEventListener("pageNavigated", () => {
             document.body.classList.remove("website-state-show-appmenu");
         });
-    });
+});

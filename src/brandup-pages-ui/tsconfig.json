@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "target": "es5",
+    "sourceMap": false,
+    "strict": false,
+    "lib": [ "DOM", "ES2020" ],
+    //"types": [ "node" ],
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "baseUrl": "./source",
+    "outDir": "./dist",
+    "declaration": false,
+    //"declarationDir": "./source",
+    "declarationMap": false,
+    "removeComments": false
+  },
+  "include": [ "source" ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".vs",
+    ".vscode",
+    "test"
+  ],
+  "compileOnSave": false,
+  "typeAcquisition": {
+    "enable": true
+  }
+}

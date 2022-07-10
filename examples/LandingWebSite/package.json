@@ -19,13 +19,16 @@
     "webpack-cli": "^3.3.12",
     "webpack-dev-middleware": "^3.7.2",
     "webpack-dev-server": "^3.11.2",
-    "webpack-hot-middleware": "^2.25.0"
+    "webpack-hot-middleware": "^2.25.0",
+    "optimize-css-assets-webpack-plugin": "^6.0.1",
+    "uglifyjs-webpack-plugin": "^2.2.0"
   },
   "dependencies": {
     "brandup-ui": "^1.1.14",
     "brandup-ui-app": "^1.2.28",
     "brandup-ui-website": "^2.1.6",
-    "brandup-pages-ckeditor": "^1.0.12"
+    "brandup-pages-ckeditor": "^1.0.12",
+    "brandup-pages-ui": "../../src/brandup-pages-ui"
   },
   "scripts": {
     "build": "webpack -p --progress --config webpack.config.js",
