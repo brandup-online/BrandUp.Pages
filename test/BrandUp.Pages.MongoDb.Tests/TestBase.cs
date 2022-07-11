@@ -14,6 +14,12 @@ namespace BrandUp.Pages.MongoDb.Tests
     {
         private ServiceProvider serviceProvider;
         private IServiceScope serviceScope;
+        protected readonly IWebsiteContext websiteContext;
+
+        public TestBase()
+        {
+            websiteContext = new TestWebsiteContext("test", "test");
+        }
 
         public IServiceProvider Services => serviceScope.ServiceProvider;
 
@@ -25,7 +31,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
             services.AddLogging();
 
-            services.AddSingleton<IWebsiteContext>(new TestWebsiteContext("test", "test"));
+            services.AddSingleton(websiteContext);
 
             services.AddPages()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)

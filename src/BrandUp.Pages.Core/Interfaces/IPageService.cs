@@ -11,12 +11,12 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default);
         Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<IPage> FindPageByPathAsync(string pagePath, CancellationToken cancellationToken = default);
-        Task<PageUrlResult> FindPageUrlAsync(string path, CancellationToken cancellationToken = default);
-        Task<IPage> GetDefaultPageAsync(CancellationToken cancellationToken = default);
+        Task<IPage> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default);
+        Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
+        Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
-        Task<IEnumerable<IPage>> GetPublishedPagesAsync(CancellationToken cancellationToken = default);
-        Task<IEnumerable<IPage>> SearchPagesAsync(string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
+        Task<IEnumerable<IPage>> GetPublishedPagesAsync(string webSiteId, CancellationToken cancellationToken = default);
+        Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default);
         Task<object> GetPageContentAsync(IPage page, CancellationToken cancellationToken = default);
         Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default);

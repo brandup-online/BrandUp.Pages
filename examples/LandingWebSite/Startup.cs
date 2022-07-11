@@ -69,10 +69,9 @@ namespace LandingWebSite
             services.AddPages()
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-                .AddMongoDb<Models.AppDbContext>()
                 .AddImageResizer<Infrastructure.ImageResizer>()
-                .AddUserProvider<Identity.PageEditorProvider>(ServiceLifetime.Scoped)
-                .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped);
+                .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped)
+                .AddMongoDb<Models.AppDbContext>();
 
             #region Identity
 

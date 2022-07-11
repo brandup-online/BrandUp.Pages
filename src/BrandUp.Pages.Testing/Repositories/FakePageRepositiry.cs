@@ -57,7 +57,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
-        public Task<PageUrlResult> FindPageUrlAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+        public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
             if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
                 return Task.FromResult<PageUrlResult>(null);

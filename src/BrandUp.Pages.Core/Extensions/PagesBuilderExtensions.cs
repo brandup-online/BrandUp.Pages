@@ -12,14 +12,6 @@ namespace BrandUp.Pages.Builder
             return builder;
         }
 
-        public static IPagesBuilder AddUserProvider<T>(this IPagesBuilder builder, ServiceLifetime serviceLifetime)
-            where T : Identity.IUserProvider
-        {
-            builder.Services.Add(new ServiceDescriptor(typeof(Identity.IUserProvider), typeof(T), serviceLifetime));
-
-            return builder;
-        }
-
         public static IPagesBuilder AddUserAccessProvider<T>(this IPagesBuilder builder, ServiceLifetime serviceLifetime)
             where T : Identity.IAccessProvider
         {

@@ -17,7 +17,7 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
 
             Assert.True(createResult.Succeeded);
 
@@ -37,13 +37,13 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
             var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
             await pageService.PublishPageAsync(page, "test");
 
-            createCollectionResult = await pageCollectionService.CreateCollectionAsync("test2", pageContentType.Name, PageSortMode.FirstOld, page.Id);
+            createCollectionResult = await pageCollectionService.CreateCollectionAsync(page, "test2", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
             var pageCollection = createCollectionResult.Data;
@@ -62,12 +62,12 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
             var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
 
-            createCollectionResult = await pageCollectionService.CreateCollectionAsync("test2", pageContentType.Name, PageSortMode.FirstOld, page.Id);
+            createCollectionResult = await pageCollectionService.CreateCollectionAsync(page, "test2", pageContentType.Name, PageSortMode.FirstOld);
             Assert.False(createCollectionResult.Succeeded);
         }
 
@@ -78,7 +78,7 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createResult.Succeeded);
 
             var pageCollection = await pageCollectionService.FindCollectiondByIdAsync(createResult.Data.Id);
@@ -92,7 +92,7 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
 
-            var collections = await pageCollectionService.ListCollectionsAsync();
+            var collections = await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
             Assert.Empty(collections);
         }
 
@@ -103,10 +103,10 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createResult.Succeeded);
 
-            var collections = await pageCollectionService.ListCollectionsAsync();
+            var collections = await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
             Assert.Single(collections);
 
             Assert.Equal(createResult.Data.Id, collections.First().Id);
@@ -120,13 +120,13 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
             var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
             await pageService.PublishPageAsync(page, "test");
 
-            var collections = await pageCollectionService.ListCollectionsAsync(page.Id);
+            var collections = await pageCollectionService.ListCollectionsAsync(page);
             Assert.Empty(collections);
         }
 
@@ -138,16 +138,16 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
             var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
             await pageService.PublishPageAsync(page, "test");
 
-            createCollectionResult = await pageCollectionService.CreateCollectionAsync("test2", pageContentType.Name, PageSortMode.FirstOld, page.Id);
+            createCollectionResult = await pageCollectionService.CreateCollectionAsync(page, "test2", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
-            var collections = await pageCollectionService.ListCollectionsAsync(page.Id);
+            var collections = await pageCollectionService.ListCollectionsAsync(page);
             Assert.Single(collections);
 
             Assert.Equal(createCollectionResult.Data.Id, collections.First().Id);
@@ -157,15 +157,14 @@ namespace BrandUp.Pages.MongoDb.Tests
         public async Task FindCollections_Empty()
         {
             var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-            var pageService = Services.GetRequiredService<IPageService>();
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
             var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.Succeeded);
 
-            var findCollections = await pageCollectionService.FindCollectionsAsync(articleContentType.Name);
+            var findCollections = await pageCollectionService.FindCollectionsAsync(websiteContext.Website.Id, articleContentType.Name);
             Assert.Empty(findCollections);
         }
 
@@ -177,12 +176,12 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
             var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
-            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync("test1", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test1", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult1.Succeeded);
-            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync("test2", articleContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test2", articleContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult2.Succeeded);
 
-            var findCollections = await pageCollectionService.FindCollectionsAsync(pageContentType.Name, null, false);
+            var findCollections = await pageCollectionService.FindCollectionsAsync(websiteContext.Website.Id, pageContentType.Name, null, false);
             Assert.Single(findCollections);
             Assert.Equal(createCollectionResult1.Data.Id, findCollections.First().Id);
         }
@@ -195,12 +194,12 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
             var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
-            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync("test1", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test1", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult1.Succeeded);
-            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync("test2", articleContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test2", articleContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult2.Succeeded);
 
-            var findCollections = await pageCollectionService.FindCollectionsAsync(pageContentType.Name, null, true);
+            var findCollections = await pageCollectionService.FindCollectionsAsync(websiteContext.Website.Id, pageContentType.Name, null, true);
             Assert.Equal(2, findCollections.ToList().Count);
         }
 
@@ -212,12 +211,12 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
             var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
-            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync("test1", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test1", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult1.Succeeded);
-            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync("test2", articleContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test2", articleContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult2.Succeeded);
 
-            var findCollections = await pageCollectionService.FindCollectionsAsync(pageContentType.Name, "test1", true);
+            var findCollections = await pageCollectionService.FindCollectionsAsync(websiteContext.Website.Id, pageContentType.Name, "test1", true);
             Assert.Single(findCollections);
         }
 
@@ -229,15 +228,13 @@ namespace BrandUp.Pages.MongoDb.Tests
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
             var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
-            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync("test1", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult1 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test1", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult1.Succeeded);
-            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync("test2", articleContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult2 = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test2", articleContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult2.Succeeded);
 
-            var findCollections = await pageCollectionService.FindCollectionsAsync(pageContentType.Name, "test1", true);
+            var findCollections = await pageCollectionService.FindCollectionsAsync(websiteContext.Website.Id, pageContentType.Name, "test1", true);
             Assert.Single(findCollections);
         }
     }
-
-
 }

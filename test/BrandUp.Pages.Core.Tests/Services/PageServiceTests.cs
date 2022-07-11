@@ -15,14 +15,17 @@ namespace BrandUp.Pages.Services
     public class PageServiceTests : IAsyncLifetime
     {
         const string DefaultPageHeader = "New page";
-        private readonly ServiceProvider serviceProvider;
-        private readonly IServiceScope serviceScope;
-        private readonly IPageService pageService;
-        private readonly IPageCollectionService pageCollectionService;
+        readonly ServiceProvider serviceProvider;
+        readonly IServiceScope serviceScope;
+        readonly IPageService pageService;
+        readonly IPageCollectionService pageCollectionService;
         private IPageMetadataManager pageMetadataManager;
+        readonly IWebsiteContext websiteContext;
 
         public PageServiceTests()
         {
+            websiteContext = new TestWebsiteContext("test", "test");
+
             var services = new ServiceCollection();
 
             services.AddPages(options =>
@@ -32,7 +35,7 @@ namespace BrandUp.Pages.Services
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes();
 
-            services.AddSingleton<IWebsiteContext>(new TestWebsiteContext("test", "test"));
+            services.AddSingleton(websiteContext);
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
@@ -76,28 +79,28 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task FindPageByPath_EmptyPath()
         {
-            var page = await pageService.FindPageByPathAsync(string.Empty);
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, string.Empty);
 
             Assert.NotNull(page);
         }
         [Fact]
         public async Task FindPageByPath_SpecifyPath()
         {
-            var page = await pageService.FindPageByPathAsync("test");
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
 
             Assert.NotNull(page);
         }
         [Fact]
         public async Task GetDefaultPage()
         {
-            var page = await pageService.GetDefaultPageAsync();
+            var page = await pageService.GetDefaultPageAsync(websiteContext.Website.Id);
 
             Assert.NotNull(page);
         }
         [Fact]
         public async Task GetPageType()
         {
-            var page = await pageService.FindPageByPathAsync(string.Empty);
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, string.Empty);
 
             var pageType = await pageService.GetPageTypeAsync(page);
 
@@ -106,7 +109,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task GetPageContent()
         {
-            var page = await pageService.FindPageByPathAsync(string.Empty);
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, string.Empty);
 
             var pageModel = await pageService.GetPageContentAsync(page);
 
@@ -115,7 +118,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task SetPageContent()
         {
-            var page = await pageService.FindPageByPathAsync(string.Empty);
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, string.Empty);
 
             var newContent = new TestPageContent { Title = "custom" };
             await pageService.SetPageContentAsync(page, newContent);
@@ -126,7 +129,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreatePage_WithContentModel()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
 
             var page = await pageService.CreatePageAsync(pageCollection, new TestPageContent { Title = "title" });
 
@@ -139,7 +142,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreatePage_WithDefaultHeader()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
@@ -152,7 +155,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreatePage_WithSpecifyHeader()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name, "test");
@@ -166,7 +169,7 @@ namespace BrandUp.Pages.Services
         public async Task CreatePage_Fail_PageTypeNotAllowered()
         {
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(ArticlePageContent));
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync("test", pageType.Name, PageSortMode.FirstOld, null)).Data;
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageType.Name, PageSortMode.FirstOld)).Data;
 
             pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
@@ -182,7 +185,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task IsPublished_True()
         {
-            var page = await pageService.FindPageByPathAsync(string.Empty);
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, string.Empty);
 
             var result = page.IsPublished;
 
@@ -191,7 +194,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task IsPublished_False()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 
@@ -202,7 +205,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task PublishPage()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 
@@ -214,7 +217,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task PublishPage_Fail_PageUrlExist()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
             var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
             var page = await pageService.CreatePageAsync(pageCollection, pageType.Name);
 
@@ -225,7 +228,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task PublishPage_Fail_AlreadyPublished()
         {
-            var page = await pageService.FindPageByPathAsync("test");
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
 
             var publishResult = await pageService.PublishPageAsync(page, "test2");
 
@@ -235,7 +238,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task GetPageSeoOptions()
         {
-            var page = await pageService.FindPageByPathAsync("test");
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
             var seo = await pageService.GetPageSeoOptionsAsync(page);
 
             Assert.NotNull(seo);
@@ -247,7 +250,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task UpdatePageSeoOptions_Title()
         {
-            var page = await pageService.FindPageByPathAsync("test");
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
             await pageService.UpdatePageSeoOptionsAsync(page, new PageSeoOptions { Title = "test" });
 
             var seo = await pageService.GetPageSeoOptionsAsync(page);
@@ -261,7 +264,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task UpdatePageSeoOptions_Description()
         {
-            var page = await pageService.FindPageByPathAsync("test");
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
             await pageService.UpdatePageSeoOptionsAsync(page, new PageSeoOptions { Description = "test" });
 
             var seo = await pageService.GetPageSeoOptionsAsync(page);
@@ -275,7 +278,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task UpdatePageSeoOptions_Keywords()
         {
-            var page = await pageService.FindPageByPathAsync("test");
+            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
             await pageService.UpdatePageSeoOptionsAsync(page, new PageSeoOptions { Keywords = new string[] { "test" } });
 
             var seo = await pageService.GetPageSeoOptionsAsync(page);

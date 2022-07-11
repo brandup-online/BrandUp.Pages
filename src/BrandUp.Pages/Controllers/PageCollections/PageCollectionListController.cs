@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Models;
+using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,13 +14,15 @@ namespace BrandUp.Pages.Controllers
         readonly IPageService pageService;
         readonly IPageCollectionService pageCollectionService;
         readonly Url.IPageLinkGenerator pageLinkGenerator;
+        readonly IWebsiteContext websiteContext;
         private IPage page;
 
-        public PageCollectionListController(IPageService pageService, IPageCollectionService pageCollectionService, Url.IPageLinkGenerator pageLinkGenerator)
+        public PageCollectionListController(IPageService pageService, IPageCollectionService pageCollectionService, Url.IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext)
         {
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
+            this.websiteContext = websiteContext ?? throw new ArgumentNullException(nameof(websiteContext));
         }
 
         #region ListController members
@@ -73,7 +76,10 @@ namespace BrandUp.Pages.Controllers
 
         protected override Task<IEnumerable<IPageCollection>> OnGetItemsAsync(int offset, int limit)
         {
-            return pageCollectionService.ListCollectionsAsync(page?.Id);
+            if (page != null)
+                return pageCollectionService.ListCollectionsAsync(page);
+            else
+                return pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
         }
 
         protected override Task<IPageCollection> OnGetItemAsync(Guid id)

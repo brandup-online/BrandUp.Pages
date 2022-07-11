@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Url;
+using BrandUp.Website;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -17,7 +18,7 @@ namespace LandingWebSite.Controllers
     {
         [HttpGet("sitemap.xml")]
         [Produces("application/xml")]
-        public async Task<IActionResult> SitemapXmlAsync([FromServices]IPageService pageService, [FromServices]IPageLinkGenerator pageLinkGenerator)
+        public async Task<IActionResult> SitemapXmlAsync([FromServices] IPageService pageService, [FromServices] IPageLinkGenerator pageLinkGenerator, [FromServices] IWebsiteContext websiteContext)
         {
             if (pageService == null)
                 throw new ArgumentNullException(nameof(pageService));
@@ -29,7 +30,7 @@ namespace LandingWebSite.Controllers
             var dateNow = DateTime.Now.ToString("s");
             var model = new SitemapModel { Urls = new List<SitemapUrl>() };
 
-            var pages = await pageService.GetPublishedPagesAsync(HttpContext.RequestAborted);
+            var pages = await pageService.GetPublishedPagesAsync(websiteContext.Website.Id, HttpContext.RequestAborted);
 
             foreach (var page in pages)
             {

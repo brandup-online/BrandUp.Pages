@@ -78,7 +78,6 @@
     <Folder Include="source\dialogs\" />
     <Folder Include="source\dialogs\collections\" />
     <Folder Include="source\dialogs\content-types\" />
-    <Folder Include="source\dialogs\editors\" />
     <Folder Include="source\dialogs\pages\" />
     <Folder Include="source\form\" />
     <Folder Include="source\pages\" />
@@ -113,9 +112,6 @@
     <TypeScriptCompile Include="source\dialogs\dialog-list.ts" />
     <TypeScriptCompile Include="source\dialogs\dialog-select-content-type.ts" />
     <TypeScriptCompile Include="source\dialogs\dialog.ts" />
-    <TypeScriptCompile Include="source\dialogs\editors\assign.ts" />
-    <TypeScriptCompile Include="source\dialogs\editors\delete.ts" />
-    <TypeScriptCompile Include="source\dialogs\editors\list.ts" />
     <TypeScriptCompile Include="source\dialogs\pages\browser.ts" />
     <TypeScriptCompile Include="source\dialogs\pages\create.ts" />
     <TypeScriptCompile Include="source\dialogs\pages\delete.ts" />

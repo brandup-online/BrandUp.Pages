@@ -13,21 +13,24 @@ namespace BrandUp.Pages.Services
 {
     public class PageCollectionServiceTests : IAsyncLifetime
     {
-        private readonly ServiceProvider serviceProvider;
-        private readonly IServiceScope serviceScope;
-        private readonly IPageService pageService;
-        private readonly IPageCollectionService pageCollectionService;
-        private readonly IPageMetadataManager pageMetadataManager;
+        readonly ServiceProvider serviceProvider;
+        readonly IServiceScope serviceScope;
+        readonly IPageService pageService;
+        readonly IPageCollectionService pageCollectionService;
+        readonly IPageMetadataManager pageMetadataManager;
+        readonly IWebsiteContext websiteContext;
 
         public PageCollectionServiceTests()
         {
+            websiteContext = new TestWebsiteContext("test", "test");
+
             var services = new ServiceCollection();
 
             services.AddPages()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes();
 
-            services.AddSingleton<IWebsiteContext>(new TestWebsiteContext("test", "test"));
+            services.AddSingleton(websiteContext);
 
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
@@ -69,7 +72,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreateCollection_root()
         {
-            var result = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null);
+            var result = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld);
 
             Assert.True(result.Succeeded);
             Assert.NotNull(result.Data);
@@ -82,8 +85,8 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreateCollection_bypage()
         {
-            var defaultPage = await pageService.GetDefaultPageAsync();
-            var result = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, defaultPage.Id);
+            var defaultPage = await pageService.GetDefaultPageAsync(websiteContext.Website.Id);
+            var result = await pageCollectionService.CreateCollectionAsync(defaultPage, "Test collection", "TestPage", PageSortMode.FirstOld);
 
             Assert.True(result.Succeeded);
             Assert.NotNull(result.Data);
@@ -96,10 +99,10 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreateCollection_Fail_PageNotPublished()
         {
-            var parentPageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var parentPageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
             var page = await pageService.CreatePageAsync(parentPageCollection);
 
-            var pageCollection = await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, page.Id);
+            var pageCollection = await pageCollectionService.CreateCollectionAsync(page, "Test collection", "TestPage", PageSortMode.FirstOld);
 
             Assert.False(pageCollection.Succeeded);
         }
@@ -107,7 +110,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task FindCollectiondById()
         {
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null)).Data;
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
 
             var findedPageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id);
 
@@ -118,7 +121,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task UpdateCollection()
         {
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null)).Data;
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
 
             pageCollection.SetTitle("New title");
             pageCollection.SetSortModel(PageSortMode.FirstNew);
@@ -133,7 +136,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task DeleteCollection()
         {
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync("Test collection", "TestPage", PageSortMode.FirstOld, null)).Data;
+            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
 
             var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
@@ -144,7 +147,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task DeleteCollection_Fail_HavePages()
         {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(null)).First();
+            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
 
             var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 

@@ -2,6 +2,7 @@
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Models;
 using BrandUp.Pages.Url;
+using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,20 +16,27 @@ namespace BrandUp.Pages.Controllers
     {
         #region Fields
 
-        private readonly IPageService pageService;
-        private readonly IPageCollectionService pageCollectionService;
-        private readonly IPageLinkGenerator pageLinkGenerator;
-        private readonly IPageMetadataManager pageMetadataManager;
+        readonly IPageService pageService;
+        readonly IPageCollectionService pageCollectionService;
+        readonly IPageLinkGenerator pageLinkGenerator;
+        readonly IPageMetadataManager pageMetadataManager;
+        readonly IWebsiteContext websiteContext;
         private IPage page;
 
         #endregion
 
-        public PageCollectionCreateController(IPageService pageService, IPageCollectionService pageCollectionService, IPageLinkGenerator pageLinkGenerator, IPageMetadataManager pageMetadataManager)
+        public PageCollectionCreateController(
+            IPageService pageService,
+            IPageCollectionService pageCollectionService,
+            IPageLinkGenerator pageLinkGenerator,
+            IPageMetadataManager pageMetadataManager,
+            IWebsiteContext websiteContext)
         {
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
             this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
+            this.websiteContext = websiteContext ?? throw new ArgumentNullException(nameof(websiteContext));
         }
 
         #region FormController members
@@ -76,7 +84,12 @@ namespace BrandUp.Pages.Controllers
         }
         protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionCreateValues values)
         {
-            var createResult = await pageCollectionService.CreateCollectionAsync(values.Title, values.PageType, values.Sort, page?.Id);
+            Result<IPageCollection> createResult;
+
+            if (page == null)
+                createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, values.Title, values.PageType, values.Sort);
+            else
+                createResult = await pageCollectionService.CreateCollectionAsync(page, values.Title, values.PageType, values.Sort);
             if (!createResult.Succeeded)
             {
                 AddErrors(createResult);

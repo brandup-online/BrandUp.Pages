@@ -9,7 +9,6 @@ namespace BrandUp.Pages.Builder
             builder.Services.AddPagesTesting();
 
             builder
-                .AddUserProvider<Identity.FakeUserProvider>(ServiceLifetime.Singleton)
                 .AddUserAccessProvider<Identity.FakeAccessProvider>(ServiceLifetime.Scoped);
 
             return builder;

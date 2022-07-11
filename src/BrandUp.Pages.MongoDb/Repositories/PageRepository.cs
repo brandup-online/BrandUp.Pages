@@ -112,7 +112,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
-        public async Task<PageUrlResult> FindPageUrlAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+        public async Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
             if (path == null)
                 throw new ArgumentNullException(nameof(path));

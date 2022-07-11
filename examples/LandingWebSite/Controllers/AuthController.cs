@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Identity;
+﻿using LandingWebSite.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,14 +9,14 @@ namespace LandingWebSite.Controllers
     public class AuthController : Controller
     {
         readonly UserManager<Identity.IdentityUser> userManager;
+        readonly RoleManager<LandingWebSite.Identity.IdentityRole> roleManager;
         readonly SignInManager<Identity.IdentityUser> signInManager;
-        readonly IUserProvider userProvider;
 
-        public AuthController(UserManager<Identity.IdentityUser> userManager, SignInManager<Identity.IdentityUser> signInManager, IUserProvider userProvider)
+        public AuthController(UserManager<Identity.IdentityUser> userManager, RoleManager<LandingWebSite.Identity.IdentityRole> roleManager, SignInManager<Identity.IdentityUser> signInManager)
         {
             this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            this.roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
             this.signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
-            this.userProvider = userProvider ?? throw new ArgumentNullException(nameof(userProvider));
         }
 
         [HttpGet("signin")]
@@ -31,10 +31,17 @@ namespace LandingWebSite.Controllers
 
                 user = await userManager.FindByNameAsync("test@test.ru");
 
-                var pageEditor = await userProvider.FindUserByNameAsync("test@test.ru");
-                var assignResult = await userProvider.AssignUserAsync(pageEditor);
-                if (!assignResult.Succeeded)
-                    return BadRequest();
+                var role = await roleManager.FindByNameAsync(RoleBasedAccessProvider.RoleName);
+                if (role == null)
+                {
+                    var createRoleResult = await roleManager.CreateAsync(new LandingWebSite.Identity.IdentityRole { Name = RoleBasedAccessProvider.RoleName });
+                    if (!createRoleResult.Succeeded)
+                        throw new InvalidOperationException();
+                }
+
+                var result = await userManager.AddToRoleAsync(user, RoleBasedAccessProvider.RoleName);
+                if (!result.Succeeded)
+                    throw new InvalidOperationException();
             }
 
             await signInManager.SignInAsync(user, false);

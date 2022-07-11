@@ -12,13 +12,17 @@ namespace BrandUp.Pages.MongoDb.Tests
         [Fact]
         public async Task Create()
         {
+            #region Prepare
+
             var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
             var pageService = Services.GetRequiredService<IPageService>();
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             var pageCollection = createCollectionResult.Data;
+
+            #endregion
 
             var page = await pageService.CreatePageAsync(pageCollection, pageContentType.Name, "test");
 
@@ -34,13 +38,17 @@ namespace BrandUp.Pages.MongoDb.Tests
         [Fact]
         public async Task Create_WithObject()
         {
+            #region Prepare
+
             var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
             var pageService = Services.GetRequiredService<IPageService>();
             var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
             var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
-            var createCollectionResult = await pageCollectionService.CreateCollectionAsync("test", pageContentType.Name, PageSortMode.FirstOld, null);
+            var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             var pageCollection = createCollectionResult.Data;
+
+            #endregion
 
             var page = await pageService.CreatePageAsync(pageCollection, new TestPageContent { Title = "test5" });
 

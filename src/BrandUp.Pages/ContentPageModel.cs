@@ -84,7 +84,7 @@ namespace BrandUp.Pages
                 if (routeData.Values.TryGetValue("url", out object urlValue) && urlValue != null)
                     pagePath = (string)urlValue;
 
-                var url = await PageService.FindPageUrlAsync(pagePath);
+                var url = await PageService.FindUrlByPathAsync(WebsiteContext.Website.Id, pagePath);
                 if (url == null)
                 {
                     context.Result = NotFound();

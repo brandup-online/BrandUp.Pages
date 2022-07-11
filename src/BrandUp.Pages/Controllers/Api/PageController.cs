@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Url;
+using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using System;
@@ -11,21 +12,23 @@ namespace BrandUp.Pages.Controllers
     [ApiController, Filters.Administration]
     public class PageController : ControllerBase
     {
-        private readonly IPageCollectionService pageCollectionService;
-        private readonly IPageService pageService;
-        private readonly IPageLinkGenerator pageLinkGenerator;
+        readonly IPageCollectionService pageCollectionService;
+        readonly IPageService pageService;
+        readonly IPageLinkGenerator pageLinkGenerator;
+        readonly IWebsiteContext websiteContext;
 
-        public PageController(IPageCollectionService pageCollectionService, IPageService pageService, IPageLinkGenerator pageLinkGenerator)
+        public PageController(IPageCollectionService pageCollectionService, IPageService pageService, IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext)
         {
             this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
             this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
+            this.websiteContext = websiteContext ?? throw new ArgumentNullException(nameof(websiteContext));
         }
 
         #region Action methods
 
         [HttpGet, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Get")]
-        public async Task<IActionResult> GetAsync([FromRoute]Guid id)
+        public async Task<IActionResult> GetAsync([FromRoute] Guid id)
         {
             var page = await pageService.FindPageByIdAsync(id);
             if (page == null)
@@ -37,7 +40,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet, Route("brandup.pages/page", Name = "BrandUp.Pages.Page.Items")]
-        public async Task<IActionResult> ListAsync([FromQuery]Guid collectionId)
+        public async Task<IActionResult> ListAsync([FromQuery] Guid collectionId)
         {
             var collection = await pageCollectionService.FindCollectiondByIdAsync(collectionId);
             if (collection == null)
@@ -53,11 +56,11 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet, Route("brandup.pages/page/search", Name = "BrandUp.Pages.Page.Search")]
-        public async Task<IActionResult> SearchAsync([FromQuery]string title)
+        public async Task<IActionResult> SearchAsync([FromQuery] string title)
         {
             var result = new List<Models.PageModel>();
 
-            var pages = await pageService.SearchPagesAsync(title, new PagePaginationOptions(0, 20), HttpContext.RequestAborted);
+            var pages = await pageService.SearchPagesAsync(websiteContext.Website.Id, title, new PagePaginationOptions(0, 20), HttpContext.RequestAborted);
             foreach (var page in pages)
                 result.Add(await GetItemModelAsync(page));
 
@@ -65,7 +68,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpDelete, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Delete")]
-        public async Task<IActionResult> DeleteAsync([FromRoute]Guid id)
+        public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
         {
             var page = await pageService.FindPageByIdAsync(id);
             if (page == null)

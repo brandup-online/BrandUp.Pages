@@ -1,7 +1,6 @@
 ﻿import { UIElement } from "brandup-ui";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
-import { listPageEditor } from "../dialogs/editors/list";
 import iconBack from "../svg/toolbar-button-back.svg";
 import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
@@ -38,7 +37,6 @@ export class WebSiteToolbar extends UIElement {
         const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);
 
         toolbarElem.appendChild(DOM.tag("div", { class: "bp-toolbar-menu" }, [
-            DOM.tag("a", { href: "", "data-command": "bp-editors" }, "Редакторы страниц"),
             DOM.tag("a", { href: "", "data-command": "bp-content-types" }, "Типы контента"),
             //DOM.tag("a", { href: "", "data-command": "bp-page-types" }, "Типы страниц"),
             //DOM.tag("a", { href: "", "data-command": "bp-recyclebin" }, "Корзина")
@@ -82,11 +80,6 @@ export class WebSiteToolbar extends UIElement {
             }
 
             document.body.addEventListener("click", this.__closeMenuFunc);
-        });
-
-        this.registerCommand("bp-editors", () => {
-            toolbarElem.classList.remove("opened-menu");
-            listPageEditor();
         });
 
         this.registerCommand("bp-content-types", () => {
