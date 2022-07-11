@@ -330,13 +330,14 @@ ASALocalRun/
 .mfractor/
 
 
-/examples/LandingWebSite/wwwroot/dist
-/examples/LandingWebSite/_client/**/*.js
-/examples/LandingWebSite/_client/**/*.js.map
 package-lock.json
 .rpt2_cache
-/src/brandup-ui-pages/**/*.js.map
-/src/brandup-ui-pages/**/*.d.ts
-/src/brandup-ui-pages/**/*.js
+
+/examples/LandingWebSite/_client/**/*.js
+/examples/LandingWebSite/_client/**/*.js.map
 /examples/LandingWebSite/_temp/files
 /examples/LandingWebSite/_temp/images
+/examples/LandingWebSite/wwwroot/dist
+
+/src/brandup-ui-pages/**/*.js
+/src/brandup-ui-pages/**/*.js.map
