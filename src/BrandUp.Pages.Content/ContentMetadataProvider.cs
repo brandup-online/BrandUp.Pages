@@ -13,12 +13,12 @@ namespace BrandUp.Pages.Content
 
         public const string ContentTypeNameDataKey = "_type";
         public static readonly string[] ContentTypePrefixes = new string[] { "Content", "Model" };
-        private readonly ConstructorInfo modelConstructor = null;
-        private readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
-        private readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
-        private readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
-        private ITextField titleField;
-        private readonly List<PropertyInfo> injectProperties;
+        readonly ConstructorInfo modelConstructor = null;
+        readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
+        readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
+        readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
+        ITextField titleField;
+        readonly List<PropertyInfo> injectProperties;
 
         #endregion
 

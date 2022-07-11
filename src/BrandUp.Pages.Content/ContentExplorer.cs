@@ -11,8 +11,8 @@ namespace BrandUp.Pages.Content
         public const char IndexStart = '[';
         public const char IndexEnd = ']';
         public static readonly char[] IndexTrimChars = new char[] { IndexStart, IndexEnd };
-        private readonly ContentExplorer rootExplorer;
-        private readonly string name;
+        readonly ContentExplorer rootExplorer;
+        readonly string name;
 
         #endregion
 

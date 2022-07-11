@@ -9,10 +9,10 @@ namespace BrandUp.Pages.Content
         where TEntry : class, IContentEntry
         where TModel : class
     {
-        private readonly IServiceProvider services;
-        private readonly IContentStore<TEntry> store;
-        private readonly IContentMetadataManager contentMetadataManager;
-        private readonly ContentMetadataProvider modelMetadataProvider;
+        readonly IServiceProvider services;
+        readonly IContentStore<TEntry> store;
+        readonly IContentMetadataManager contentMetadataManager;
+        //readonly ContentMetadataProvider modelMetadataProvider;
 
         public ContentManager(IContentStore<TEntry> store, IContentMetadataManager contentMetadataManager, IServiceProvider services)
         {
@@ -20,7 +20,7 @@ namespace BrandUp.Pages.Content
             this.store = store ?? throw new ArgumentNullException(nameof(store));
             this.services = services ?? throw new ArgumentNullException(nameof(services));
 
-            modelMetadataProvider = contentMetadataManager.GetMetadata<TModel>();
+            //modelMetadataProvider = contentMetadataManager.GetMetadata<TModel>();
         }
 
         public async Task<ContentProvider<TEntry>> CreateContentAsync<TCustomModel>(TEntry entry, CancellationToken cancellationToken = default)

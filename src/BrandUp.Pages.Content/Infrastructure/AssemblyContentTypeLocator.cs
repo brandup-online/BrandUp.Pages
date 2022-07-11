@@ -6,7 +6,7 @@ namespace BrandUp.Pages.Content.Infrastructure
 {
     public class AssemblyContentTypeLocator : IContentTypeLocator
     {
-        private readonly IList<TypeInfo> types = new List<TypeInfo>();
+        readonly IList<TypeInfo> types = new List<TypeInfo>();
 
         public AssemblyContentTypeLocator(Assembly[] assemblies)
         {

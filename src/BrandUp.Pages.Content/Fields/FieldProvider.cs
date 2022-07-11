@@ -7,10 +7,10 @@ namespace BrandUp.Pages.Content.Fields
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public abstract class FieldProviderAttribute : Attribute, IFieldProvider
     {
-        private const string TypeValueSuffiks = "Attribute";
-        private static readonly Type IEquatableType = typeof(IEquatable<>);
-        private MethodInfo equalMethodInfo = null;
-        private IModelBinding modelBinding;
+        const string TypeValueSuffiks = "Attribute";
+        static readonly Type IEquatableType = typeof(IEquatable<>);
+        MethodInfo equalMethodInfo = null;
+        IModelBinding modelBinding;
 
         #region Properties
 

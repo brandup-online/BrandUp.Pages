@@ -46,5 +46,16 @@ namespace BrandUp.Pages.Metadata
 
             Assert.Equal(new TestPageContent().Title, pageContent.Title);
         }
+
+        [Fact]
+        public void IsEqual()
+        {
+            var pageType1 = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var pageType2 = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+
+            Assert.Equal(pageType1, pageType2);
+
+            Assert.True(pageType1.Equals(pageType2));
+        }
     }
 }

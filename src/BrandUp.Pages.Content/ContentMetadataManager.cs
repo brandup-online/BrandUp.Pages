@@ -7,9 +7,9 @@ namespace BrandUp.Pages.Content
 {
     public class ContentMetadataManager : IContentMetadataManager
     {
-        private readonly List<ContentMetadataProvider> metadataProviders = new List<ContentMetadataProvider>();
-        private readonly Dictionary<Type, int> contentTypes = new Dictionary<Type, int>();
-        private readonly Dictionary<string, int> contentNames = new Dictionary<string, int>();
+        readonly List<ContentMetadataProvider> metadataProviders = new List<ContentMetadataProvider>();
+        readonly Dictionary<Type, int> contentTypes = new Dictionary<Type, int>();
+        readonly Dictionary<string, int> contentNames = new Dictionary<string, int>();
 
         public ContentMetadataManager(IContentTypeLocator contentLocator)
         {

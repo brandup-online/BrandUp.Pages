@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace BrandUp.Pages.Metadata
 {
-    public class PageMetadataProvider
+    public class PageMetadataProvider : IEquatable<PageMetadataProvider>
     {
         private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
 
@@ -67,11 +67,27 @@ namespace BrandUp.Pages.Metadata
 
         #endregion
 
+        #region IEquatable members
+
+        public bool Equals(PageMetadataProvider other)
+        {
+            if (other == null || !(other is PageMetadataProvider))
+                return false;
+
+            return ContentType == other.ContentType;
+        }
+
+        #endregion
+
         #region Object members
 
         public override string ToString()
         {
-            return "Name";
+            return Name;
+        }
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as PageMetadataProvider);
         }
         public override int GetHashCode()
         {
