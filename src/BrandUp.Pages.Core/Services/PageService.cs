@@ -244,7 +244,7 @@ namespace BrandUp.Pages.Services
                 return Result.Failed("Страница уже опубликована.");
 
             var urlPathValidationResult = pageUrlHelper.ValidateUrlPath(urlPath);
-            if (!urlPathValidationResult.Succeeded)
+            if (!urlPathValidationResult.IsSuccess)
                 return urlPathValidationResult;
 
             var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);

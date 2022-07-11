@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace BrandUp.Pages.Builder
 {
-    public static class PagesBuilderExtensions
+    public static class IPagesBuilderExtensions
     {
         public static IPagesBuilder AddContentTypesFromAssemblies(this IPagesBuilder builder, params Assembly[] assemblies)
         {

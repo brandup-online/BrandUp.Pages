@@ -211,7 +211,7 @@ namespace BrandUp.Pages.Services
 
             var publishResult = await pageService.PublishPageAsync(page, "test2");
 
-            Assert.True(publishResult.Succeeded);
+            Assert.True(publishResult.IsSuccess);
             Assert.Equal("test2", page.UrlPath);
         }
         [Fact]
@@ -223,7 +223,7 @@ namespace BrandUp.Pages.Services
 
             var publishResult = await pageService.PublishPageAsync(page, "test");
 
-            Assert.False(publishResult.Succeeded);
+            Assert.False(publishResult.IsSuccess);
         }
         [Fact]
         public async Task PublishPage_Fail_AlreadyPublished()
@@ -232,7 +232,7 @@ namespace BrandUp.Pages.Services
 
             var publishResult = await pageService.PublishPageAsync(page, "test2");
 
-            Assert.False(publishResult.Succeeded);
+            Assert.False(publishResult.IsSuccess);
         }
 
         [Fact]

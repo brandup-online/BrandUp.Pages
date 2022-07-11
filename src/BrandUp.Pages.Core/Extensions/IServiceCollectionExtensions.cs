@@ -4,7 +4,7 @@ using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtensions
+    public static class IServiceCollectionExtensions
     {
         public static IPagesBuilder AddPages(this IServiceCollection services)
         {
@@ -14,6 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IPagesBuilder AddPages(this IServiceCollection services, Action<PagesOptions> setupAction)
         {
             services.Configure(setupAction);
+
             return new PagesBuilder(services);
         }
     }

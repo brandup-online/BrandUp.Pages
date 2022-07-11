@@ -74,7 +74,7 @@ namespace BrandUp.Pages.Services
         {
             var result = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld);
 
-            Assert.True(result.Succeeded);
+            Assert.True(result.IsSuccess);
             Assert.NotNull(result.Data);
             Assert.Equal("Test collection", result.Data.Title);
             Assert.Equal("TestPage", result.Data.PageTypeName);
@@ -88,7 +88,7 @@ namespace BrandUp.Pages.Services
             var defaultPage = await pageService.GetDefaultPageAsync(websiteContext.Website.Id);
             var result = await pageCollectionService.CreateCollectionAsync(defaultPage, "Test collection", "TestPage", PageSortMode.FirstOld);
 
-            Assert.True(result.Succeeded);
+            Assert.True(result.IsSuccess);
             Assert.NotNull(result.Data);
             Assert.Equal("Test collection", result.Data.Title);
             Assert.Equal("TestPage", result.Data.PageTypeName);
@@ -104,7 +104,7 @@ namespace BrandUp.Pages.Services
 
             var pageCollection = await pageCollectionService.CreateCollectionAsync(page, "Test collection", "TestPage", PageSortMode.FirstOld);
 
-            Assert.False(pageCollection.Succeeded);
+            Assert.False(pageCollection.IsSuccess);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace BrandUp.Pages.Services
 
             var result = await pageCollectionService.UpdateCollectionAsync(pageCollection);
 
-            Assert.True(result.Succeeded);
+            Assert.True(result.IsSuccess);
             Assert.Equal("New title", pageCollection.Title);
             Assert.Equal(PageSortMode.FirstNew, pageCollection.SortMode);
         }
@@ -140,7 +140,7 @@ namespace BrandUp.Pages.Services
 
             var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
-            Assert.True(result.Succeeded);
+            Assert.True(result.IsSuccess);
             Assert.Null(await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id));
         }
 
@@ -151,7 +151,7 @@ namespace BrandUp.Pages.Services
 
             var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
-            Assert.False(result.Succeeded);
+            Assert.False(result.IsSuccess);
         }
 
         #endregion

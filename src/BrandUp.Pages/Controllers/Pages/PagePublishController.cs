@@ -63,7 +63,7 @@ namespace BrandUp.Pages.Controllers
         protected override async Task<PagePublishResult> OnCommitAsync(PagePublishValues values)
         {
             var publishResult = await pageService.PublishPageAsync(page, values.UrlPath);
-            if (!publishResult.Succeeded)
+            if (!publishResult.IsSuccess)
             {
                 AddErrors(publishResult);
                 return null;

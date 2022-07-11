@@ -82,7 +82,7 @@ namespace BrandUp.Pages.Url
         {
             var validateResult = pageUrlHelper.ValidateUrlPath(urlPath);
 
-            Assert.Equal(validValue, validateResult.Succeeded);
+            Assert.Equal(validValue, validateResult.IsSuccess);
         }
 
         [Theory]

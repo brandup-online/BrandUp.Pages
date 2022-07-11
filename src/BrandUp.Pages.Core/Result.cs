@@ -7,14 +7,14 @@ namespace BrandUp.Pages
     {
         private readonly List<string> errors = new List<string>();
 
-        public bool Succeeded { get; protected set; }
+        public bool IsSuccess { get; protected set; }
         public IEnumerable<string> Errors => errors;
 
         protected Result() { }
 
         public static Result Failed(params string[] message)
         {
-            var result = new Result { Succeeded = false };
+            var result = new Result { IsSuccess = false };
 
             if (message != null)
                 result.errors.AddRange(message);
@@ -25,14 +25,14 @@ namespace BrandUp.Pages
         {
             return Failed(ex.Message);
         }
-        public static Result Success { get; } = new Result { Succeeded = true };
+        public static Result Success { get; } = new Result { IsSuccess = true };
     }
 
     public class Result<TData> : IResult
     {
         private readonly List<string> errors = new List<string>();
 
-        public bool Succeeded { get; protected set; }
+        public bool IsSuccess { get; protected set; }
         public IEnumerable<string> Errors => errors;
         public TData Data { get; private set; }
 
@@ -40,7 +40,7 @@ namespace BrandUp.Pages
 
         public static Result<TData> Failed(params string[] message)
         {
-            var result = new Result<TData> { Succeeded = false };
+            var result = new Result<TData> { IsSuccess = false };
 
             if (message != null)
                 result.errors.AddRange(message);
@@ -53,13 +53,13 @@ namespace BrandUp.Pages
         }
         public static Result<TData> Success(TData data)
         {
-            return new Result<TData> { Succeeded = true, Data = data };
+            return new Result<TData> { IsSuccess = true, Data = data };
         }
     }
 
     public interface IResult
     {
-        bool Succeeded { get; }
+        bool IsSuccess { get; }
         IEnumerable<string> Errors { get; }
     }
 }

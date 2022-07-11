@@ -90,7 +90,7 @@ namespace BrandUp.Pages.Controllers
                 createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, values.Title, values.PageType, values.Sort);
             else
                 createResult = await pageCollectionService.CreateCollectionAsync(page, values.Title, values.PageType, values.Sort);
-            if (!createResult.Succeeded)
+            if (!createResult.IsSuccess)
             {
                 AddErrors(createResult);
                 return null;

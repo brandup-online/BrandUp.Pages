@@ -137,7 +137,7 @@ namespace BrandUp.Pages.Controllers
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
 
-            if (result.Succeeded)
+            if (result.IsSuccess)
                 return Ok();
             else
                 return BadRequest(result);
