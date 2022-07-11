@@ -1,7 +1,7 @@
 ﻿import { Field } from "./field";
 import { DOM } from "brandup-ui-dom";
-import "./string-array.less";
 import iconDelete from "../svg/toolbar-button-discard.svg";
+import "./string-array.less";
 
 export class StringArrayField extends Field<Array<string>, StringArrayFieldOptions> {
     private __itemsElem: HTMLElement;

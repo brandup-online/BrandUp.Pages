@@ -1,7 +1,7 @@
 ﻿import { Field } from "./field";
 import { DOM } from "brandup-ui-dom";
-import "./combobox.less";
 import iconArrow from "../svg/combobox-arrow.svg";
+import "./combobox.less";
 
 export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     private __valueElem: HTMLElement;
