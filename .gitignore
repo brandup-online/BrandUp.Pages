@@ -335,8 +335,8 @@ ASALocalRun/
 /examples/LandingWebSite/_client/**/*.js.map
 package-lock.json
 .rpt2_cache
-/src/brandup-pages-ui/**/*.js.map
-/src/brandup-pages-ui/**/*.d.ts
-/src/brandup-pages-ui/**/*.js
+/src/brandup-ui-pages/**/*.js.map
+/src/brandup-ui-pages/**/*.d.ts
+/src/brandup-ui-pages/**/*.js
 /examples/LandingWebSite/_temp/files
 /examples/LandingWebSite/_temp/images

@@ -35,7 +35,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.Tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.MongoDb.Tests", "test\BrandUp.Pages.MongoDb.Tests\BrandUp.Pages.MongoDb.Tests.csproj", "{701582C9-B9FC-4431-8100-EFF077030DA8}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "brandup-pages-ui", "src\brandup-pages-ui\brandup-pages-ui.njsproj", "{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "brandup-ui-pages", "src\brandup-ui-pages\brandup-ui-pages.njsproj", "{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

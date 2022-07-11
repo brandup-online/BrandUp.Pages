@@ -28,7 +28,7 @@
     "brandup-ui-dom": "^2.0.5",
     "brandup-ui-ajax": "^2.0.5",
     "brandup-ui-website": "^3.1.1",
-    "brandup-pages-ui": "../../src/brandup-pages-ui"
+    "brandup-ui-pages": "../../src/brandup-ui-pages"
   },
   "scripts": {
     "build": "webpack -p --progress --config webpack.config.js",

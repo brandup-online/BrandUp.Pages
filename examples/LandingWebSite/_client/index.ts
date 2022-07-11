@@ -1,11 +1,11 @@
 ﻿import { host } from "brandup-ui-website";
 import { ajaxRequest } from "brandup-ui-ajax";
-import { PagesMiddleware } from "brandup-pages-ui";
+import { PagesMiddleware } from "brandup-ui-pages";
 import "./styles.less";
 
 host.start({
     pageTypes: {
-        "content": () => import("brandup-pages-ui/source/pages/content"),
+        "content": () => import("brandup-ui-pages/source/pages/content"),
         "about": () => import("./pages/about/index")
     },
     scripts: {
