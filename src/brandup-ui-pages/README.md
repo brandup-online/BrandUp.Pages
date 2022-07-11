@@ -1,4 +1,4 @@
-# brandup-pages-ui
+# brandup-ui-pages
 
 ## Setup
 
@@ -8,7 +8,7 @@ import { PagesMiddleware } from "brandup-ui-pages";
 
 host.start({
     pageTypes: {
-        "content": () => import("brandup-pages-ui/source/pages/content")
+        "content": () => import("brandup-ui-pages/source/pages/content")
     }
 }, (builder) => {
         builder.useMiddleware(new PagesMiddleware());
