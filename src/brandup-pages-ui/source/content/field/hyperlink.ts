@@ -1,9 +1,10 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
+import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import iconArrow from "../../svg/combobox-arrow.svg";
 import { PageModel } from "../../typings/models";
 import "./hyperlink.less";
+import { DOM } from "brandup-ui-dom";
 
 export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> implements IContentField {
     readonly form: IContentForm;

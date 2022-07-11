@@ -1,5 +1,5 @@
 ﻿import { ModelDesigner } from "./model";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import "./page-blocks.less";
 import iconRefresh from "../../svg/page-blocks-refresh.svg";
 import iconSettings from "../../svg/page-blocks-settings.svg";

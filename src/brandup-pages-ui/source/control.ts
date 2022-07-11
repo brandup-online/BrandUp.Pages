@@ -1,4 +1,5 @@
-﻿import { UIElement, Utility } from "brandup-ui";
+﻿import { UIElement } from "brandup-ui";
+import { Utility } from "brandup-ui-helpers";
 
 export abstract class UIControl<TOptions = {}> extends UIElement {
     readonly options: TOptions = {} as TOptions;

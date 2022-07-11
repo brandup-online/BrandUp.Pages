@@ -1,7 +1,7 @@
 ﻿import { FieldDesigner } from "./base";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
-import { AjaxResponse } from "brandup-ui";
+import { AjaxResponse } from "brandup-ui-ajax";
 
 export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     private __isChanged: boolean;

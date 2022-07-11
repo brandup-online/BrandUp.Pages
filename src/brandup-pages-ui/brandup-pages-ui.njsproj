@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6f86fd97-7a5a-4296-afe2-6244c32b3e4f}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartupFile />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -126,7 +126,10 @@
     <TypeScriptCompile Include="source\form\field.ts" />
     <TypeScriptCompile Include="source\form\string-array.ts" />
     <TypeScriptCompile Include="source\form\textbox.ts" />
-    <TypeScriptCompile Include="source\index.ts" />
+    <TypeScriptCompile Include="source\index.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="source\middleware.ts" />
     <TypeScriptCompile Include="source\pages\content.ts" />
     <TypeScriptCompile Include="source\typings\svg.d.ts" />
     <TypeScriptCompile Include="source\typings\content.ts" />

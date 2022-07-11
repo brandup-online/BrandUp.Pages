@@ -1,8 +1,9 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
+import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import { PageCollectionModel } from "../../typings/models";
 import "./pages.less";
+import { DOM } from "brandup-ui-dom";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
     readonly form: IContentForm;

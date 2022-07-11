@@ -1,16 +1,16 @@
 ﻿import { host } from "brandup-ui-website";
-import { ajaxRequest } from "brandup-ui";
+import { ajaxRequest } from "brandup-ui-ajax";
 import { PagesMiddleware } from "brandup-pages-ui";
 import "./styles.less";
 
 host.start({
-    //pageTypes: {
-    //    //"content": () => import("./brandup.pages/pages/content"),
-    //    "about": () => import("./pages/about/index")
-    //},
-    //scripts: {
-    //    "BB1": () => import("./contents/BB1")
-    //}
+    pageTypes: {
+        "content": () => import("brandup-pages-ui/source/pages/content"),
+        "about": () => import("./pages/about/index")
+    },
+    scripts: {
+        "BB1": () => import("./contents/BB1")
+    }
 }, (builder) => {
         builder.useMiddleware(new PagesMiddleware());
     }, (app) => {

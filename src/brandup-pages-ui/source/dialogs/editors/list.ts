@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import { assignPageEditor } from "./assign";
 import { deletePageEditor } from "./delete";
 import { PageEditorModel } from "../../typings/models";

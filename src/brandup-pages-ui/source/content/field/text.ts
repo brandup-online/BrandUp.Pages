@@ -1,6 +1,6 @@
 ﻿import { Textbox, TextboxOptions } from "../../form/textbox";
 import { IContentField, IContentForm } from "../../typings/content";
-import { AjaxResponse } from "brandup-ui";
+import { AjaxResponse } from "brandup-ui-ajax";
 
 export class TextContent extends Textbox implements IContentField {
     readonly form: IContentForm;

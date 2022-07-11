@@ -1,4 +1,5 @@
-﻿import { UIElement, AjaxRequest } from "brandup-ui";
+﻿import { UIElement } from "brandup-ui";
+import { AjaxRequest } from "brandup-ui-ajax";
 import { IContentFieldDesigner, IPageDesigner } from "../../typings/content";
 import "./base.less";
 

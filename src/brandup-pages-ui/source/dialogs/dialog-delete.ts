@@ -1,6 +1,7 @@
 ﻿import { Dialog } from "./dialog";
-import { DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import { Result } from "../typings/models";
+import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {

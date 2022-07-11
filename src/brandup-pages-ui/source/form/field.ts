@@ -1,4 +1,4 @@
-﻿import { DOM } from "brandup-ui";
+﻿import { DOM } from "brandup-ui-dom";
 import { UIControl } from "../control";
 import "./field.less";
 

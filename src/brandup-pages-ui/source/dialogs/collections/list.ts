@@ -3,7 +3,7 @@ import { createPageCollection } from "./create";
 import { deletePageCollection } from "./delete";
 import { updatePageCollection } from "./update";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import { PageCollectionModel } from "../../typings/models";
 
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {

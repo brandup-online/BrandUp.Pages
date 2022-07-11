@@ -1,4 +1,4 @@
-﻿import { AjaxQueue, AjaxRequest } from "brandup-ui";
+﻿import { AjaxQueue, AjaxRequest } from "brandup-ui-ajax";
 
 export interface IContentForm {
     editId: string;

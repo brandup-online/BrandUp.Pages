@@ -1,7 +1,8 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM, AjaxResponse } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import "./image.less";
+import { AjaxResponse } from "brandup-ui-ajax";
 
 export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> implements IContentField {
     readonly form: IContentForm;

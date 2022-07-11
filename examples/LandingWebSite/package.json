@@ -24,16 +24,15 @@
     "uglifyjs-webpack-plugin": "^2.2.0"
   },
   "dependencies": {
-    "brandup-ui": "^1.1.14",
-    "brandup-ui-app": "^1.2.28",
-    "brandup-ui-website": "^2.1.6",
-    "brandup-pages-ckeditor": "^1.0.12",
+    "brandup-ui": "^2.0.5",
+    "brandup-ui-dom": "^2.0.5",
+    "brandup-ui-ajax": "^2.0.5",
+    "brandup-ui-website": "^3.1.1",
     "brandup-pages-ui": "../../src/brandup-pages-ui"
   },
   "scripts": {
     "build": "webpack -p --progress --config webpack.config.js",
     "dev-build": "webpack --progress -d --config webpack.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --progress -d --config webpack.config.js --watch"
   }
 }

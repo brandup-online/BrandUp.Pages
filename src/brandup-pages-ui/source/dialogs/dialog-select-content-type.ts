@@ -1,5 +1,5 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import { ContentTypeModel } from "../typings/models";
 import "./dialog-select-content-type.less";
 

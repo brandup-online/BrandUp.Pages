@@ -1,4 +1,4 @@
-﻿import { UIElement, DOM, ajaxRequest, AjaxResponse } from "brandup-ui";
+﻿import { UIElement } from "brandup-ui";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import { listPageEditor } from "../dialogs/editors/list";
@@ -8,6 +8,8 @@ import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
 import { listContentType } from "../dialogs/content-types/list";
 import { Page, PageModel } from "brandup-ui-website";
+import { DOM } from "brandup-ui-dom";
+import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;

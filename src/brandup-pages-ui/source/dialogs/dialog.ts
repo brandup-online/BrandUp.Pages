@@ -1,8 +1,9 @@
-﻿import { DOM, Utility } from "brandup-ui";
-import "./dialog.less";
+﻿import { DOM } from "brandup-ui-dom";
+import { Utility } from "brandup-ui-helpers";
+import { UIControl } from "../control";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";
-import { UIControl } from "../control";
+import "./dialog.less";
 
 const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
 let currentDialog: Dialog = null;

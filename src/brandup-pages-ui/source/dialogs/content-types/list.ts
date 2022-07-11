@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 
 export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, ContentTypeItemModel> {
     private __isModified: boolean = false;

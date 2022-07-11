@@ -1,20 +1,44 @@
 {
   "name": "brandup-pages-ui",
-  "version": "0.0.0",
-  "description": "brandup-pages-ui",
+  "description": "UI for Brandup.Pages",
+  "keywords": [
+    "brandup",
+    "javascript",
+    "typescript",
+    "pages",
+    "content"
+  ],
   "author": {
-    "name": ""
+    "name": "Dmitry Kovyazin",
+    "email": "it@brandup.online"
   },
+  "homepage": "https://github.com/dkovyazin/BrandUp.Pages",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dkovyazin/BrandUp.Pages.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dkovyazin/BrandUp.Pages/issues",
+    "email": "it@brandup.online"
+  },
+  "license": "Apache-2.0",
+  "version": "1.0.0",
   "main": "./source/index.ts",
   "types": "./source/index.ts",
-  "dependencies": {
-    "brandup-ui": "^1.1.14",
-    "brandup-ui-app": "^1.2.28",
-    "brandup-ui-website": "^2.1.6",
-    "brandup-pages-ckeditor": "^1.0.12"
-  },
+  "files": [
+    "source"
+  ],
   "devDependencies": {
     "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "brandup-ui": "^2.0.5",
+    "brandup-ui-dom": "^2.0.5",
+    "brandup-ui-ajax": "^2.0.5",
+    "brandup-ui-helpers": "^2.0.5",
+    "brandup-ui-app": "^2.0.1",
+    "brandup-ui-website": "^3.1.1",
+    "brandup-pages-ckeditor": "^1.0.12"
   },
   "scripts": {
     "build": "tsc"

@@ -1,8 +1,9 @@
 ﻿import { FieldDesigner } from "./base";
-import { DOM, AjaxResponse } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
 import { ImageFieldOptions } from "../field/image";
+import { AjaxResponse } from "brandup-ui-ajax";
 
 export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     private __fileInputElem: HTMLInputElement;

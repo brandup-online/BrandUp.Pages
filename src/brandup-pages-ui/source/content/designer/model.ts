@@ -1,9 +1,10 @@
 ﻿import { FieldDesigner } from "./base";
-import { DOM, AjaxResponse } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import { editPage } from "../../dialogs/pages/edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { ContentTypeModel } from "../../typings/models";
 import "./model.less";
+import { AjaxResponse } from "brandup-ui-ajax";
 
 export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     get typeName(): string { return "BrandUpPages.ModelDesigner"; }

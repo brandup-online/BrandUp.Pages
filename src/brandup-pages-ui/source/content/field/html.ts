@@ -1,6 +1,6 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 

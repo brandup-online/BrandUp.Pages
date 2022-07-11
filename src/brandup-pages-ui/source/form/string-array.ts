@@ -1,5 +1,5 @@
 ﻿import { Field } from "./field";
-import { DOM } from "brandup-ui";
+import { DOM } from "brandup-ui-dom";
 import "./string-array.less";
 import iconDelete from "../svg/toolbar-button-discard.svg";
 
