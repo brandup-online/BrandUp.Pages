@@ -14,12 +14,12 @@ namespace LandingWebSite.Pages
             this.pageAccessProvider = pageAccessProvider ?? throw new ArgumentNullException(nameof(pageAccessProvider));
         }
 
-        public Task PageBuildAsync(PageBuildContext context)
+        public Task PageClientBuildAsync(PageClientBuildContext context)
         {
             return Task.CompletedTask;
         }
 
-        public async Task PageNavigationAsync(PageNavidationContext context)
+        public async Task PageClientNavigationAsync(PageClientNavidationContext context)
         {
             var enableAdmin = await pageAccessProvider.CheckAccessAsync(context.CancellationToken);
             context.ClientData.Add("enableAdministration", enableAdmin);

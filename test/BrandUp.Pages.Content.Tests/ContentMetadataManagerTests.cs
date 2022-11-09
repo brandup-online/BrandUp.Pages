@@ -34,7 +34,7 @@ namespace BrandUp.Pages.Content
             Assert.NotNull(contentMetadata);
             Assert.Equal(contentMetadata.ModelType, contentType);
             Assert.Equal("TestPage", contentMetadata.Name);
-            Assert.Equal(contentMetadata.Title, TestPageContent.ContentTypeTitle);
+            Assert.Equal(TestPageContent.ContentTypeTitle, contentMetadata.Title);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace BrandUp.Pages.Content
             var metadatas = metadataManager.MetadataProviders;
 
             Assert.NotNull(metadatas);
-            Assert.True(metadatas.Count() > 0);
+            Assert.True(metadatas.Any());
             Assert.Contains(contentMetadata, metadatas);
         }
 
@@ -85,41 +85,31 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void ApplyInjections()
         {
-            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var services = new ServiceCollection().AddScoped<TestService>();
-            using (var serviceProvider = services.BuildServiceProvider())
-            {
-                using (var serviceScope = serviceProvider.CreateScope())
-                {
-                    var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
+            using var serviceProvider = services.BuildServiceProvider();
+            using var serviceScope = serviceProvider.CreateScope();
+            var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
 
-                    metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, false);
+            metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, false);
 
-                    Assert.NotNull(page.Service);
-                    Assert.Null(page.Header.Service);
-                    Assert.Null(page.Headers[0].Service);
-                }
-            }
+            Assert.NotNull(page.Service);
+            Assert.Null(page.Header.Service);
+            Assert.Null(page.Headers[0].Service);
         }
 
         [Fact]
         public void ApplyInjections_WithInnerModels()
         {
-            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var services = new ServiceCollection().AddScoped<TestService>();
-            using (var serviceProvider = services.BuildServiceProvider())
-            {
-                using (var serviceScope = serviceProvider.CreateScope())
-                {
-                    var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
+            using var serviceProvider = services.BuildServiceProvider();
+            using var serviceScope = serviceProvider.CreateScope();
+            var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
 
-                    metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, true);
+            metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, true);
 
-                    Assert.NotNull(page.Service);
-                    Assert.NotNull(page.Header.Service);
-                    Assert.NotNull(page.Headers[0].Service);
-                }
-            }
+            Assert.NotNull(page.Service);
+            Assert.NotNull(page.Header.Service);
+            Assert.NotNull(page.Headers[0].Service);
         }
 
         #endregion

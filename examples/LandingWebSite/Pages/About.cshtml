@@ -1,6 +1,6 @@
 ﻿@page
 @model LandingWebSite.Pages.AbountModel
-@{ Model.RenderPage(this); }
+@{ await Model.RenderPageAsync(this); }
 
 <h1>@Model.Title</h1>
 

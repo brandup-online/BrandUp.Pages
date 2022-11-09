@@ -1,5 +1,4 @@
-﻿using BrandUp.Website;
-using BrandUp.Website.Pages;
+﻿using BrandUp.Website.Pages;
 using System.Threading.Tasks;
 
 namespace LandingWebSite.Pages
@@ -14,7 +13,7 @@ namespace LandingWebSite.Pages
 
         protected override Task OnPageRequestAsync(PageRequestContext context)
         {
-            SetOpenGraph(Url.ContentLink("~/images/banner.jpg"), Title, Description);
+            //SetOpenGraph(Url.ContentLink("~/images/banner.jpg"), Title, Description);
 
             return base.OnPageRequestAsync(context);
         }

@@ -48,7 +48,7 @@ namespace BrandUp.Pages.Content
             Assert.Equal("Header", explorer.ModelPath);
             Assert.NotEqual(explorer.Root, explorer);
             Assert.NotNull(explorer.Parent);
-            Assert.Equal(explorer.Index, -1);
+            Assert.Equal(-1, explorer.Index);
             Assert.False(explorer.IsRoot);
         }
 

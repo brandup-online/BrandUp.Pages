@@ -1,6 +1,5 @@
 ﻿@page
 @model LandingWebSite.Pages.ErrorModel
-
-@{ Model.RenderPage(this); }
+@{ await Model.RenderPageAsync(this); }
 
 <h1>@Model.Title</h1>

@@ -32,12 +32,12 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "brandup-ui": "^2.0.5",
-    "brandup-ui-dom": "^2.0.5",
-    "brandup-ui-ajax": "^2.0.5",
-    "brandup-ui-helpers": "^2.0.5",
-    "brandup-ui-app": "^2.0.1",
-    "brandup-ui-website": "^3.1.2",
+    "brandup-ui": "^2.0.6",
+    "brandup-ui-dom": "^2.0.6",
+    "brandup-ui-ajax": "^2.0.6",
+    "brandup-ui-helpers": "^2.0.6",
+    "brandup-ui-app": "^2.0.2",
+    "brandup-ui-website": "^3.1.4",
     "brandup-pages-ckeditor": "^1.0.12"
   },
   "scripts": {
