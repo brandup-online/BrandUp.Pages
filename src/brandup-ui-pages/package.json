@@ -29,7 +29,7 @@
     "source"
   ],
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.4"
   },
   "dependencies": {
     "brandup-ui": "^2.0.6",
