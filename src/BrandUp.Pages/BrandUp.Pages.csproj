@@ -8,6 +8,7 @@
     <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
     <Product>BrandUp.Pages</Product>
     <Company>BrandUp.online</Company>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

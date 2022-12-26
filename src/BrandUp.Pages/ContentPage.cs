@@ -1,9 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages
 {
@@ -25,7 +22,7 @@ namespace BrandUp.Pages
             var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
 
             if (pageCollectionReference.CollectionId == Guid.Empty)
-                return new IPage[0];
+                return Array.Empty<IPage>();
 
             var options = new GetPagesOptions(pageCollectionReference.CollectionId);
             if (offset >= 0 && limit > 0)
