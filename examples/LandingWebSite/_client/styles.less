@@ -1,22 +1,4 @@
-﻿@Primary-Color: #FFC700;
-@Accent-Color: #FFC700;
-@Main-Color: #F6F6F6;
-@Text-Color: #33333C;
-
-@Border-Radius: 5px;
-
-@Font-Size: 15px;
-@Font-Family: 'Segoe UI', sans-serif;
-@LineHeight: 150%;
-
-@Link-Color: @Accent-Color;
-@Link-Color-Hover: @Accent-Color;
-
-@Header-Font-Family: 'Segoe UI', sans-serif;
-
-@Content-MaxWidth: 1280px;
-@Content-MinWidth: 320px;
-@Content-Padding: 30px;
+﻿@import "vars.less";
 
 html, body {
 	margin: 0;
@@ -74,6 +56,153 @@ a {
 	overflow: hidden;
 	position: relative;
 	transition: transform ease 250ms;
+}
+
+.app-button {
+	background: @Button-Background;
+	box-sizing: border-box;
+	outline: 0;
+	min-height: 50px;
+	border: 0;
+	border-radius: 3px;
+	padding: 0 30px;
+	margin: 0;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	justify-content: center;
+	color: #fff;
+	font-size: 16px;
+	line-height: 20px;
+	font-weight: 400;
+	text-transform: uppercase;
+	text-align: center;
+	cursor: pointer;
+	text-decoration: none;
+	transition: box-shadow .13s ease-out,background .13s ease-out,color .13s ease-out;
+	user-select: none;
+
+	& svg {
+		flex: 0 0 auto;
+		fill: #fff;
+		display: block;
+		width: 24px;
+		height: 24px;
+
+		& ~ span {
+			margin-left: 6px;
+		}
+	}
+
+	& span {
+		display: block;
+
+		& i {
+			display: block;
+			font-style: normal;
+			font-size: 12px;
+			line-height: 13px;
+			padding-top: 4px;
+		}
+	}
+
+	&:hover,
+	&:focus {
+		background: @Button-Background-Hovered;
+		color: #fff;
+		text-decoration: none;
+		box-shadow: 0 1px 1px 0 rgba(0,0,0,.06),0 2px 5px 0 rgba(0,0,0,.2);
+	}
+
+	&:active {
+		background: @Button-Background-Pressed;
+	}
+
+	&.secondary {
+		background: #fff;
+		border: solid 1px rgb(240, 240, 240);
+		color: @Button-Background;
+
+		& svg {
+			fill: @Button-Background;
+		}
+
+		&:hover,
+		&:focus {
+		}
+
+		&:active {
+		}
+	}
+
+	&.red {
+		background: @Button2-Background;
+
+		& svg {
+			fill: @Button2-Background;
+		}
+
+		&:hover,
+		&:focus {
+			background: @Button2-Background-Hovered;
+		}
+
+		&:active {
+			background: @Button2-Background-Pressed;
+		}
+	}
+
+	&.loading {
+		color: rgba(0,0,0,0);
+		position: relative;
+
+		& svg {
+			visibility: hidden;
+		}
+
+		&:after {
+			content: '';
+			display: block;
+			border-radius: 50%;
+			width: 20px;
+			height: 20px;
+			border: 2px solid rgba(255,255,255,0.2);
+			border-top-color: #fff;
+			animation: spin 0.5s infinite steps(100);
+			position: absolute;
+			left: 50%;
+			top: 50%;
+			margin-left: -10px;
+			margin-top: -10px;
+		}
+
+		&.secondary {
+			&:after {
+				border: 2px solid rgba(0,0,0,0.2);
+				border-top-color: @Text-Color;
+			}
+		}
+	}
+
+	@media all and (max-width: @Adaptive-3-Width) {
+		font-size: 15px;
+		line-height: 19px;
+		padding: 0 25px;
+
+		& svg {
+			width: 22px;
+			height: 22px;
+		}
+	}
+
+	@media all and (max-width: @Adaptive-4-Width) {
+		min-height: 44px;
+
+		& svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
 }
 
 nav.app-top {
@@ -222,12 +351,28 @@ main.app-content {
 
 .page-header {
 	padding-bottom: 20px;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
 
-	& p {
-		padding: 10px 0 0;
-		margin: 0;
+	& .content {
+		flex: 1 1 auto;
 
-		& strong {
+		& p {
+			padding: 10px 0 0;
+			margin: 0;
+
+			& strong {
+				display: block;
+			}
+		}
+	}
+
+	& .actions {
+		flex: 0 0 auto;
+		margin-left: 20px;
+
+		& a {
 			display: block;
 		}
 	}

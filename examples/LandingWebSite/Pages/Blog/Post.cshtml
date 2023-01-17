@@ -1,5 +1,5 @@
-﻿@page
-@model BrandUp.Pages.ContentPageModel
+﻿@page "{url}"
+@model LandingWebSite.Pages.Blog.BlogPostModel
 @{ await Model.RenderPageAsync(this); }
 
 @await Html.RenderPageContentAsync()

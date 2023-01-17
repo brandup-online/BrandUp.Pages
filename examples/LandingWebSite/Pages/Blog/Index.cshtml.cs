@@ -1,22 +1,20 @@
-﻿using BrandUp.Pages;
-using BrandUp.Website.Pages;
+﻿using BrandUp.Website.Pages;
+using LandingWebSite.Repositories;
 using System;
-using System.Threading.Tasks;
 
 namespace LandingWebSite.Pages.Blog
 {
-    public class IndexModel : PageSetModel<BlogPostDocument>
+    public class IndexModel : AppPageModel
     {
-        public override string Title => "About";
+        readonly IBlogPostRepository blogPostRepository;
 
-        protected override Task OnPageRequestAsync(PageRequestContext context)
+        public IndexModel(IBlogPostRepository blogPostRepository)
         {
-            return base.OnPageRequestAsync(context);
+            this.blogPostRepository = blogPostRepository ?? throw new ArgumentNullException(nameof(blogPostRepository));
         }
-    }
 
-    public class BlogPostDocument
-    {
-        public Guid Id { get; set; }
+        public override string Title => "Blog";
+        public override string Description => "Blog page description";
+        public override string Keywords => "blog, company";
     }
 }

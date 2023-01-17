@@ -5,6 +5,8 @@
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <UserSecretsId>8118381a-1b40-4169-ae82-a4576a0f2cf5</UserSecretsId>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="_client\pages\form.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
   </ItemGroup>
@@ -32,6 +38,10 @@
   <ItemGroup>
     <Folder Include="wwwroot\dist\" />
     <Folder Include="_temp\images\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="_client\pages\form.ts" />
   </ItemGroup>
 
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">

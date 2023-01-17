@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages
 {
-    public sealed class ContentPageModel : AppPageModel
+    public class ContentPageModel : AppPageModel
     {
         private IPage page;
         private IPageEdit editSession;

@@ -2,4 +2,14 @@
 @model LandingWebSite.Pages.Blog.IndexModel
 @{ await Model.RenderPageAsync(this); }
 
-<h1>@Model.Title</h1>
+<header class="page-header">
+    <div class="content">
+        <h1>@Model.Title</h1>
+    </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="actions">
+            <a asp-page="Create">Новый пост</a>
+        </div>
+    }
+</header>

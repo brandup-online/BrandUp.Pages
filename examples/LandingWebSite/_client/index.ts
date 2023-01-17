@@ -5,6 +5,7 @@ import "./styles.less";
 
 host.start({
     pageTypes: {
+        "form": () => import("./pages/form"),
         "content": () => import("brandup-ui-pages/source/pages/content"),
         "about": () => import("./pages/about/index")
     },

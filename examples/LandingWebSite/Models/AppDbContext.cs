@@ -1,7 +1,9 @@
 ﻿using BrandUp.MongoDB;
 using BrandUp.Pages.MongoDb.Documents;
 using LandingWebSite.Identity;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using System;
 
 namespace LandingWebSite.Models
 {
@@ -11,6 +13,8 @@ namespace LandingWebSite.Models
 
         public IMongoCollection<IdentityUser> Users => GetCollection<IdentityUser>();
         public IMongoCollection<IdentityRole> Roles => GetCollection<IdentityRole>();
+
+        public IMongoCollection<BlogPostDocument> BlogPosts => GetCollection<BlogPostDocument>();
 
         #region IPagesDbContext members
 
@@ -22,5 +26,16 @@ namespace LandingWebSite.Models
         public IMongoCollection<PageUrlDocument> PageUrls => GetCollection<PageUrlDocument>();
 
         #endregion
+    }
+
+    [Document(CollectionName = "Blog.Post")]
+    public class BlogPostDocument
+    {
+        [BsonId, BsonRepresentation(MongoDB.Bson.BsonType.String)]
+        public Guid Id { get; set; }
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc, Representation = MongoDB.Bson.BsonType.DateTime)]
+        public DateTime CreatedDate { get; set; }
+        [BsonRequired]
+        public string Title { get; set; }
     }
 }

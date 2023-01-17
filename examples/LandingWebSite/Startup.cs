@@ -2,14 +2,9 @@ using BrandUp.Pages.Builder;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
 using LandingWebSite._migrations;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using LandingWebSite.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
 using System.Globalization;
 using System.Text.Encodings.Web;
@@ -66,7 +61,9 @@ namespace LandingWebSite
                 .AddUrlMapProvider<SubdomainUrlMapProvider>()
                 .AddPageEvents<Pages.PageEvents>();
 
-            services.AddPages()
+            services.AddPages(options =>
+            {
+            })
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
                 .AddImageResizer<Infrastructure.ImageResizer>()
@@ -94,7 +91,7 @@ namespace LandingWebSite
                 .AddCookie(options =>
                 {
                     options.Cookie.Name = "LandingWebSite.Identity";
-                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/signin");
+                    options.LoginPath = new PathString("/signin");
                     options.SlidingExpiration = true;
                     options.ReturnUrlParameter = "returnUrl";
                 });
@@ -111,6 +108,8 @@ namespace LandingWebSite
             services.AddHostedService<MigrationService>();
 
             #endregion
+
+            services.AddScoped<IBlogPostRepository, BlogPostRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -129,6 +128,7 @@ namespace LandingWebSite
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

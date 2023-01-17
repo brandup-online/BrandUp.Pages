@@ -1,13 +1,7 @@
-﻿using BrandUp.Website.Pages;
-
-namespace BrandUp.Pages
+﻿namespace BrandUp.Pages
 {
-    public abstract class PageSetModel<TItem> : AppPageModel
+    public abstract class PageSetModel<TItem, TContent> : ContentPageModel
         where TItem : class
     {
-        protected override Task OnPageRequestAsync(PageRequestContext context)
-        {
-            return base.OnPageRequestAsync(context);
-        }
     }
 }
