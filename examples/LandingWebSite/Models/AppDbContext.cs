@@ -1,20 +1,22 @@
 ﻿using BrandUp.MongoDB;
 using BrandUp.Pages.MongoDb.Documents;
 using LandingWebSite.Identity;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using System;
 
 namespace LandingWebSite.Models
 {
-    public class AppDbContext : MongoDbContext, BrandUp.Pages.MongoDb.IPagesDbContext
+    public class AppDbContext : MongoDbContext, BrandUp.Pages.MongoDb.IPagesDbContext, Blog.IBlogContext
     {
         public AppDbContext(MongoDbContextOptions options) : base(options) { }
 
         public IMongoCollection<IdentityUser> Users => GetCollection<IdentityUser>();
         public IMongoCollection<IdentityRole> Roles => GetCollection<IdentityRole>();
 
-        public IMongoCollection<BlogPostDocument> BlogPosts => GetCollection<BlogPostDocument>();
+        #region IBlogContext members
+
+        public IMongoCollection<Blog.Documents.BlogPostDocument> BlogPosts => GetCollection<Blog.Documents.BlogPostDocument>();
+
+        #endregion
 
         #region IPagesDbContext members
 
@@ -26,16 +28,5 @@ namespace LandingWebSite.Models
         public IMongoCollection<PageUrlDocument> PageUrls => GetCollection<PageUrlDocument>();
 
         #endregion
-    }
-
-    [Document(CollectionName = "Blog.Post")]
-    public class BlogPostDocument
-    {
-        [BsonId, BsonRepresentation(MongoDB.Bson.BsonType.String)]
-        public Guid Id { get; set; }
-        [BsonDateTimeOptions(Kind = DateTimeKind.Utc, Representation = MongoDB.Bson.BsonType.DateTime)]
-        public DateTime CreatedDate { get; set; }
-        [BsonRequired]
-        public string Title { get; set; }
     }
 }

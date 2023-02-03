@@ -1,8 +1,9 @@
-﻿using BrandUp.Pages.Content.Infrastructure;
+﻿using BrandUp.Pages.Builder;
+using BrandUp.Pages.Content.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace BrandUp.Pages.Builder
+namespace BrandUp.Pages
 {
     public static class IPagesBuilderExtensions
     {

@@ -2,6 +2,9 @@
 {
     public interface IPageRepository
     {
+        Task<IPage> CreatePageByItemAsync(string websiteId, string itemId, string itemType, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
+        Task<IPage> FindPageByItemAsync(string websiteId, string itemId, CancellationToken cancellationToken = default);
+
         Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default);

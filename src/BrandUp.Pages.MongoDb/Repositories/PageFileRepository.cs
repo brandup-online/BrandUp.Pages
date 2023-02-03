@@ -2,16 +2,12 @@
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
     public class PageFileRepository : IFileRepository
     {
-        private readonly FileBucket files;
+        readonly FileBucket files;
 
         public PageFileRepository(IPagesDbContext dbContext)
         {

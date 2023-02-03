@@ -1,5 +1,7 @@
-﻿using BrandUp.Pages.Metadata;
+﻿using BrandUp.Pages.Items;
+using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace BrandUp.Pages.Services
@@ -12,6 +14,8 @@ namespace BrandUp.Pages.Services
         readonly Url.IPageUrlHelper pageUrlHelper;
         readonly Views.IViewLocator viewLocator;
         readonly PagesOptions options;
+        readonly IServiceProvider serviceProvider;
+        readonly IOptionsSnapshot<ItemPageOptions> itemOptions;
 
         public PageService(
             IPageRepository pageRepositiry,
@@ -19,7 +23,9 @@ namespace BrandUp.Pages.Services
             IPageMetadataManager pageMetadataManager,
             Url.IPageUrlHelper pageUrlHelper,
             Views.IViewLocator viewLocator,
-            IOptions<PagesOptions> options)
+            IOptions<PagesOptions> options,
+            IServiceProvider serviceProvider,
+            IOptionsSnapshot<ItemPageOptions> itemOptions)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
@@ -30,6 +36,44 @@ namespace BrandUp.Pages.Services
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
             this.viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
             this.options = options.Value;
+            this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            this.itemOptions = itemOptions ?? throw new ArgumentNullException(nameof(itemOptions));
+        }
+
+        public async Task<IPage> CreatePageByItemAsync<TItem, TContent>(string webSiteId, TItem item, TContent pageContent, CancellationToken cancellationToken = default)
+            where TItem : class
+            where TContent : class, new()
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+            if (pageContent == null)
+                throw new ArgumentNullException(nameof(pageContent));
+
+            var pageMetadata = pageMetadataManager.GetMetadata(pageContent.GetType());
+            if (!pageMetadata.AllowCreateModel)
+                throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
+
+            var itemProvider = serviceProvider.GetRequiredService<IItemProvider<TItem>>();
+            var itemId = await itemProvider.GetIdAsync(item, cancellationToken);
+            if (string.IsNullOrEmpty(itemId))
+                throw new InvalidOperationException("ID элемента страницы не может быть пустым.");
+            var itemTypeName = typeof(TItem).FullName;
+
+            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
+            var pageHeader = pageMetadata.GetPageHeader(pageContent);
+
+            return await pageRepositiry.CreatePageByItemAsync(webSiteId, itemId, itemTypeName, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+        }
+        public async Task<IPage> FindPageByItemAsync<TItem>(string webSiteId, TItem item, CancellationToken cancellationToken = default)
+            where TItem : class
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            var itemProvider = serviceProvider.GetRequiredService<IItemProvider<TItem>>();
+            var itemId = await itemProvider.GetIdAsync(item, cancellationToken);
+
+            return await pageRepositiry.FindPageByItemAsync(webSiteId, itemId, cancellationToken);
         }
 
         public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
@@ -218,15 +262,26 @@ namespace BrandUp.Pages.Services
                 throw new ArgumentNullException(nameof(page));
 
             var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
-            if (contentModel.GetType() != pageMetadata.ContentType)
+            var contentModelType = contentModel.GetType();
+            if (contentModelType != pageMetadata.ContentType)
                 throw new ArgumentException($"Тип контента страницы должен наследовать {pageMetadata.ContentType.AssemblyQualifiedName}.", nameof(contentModel));
 
-            var pageTitle = pageMetadata.GetPageHeader(contentModel);
+            var pageHeader = pageMetadata.GetPageHeader(contentModel);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await pageRepositiry.SetContentAsync(page.Id, pageTitle, pageData, cancellationToken);
+            await pageRepositiry.SetContentAsync(page.Id, pageHeader, pageData, cancellationToken);
 
-            page.Header = pageTitle;
+            if (page.ItemId != null)
+            {
+                var itemPageOptions = itemOptions.Get(page.ItemType);
+                if (itemPageOptions == null)
+                    throw new InvalidOperationException($"Не найдена конфигурация элементов с типом {page.ItemType}.");
+                var itemProvider = serviceProvider.GetRequiredService(itemPageOptions.ItemProviderType);
+                if (itemProvider is IPageCallbacks pageCallbacks)
+                    await pageCallbacks.UpdateHeaderAsync(page.ItemId, page.ItemType, cancellationToken);
+            }
+
+            page.Header = pageHeader;
         }
         public async Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
@@ -242,21 +297,30 @@ namespace BrandUp.Pages.Services
             if (!urlPathValidationResult.IsSuccess)
                 return urlPathValidationResult;
 
-            var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
-            if (collection.PageId.HasValue)
+            string normalizedUrlPath;
+            if (page.ItemId == null)
             {
-                var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value, cancellationToken);
-                if (!parentPage.IsPublished)
-                    return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
-                urlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);
+                var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
+                if (collection.PageId.HasValue)
+                {
+                    var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value, cancellationToken);
+                    if (!parentPage.IsPublished)
+                        return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
+
+                    normalizedUrlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);
+                }
+                else
+                    normalizedUrlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
             }
             else
-                urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
+            {
+                normalizedUrlPath = string.Concat(page.ItemType.ToLower(), ":", pageUrlHelper.NormalizeUrlPath(urlPath));
+            }
 
-            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath, cancellationToken) != null)
+            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, normalizedUrlPath, cancellationToken) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
-            await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);
+            await pageRepositiry.SetUrlPathAsync(page, normalizedUrlPath, cancellationToken);
             await pageRepositiry.UpdatePageAsync(page, cancellationToken);
 
             return Result.Success;
@@ -281,6 +345,8 @@ namespace BrandUp.Pages.Services
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
+            if (page.ItemId != null)
+                return null;
 
             var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
             return pageCollection.PageId;
@@ -314,10 +380,24 @@ namespace BrandUp.Pages.Services
         }
         public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
         {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+            if (beforePage == null)
+                throw new ArgumentNullException(nameof(beforePage));
+            if (page.ItemId != null)
+                throw new InvalidOperationException("Страницы связанные с элементами не поддерживают ручную сортировку.");
+
             return pageRepositiry.UpPagePositionAsync(page, beforePage, cancellationToken);
         }
         public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
         {
+            if (page == null)
+                throw new ArgumentNullException(nameof(page));
+            if (afterPage == null)
+                throw new ArgumentNullException(nameof(afterPage));
+            if (page.ItemId != null)
+                throw new InvalidOperationException("Страницы связанные с элементами не поддерживают ручную сортировку.");
+
             return pageRepositiry.DownPagePositionAsync(page, afterPage, cancellationToken);
         }
 

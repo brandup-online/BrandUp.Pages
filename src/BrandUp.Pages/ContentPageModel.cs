@@ -7,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 namespace BrandUp.Pages
 {
     /// <summary>
-    /// Базовая модель страницы с контентом. На странице использующей эту модель можно разместить 
-    /// контент с типом <see cref="TContent"/> или типами наследующими его.
+    /// Базовая модель страницы с контентом <see cref="TContent"/>. На странице использующей эту модель можно разместить 
+    /// контент только с этим типом или типами наследующими его.
     /// </summary>
-    /// <typeparam name="TContent">Базовый тип контента страницы, который на ней размещается.</typeparam>
+    /// <typeparam name="TContent">Тип контента страницы.</typeparam>
     public class ContentPageModel<TContent> : AppPageModel, IContentPageModel
         where TContent : class
     {

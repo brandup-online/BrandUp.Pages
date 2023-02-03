@@ -1,11 +1,6 @@
 ﻿using BrandUp.Extensions.Migrations;
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb._migrations
 {

@@ -4,6 +4,12 @@ namespace BrandUp.Pages
 {
     public interface IPageService
     {
+        Task<IPage> CreatePageByItemAsync<TItem, TContent>(string webSiteId, TItem item, TContent pageContent, CancellationToken cancellationToken = default)
+            where TItem : class
+            where TContent : class, new();
+        Task<IPage> FindPageByItemAsync<TItem>(string webSiteId, TItem item, CancellationToken cancellationToken = default)
+            where TItem : class;
+
         Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default);
         Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
@@ -25,13 +31,6 @@ namespace BrandUp.Pages
         Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default);
     }
 
-    public class PageSeoOptions
-    {
-        public string Title { get; set; }
-        public string Description { get; set; }
-        public string[] Keywords { get; set; }
-    }
-
     public interface IPage
     {
         Guid Id { get; }
@@ -39,6 +38,8 @@ namespace BrandUp.Pages
         string WebsiteId { get; }
         string TypeName { get; }
         Guid OwnCollectionId { get; }
+        string ItemId { get; }
+        string ItemType { get; }
         string Header { get; set; }
         string UrlPath { get; }
         bool IsPublished { get; }
@@ -48,6 +49,13 @@ namespace BrandUp.Pages
     {
         FirstOld = 0,
         FirstNew = 1
+    }
+
+    public class PageSeoOptions
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string[] Keywords { get; set; }
     }
 
     public class GetPagesOptions
@@ -63,7 +71,6 @@ namespace BrandUp.Pages
             CollectionId = collectionId;
         }
     }
-
 
     public class PageUrlResult
     {

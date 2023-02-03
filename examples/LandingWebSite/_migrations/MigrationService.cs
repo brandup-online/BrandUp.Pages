@@ -1,15 +1,12 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace LandingWebSite._migrations
+﻿namespace LandingWebSite._migrations
 {
-    public class MigrationService : Microsoft.Extensions.Hosting.IHostedService
+    public class MigrationService : IHostedService
     {
         private readonly BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor;
 
         public MigrationService(BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor)
         {
-            this.migrationExecutor = migrationExecutor ?? throw new System.ArgumentNullException(nameof(migrationExecutor));
+            this.migrationExecutor = migrationExecutor ?? throw new ArgumentNullException(nameof(migrationExecutor));
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)

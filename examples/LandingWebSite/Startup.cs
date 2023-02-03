@@ -1,8 +1,8 @@
-using BrandUp.Pages.Builder;
+using BrandUp.Pages;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
 using LandingWebSite._migrations;
-using LandingWebSite.Repositories;
+using LandingWebSite.Blog;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.WebEncoders;
@@ -24,7 +24,7 @@ namespace LandingWebSite
         {
             #region Web
 
-            services.AddRazorPages();
+            services.AddRazorPages().AddApplicationPart(typeof(RootPageOptions).Assembly);
             services.AddControllers();
 
             services.Configure<WebEncoderOptions>(options =>
@@ -61,12 +61,13 @@ namespace LandingWebSite
                 .AddUrlMapProvider<SubdomainUrlMapProvider>()
                 .AddPageEvents<Pages.PageEvents>();
 
-            services.AddPagesCore()
-                .AddRazorContentPage()
-                .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
+            services.AddPages()
+                .AddContentTypesFromAssemblies(typeof(Startup).Assembly, typeof(Contents.Page.PageContent).Assembly)
                 .AddImageResizer<Infrastructure.ImageResizer>()
                 .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped)
-                .AddMongoDb<Models.AppDbContext>();
+                .AddMongoDb<Models.AppDbContext>()
+                .AddRootPages()
+                .AddItemPages<Blog.Documents.BlogPostDocument, Blog.Pages.PostItemProvider>();
 
             #region Identity
 
@@ -107,7 +108,7 @@ namespace LandingWebSite
 
             #endregion
 
-            services.AddScoped<IBlogPostRepository, BlogPostRepository>();
+            services.AddBlog<Models.AppDbContext>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

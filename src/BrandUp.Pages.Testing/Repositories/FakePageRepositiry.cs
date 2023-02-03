@@ -11,14 +11,23 @@ namespace BrandUp.Pages.Repositories
         private readonly FakePageHierarhyRepository pageHierarhy;
 
         private int pageIndex = 0;
-        private readonly Dictionary<int, Page> pages = new Dictionary<int, Page>();
-        private readonly Dictionary<Guid, int> pageIds = new Dictionary<Guid, int>();
-        private readonly Dictionary<string, int> pagePaths = new Dictionary<string, int>();
-        private readonly Dictionary<int, IDictionary<string, object>> pageContents = new Dictionary<int, IDictionary<string, object>>();
+        private readonly Dictionary<int, Page> pages = new();
+        private readonly Dictionary<Guid, int> pageIds = new();
+        private readonly Dictionary<string, int> pagePaths = new();
+        private readonly Dictionary<int, IDictionary<string, object>> pageContents = new();
 
         public FakePageRepositiry(FakePageHierarhyRepository pageHierarhy)
         {
             this.pageHierarhy = pageHierarhy ?? throw new ArgumentNullException(nameof(pageHierarhy));
+        }
+
+        public Task<IPage> CreatePageByItemAsync(string websiteId, string itemId, string itemType, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<IPage> FindPageByItemAsync(string websiteId, string itemId, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<IPage> CreatePageAsync(string webSiteId, Guid ownCollectionId, string typeName, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
@@ -141,12 +150,9 @@ namespace BrandUp.Pages.Repositories
         }
         public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
-
             var pageDocument = (Page)page;
 
-            pageDocument.UrlPath = urlPath;
+            pageDocument.UrlPath = urlPath ?? throw new ArgumentNullException(nameof(urlPath));
             pageDocument.Status = PageStatus.Published;
 
             return Task.CompletedTask;
@@ -200,6 +206,8 @@ namespace BrandUp.Pages.Repositories
             public string WebsiteId { get; set; }
             public string TypeName { get; }
             public Guid OwnCollectionId { get; }
+            public string ItemId { get; }
+            public string ItemType { get; }
             public string UrlPath { get; set; }
             public string Header { get; set; }
             public int ContentVersion { get; set; } = 1;

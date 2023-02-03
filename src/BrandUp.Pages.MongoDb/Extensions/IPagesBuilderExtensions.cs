@@ -1,12 +1,13 @@
 ﻿using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
+using BrandUp.Pages.Builder;
 using BrandUp.Pages.Files;
 using BrandUp.Pages.MongoDb.Repositories;
 using BrandUp.Pages.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BrandUp.Pages.Builder
+namespace BrandUp.Pages
 {
     public static class IPagesBuilderExtensions
     {

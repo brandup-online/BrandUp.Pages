@@ -28,7 +28,7 @@ namespace LandingWebSite.Controllers
 
             foreach (var page in pages)
             {
-                var url = await pageLinkGenerator.GetUriAsync(page);
+                var url = await pageLinkGenerator.GetUrlAsync(page);
 
                 model.Urls.Add(new SitemapUrl
                 {

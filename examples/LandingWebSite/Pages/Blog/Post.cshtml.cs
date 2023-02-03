@@ -1,11 +1,11 @@
 ﻿using BrandUp.Pages;
 using BrandUp.Website.Pages;
+using LandingWebSite.Blog.Documents;
 using LandingWebSite.Contents.Page;
-using LandingWebSite.Models;
 
 namespace LandingWebSite.Pages.Blog
 {
-    public class BlogPostModel : PageSetModel<BlogPostDocument, BlogPostPageContent>
+    public class BlogPostModel : ItemContentPageModel<BlogPostDocument, BlogPostPageContent>
     {
         public override string Title => "About";
 

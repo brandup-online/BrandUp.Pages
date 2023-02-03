@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BrandUp.MongoDB" Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\BrandUp.Pages.Abstractions\BrandUp.Pages.Abstractions.csproj" />
+    <ProjectReference Include="..\LandingWebSite.Contents\LandingWebSite.Contents.csproj" />
+  </ItemGroup>
+
+</Project>

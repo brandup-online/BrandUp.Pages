@@ -12,6 +12,8 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string TypeName { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid OwnCollectionId { get; set; }
+        public string ItemId { get; set; }
+        public string ItemType { get; set; }
         [BsonRequired]
         public string UrlPath { get; set; }
         [BsonRequired]
@@ -21,6 +23,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public PageSeoDocument Seo { get; set; }
         public bool IsPublished { get => Status == PageStatus.Published; }
         public int Order { get; set; }
+
     }
 
     public enum PageStatus

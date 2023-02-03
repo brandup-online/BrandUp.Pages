@@ -4,20 +4,22 @@ using Microsoft.Extensions.Options;
 
 namespace BrandUp.Pages.Url
 {
-    public class RazorPageLinkGenerator : IPageLinkGenerator
+    public class PageLinkGenerator : IPageLinkGenerator
     {
         readonly LinkGenerator linkGenerator;
         readonly IHttpContextAccessor httpContextAccessor;
         readonly IPageUrlHelper pageUrlHelper;
-        readonly ContentPageOptions contentPageOptions;
+        readonly RootPageOptions contentPageOptions;
 
-        public RazorPageLinkGenerator(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IPageUrlHelper pageUrlHelper, IOptions<ContentPageOptions> contentPageOptions)
+        public PageLinkGenerator(LinkGenerator linkGenerator, IHttpContextAccessor httpContextAccessor, IPageUrlHelper pageUrlHelper, IOptions<RootPageOptions> contentPageOptions)
         {
             this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
             this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
             this.contentPageOptions = contentPageOptions?.Value ?? throw new ArgumentNullException(nameof(contentPageOptions));
         }
+
+        #region IPageLinkGenerator members
 
         public Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default)
         {
@@ -32,7 +34,7 @@ namespace BrandUp.Pages.Url
             return Task.FromResult(pageUrl);
         }
 
-        public Task<string> GetUriAsync(IPage page, CancellationToken cancellationToken = default)
+        public Task<string> GetUrlAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
@@ -45,14 +47,6 @@ namespace BrandUp.Pages.Url
             return Task.FromResult(pageUrl);
         }
 
-        private string GetPagePath(IPage page)
-        {
-            if (pageUrlHelper.IsDefaultUrlPath(page.UrlPath))
-                return string.Empty;
-            else
-                return pageUrlHelper.NormalizeUrlPath(page.UrlPath);
-        }
-
         public Task<string> GetPathAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
         {
             if (pageEditSession == null)
@@ -63,7 +57,7 @@ namespace BrandUp.Pages.Url
             return Task.FromResult(url);
         }
 
-        public Task<string> GetUriAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
+        public Task<string> GetUrlAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default)
         {
             if (pageEditSession == null)
                 throw new ArgumentNullException(nameof(pageEditSession));
@@ -83,7 +77,7 @@ namespace BrandUp.Pages.Url
             return Task.FromResult(pageUrl);
         }
 
-        public Task<string> GetUriAsync(string pagePath, CancellationToken cancellationToken = default)
+        public Task<string> GetUrlAsync(string pagePath, CancellationToken cancellationToken = default)
         {
             pagePath ??= string.Empty;
 
@@ -93,7 +87,16 @@ namespace BrandUp.Pages.Url
             return Task.FromResult(pageUrl);
         }
 
-        private string NormalizePagePath(string pagePath)
+        #endregion
+
+        string GetPagePath(IPage page)
+        {
+            if (pageUrlHelper.IsDefaultUrlPath(page.UrlPath))
+                return string.Empty;
+            else
+                return pageUrlHelper.NormalizeUrlPath(page.UrlPath);
+        }
+        string NormalizePagePath(string pagePath)
         {
             if (pageUrlHelper.IsDefaultUrlPath(pagePath))
                 return string.Empty;

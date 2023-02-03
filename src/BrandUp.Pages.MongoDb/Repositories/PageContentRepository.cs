@@ -8,8 +8,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
     public class PageContentRepository : IPageContentRepository
     {
         private static readonly Expression<Func<PageEditDocument, PageEdit>> ProjectionExpression;
-        readonly IMongoCollection<PageEditDocument> documents;
-        readonly IMongoCollection<PageContentDocument> contentDocuments;
+        readonly IMongoCollection<PageEditDocument> pageEdits;
+        readonly IMongoCollection<PageContentDocument> pageContents;
 
         static PageContentRepository()
         {
@@ -24,13 +24,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public PageContentRepository(IPagesDbContext dbContext)
         {
-            documents = dbContext.PageEditSessions;
-            contentDocuments = dbContext.Contents;
+            pageEdits = dbContext.PageEditSessions;
+            pageContents = dbContext.Contents;
         }
 
         public async Task<IPageEdit> CreateEditAsync(IPage page, string userId, CancellationToken cancellationToken = default)
         {
-            var pageContent = await (await contentDocuments.FindAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var pageContent = await (await pageContents.FindAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
 
             var createdDate = DateTime.UtcNow;
             var pageEdit = new PageEditDocument
@@ -44,7 +44,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Content = pageContent.Data
             };
 
-            await documents.InsertOneAsync(pageEdit, cancellationToken: cancellationToken);
+            await pageEdits.InsertOneAsync(pageEdit, cancellationToken: cancellationToken);
 
             return new PageEdit
             {
@@ -57,21 +57,21 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<IPageEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var cursor = await documents.Find(it => it.Id == id).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
+            var cursor = await pageEdits.Find(it => it.Id == id).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IPageEdit> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
         {
-            var cursor = await documents.Find(it => it.PageId == page.Id && it.UserId == userId).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
+            var cursor = await pageEdits.Find(it => it.PageId == page.Id && it.UserId == userId).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IDictionary<string, object>> GetContentAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
         {
-            var document = await (await documents.FindAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
+            var document = await (await pageEdits.FindAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
             if (document == null)
                 return null;
 
@@ -83,14 +83,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
             var updateDefinition = Builders<PageEditDocument>.Update.Set(it => it.Content, contentDataDocument);
 
-            var updateResult = await documents.UpdateOneAsync(it => it.Id == pageEdit.Id, updateDefinition, cancellationToken: cancellationToken);
+            var updateResult = await pageEdits.UpdateOneAsync(it => it.Id == pageEdit.Id, updateDefinition, cancellationToken: cancellationToken);
             if (updateResult.MatchedCount != 1)
                 throw new InvalidOperationException();
         }
 
         public async Task DeleteEditAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
         {
-            await documents.FindOneAndDeleteAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken);
+            await pageEdits.FindOneAndDeleteAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken);
         }
     }
 }

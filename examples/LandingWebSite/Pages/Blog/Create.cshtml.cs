@@ -1,4 +1,4 @@
-﻿using LandingWebSite.Repositories;
+﻿using LandingWebSite.Blog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -8,11 +8,11 @@ namespace LandingWebSite.Pages.Blog
     [Authorize]
     public class CreateModel : FormPageModel
     {
-        readonly IBlogPostRepository blogPostRepository;
+        readonly BlogService blogService;
 
-        public CreateModel(IBlogPostRepository blogPostRepository)
+        public CreateModel(BlogService blogService)
         {
-            this.blogPostRepository = blogPostRepository ?? throw new ArgumentNullException(nameof(blogPostRepository));
+            this.blogService = blogService ?? throw new ArgumentNullException(nameof(blogService));
         }
 
         #region AppPageModel members
@@ -23,12 +23,14 @@ namespace LandingWebSite.Pages.Blog
 
         #endregion
 
-        [BindProperty, Display(Name = "Заголовок страницы")]
+        [BindProperty, Display(Name = "Заголовок страницы"), Required]
         public string Name { get; set; }
 
-        public async Task OnPostAsync()
+        public async Task<IActionResult> OnPostAsync()
         {
-            var post = await blogPostRepository.CreateAsync(Name, HttpContext.RequestAborted);
+            var createPostResult = await blogService.CreatePostAsync(WebsiteContext.Website.Id, Name, HttpContext.RequestAborted);
+
+            return PageRedirect(await Url.PagePathAsync(createPostResult.Page));
         }
     }
 }

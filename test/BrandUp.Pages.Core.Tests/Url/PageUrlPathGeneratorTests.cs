@@ -7,9 +7,9 @@ namespace BrandUp.Pages.Url
 {
     public class PageUrlPathGeneratorTests : IAsyncLifetime
     {
-        private ServiceProvider serviceProvider;
-        private IServiceScope serviceScope;
-        private readonly IPageUrlPathGenerator pageUrlPathGenerator;
+        readonly ServiceProvider serviceProvider;
+        readonly IServiceScope serviceScope;
+        readonly IPageUrlPathGenerator pageUrlPathGenerator;
 
         public PageUrlPathGeneratorTests()
         {
@@ -75,10 +75,11 @@ namespace BrandUp.Pages.Url
             public string WebsiteId => throw new NotImplementedException();
             public string TypeName => throw new NotImplementedException();
             public Guid OwnCollectionId => throw new NotImplementedException();
+            public string ItemId => throw new NotImplementedException();
+            public string ItemType => throw new NotImplementedException();
             public string Header { get; set; }
             public string UrlPath { get; set; }
             public string EntryId => throw new NotImplementedException();
-
             public bool IsPublished => throw new NotImplementedException();
 
             public Page(string header)

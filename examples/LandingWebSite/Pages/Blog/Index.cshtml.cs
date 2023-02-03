@@ -1,16 +1,15 @@
 ﻿using BrandUp.Website.Pages;
-using LandingWebSite.Repositories;
-using System;
+using LandingWebSite.Blog;
 
 namespace LandingWebSite.Pages.Blog
 {
     public class IndexModel : AppPageModel
     {
-        readonly IBlogPostRepository blogPostRepository;
+        readonly BlogService blogService;
 
-        public IndexModel(IBlogPostRepository blogPostRepository)
+        public IndexModel(BlogService blogService)
         {
-            this.blogPostRepository = blogPostRepository ?? throw new ArgumentNullException(nameof(blogPostRepository));
+            this.blogService = blogService ?? throw new ArgumentNullException(nameof(blogService));
         }
 
         public override string Title => "Blog";

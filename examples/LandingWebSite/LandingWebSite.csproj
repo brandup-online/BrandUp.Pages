@@ -33,6 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\BrandUp.Pages.MongoDb\BrandUp.Pages.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\BrandUp.Pages\BrandUp.Pages.csproj" />
+    <ProjectReference Include="..\LandingWebSite.Blog\LandingWebSite.Blog.csproj" />
   </ItemGroup>
 
   <ItemGroup>

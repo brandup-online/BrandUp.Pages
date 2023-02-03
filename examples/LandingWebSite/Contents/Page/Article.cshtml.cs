@@ -1,6 +1,5 @@
 ﻿using BrandUp.Pages;
 using BrandUp.Pages.Content.Fields;
-using System.Collections.Generic;
 
 namespace LandingWebSite.Contents.Page
 {

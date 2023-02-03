@@ -1,35 +1,54 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using BrandUp.Pages.Builder;
+using BrandUp.Pages.Items;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BrandUp.Pages.Builder
+namespace BrandUp.Pages
 {
     public static class IPagesBuilderExtensions
     {
-        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder)
+        /// <summary>
+        /// Маппинг корневых страниц сайта.
+        /// </summary>
+        /// <param name="pageName">Имя страницы.</param>
+        public static IPagesBuilder AddRootPages(this IPagesBuilder builder, string pageName = "/Content")
         {
-            return AddRazorContentPage(builder, options => { });
-        }
+            if (pageName == null)
+                throw new ArgumentNullException(nameof(pageName));
 
-        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<ContentPageOptions> optionAction)
-        {
             var services = builder.Services;
 
-            var contentPageOptions = new ContentPageOptions();
-            optionAction?.Invoke(contentPageOptions);
-            services.Configure(optionAction);
-
-            services.AddHttpContextAccessor();
-
-            services.Configure<RazorPagesOptions>(options =>
+            services.Configure<RootPageOptions>(options =>
             {
-                options.Conventions.AddPageRoute(contentPageOptions.ContentPageName, "{**url}");
+                options.ContentPageName = pageName;
             });
 
-            services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
-            services.AddTransient<Files.IFileUrlGenerator, Url.FileUrlGenerator>();
+            services.PostConfigureAll<RazorPagesOptions>(options =>
+            {
+                options.Conventions.AddPageRoute(pageName, "{**url}");
+            });
 
-            services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
-            services.AddScoped<Views.IViewRenderService, Views.RazorViewRenderService>();
+            return builder;
+        }
+
+        /// <summary>
+        /// Маппинг страниц элементов с типом <see cref="TItem"/>.
+        /// </summary>
+        /// <typeparam name="TItem">Тип элемента страницы.</typeparam>
+        /// <typeparam name="TStore">Хранилище элементов страницы.</typeparam>
+        public static IPagesBuilder AddItemPages<TItem, TStore>(this IPagesBuilder builder)
+            where TItem : class
+            where TStore : class, IItemProvider<TItem>
+        {
+            var services = builder.Services;
+            var itemTypeName = typeof(TItem).FullName;
+
+            services.Configure<ItemPageOptions>(itemTypeName, options =>
+            {
+                options.ItemProviderType = typeof(IItemProvider<TItem>);
+            });
+
+            services.AddScoped<IItemProvider<TItem>, TStore>();
 
             return builder;
         }

@@ -10,11 +10,12 @@
 
 ```
 services.AddPages()
-    .AddRazorContentPage()
     .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
     .AddImageResizer<Infrastructure.ImageResizer>()
     .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped)
-    .AddMongoDb<Models.AppDbContext>();
+    .AddMongoDb<Models.AppDbContext>()
+    .AddRootPages()
+    .AddItemPages<Models.BlogPostDocument, BlogPostItemProvider>("/Blog/Post");
 ```
 
 На строне фронта нужно добавить middleware и тип страницы.
@@ -40,7 +41,7 @@ host.start({
 
 Модели данных делятся на два типа, модели страниц и модели контента.
 
-## Регистрация моделей
+### Регистрация моделей
 
 Поиск моделей осуществляется с помощью IContentTypeLocator.
 
@@ -110,17 +111,10 @@ public class TB3 : TextBlockContent
 
 ## Представления моделей
 
-Инициализация Razor представлений:
-
-```
-services.AddPages()
-    .AddRazorContentPage();
-``` 
-
 Пример представления:
 
 ```
-@inherits ContentPage<TextBlock.TB3>
+@inherits ContentRazorPage<TextBlock.TB3>
 
 <content-element tag="div" class="block-text tb3" script="BB1" />
 
