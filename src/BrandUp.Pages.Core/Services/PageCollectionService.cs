@@ -1,9 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Metadata;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using BrandUp.Pages.Metadata;
+using BrandUp.Pages.Repositories;
 
 namespace BrandUp.Pages.Services
 {
@@ -100,7 +96,7 @@ namespace BrandUp.Pages.Services
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            if (await pageRepositiry.HasPagesAsync(collection.Id))
+            if (await pageRepositiry.HasPagesAsync(collection.Id, cancellationToken))
                 return Result.Failed("Нельзя удалить коллекцию страниц, которая содержит страницы.");
 
             try

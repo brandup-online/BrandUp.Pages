@@ -1,10 +1,9 @@
-﻿using BrandUp.Pages.Interfaces;
-using Microsoft.AspNetCore.Mvc.Razor;
+﻿using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages
 {
-    public abstract class ContentPage<TModel> : RazorPage<TModel>
+    public abstract class ContentRazorPage<TModel> : RazorPage<TModel>
     {
         public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext;
         public IPage Page => Content.Page;

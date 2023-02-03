@@ -1,8 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace BrandUp.Pages.Services
+﻿namespace BrandUp.Pages.Services
 {
     public static class IPageServiceExtensions
     {

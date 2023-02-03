@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>net7.0</TargetFramework>
+	<ImplicitUsings>enable</ImplicitUsings>
+	<Authors>Dmitry Kovyazin</Authors>
+	<PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+	<PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+	<Product>BrandUp.Pages</Product>
+	<Company>BrandUp.online</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
+  </ItemGroup>
+
+</Project>

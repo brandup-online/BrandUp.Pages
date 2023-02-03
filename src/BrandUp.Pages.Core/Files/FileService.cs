@@ -1,10 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace BrandUp.Pages.Files
+﻿namespace BrandUp.Pages.Files
 {
     public class FileService
     {

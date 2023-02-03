@@ -1,7 +1,5 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace BrandUp.Pages
 {

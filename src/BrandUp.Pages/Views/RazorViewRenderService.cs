@@ -5,10 +5,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.IO;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Views
 {
@@ -57,41 +54,39 @@ namespace BrandUp.Pages.Views
             var itemRenderingContext = new ViewRenderingContext();
             viewData.Add(ViewData_ViewRenderingContextKeyName, itemRenderingContext);
 
-            using (var contentOutput = new StringWriter())
+            using var contentOutput = new StringWriter();
+            var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
+
+            var viewContext = new ViewContext
             {
-                var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
+                HttpContext = httpContextAccessor.HttpContext,
+                ViewData = viewData,
+                Writer = contentOutput,
+                RouteData = new RouteData()
+            };
 
-                var viewContext = new ViewContext
-                {
-                    HttpContext = httpContextAccessor.HttpContext,
-                    ViewData = viewData,
-                    Writer = contentOutput,
-                    RouteData = new RouteData()
-                };
+            await view.RenderAsync(viewContext);
 
-                await view.RenderAsync(viewContext);
+            string tagName = "div";
+            if (!string.IsNullOrEmpty(itemRenderingContext.HtmlTag))
+                tagName = itemRenderingContext.HtmlTag;
 
-                string tagName = "div";
-                if (!string.IsNullOrEmpty(itemRenderingContext.HtmlTag))
-                    tagName = itemRenderingContext.HtmlTag;
+            var tag = new TagBuilder(tagName);
+            if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
+                tag.AddCssClass(itemRenderingContext.CssClass);
 
-                var tag = new TagBuilder(tagName);
-                if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
-                    tag.AddCssClass(itemRenderingContext.CssClass);
+            if (!string.IsNullOrEmpty(itemRenderingContext.ScriptName))
+                tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
 
-                if (!string.IsNullOrEmpty(itemRenderingContext.ScriptName))
-                    tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
+            if (contentContext.Explorer.IsRoot)
+                tag.Attributes.Add("content-root", string.Empty);
+            tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);
+            tag.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
+            tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
 
-                if (contentContext.Explorer.IsRoot)
-                    tag.Attributes.Add("content-root", string.Empty);
-                tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);
-                tag.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
-                tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
+            tag.InnerHtml.AppendHtml(contentOutput.ToString());
 
-                tag.InnerHtml.AppendHtml(contentOutput.ToString());
-
-                tag.WriteTo(output, htmlEncoder);
-            }
+            tag.WriteTo(output, htmlEncoder);
         }
 
         #endregion

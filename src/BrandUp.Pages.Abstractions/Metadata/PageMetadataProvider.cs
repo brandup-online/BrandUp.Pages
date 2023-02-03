@@ -1,12 +1,10 @@
 ﻿using BrandUp.Pages.Content;
-using System;
-using System.Collections.Generic;
 
 namespace BrandUp.Pages.Metadata
 {
     public class PageMetadataProvider : IEquatable<PageMetadataProvider>
     {
-        private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
+        private readonly List<PageMetadataProvider> derivedTypes = new();
 
         #region Properties
 
@@ -26,8 +24,7 @@ namespace BrandUp.Pages.Metadata
             ContentMetadata = contentMetadata;
             ParentMetadata = parentPageMetadata;
 
-            if (parentPageMetadata != null)
-                parentPageMetadata.derivedTypes.Add(this);
+            parentPageMetadata?.derivedTypes.Add(this);
         }
 
         #region Methods
@@ -71,7 +68,7 @@ namespace BrandUp.Pages.Metadata
 
         public bool Equals(PageMetadataProvider other)
         {
-            if (other == null || !(other is PageMetadataProvider))
+            if (other is null or not PageMetadataProvider)
                 return false;
 
             return ContentType == other.ContentType;

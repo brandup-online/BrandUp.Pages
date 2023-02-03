@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
 
 namespace BrandUp.Pages.TagHelpers
 {
@@ -23,7 +22,7 @@ namespace BrandUp.Pages.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (!(ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is ViewRenderingContext contentRenderingContext))
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ViewRenderingContext contentRenderingContext)
                 throw new InvalidOperationException();
 
             output.SuppressOutput();

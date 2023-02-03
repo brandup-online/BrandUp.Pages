@@ -1,8 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace BrandUp.Pages.Url
+﻿namespace BrandUp.Pages.Url
 {
     public interface IPageLinkGenerator
     {

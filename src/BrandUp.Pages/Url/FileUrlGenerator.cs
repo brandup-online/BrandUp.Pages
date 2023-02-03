@@ -1,8 +1,5 @@
 ﻿using BrandUp.Pages.Files;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Url
 {
@@ -18,7 +15,7 @@ namespace BrandUp.Pages.Url
         public Task<string> GetImageUrlAsync(ImageValue image, int width = 0, int height = 0, CancellationToken cancellationToken = default)
         {
             if (!image.HasValue)
-                throw new ArgumentException();
+                throw new ArgumentException("Image value is required.", nameof(image));
 
             string url;
             switch (image.ValueType)
@@ -41,11 +38,8 @@ namespace BrandUp.Pages.Url
 
         static string NormalizeUrl(string url)
         {
-            if (!url.StartsWith("http"))
-            {
-                if (url.StartsWith("~"))
-                    url = url.Substring(1);
-            }
+            if (!url.StartsWith("http") && url.StartsWith("~"))
+                url = url[1..];
 
             return url;
         }

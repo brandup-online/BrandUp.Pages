@@ -1,14 +1,8 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 

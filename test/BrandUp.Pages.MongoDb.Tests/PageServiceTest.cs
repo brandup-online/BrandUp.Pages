@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Metadata;
+﻿using BrandUp.Pages.Metadata;
 using BrandUp.Pages.MongoDb.Tests.ContentModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;

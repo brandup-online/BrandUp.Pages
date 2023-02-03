@@ -33,7 +33,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
             services.AddSingleton(websiteContext);
 
-            services.AddPages()
+            services.AddPagesCore()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes()
                 .AddMongoDb(options =>

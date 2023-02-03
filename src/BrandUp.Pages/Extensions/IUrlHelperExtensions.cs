@@ -1,6 +1,5 @@
 ﻿using BrandUp.Pages.Url;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 
 namespace Microsoft.AspNetCore.Mvc
 {

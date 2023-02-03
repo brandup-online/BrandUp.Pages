@@ -1,7 +1,5 @@
 ﻿using BrandUp.Pages.Metadata;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 
 namespace BrandUp.Pages.Controllers
 {

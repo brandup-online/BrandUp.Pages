@@ -1,11 +1,6 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.MongoDb.Documents;
+﻿using BrandUp.Pages.MongoDb.Documents;
+using BrandUp.Pages.Repositories;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {

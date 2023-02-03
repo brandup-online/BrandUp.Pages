@@ -1,12 +1,9 @@
 ﻿using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
 using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {

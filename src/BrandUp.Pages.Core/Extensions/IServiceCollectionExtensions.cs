@@ -1,19 +1,18 @@
 ﻿using BrandUp.Pages;
 using BrandUp.Pages.Builder;
-using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IServiceCollectionExtensions
     {
-        public static IPagesBuilder AddPages(this IServiceCollection services)
+        public static IPagesBuilder AddPagesCore(this IServiceCollection services)
         {
-            return AddPages(services, options => { });
+            return AddPagesCore(services, null);
         }
 
-        public static IPagesBuilder AddPages(this IServiceCollection services, Action<PagesOptions> setupAction)
+        public static IPagesBuilder AddPagesCore(this IServiceCollection services, Action<PagesOptions> setupAction)
         {
-            services.Configure(setupAction);
+            services.Configure(setupAction ?? new Action<PagesOptions>(_ => { }));
 
             return new PagesBuilder(services);
         }

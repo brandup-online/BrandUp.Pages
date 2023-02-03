@@ -11,8 +11,8 @@ namespace BrandUp.Pages
         {
             var viewRenderService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IViewRenderService>();
             var pageModel = htmlHelper.ViewData.Model;
-            if (pageModel is not ContentPageModel contentPageModel)
-                throw new InvalidOperationException($"Модель страницы должна наследовать {typeof(ContentPageModel).FullName}.");
+            if (pageModel is not IContentPageModel contentPageModel)
+                throw new InvalidOperationException($"Модель страницы должна наследовать {typeof(IContentPageModel).FullName}.");
 
             var builder = new HtmlContentBuilder();
             var pageHtml = await viewRenderService.RenderToStringAsync(contentPageModel.ContentContext);

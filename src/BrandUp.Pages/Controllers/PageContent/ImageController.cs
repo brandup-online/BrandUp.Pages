@@ -1,9 +1,6 @@
 ﻿using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Files;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
@@ -19,7 +16,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromQuery]string fileName, [FromQuery]string width = null, [FromQuery]string height = null)
+        public async Task<IActionResult> PostAsync([FromQuery] string fileName, [FromQuery] string width = null, [FromQuery] string height = null)
         {
             if (string.IsNullOrEmpty(fileName))
                 return BadRequest();
@@ -45,7 +42,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("url")]
-        public async Task<IActionResult> UrlAsync([FromQuery]string url, [FromQuery]string width = null, [FromQuery]string height = null)
+        public async Task<IActionResult> UrlAsync([FromQuery] string url, [FromQuery] string width = null, [FromQuery] string height = null)
         {
             if (string.IsNullOrEmpty(url))
                 return BadRequest();

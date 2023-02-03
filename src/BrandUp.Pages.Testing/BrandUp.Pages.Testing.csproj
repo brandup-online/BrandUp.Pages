@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
     <ProjectReference Include="..\BrandUp.Pages.Core\BrandUp.Pages.Core.csproj" />
   </ItemGroup>

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BrandUp.Pages
+﻿namespace BrandUp.Pages
 {
     public class Result : IResult
     {
-        private readonly List<string> errors = new List<string>();
+        private readonly List<string> errors = new();
 
         public bool IsSuccess { get; protected set; }
         public IEnumerable<string> Errors => errors;

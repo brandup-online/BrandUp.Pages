@@ -1,16 +1,11 @@
-﻿using BrandUp.Pages.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Url
 {
     public class RazorPageLinkGenerator : IPageLinkGenerator
     {
-        //public const string RazorPagePath = "/ContentPage";
         readonly LinkGenerator linkGenerator;
         readonly IHttpContextAccessor httpContextAccessor;
         readonly IPageUrlHelper pageUrlHelper;
@@ -21,7 +16,7 @@ namespace BrandUp.Pages.Url
             this.linkGenerator = linkGenerator ?? throw new ArgumentNullException(nameof(linkGenerator));
             this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
-            this.contentPageOptions = contentPageOptions?.Value ?? throw new ArgumentNullException(nameof(contentPageOptions.Value));
+            this.contentPageOptions = contentPageOptions?.Value ?? throw new ArgumentNullException(nameof(contentPageOptions));
         }
 
         public Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default)
@@ -80,8 +75,7 @@ namespace BrandUp.Pages.Url
 
         public Task<string> GetPathAsync(string pagePath, CancellationToken cancellationToken = default)
         {
-            if (pagePath == null)
-                pagePath = string.Empty;
+            pagePath ??= string.Empty;
 
             var urlPath = NormalizePagePath(pagePath);
             var pageUrl = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
@@ -91,8 +85,7 @@ namespace BrandUp.Pages.Url
 
         public Task<string> GetUriAsync(string pagePath, CancellationToken cancellationToken = default)
         {
-            if (pagePath == null)
-                pagePath = string.Empty;
+            pagePath ??= string.Empty;
 
             var urlPath = NormalizePagePath(pagePath);
             var pageUrl = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });

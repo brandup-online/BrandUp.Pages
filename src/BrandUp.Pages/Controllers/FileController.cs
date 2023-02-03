@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
@@ -35,7 +33,7 @@ namespace BrandUp.Pages.Controllers
                 return NotFound();
 
             DateTime cacheFileDate;
-            var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}");
+            var fileTempPath = Path.Combine(filesTempPath, $"{fileId}");
             if (!System.IO.File.Exists(fileTempPath))
             {
                 using (var fileStream = await fileService.ReadFileAsync(fileId))
@@ -48,7 +46,7 @@ namespace BrandUp.Pages.Controllers
             {
                 cacheFileDate = System.IO.File.GetLastWriteTimeUtc(fileTempPath);
 
-                if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
+                if (HttpContext.Request.Headers.ContainsKey("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
                     return StatusCode((int)HttpStatusCode.NotModified);
             }
 
@@ -74,12 +72,12 @@ namespace BrandUp.Pages.Controllers
             var imageResizer = HttpContext.RequestServices.GetService<Images.IImageResizer>();
             if (imageResizer != null)
             {
-                var imageTempPath = System.IO.Path.Combine(imagesTempPath, $"{fileId}-{width}-{height}.jpg");
+                var imageTempPath = Path.Combine(imagesTempPath, $"{fileId}-{width}-{height}.jpg");
                 if (System.IO.File.Exists(imageTempPath))
                 {
                     cacheFileDate = System.IO.File.GetLastWriteTimeUtc(imageTempPath);
 
-                    if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
+                    if (HttpContext.Request.Headers.ContainsKey("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
                         return StatusCode((int)HttpStatusCode.NotModified);
 
                     HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
@@ -99,7 +97,7 @@ namespace BrandUp.Pages.Controllers
 
             var fileExtension = fileService.GetFileExtension(file);
 
-            var fileTempPath = System.IO.Path.Combine(filesTempPath, $"{fileId}{fileExtension}");
+            var fileTempPath = Path.Combine(filesTempPath, $"{fileId}{fileExtension}");
             if (!System.IO.File.Exists(fileTempPath))
             {
                 using (var fileStream = await fileService.ReadFileAsync(fileId))
@@ -112,7 +110,7 @@ namespace BrandUp.Pages.Controllers
             {
                 cacheFileDate = System.IO.File.GetLastWriteTimeUtc(fileTempPath);
 
-                if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
+                if (HttpContext.Request.Headers.ContainsKey("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
                     return StatusCode((int)HttpStatusCode.NotModified);
             }
 

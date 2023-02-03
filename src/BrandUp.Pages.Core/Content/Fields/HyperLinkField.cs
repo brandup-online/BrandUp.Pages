@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {
@@ -59,7 +57,7 @@ namespace BrandUp.Pages.Content.Fields
 
                 if (hyperLinkValue.ValueType == HyperLinkType.Page)
                 {
-                    var pageService = services.GetRequiredService<Interfaces.IPageService>();
+                    var pageService = services.GetRequiredService<IPageService>();
                     var page = await pageService.FindPageByIdAsync(Guid.Parse(hyperLinkValue.Value));
                     if (page != null)
                         formValue.PageTitle = page.Header;

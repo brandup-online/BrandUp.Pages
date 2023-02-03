@@ -8,12 +8,13 @@
     <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
     <Company>BrandUp.online</Company>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.1" />
     <PackageReference Include="BrandUp.MongoDB" Version="7.0.1" />
-    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.0" />
   </ItemGroup>
 
   <ItemGroup>

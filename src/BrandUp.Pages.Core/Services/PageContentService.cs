@@ -1,7 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using BrandUp.Pages.Repositories;
 
 namespace BrandUp.Pages.Services
 {
@@ -44,8 +41,8 @@ namespace BrandUp.Pages.Services
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
 
-            var page = await pageService.FindPageByIdAsync(editSession.PageId);
-            var pageMetadataProvider = await pageService.GetPageTypeAsync(page);
+            var page = await pageService.FindPageByIdAsync(editSession.PageId, cancellationToken);
+            var pageMetadataProvider = await pageService.GetPageTypeAsync(page, cancellationToken);
             var pageContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
 
             return pageMetadataProvider.ContentMetadata.ConvertDictionaryToContentModel(pageContentData);
@@ -55,8 +52,8 @@ namespace BrandUp.Pages.Services
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
 
-            var page = await pageService.FindPageByIdAsync(editSession.PageId);
-            var pageMetadata = await pageService.GetPageTypeAsync(page);
+            var page = await pageService.FindPageByIdAsync(editSession.PageId, cancellationToken);
+            var pageMetadata = await pageService.GetPageTypeAsync(page, cancellationToken);
 
             var contentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(content);
 
@@ -67,12 +64,12 @@ namespace BrandUp.Pages.Services
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
 
-            var page = await pageService.FindPageByIdAsync(editSession.PageId);
-            var pageMetadata = await pageService.GetPageTypeAsync(page);
-            var newContentData = await editSessionRepository.GetContentAsync(editSession);
+            var page = await pageService.FindPageByIdAsync(editSession.PageId, cancellationToken);
+            var pageMetadata = await pageService.GetPageTypeAsync(page, cancellationToken);
+            var newContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
             var pageContentModel = pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(newContentData);
 
-            await pageService.SetPageContentAsync(page, pageContentModel);
+            await pageService.SetPageContentAsync(page, pageContentModel, cancellationToken);
 
             await editSessionRepository.DeleteEditAsync(editSession, cancellationToken);
         }

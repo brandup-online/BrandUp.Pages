@@ -1,10 +1,6 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Metadata;
+﻿using BrandUp.Pages.Metadata;
+using BrandUp.Pages.Repositories;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Services
 {
@@ -80,8 +76,7 @@ namespace BrandUp.Pages.Services
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            if (pageType == null)
-                pageType = collection.PageTypeName;
+            pageType ??= collection.PageTypeName;
 
             var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
             var pageMetadata = pageMetadataManager.GetMetadata(pageType);
@@ -134,7 +129,7 @@ namespace BrandUp.Pages.Services
 
             pagePath = pageUrlHelper.NormalizeUrlPath(pagePath);
             if (pagePath == string.Empty)
-                return GetDefaultPageAsync(webSiteId);
+                return GetDefaultPageAsync(webSiteId, cancellationToken);
 
             return pageRepositiry.FindPageByPathAsync(webSiteId, pagePath, cancellationToken);
         }
@@ -224,7 +219,7 @@ namespace BrandUp.Pages.Services
 
             var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
             if (contentModel.GetType() != pageMetadata.ContentType)
-                throw new ArgumentException();
+                throw new ArgumentException($"Тип контента страницы должен наследовать {pageMetadata.ContentType.AssemblyQualifiedName}.", nameof(contentModel));
 
             var pageTitle = pageMetadata.GetPageHeader(contentModel);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
@@ -258,7 +253,7 @@ namespace BrandUp.Pages.Services
             else
                 urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
 
-            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath) != null)
+            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath, cancellationToken) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
             await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);
@@ -311,9 +306,9 @@ namespace BrandUp.Pages.Services
             if (seoOptions == null)
                 throw new ArgumentNullException(nameof(seoOptions));
 
-            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title);
-            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description);
-            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords);
+            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title, cancellationToken);
+            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description, cancellationToken);
+            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords, cancellationToken);
 
             await pageRepositiry.UpdatePageAsync(page, cancellationToken);
         }

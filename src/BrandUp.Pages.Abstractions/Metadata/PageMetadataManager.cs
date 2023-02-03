@@ -1,15 +1,13 @@
 ﻿using BrandUp.Pages.Content;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace BrandUp.Pages.Metadata
 {
     public class PageMetadataManager : IPageMetadataManager
     {
-        readonly List<PageMetadataProvider> metadataProviders = new List<PageMetadataProvider>();
-        readonly Dictionary<string, int> typeNames = new Dictionary<string, int>();
-        readonly Dictionary<Type, int> typeObjectTypes = new Dictionary<Type, int>();
+        readonly List<PageMetadataProvider> metadataProviders = new();
+        readonly Dictionary<string, int> typeNames = new();
+        readonly Dictionary<Type, int> typeObjectTypes = new();
 
         public PageMetadataManager(IContentMetadataManager contentManager)
         {

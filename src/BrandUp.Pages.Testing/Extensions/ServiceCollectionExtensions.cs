@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Repositories;
+﻿using BrandUp.Pages.Repositories;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

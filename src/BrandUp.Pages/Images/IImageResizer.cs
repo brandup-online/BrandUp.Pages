@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-namespace BrandUp.Pages.Images
+﻿namespace BrandUp.Pages.Images
 {
     public interface IImageResizer
     {

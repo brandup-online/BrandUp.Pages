@@ -1,9 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Models;
+﻿using BrandUp.Pages.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {

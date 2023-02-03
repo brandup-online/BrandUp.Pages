@@ -2,10 +2,7 @@
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Views;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
@@ -33,7 +30,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("data")]
-        public IActionResult GetData([FromQuery]int itemIndex = -1)
+        public IActionResult GetData([FromQuery] int itemIndex = -1)
         {
             var contentPath = Field.Name;
             if (Field.IsListValue)
@@ -64,7 +61,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("view")]
-        public async Task<IActionResult> ViewAsync([FromServices]IViewRenderService viewRenderService, [FromQuery]int itemIndex = -1)
+        public async Task<IActionResult> ViewAsync([FromServices] IViewRenderService viewRenderService, [FromQuery] int itemIndex = -1)
         {
             var contentPath = Field.Name;
             if (Field.IsListValue)
@@ -90,7 +87,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> AddAsync([FromServices]IViewLocator viewLocator, [FromQuery]string itemType, [FromQuery]int itemIndex = -1)
+        public async Task<IActionResult> AddAsync([FromServices] IViewLocator viewLocator, [FromQuery] string itemType, [FromQuery] int itemIndex = -1)
         {
             if (itemType == null)
                 return BadRequest();
@@ -109,7 +106,7 @@ namespace BrandUp.Pages.Controllers
 
             if (Field.IsListValue)
             {
-                if (!(Field.GetModelValue(ContentContext.Content) is IList list))
+                if (Field.GetModelValue(ContentContext.Content) is not IList list)
                     list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(Field.ValueContentMetadata.ModelType));
 
                 if (itemIndex == -1)
@@ -130,7 +127,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("up")]
-        public async Task<IActionResult> UpAsync([FromQuery]int itemIndex)
+        public async Task<IActionResult> UpAsync([FromQuery] int itemIndex)
         {
             if (!Field.IsListValue)
                 return BadRequest();
@@ -153,7 +150,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("down")]
-        public async Task<IActionResult> DownAsync([FromQuery]int itemIndex)
+        public async Task<IActionResult> DownAsync([FromQuery] int itemIndex)
         {
             if (!Field.IsListValue)
                 return BadRequest();
@@ -177,7 +174,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("move")]
-        public async Task<IActionResult> MoveAsync([FromQuery]int itemIndex, [FromQuery]int newIndex)
+        public async Task<IActionResult> MoveAsync([FromQuery] int itemIndex, [FromQuery] int newIndex)
         {
             if (itemIndex == newIndex)
                 return BadRequest();
@@ -205,7 +202,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteAsync([FromQuery]int itemIndex)
+        public async Task<IActionResult> DeleteAsync([FromQuery] int itemIndex)
         {
             if (Field.IsListValue)
             {

@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using System;
-using System.Collections.Generic;
 
 namespace BrandUp.Pages.Views
 {
     public class RazorViewLocator : IViewLocator
     {
-        private readonly Dictionary<Type, ContentView> views = new Dictionary<Type, ContentView>();
+        private readonly Dictionary<Type, ContentView> views = new();
 
         public RazorViewLocator(ApplicationPartManager applicationPartManager, IHostingEnvironment hostingEnvironment)
         {
@@ -23,7 +21,7 @@ namespace BrandUp.Pages.Views
                     continue;
 
                 var d = viewDescriptor.Type.BaseType.GetGenericTypeDefinition();
-                if (d == typeof(ContentPage<>))
+                if (d == typeof(ContentRazorPage<>))
                 {
                     var contentType = viewDescriptor.Type.BaseType.GenericTypeArguments[0];
                     IDictionary<string, object> defaultModelData = null;
@@ -31,8 +29,8 @@ namespace BrandUp.Pages.Views
                     var fileInfo = hostingEnvironment.ContentRootFileProvider.GetFileInfo(viewDescriptor.RelativePath + ".json");
                     if (fileInfo.Exists)
                     {
-                        using (var stream = fileInfo.CreateReadStream())
-                            defaultModelData = Content.Serialization.JsonContentDataSerializer.DeserializeFromStream(stream);
+                        using var stream = fileInfo.CreateReadStream();
+                        defaultModelData = Content.Serialization.JsonContentDataSerializer.DeserializeFromStream(stream);
                     }
 
                     var item = new ContentView(viewDescriptor.RelativePath, contentType, defaultModelData);

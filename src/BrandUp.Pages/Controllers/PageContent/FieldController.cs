@@ -1,11 +1,8 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {

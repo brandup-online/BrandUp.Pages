@@ -1,6 +1,5 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Infrastructure;
-using BrandUp.Pages.ContentModels;
 using Xunit;
 
 namespace BrandUp.Pages.Metadata

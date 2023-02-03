@@ -1,13 +1,12 @@
 ﻿using BrandUp.Pages.Content.Fields;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
     public class HtmlController : FieldController<IHtmlField>
     {
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody]string text = null)
+        public async Task<IActionResult> PostAsync([FromBody] string text = null)
         {
             var currentModelValue = Field.GetModelValue(ContentContext.Content);
 

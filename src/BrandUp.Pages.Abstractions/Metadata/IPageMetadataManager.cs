@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BrandUp.Pages.Metadata
+﻿namespace BrandUp.Pages.Metadata
 {
     public interface IPageMetadataManager
     {

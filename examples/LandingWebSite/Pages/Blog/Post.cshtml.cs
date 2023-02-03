@@ -2,7 +2,6 @@
 using BrandUp.Website.Pages;
 using LandingWebSite.Contents.Page;
 using LandingWebSite.Models;
-using System.Threading.Tasks;
 
 namespace LandingWebSite.Pages.Blog
 {

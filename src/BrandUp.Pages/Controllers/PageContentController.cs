@@ -1,9 +1,5 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
@@ -22,7 +18,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("begin")]
-        public async Task<IActionResult> BeginEditAsync([FromQuery]Guid pageId, [FromQuery]bool force)
+        public async Task<IActionResult> BeginEditAsync([FromQuery] Guid pageId, [FromQuery] bool force)
         {
             var page = await pageService.FindPageByIdAsync(pageId);
             if (page == null)
@@ -42,8 +38,7 @@ namespace BrandUp.Pages.Controllers
                     result.CurrentDate = currentEdit.CreatedDate;
             }
 
-            if (currentEdit == null)
-                currentEdit = await pageContentService.BeginEditAsync(page, HttpContext.RequestAborted);
+            currentEdit ??= await pageContentService.BeginEditAsync(page, HttpContext.RequestAborted);
 
             result.Url = await pageLinkGenerator.GetPathAsync(currentEdit, HttpContext.RequestAborted);
 
@@ -51,7 +46,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("form")]
-        public async Task<IActionResult> GetFormAsync([FromQuery]Guid editId, [FromQuery]string modelPath)
+        public async Task<IActionResult> GetFormAsync([FromQuery] Guid editId, [FromQuery] string modelPath)
         {
             var editSession = await pageContentService.FindEditByIdAsync(editId);
             if (editSession == null)
@@ -61,8 +56,7 @@ namespace BrandUp.Pages.Controllers
             if (page == null)
                 return BadRequest();
 
-            if (modelPath == null)
-                modelPath = string.Empty;
+            modelPath ??= string.Empty;
 
             var pageContent = await pageContentService.GetContentAsync(editSession);
             var pageContentContext = new ContentContext(page, pageContent, HttpContext.RequestServices, true);
@@ -119,7 +113,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("changeType")]
-        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery]Guid editId, [FromQuery]string modelPath, [FromQuery]string modelType, [FromServices]IContentMetadataManager contentMetadataManager, [FromServices]Views.IViewLocator viewLocator)
+        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] IContentMetadataManager contentMetadataManager, [FromServices] Views.IViewLocator viewLocator)
         {
             if (modelType == null)
                 return BadRequest();
@@ -132,8 +126,7 @@ namespace BrandUp.Pages.Controllers
             if (page == null)
                 return BadRequest();
 
-            if (modelPath == null)
-                modelPath = string.Empty;
+            modelPath ??= string.Empty;
 
             var newModelType = contentMetadataManager.GetMetadata(modelType);
 
@@ -155,7 +148,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("commit")]
-        public async Task<IActionResult> CommitEditAsync([FromQuery]Guid editId)
+        public async Task<IActionResult> CommitEditAsync([FromQuery] Guid editId)
         {
             var editSession = await pageContentService.FindEditByIdAsync(editId);
             if (editSession == null)
@@ -171,7 +164,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("discard")]
-        public async Task<IActionResult> DiscardEditAsync([FromQuery]Guid editId)
+        public async Task<IActionResult> DiscardEditAsync([FromQuery] Guid editId)
         {
             var editSession = await pageContentService.FindEditByIdAsync(editId);
             if (editSession == null)

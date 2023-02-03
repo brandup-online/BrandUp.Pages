@@ -1,12 +1,10 @@
 ﻿using BrandUp.Pages.Builder;
 using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Helpers;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Pages.Repositories;
 using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BrandUp.Pages.Services
@@ -27,7 +25,7 @@ namespace BrandUp.Pages.Services
 
             var services = new ServiceCollection();
 
-            services.AddPages()
+            services.AddPagesCore()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes();
 

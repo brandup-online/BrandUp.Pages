@@ -1,10 +1,6 @@
 ﻿using BrandUp.Pages.Metadata;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace BrandUp.Pages.Interfaces
+namespace BrandUp.Pages
 {
     public interface IPageService
     {
@@ -66,5 +62,51 @@ namespace BrandUp.Pages.Interfaces
         {
             CollectionId = collectionId;
         }
+    }
+
+
+    public class PageUrlResult
+    {
+        public Guid? PageId { get; }
+        public PageUrlRedirect Redirect { get; }
+
+        public PageUrlResult(Guid pageId)
+        {
+            PageId = pageId;
+        }
+        public PageUrlResult(PageUrlRedirect redirect)
+        {
+            Redirect = redirect;
+        }
+    }
+
+    public class PageUrlRedirect
+    {
+        public string Path { get; }
+        public bool IsPermament { get; }
+
+        public PageUrlRedirect(string path, bool isPermament)
+        {
+            Path = path ?? throw new ArgumentNullException(nameof(path));
+            IsPermament = isPermament;
+        }
+    }
+
+    public class PagePaginationOptions
+    {
+        public int Skip { get; }
+        public int Limit { get; }
+
+        public PagePaginationOptions(int skip, int limit)
+        {
+            if (skip < 0)
+                throw new ArgumentOutOfRangeException(nameof(skip));
+            if (limit <= skip || limit - skip > 50)
+                throw new ArgumentOutOfRangeException(nameof(limit));
+
+            Skip = skip;
+            Limit = limit;
+        }
+        public PagePaginationOptions(int limit) : this(0, limit) { }
     }
 }

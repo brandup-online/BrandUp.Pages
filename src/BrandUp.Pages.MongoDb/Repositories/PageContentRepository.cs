@@ -1,11 +1,7 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.MongoDb.Documents;
+﻿using BrandUp.Pages.MongoDb.Documents;
+using BrandUp.Pages.Repositories;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
@@ -37,7 +33,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var pageContent = await (await contentDocuments.FindAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
 
             var createdDate = DateTime.UtcNow;
-            var document = new PageEditDocument
+            var pageEdit = new PageEditDocument
             {
                 Id = Guid.NewGuid(),
                 CreatedDate = createdDate,
@@ -48,14 +44,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Content = pageContent.Data
             };
 
-            await documents.InsertOneAsync(document);
+            await documents.InsertOneAsync(pageEdit, cancellationToken: cancellationToken);
 
             return new PageEdit
             {
-                Id = document.Id,
+                Id = pageEdit.Id,
                 CreatedDate = createdDate,
-                PageId = document.PageId,
-                UserId = document.UserId
+                PageId = pageEdit.PageId,
+                UserId = pageEdit.UserId
             };
         }
 
@@ -94,7 +90,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task DeleteEditAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
         {
-            await documents.FindOneAndDeleteAsync(it => it.Id == pageEdit.Id);
+            await documents.FindOneAndDeleteAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken);
         }
     }
 }

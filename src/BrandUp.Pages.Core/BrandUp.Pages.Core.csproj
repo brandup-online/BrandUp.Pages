@@ -9,6 +9,7 @@
     <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
     <Company>BrandUp.online</Company>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
+    <ProjectReference Include="..\BrandUp.Pages.Abstractions\BrandUp.Pages.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

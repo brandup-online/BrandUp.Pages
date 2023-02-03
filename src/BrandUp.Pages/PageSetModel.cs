@@ -1,6 +1,7 @@
 ﻿namespace BrandUp.Pages
 {
-    public abstract class PageSetModel<TItem, TContent> : ContentPageModel
+    public abstract class PageSetModel<TContent, TItem> : ContentPageModel<TContent>
+        where TContent : class
         where TItem : class
     {
     }

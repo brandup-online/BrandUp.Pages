@@ -1,7 +1,6 @@
 ﻿using BrandUp.Pages.Builder;
 using BrandUp.Pages.ContentModels;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BrandUp.Pages.Url
@@ -16,7 +15,7 @@ namespace BrandUp.Pages.Url
         {
             var services = new ServiceCollection();
 
-            services.AddPages(options =>
+            services.AddPagesCore(options =>
             {
                 options.DefaultPagePath = "Home";
             })

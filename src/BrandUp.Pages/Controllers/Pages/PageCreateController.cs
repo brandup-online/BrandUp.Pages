@@ -1,11 +1,7 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Models;
+﻿using BrandUp.Pages.Models;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
@@ -70,7 +66,7 @@ namespace BrandUp.Pages.Controllers
 
         #region Helper methods
 
-        private PageCollectionModel GetPageCollectionModel(IPageCollection pageCollection)
+        static PageCollectionModel GetPageCollectionModel(IPageCollection pageCollection)
         {
             return new PageCollectionModel
             {

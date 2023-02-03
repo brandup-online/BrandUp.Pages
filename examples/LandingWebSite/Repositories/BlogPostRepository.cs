@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages;
 using LandingWebSite.Contents.Page;
 using LandingWebSite.Models;
 using MongoDB.Driver;

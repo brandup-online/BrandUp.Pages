@@ -1,6 +1,5 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Infrastructure;
-using BrandUp.Pages.ContentModels;
 using Xunit;
 
 namespace BrandUp.Pages.Metadata
@@ -38,7 +37,6 @@ namespace BrandUp.Pages.Metadata
         [Fact]
         public void FindPageMetadataByName()
         {
-            var pageContentType = typeof(TestPageContent);
             var pageTypeName = "TestPage";
             var pageMetadata = pageMetadataManager.FindPageMetadataByName(pageTypeName);
 

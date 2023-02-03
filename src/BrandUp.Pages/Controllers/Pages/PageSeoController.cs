@@ -1,11 +1,7 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Models;
+﻿using BrandUp.Pages.Models;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {

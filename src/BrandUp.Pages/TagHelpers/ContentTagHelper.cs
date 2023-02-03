@@ -3,9 +3,7 @@ using BrandUp.Pages.Views;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
 using System.Collections;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {

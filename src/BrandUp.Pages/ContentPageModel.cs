@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Metadata;
+﻿using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
 using BrandUp.Website.Pages;
@@ -7,7 +6,13 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages
 {
-    public class ContentPageModel : AppPageModel
+    /// <summary>
+    /// Базовая модель страницы с контентом. На странице использующей эту модель можно разместить 
+    /// контент с типом <see cref="TContent"/> или типами наследующими его.
+    /// </summary>
+    /// <typeparam name="TContent">Базовый тип контента страницы, который на ней размещается.</typeparam>
+    public class ContentPageModel<TContent> : AppPageModel, IContentPageModel
+        where TContent : class
     {
         private IPage page;
         private IPageEdit editSession;
@@ -18,7 +23,7 @@ namespace BrandUp.Pages
         public IPageService PageService { get; private set; }
         public IPage PageEntry => page;
         public PageMetadataProvider PageMetadata { get; private set; }
-        public object PageContent { get; private set; }
+        public TContent PageContent { get; private set; }
         public ContentContext ContentContext { get; private set; }
         [ClientProperty]
         public Guid Id => page.Id;
@@ -125,22 +130,31 @@ namespace BrandUp.Pages
 
             pageSeo = await PageService.GetPageSeoOptionsAsync(page, HttpContext.RequestAborted);
 
+            object pageContent;
             if (editSession != null)
             {
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageContentService>();
-                PageContent = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
+                var pageContentService = HttpContext.RequestServices.GetRequiredService<IPageContentService>();
+                pageContent = await pageContentService.GetContentAsync(editSession, HttpContext.RequestAborted);
             }
             else
-                PageContent = await PageService.GetPageContentAsync(page, HttpContext.RequestAborted);
-            if (PageContent == null)
-                throw new InvalidOperationException();
+                pageContent = await PageService.GetPageContentAsync(page, HttpContext.RequestAborted);
+            if (pageContent == null)
+                throw new InvalidOperationException("Не найден контент для страницы.");
+            if (pageContent is not TContent)
+                throw new InvalidOperationException($"Тип контента страницы не наследует тип {typeof(TContent).AssemblyQualifiedName}.");
+            PageContent = (TContent)pageContent;
 
-            ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices, editSession != null);
+            ContentContext = new ContentContext(page, pageContent, HttpContext.RequestServices, editSession != null);
 
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
             ParentPageId = await PageService.GetParentPageIdAsync(page, HttpContext.RequestAborted);
         }
 
         #endregion
+    }
+
+    internal interface IContentPageModel
+    {
+        ContentContext ContentContext { get; }
     }
 }

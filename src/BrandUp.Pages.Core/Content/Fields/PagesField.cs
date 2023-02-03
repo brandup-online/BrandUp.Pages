@@ -1,8 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Content.Fields
 {

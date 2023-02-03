@@ -1,5 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +18,7 @@ namespace BrandUp.Pages.Repositories
 
         public async Task<IPageEdit> CreateEditAsync(IPage page, string userId, CancellationToken cancellationToken = default)
         {
-            var content = await pageRepository.GetContentAsync(page.Id);
+            var content = await pageRepository.GetContentAsync(page.Id, cancellationToken);
 
             var editId = Guid.NewGuid();
             var edit = new PageEdit

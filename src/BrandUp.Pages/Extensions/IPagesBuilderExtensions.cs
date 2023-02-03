@@ -12,10 +12,11 @@ namespace BrandUp.Pages.Builder
 
         public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<ContentPageOptions> optionAction)
         {
+            var services = builder.Services;
+
             var contentPageOptions = new ContentPageOptions();
             optionAction?.Invoke(contentPageOptions);
-
-            var services = builder.Services;
+            services.Configure(optionAction);
 
             services.AddHttpContextAccessor();
 
@@ -29,8 +30,6 @@ namespace BrandUp.Pages.Builder
 
             services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
             services.AddScoped<Views.IViewRenderService, Views.RazorViewRenderService>();
-
-            services.Configure(optionAction);
 
             return builder;
         }

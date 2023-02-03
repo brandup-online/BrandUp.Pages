@@ -61,9 +61,7 @@ namespace LandingWebSite
                 .AddUrlMapProvider<SubdomainUrlMapProvider>()
                 .AddPageEvents<Pages.PageEvents>();
 
-            services.AddPages(options =>
-            {
-            })
+            services.AddPagesCore()
                 .AddRazorContentPage()
                 .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
                 .AddImageResizer<Infrastructure.ImageResizer>()

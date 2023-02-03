@@ -2,8 +2,6 @@
 using BrandUp.Pages.Files;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
-using System;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {
@@ -37,7 +35,7 @@ namespace BrandUp.Pages.TagHelpers
             var imageValue = (ImageValue)value;
 
             output.Attributes.TryGetAttribute(StyleAttributeName, out TagHelperAttribute styleAttribute);
-            if (styleAttribute == null || !(styleAttribute.Value is string styleStr))
+            if (styleAttribute == null || styleAttribute.Value is not string styleStr)
                 styleStr = string.Empty;
             if (!string.IsNullOrEmpty(styleStr) && !styleStr.EndsWith(";"))
                 styleStr += ";";

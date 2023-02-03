@@ -1,15 +1,12 @@
 ﻿using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
     public class HyperLinkController : FieldController<IHyperLinkField>
     {
         [HttpPost("url")]
-        public async Task<IActionResult> SetUrlAsync([FromQuery]string url)
+        public async Task<IActionResult> SetUrlAsync([FromQuery] string url)
         {
             HyperLinkValue value = default;
             if (!string.IsNullOrEmpty(url))
@@ -22,7 +19,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("page")]
-        public async Task<IActionResult> SetUrlAsync([FromQuery]Guid pageId, [FromServices]IPageService pageService)
+        public async Task<IActionResult> SetUrlAsync([FromQuery] Guid pageId, [FromServices] IPageService pageService)
         {
             var page = await pageService.FindPageByIdAsync(pageId);
             if (page == null)

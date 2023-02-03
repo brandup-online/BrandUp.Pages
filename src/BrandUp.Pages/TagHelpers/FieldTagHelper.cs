@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.TagHelpers
 {
@@ -28,11 +26,11 @@ namespace BrandUp.Pages.TagHelpers
 
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
-            if (!(ViewContext.ViewData[RazorViewRenderService.ViewData_ContentContextKeyName] is ContentContext contentContext))
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ContentContextKeyName] is not ContentContext contentContext)
                 throw new InvalidOperationException();
             ContentContext = contentContext;
 
-            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || !(field is TField textField))
+            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || field is not TField textField)
                 throw new InvalidOperationException();
             Field = textField;
 
