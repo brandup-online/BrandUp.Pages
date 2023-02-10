@@ -278,7 +278,7 @@ namespace BrandUp.Pages.Services
                     throw new InvalidOperationException($"Не найдена конфигурация элементов с типом {page.ItemType}.");
                 var itemProvider = serviceProvider.GetRequiredService(itemPageOptions.ItemProviderType);
                 if (itemProvider is IPageCallbacks pageCallbacks)
-                    await pageCallbacks.UpdateHeaderAsync(page.ItemId, page.ItemType, cancellationToken);
+                    await pageCallbacks.UpdateHeaderAsync(page.ItemId, pageHeader, cancellationToken);
             }
 
             page.Header = pageHeader;

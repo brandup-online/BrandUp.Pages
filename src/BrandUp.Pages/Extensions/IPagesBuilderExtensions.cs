@@ -36,15 +36,26 @@ namespace BrandUp.Pages
         /// </summary>
         /// <typeparam name="TItem">Тип элемента страницы.</typeparam>
         /// <typeparam name="TStore">Хранилище элементов страницы.</typeparam>
-        public static IPagesBuilder AddItemPages<TItem, TStore>(this IPagesBuilder builder)
+        public static IPagesBuilder AddItemPages<TItem, TStore>(this IPagesBuilder builder, string pageName, string route)
             where TItem : class
             where TStore : class, IItemProvider<TItem>
         {
+            if (pageName == null)
+                throw new ArgumentNullException(nameof(pageName));
+            if (route == null)
+                throw new ArgumentNullException(nameof(route));
+
             var services = builder.Services;
             var itemTypeName = typeof(TItem).FullName;
 
+            services.Configure<RazorPagesOptions>(options =>
+            {
+                options.Conventions.AddPageRoute(pageName, route);
+            });
+
             services.Configure<ItemPageOptions>(itemTypeName, options =>
             {
+                options.PageName = pageName;
                 options.ItemProviderType = typeof(IItemProvider<TItem>);
             });
 

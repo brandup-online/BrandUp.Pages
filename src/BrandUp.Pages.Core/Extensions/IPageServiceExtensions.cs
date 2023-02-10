@@ -1,4 +1,4 @@
-﻿namespace BrandUp.Pages.Services
+﻿namespace BrandUp.Pages
 {
     public static class IPageServiceExtensions
     {

@@ -34,6 +34,8 @@ namespace LandingWebSite.Blog.Pages
             var blogPost = await FindByIdAsync(id, cancellationToken);
 
             blogPost.Title = header;
+
+            await blogPostRepository.UpdateAsync(blogPost, cancellationToken);
         }
 
         #endregion

@@ -122,6 +122,7 @@ namespace BrandUp.Pages
                         context.Result = RedirectPermanent(redirectUrl);
                     else
                         context.Result = Redirect(redirectUrl);
+
                     return;
                 }
             }

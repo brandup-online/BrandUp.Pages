@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.Encodings.Web;
 using BrandUp.Pages;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
@@ -6,8 +8,6 @@ using LandingWebSite.Blog;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.WebEncoders;
-using System.Globalization;
-using System.Text.Encodings.Web;
 
 namespace LandingWebSite
 {
@@ -24,7 +24,9 @@ namespace LandingWebSite
         {
             #region Web
 
-            services.AddRazorPages().AddApplicationPart(typeof(RootPageOptions).Assembly);
+            services
+                .AddRazorPages()
+                .AddApplicationPart(typeof(RootPageOptions).Assembly);
             services.AddControllers();
 
             services.Configure<WebEncoderOptions>(options =>
@@ -67,7 +69,7 @@ namespace LandingWebSite
                 .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped)
                 .AddMongoDb<Models.AppDbContext>()
                 .AddRootPages()
-                .AddItemPages<Blog.Documents.BlogPostDocument, Blog.Pages.PostItemProvider>();
+                .AddItemPages<Blog.Documents.BlogPostDocument, Blog.Pages.PostItemProvider>("/Blog/Post", "/blog/{url}");
 
             #region Identity
 
