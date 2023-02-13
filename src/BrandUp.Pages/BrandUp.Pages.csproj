@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Authors>Dmitry Kovyazin</Authors>
-    <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
     <Product>BrandUp.Pages</Product>
     <Company>BrandUp.online</Company>
   </PropertyGroup>

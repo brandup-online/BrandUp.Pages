@@ -2,18 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
     <Authors>Dmitry Kovyazin</Authors>
     <Product>BrandUp.Pages</Product>
-    <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
     <Company>BrandUp.online</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.1" />
-    <PackageReference Include="BrandUp.MongoDB" Version="7.0.1" />
-    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.18.0" />
+    <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.2" />
+    <PackageReference Include="BrandUp.MongoDB" Version="7.0.2" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.19.0" />
   </ItemGroup>
 
   <ItemGroup>

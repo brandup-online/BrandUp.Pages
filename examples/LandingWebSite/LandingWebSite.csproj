@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.1" />
+    <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.2" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
   </ItemGroup>
 
