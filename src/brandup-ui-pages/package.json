@@ -12,13 +12,13 @@
     "name": "Dmitry Kovyazin",
     "email": "it@brandup.online"
   },
-  "homepage": "https://github.com/dkovyazin/BrandUp.Pages",
+  "homepage": "https://github.com/brandup-online/BrandUp.Pages",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dkovyazin/BrandUp.Pages.git"
+    "url": "https://github.com/brandup-online/BrandUp.Pages.git"
   },
   "bugs": {
-    "url": "https://github.com/dkovyazin/BrandUp.Pages/issues",
+    "url": "https://github.com/brandup-online/BrandUp.Pages/issues",
     "email": "it@brandup.online"
   },
   "license": "Apache-2.0",
@@ -29,15 +29,15 @@
     "source"
   ],
   "devDependencies": {
-    "typescript": "^4.8.4"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
-    "brandup-ui": "^2.0.6",
-    "brandup-ui-dom": "^2.0.6",
-    "brandup-ui-ajax": "^2.0.6",
-    "brandup-ui-helpers": "^2.0.6",
-    "brandup-ui-app": "^2.0.2",
-    "brandup-ui-website": "^3.1.4",
+    "brandup-ui": "^2.0.7",
+    "brandup-ui-dom": "^2.0.7",
+    "brandup-ui-ajax": "^2.0.7",
+    "brandup-ui-helpers": "^2.0.7",
+    "brandup-ui-app": "^2.0.3",
+    "brandup-ui-website": "^7.0.2",
     "brandup-pages-ckeditor": "^1.0.12"
   },
   "scripts": {

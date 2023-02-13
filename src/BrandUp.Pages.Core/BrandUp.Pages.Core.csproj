@@ -5,9 +5,9 @@
     <RootNamespace>BrandUp.Pages</RootNamespace>
     <Authors>Dmitry Kovyazin</Authors>
     <Product>BrandUp.Pages</Product>
-    <PackageLicenseUrl>https://github.com/dkovyazin/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/dkovyazin/BrandUp.Pages</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/dkovyazin/BrandUp.Pages</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
     <Company>BrandUp.online</Company>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
