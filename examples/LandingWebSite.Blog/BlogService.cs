@@ -16,6 +16,8 @@ namespace LandingWebSite.Blog
             this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
         }
 
+        public IQueryable<BlogPostDocument> Posts => blogPostRepository.Posts;
+
         public async Task<CreatePostResult> CreatePostAsync(string websiteId, string header, CancellationToken cancellationToken = default)
         {
             if (websiteId == null) throw new ArgumentNullException(nameof(websiteId));

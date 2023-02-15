@@ -13,3 +13,12 @@
         </div>
     }
 </header>
+
+<section class="page-post-list">
+    @foreach(var post in Model.Posts)
+    {
+        <div class="post">
+            <a nav-url="@await Url.ItemPathAsync(post)">@post.Title</a>
+        </div>
+    }
+</section>

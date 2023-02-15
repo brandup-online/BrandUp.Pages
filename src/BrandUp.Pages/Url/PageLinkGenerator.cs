@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BrandUp.Website;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace BrandUp.Pages.Url
@@ -20,6 +22,18 @@ namespace BrandUp.Pages.Url
         }
 
         #region IPageLinkGenerator members
+
+        public async Task<string> GetItemPathAsync<TItem>(TItem item, CancellationToken cancellationToken = default)
+            where TItem : class
+        {
+            var httpContext = httpContextAccessor.HttpContext;
+            var pageService = httpContext.RequestServices.GetRequiredService<IPageService>();
+            var websiteContext = httpContext.GetWebsiteContext();
+
+            var page = await pageService.FindPageByItemAsync(websiteContext.Website.Id, item, cancellationToken);
+
+            return await GetPathAsync(page, cancellationToken);
+        }
 
         public Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default)
         {

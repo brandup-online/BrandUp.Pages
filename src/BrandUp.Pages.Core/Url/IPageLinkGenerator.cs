@@ -2,6 +2,7 @@
 {
     public interface IPageLinkGenerator
     {
+        Task<string> GetItemPathAsync<TItem>(TItem item, CancellationToken cancellationToken = default) where TItem : class;
         Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default);
         Task<string> GetUrlAsync(IPage page, CancellationToken cancellationToken = default);
         Task<string> GetPathAsync(IPageEdit pageEditSession, CancellationToken cancellationToken = default);
