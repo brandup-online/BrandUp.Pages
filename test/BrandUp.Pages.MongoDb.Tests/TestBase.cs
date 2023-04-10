@@ -1,11 +1,11 @@
-﻿using BrandUp.Extensions.Migrations;
+﻿using System;
+using System.Threading.Tasks;
+using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
 using BrandUp.Pages.MongoDb.Tests.ContentModels;
 using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace BrandUp.Pages.MongoDb.Tests
@@ -33,16 +33,16 @@ namespace BrandUp.Pages.MongoDb.Tests
 
             services.AddSingleton(websiteContext);
 
-            services.AddPages()
+            services
+                .AddPages()
                 .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
                 .AddFakes()
                 .AddMongoDb(options =>
                 {
                     options.DatabaseName = "Test";
-                    options.UseCamelCaseElementName();
                 });
 
-            services.AddMongo2GoDbClientFactory();
+            services.AddTestMongoDb();
 
             services.AddMigrations(options =>
             {

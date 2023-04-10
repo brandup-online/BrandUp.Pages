@@ -1,10 +1,10 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    [MongoDB.Document(CollectionName = "BrandUpPages.urls")]
+    [MongoDB.MongoCollection(CollectionName = "BrandUpPages.urls")]
     public class PageUrlDocument
     {
         [BsonId, BsonRepresentation(BsonType.String)]

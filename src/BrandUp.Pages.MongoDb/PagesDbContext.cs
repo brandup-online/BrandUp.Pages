@@ -6,8 +6,6 @@ namespace BrandUp.Pages.MongoDb
 {
     public class PagesDbContext : MongoDbContext, IPagesDbContext
     {
-        public PagesDbContext(MongoDbContextOptions options) : base(options) { }
-
         public IMongoCollection<PageCollectionDocument> PageCollections => GetCollection<PageCollectionDocument>();
         public IMongoCollection<PageDocument> Pages => GetCollection<PageDocument>();
         public IMongoCollection<PageEditDocument> PageEditSessions => GetCollection<PageEditDocument>();

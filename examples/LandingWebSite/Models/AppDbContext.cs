@@ -7,8 +7,6 @@ namespace LandingWebSite.Models
 {
     public class AppDbContext : MongoDbContext, BrandUp.Pages.MongoDb.IPagesDbContext
     {
-        public AppDbContext(MongoDbContextOptions options) : base(options) { }
-
         public IMongoCollection<IdentityUser> Users => GetCollection<IdentityUser>();
         public IMongoCollection<IdentityRole> Roles => GetCollection<IdentityRole>();
 

@@ -1,10 +1,10 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace LandingWebSite.Identity
 {
-    [BrandUp.MongoDB.Document(CollectionName = "Roles")]
+    [BrandUp.MongoDB.MongoCollection(CollectionName = "Roles")]
     public class IdentityRole
     {
         public IdentityRole()

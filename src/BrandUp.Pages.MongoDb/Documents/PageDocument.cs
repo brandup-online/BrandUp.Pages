@@ -1,11 +1,11 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using System;
+using BrandUp.Pages.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    [MongoDB.Document(CollectionName = "BrandUpPages.pages")]
+    [MongoDB.MongoCollection(CollectionName = "BrandUpPages.pages")]
     public class PageDocument : Document, IPage
     {
         [BsonRequired]

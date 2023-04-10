@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace LandingWebSite.Identity
 {
-    [BrandUp.MongoDB.Document(CollectionName = "Users")]
+    [BrandUp.MongoDB.MongoCollection(CollectionName = "Users")]
     public class IdentityUser
     {
         public IdentityUser()

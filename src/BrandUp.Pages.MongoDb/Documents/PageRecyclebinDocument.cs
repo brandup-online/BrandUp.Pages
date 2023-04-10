@@ -1,10 +1,10 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    [MongoDB.Document(CollectionName = "BrandUpPages.recyclebin")]
+    [MongoDB.MongoCollection(CollectionName = "BrandUpPages.recyclebin")]
     public class PageRecyclebinDocument : Document
     {
         [BsonRequired]

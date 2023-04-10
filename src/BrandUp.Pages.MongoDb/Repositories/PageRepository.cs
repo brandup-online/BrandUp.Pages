@@ -1,13 +1,13 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.MongoDb.Documents;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.MongoDb.Documents;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
@@ -77,11 +77,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                     await session.CommitTransactionAsync(cancellationToken);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     await session.AbortTransactionAsync(cancellationToken);
 
-                    throw ex;
+                    throw;
                 }
             }
 
@@ -232,11 +232,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                 await session.CommitTransactionAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await session.AbortTransactionAsync(cancellationToken);
 
-                throw ex;
+                throw;
             }
         }
         public async Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
@@ -267,11 +267,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                 await session.CommitTransactionAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await session.AbortTransactionAsync(cancellationToken);
 
-                throw ex;
+                throw;
             }
         }
         public async Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
@@ -319,11 +319,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                 await session.CommitTransactionAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await session.AbortTransactionAsync(cancellationToken);
 
-                throw ex;
+                throw;
             }
         }
         public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
@@ -417,11 +417,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                 await session.CommitTransactionAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await session.AbortTransactionAsync(cancellationToken);
 
-                throw ex;
+                throw;
             }
         }
         public async Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
@@ -461,11 +461,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
                 await session.CommitTransactionAsync(cancellationToken);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await session.AbortTransactionAsync(cancellationToken);
 
-                throw ex;
+                throw;
             }
         }
 

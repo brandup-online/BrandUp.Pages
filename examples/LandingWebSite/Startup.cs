@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.Encodings.Web;
 using BrandUp.Pages.Builder;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
@@ -11,8 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
-using System.Globalization;
-using System.Text.Encodings.Web;
 
 namespace LandingWebSite
 {
@@ -29,7 +29,7 @@ namespace LandingWebSite
         {
             #region Web
 
-            services.AddRazorPages();
+            services.AddRazorPages().AddApplicationPart(typeof(BrandUp.Pages.ContentPageModel).Assembly);
             services.AddControllers();
 
             services.Configure<WebEncoderOptions>(options =>
@@ -43,7 +43,7 @@ namespace LandingWebSite
                 options.AppendTrailingSlash = false;
             });
 
-            services.Configure<RequestLocalizationOptions>(options =>
+            services.AddRequestLocalization(options =>
             {
                 var defaultCulture = new CultureInfo("en");
                 var supportedCultures = new[] { defaultCulture };
@@ -55,7 +55,12 @@ namespace LandingWebSite
 
             #endregion
 
-            services.AddMongoDbContext<Models.AppDbContext>(Configuration.GetSection("MongoDb"));
+            services.AddMongoDb();
+
+            services.AddMongoDbContext<Models.AppDbContext>(options =>
+            {
+                Configuration.GetSection("MongoDb").Bind(options);
+            });
 
             services
                 .AddWebsite(options =>
@@ -127,6 +132,7 @@ namespace LandingWebSite
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseRequestLocalization();
 
             app.UseAuthentication();
 

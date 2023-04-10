@@ -1,7 +1,7 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using System;
+using BrandUp.Pages.Interfaces;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
@@ -13,7 +13,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string UserId { get; set; }
     }
 
-    [MongoDB.Document(CollectionName = "BrandUpPages.edits")]
+    [MongoDB.MongoCollection(CollectionName = "BrandUpPages.edits")]
     public class PageEditDocument : Document
     {
         [BsonRequired]

@@ -1,11 +1,11 @@
-﻿using BrandUp.Extensions.Migrations;
-using BrandUp.Pages.MongoDb.Documents;
-using MongoDB.Driver;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BrandUp.Extensions.Migrations;
+using BrandUp.Pages.MongoDb.Documents;
+using MongoDB.Driver;
 
 namespace BrandUp.Pages.MongoDb._migrations
 {
@@ -25,6 +25,7 @@ namespace BrandUp.Pages.MongoDb._migrations
         {
             await CreateIndexes_PageCollectionAsync();
             await CreateIndexes_PageAsync();
+            await CreateIndexes_PageContentAsync();
             await CreateIndexes_PageUrlAsync();
             await CreateIndexes_PageEditAsync();
             await CreateIndexes_PageRecyclebinAsync();
@@ -70,6 +71,16 @@ namespace BrandUp.Pages.MongoDb._migrations
                 new CreateIndexModel<PageDocument>(statusIndex, new CreateIndexOptions { Name = "Status" }),
                 new CreateIndexModel<PageDocument>(urlIndex, new CreateIndexOptions { Name = "Url", Unique = true }),
                 new CreateIndexModel<PageDocument>(textIndex, new CreateIndexOptions { Name = "Text" })
+            });
+        }
+        async Task CreateIndexes_PageContentAsync()
+        {
+            await dbContext.Contents.Indexes.DropAllAsync();
+
+            var pageIdIndex = Builders<PageContentDocument>.IndexKeys.Ascending(it => it.PageId);
+
+            await ApplyIndexes(dbContext.Contents, new CreateIndexModel<PageContentDocument>[] {
+                new CreateIndexModel<PageContentDocument>(pageIdIndex, new CreateIndexOptions { Name = "Page", Unique = true })
             });
         }
         async Task CreateIndexes_PageUrlAsync()
