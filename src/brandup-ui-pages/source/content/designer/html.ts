@@ -18,31 +18,19 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             .then(editor => {
                 this.__editor = editor;
 
-                editor.model.document.on('change', () => {
-                    if (editor.model.document.differ.hasDataChanges())
-                        this.__isChanged = true;
-
-                    this.__refreshUI();
+                editor.model.document.on("change", () => {
+                    if (editor.model.document.differ.hasDataChanges()) {
+                        //this.__editor.model.document.differ.reset();
+                        this._onChanged();
+                    }
                 });
 
                 this.__refreshUI();
             });
-
-        this.element.addEventListener("focus", () => {
-            this.__isChanged = false;
-        });
-        this.element.addEventListener("blur", () => {
-            if (this.__isChanged) {
-                this.__editor.model.document.differ.reset();
-                this._onChanged();
-            }
-
-            this.__refreshUI();
-        });
     }
 
     getValue(): string {
-        const data = this.__editor.data.get();
+        const data = this.__editor.data.get({ trim: "none" });
         return data ? data : null;
     }
     setValue(value: string) {
@@ -56,7 +44,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             return false;
 
         const val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
-        return value && val ? true : false;
+        return val ? true : false;
     }
 
     protected _onChanged() {
@@ -76,7 +64,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             data: value ? value : "",
             success: (response: AjaxResponse<string>) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    //this.setValue(response.data);
                 }
             }
         });
@@ -98,10 +86,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     destroy() {
-        this.__editor.destroy().then(() => {
-            super.destroy();
-        });
-
+        this.__editor.destroy();
         super.destroy();
     }
 }

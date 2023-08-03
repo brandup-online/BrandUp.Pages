@@ -38,7 +38,7 @@
     "brandup-ui-helpers": "^2.0.7",
     "brandup-ui-app": "^2.0.3",
     "brandup-ui-website": "^7.0.17",
-    "brandup-pages-ckeditor": "^1.0.12"
+    "brandup-pages-ckeditor": "^1.0.15"
   },
   "scripts": {
     "build": "tsc"
