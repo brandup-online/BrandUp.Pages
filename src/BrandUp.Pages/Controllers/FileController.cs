@@ -1,10 +1,10 @@
-﻿using BrandUp.Pages.Files;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using BrandUp.Pages.Files;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace BrandUp.Pages.Controllers
 {
@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Controllers
         readonly string imagesTempPath;
         readonly string filesTempPath;
 
-        public FileController(FileService fileService, IHostingEnvironment hostingEnvironment)
+        public FileController(FileService fileService, IWebHostEnvironment hostingEnvironment)
         {
             this.fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
 
