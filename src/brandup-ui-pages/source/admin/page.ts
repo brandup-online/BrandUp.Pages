@@ -15,14 +15,11 @@ import { AjaxResponse } from "brandup-ui-ajax";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
-    //private __pageNavFunc: (e: CustomEvent) => void;
 
     get typeName(): string { return "BrandUpPages.PageToolbar"; }
 
     constructor(page: ContentPage) {
         super();
-
-        //page.attachDestroyFunc(() => { this.destroy(); });
 
         const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar bp-toolbar-right" });
         let isLoading = false;
@@ -81,21 +78,6 @@ export class PageToolbar extends UIElement {
             });
 
             this.__designer = new PageDesigner(page);
-
-            //this.__pageNavFunc = (e: CustomEvent<NavigationOptions>) => {
-            //    if (cancelNav && e.detail.pushState) {
-            //        e.cancelBubble = true;
-            //        e.stopPropagation();
-            //        e.preventDefault();
-            //    }
-            //    else {
-            //        e.cancelBubble = false;
-            //    }
-
-            //    cancelNav = true;
-            //};
-
-            //window.addEventListener("pageNavigating", this.__pageNavFunc, false);
         }
         else {
             if (page.model.status !== "Published") {
@@ -212,7 +194,6 @@ export class PageToolbar extends UIElement {
         }
 
         this.element.remove();
-        //window.removeEventListener("pageNavigating", this.__pageNavFunc, false);
 
         super.destroy();
     }

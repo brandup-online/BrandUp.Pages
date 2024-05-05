@@ -19,10 +19,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "brandup-ui": "^2.0.8",
-    "brandup-ui-dom": "^2.0.8",
-    "brandup-ui-ajax": "^2.0.8",
-    "brandup-ui-website": "^7.1.5",
+    "brandup-ui": "^2.0.9",
+    "brandup-ui-dom": "^2.0.9",
+    "brandup-ui-ajax": "^2.0.9",
+    "brandup-ui-website": "^7.1.6",
     "brandup-ui-pages": "../../src/brandup-ui-pages"
   },
   "scripts": {

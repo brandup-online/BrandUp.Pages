@@ -4,6 +4,18 @@ import ContentPage from "./pages/content";
 import "./styles.less";
 
 export class PagesMiddleware extends Middleware {
+    start(context, next) {
+        next();
+
+        this._showUI(context.items);
+    }
+
+    navigate(context, next) {
+        next();
+
+        this._showUI(context.items);
+    }
+
     private _showUI(items: { [key: string]: any }) {
         if (items["nav"].enableAdministration) {
             const page = items["page"] as Page<PageModel>;
@@ -19,19 +31,5 @@ export class PagesMiddleware extends Middleware {
                 });
             }
         }
-    }
-
-    start(context, next) {
-        next();
-
-        this._showUI(context.items);
-    }
-    navigating(context, next) {
-        next();
-    }
-    navigate(context, next) {
-        next();
-
-        this._showUI(context.items);
     }
 }
