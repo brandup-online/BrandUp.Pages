@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
     <Authors>Dmitry Kovyazin</Authors>
     <Product>BrandUp.Pages</Product>
@@ -11,9 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BrandUp.Extensions.Migrations" Version="7.0.3" />
-    <PackageReference Include="BrandUp.MongoDB" Version="7.1.1" />
-    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.20.0" />
+    <PackageReference Include="BrandUp.Extensions.Migrations" Version="8.0.4" />
+    <PackageReference Include="BrandUp.MongoDB" Version="7.2.3" />
+    <PackageReference Include="MongoDB.Driver.GridFS" Version="2.25.0" />
   </ItemGroup>
 
   <ItemGroup>

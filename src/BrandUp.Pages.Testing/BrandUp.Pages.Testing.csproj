@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Authors>Dmitry Kovyazin</Authors>
     <Product>BrandUp.Pages</Product>
     <PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
