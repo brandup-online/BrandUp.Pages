@@ -8,7 +8,15 @@
 		<RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
 		<Product>BrandUp.Pages</Product>
 		<Company>BrandUp.online</Company>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

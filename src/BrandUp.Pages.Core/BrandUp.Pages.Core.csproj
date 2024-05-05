@@ -1,24 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>BrandUp.Pages</RootNamespace>
-    <Authors>Dmitry Kovyazin</Authors>
-    <Product>BrandUp.Pages</Product>
-    <PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
-    <Company>BrandUp.online</Company>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<RootNamespace>BrandUp.Pages</RootNamespace>
+		<Authors>Dmitry Kovyazin</Authors>
+		<Product>BrandUp.Pages</Product>
+		<PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
+		<Company>BrandUp.online</Company>
+		<PackageIcon>icon.png</PackageIcon>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BrandUp.Website.Abstractions" Version="7.1.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="BrandUp.Website.Abstractions" Version="7.1.4" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />
+	</ItemGroup>
 
 </Project>
