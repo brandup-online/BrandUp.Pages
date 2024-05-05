@@ -1,25 +1,24 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using BrandUp.Extensions.Migrations;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LandingWebSite._migrations
 {
-    public class MigrationService : Microsoft.Extensions.Hosting.IHostedService
+    public class MigrationService(IServiceProvider serviceProvider) : Microsoft.Extensions.Hosting.IHostedService
     {
-        private readonly BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor;
-
-        public MigrationService(BrandUp.Extensions.Migrations.MigrationExecutor migrationExecutor)
-        {
-            this.migrationExecutor = migrationExecutor ?? throw new System.ArgumentNullException(nameof(migrationExecutor));
-        }
-
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            await using var scope = serviceProvider.CreateAsyncScope();
+
+            var migrationExecutor = scope.ServiceProvider.GetRequiredService<MigrationExecutor>();
             await migrationExecutor.UpAsync(cancellationToken);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
 }

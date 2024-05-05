@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Encodings.Web;
+using BrandUp.Extensions.Migrations;
 using BrandUp.Pages.Builder;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
@@ -108,11 +109,10 @@ namespace LandingWebSite
 
             #region Migrations
 
-            services.AddMigrations(options =>
+            services.AddMigrations<MigrationState>(options =>
             {
                 options.AddAssembly(typeof(SetupMigration).Assembly);
             });
-            services.AddSingleton<BrandUp.Extensions.Migrations.IMigrationState, MigrationState>();
             services.AddHostedService<MigrationService>();
 
             #endregion

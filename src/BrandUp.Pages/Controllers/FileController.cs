@@ -52,7 +52,7 @@ namespace BrandUp.Pages.Controllers
                     return StatusCode((int)HttpStatusCode.NotModified);
             }
 
-            HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
+            HttpContext.Response.Headers["ETag"] = new[] { cacheFileDate.Ticks.ToString() };
 
             return new FileStreamResult(System.IO.File.OpenRead(fileTempPath), file.ContentType);
         }
@@ -82,7 +82,7 @@ namespace BrandUp.Pages.Controllers
                     if (HttpContext.Request.Headers.Keys.Contains("If-None-Match") && HttpContext.Request.Headers["If-None-Match"].ToString() == cacheFileDate.Ticks.ToString())
                         return StatusCode((int)HttpStatusCode.NotModified);
 
-                    HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
+                    HttpContext.Response.Headers["ETag"] = new[] { cacheFileDate.Ticks.ToString() };
 
                     return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
                 }
@@ -92,7 +92,7 @@ namespace BrandUp.Pages.Controllers
                     await imageResizer.Resize(fileStream, width, height, tempFileStream);
 
                 cacheFileDate = System.IO.File.GetLastWriteTimeUtc(imageTempPath);
-                HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
+                HttpContext.Response.Headers["ETag"] = new[] { cacheFileDate.Ticks.ToString() };
 
                 return new FileStreamResult(System.IO.File.OpenRead(imageTempPath), "image/jpeg");
             }
@@ -116,7 +116,7 @@ namespace BrandUp.Pages.Controllers
                     return StatusCode((int)HttpStatusCode.NotModified);
             }
 
-            HttpContext.Response.Headers.Add("ETag", new[] { cacheFileDate.Ticks.ToString() });
+            HttpContext.Response.Headers["ETag"] = new[] { cacheFileDate.Ticks.ToString() };
 
             return new FileStreamResult(System.IO.File.OpenRead(fileTempPath), file.ContentType);
         }

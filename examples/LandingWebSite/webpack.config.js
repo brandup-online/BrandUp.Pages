@@ -2,9 +2,30 @@
 
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CleanCSSPlugin = require("less-plugin-clean-css");
 const TerserPlugin = require("terser-webpack-plugin");
 const bundleOutputDir = './wwwroot/dist';
+
+const lessLoaderOptions = { webpackImporter: true, lessOptions: { math: 'always', plugins: [new CleanCSSPlugin({ advanced: true })] } };
+var splitChunks = {
+    cacheGroups: {
+        vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            reuseExistingChunk: true,
+            enforce: true
+        },
+        styles: {
+            test: /\.(css|scss|less)$/, // нужно чтобы import`ы на одинаковые файла less не дублировались на выходе
+            reuseExistingChunk: true,
+            enforce: true
+        },
+        images: {
+            test: /\.(svg|jpg|png)$/,
+            reuseExistingChunk: true,
+            enforce: true
+        }
+    }
+};
 
 module.exports = (env) => {
     const isDevBuild = process.env.NODE_ENV !== "production";
@@ -30,19 +51,28 @@ module.exports = (env) => {
                 {
                     test: /\.tsx?$/,
                     loader: 'ts-loader',
-                    options: { allowTsInNodeModules: true }
+                    options: { allowTsInNodeModules: true, onlyCompileBundledFiles: true }
                 },
                 {
                     test: /\.(le|c)ss$/,
                     use: [
                         { loader: MiniCssExtractPlugin.loader },
-                        { loader: 'css-loader', options: { importLoaders: 1 } },
-                        { loader: 'less-loader', options: { lessOptions: { math: 'always', strictMath: true, noIeCompat: true, } } }
+                        { loader: 'css-loader', options: { importLoaders: 2 } },
+                        { loader: 'less-loader', options: lessLoaderOptions }
                     ]
                 },
                 {
                     test: /\.svg$/,
-                    use: 'raw-loader'
+                    use: [
+                        { loader: "raw-loader" },
+                        {
+                            loader: "svgo-loader",
+                            options: {
+                                configFile: __dirname + "/svgo.config.mjs",
+                                floatPrecision: 2,
+                            }
+                        }
+                    ]
                 },
                 {
                     test: /\.(png|jpg|jpeg|gif)$/,
@@ -51,14 +81,14 @@ module.exports = (env) => {
             ]
         },
         optimization: {
+            splitChunks: splitChunks,
             minimize: !isDevBuild,
             minimizer: [
-                new CssMinimizerPlugin(),
                 new TerserPlugin({
                     terserOptions: {
                         compress: true,
                         keep_classnames: true,
-                        keep_fnames: false,
+                        keep_fnames: true,
                         format: {
                             comments: false
                         },
