@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>BrandUp.Pages</RootNamespace>
 		<Authors>Dmitry Kovyazin</Authors>
 		<Product>BrandUp.Pages</Product>

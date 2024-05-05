@@ -4,6 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
 		<UserSecretsId>8118381a-1b40-4169-ae82-a4576a0f2cf5</UserSecretsId>
+		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
 
 	<ItemGroup>
