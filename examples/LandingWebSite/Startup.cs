@@ -2,6 +2,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Encodings.Web;
 using BrandUp.Extensions.Migrations;
+using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
@@ -80,10 +81,9 @@ namespace LandingWebSite
 
 			services.AddMongoDb();
 
-			services.AddMongoDbContext<Models.AppDbContext>(options =>
-			{
-				Configuration.GetSection("MongoDb").Bind(options);
-			});
+			services
+				.AddMongoDbContext<Models.AppDbContext>(options => options.DatabaseName = "landing-website")
+				.UseCamelCaseElementName();
 
 			services
 				.AddWebsite(options =>
