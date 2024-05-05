@@ -2,18 +2,18 @@
 
 namespace BrandUp.Pages
 {
-    public static class IQueryCollectionExtensions
-    {
-        public static bool TryGetValue(this IQueryCollection collection, string name, out string value)
-        {
-            if (!collection.TryGetValue(name, out Microsoft.Extensions.Primitives.StringValues values))
-            {
-                value = default;
-                return false;
-            }
+	public static class IQueryCollectionExtensions
+	{
+		public static bool TryGetValue(this IQueryCollection collection, string name, out string value)
+		{
+			if (!collection.TryGetValue(name, out Microsoft.Extensions.Primitives.StringValues values))
+			{
+				value = default;
+				return false;
+			}
 
-            value = values[0];
-            return true;
-        }
-    }
+			value = values[0];
+			return true;
+		}
+	}
 }

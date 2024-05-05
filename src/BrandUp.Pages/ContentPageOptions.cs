@@ -1,7 +1,7 @@
 ﻿namespace BrandUp.Pages
 {
-    public class ContentPageOptions
-    {
-        public string ContentPageName { get; set; } = "/ContentPage";
-    }
+	public class ContentPageOptions
+	{
+		public string ContentPageName { get; set; } = "/ContentPage";
+	}
 }

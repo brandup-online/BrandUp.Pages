@@ -4,10 +4,10 @@ using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents.Page
 {
-    [PageContent]
-    public abstract class PageContent
-    {
-        [Text(Placeholder = "Input page header"), Title]
-        public string Header { get; set; }
-    }
+	[PageContent]
+	public abstract class PageContent
+	{
+		[Text(Placeholder = "Input page header"), Title]
+		public string Header { get; set; }
+	}
 }

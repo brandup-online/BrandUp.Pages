@@ -2,8 +2,8 @@
 
 namespace LandingWebSite.Pages
 {
-    public class ErrorModel : AppPageModel
-    {
-        public override string Title => "Error";
-    }
+	public class ErrorModel : AppPageModel
+	{
+		public override string Title => "Error";
+	}
 }

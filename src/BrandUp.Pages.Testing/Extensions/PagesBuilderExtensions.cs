@@ -2,16 +2,16 @@
 
 namespace BrandUp.Pages.Builder
 {
-    public static class PagesBuilderExtensions
-    {
-        public static IPagesBuilder AddFakes(this IPagesBuilder builder)
-        {
-            builder.Services.AddPagesTesting();
+	public static class PagesBuilderExtensions
+	{
+		public static IPagesBuilder AddFakes(this IPagesBuilder builder)
+		{
+			builder.Services.AddPagesTesting();
 
-            builder
-                .AddUserAccessProvider<Identity.FakeAccessProvider>(ServiceLifetime.Scoped);
+			builder
+				.AddUserAccessProvider<Identity.FakeAccessProvider>(ServiceLifetime.Scoped);
 
-            return builder;
-        }
-    }
+			return builder;
+		}
+	}
 }

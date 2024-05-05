@@ -1,99 +1,97 @@
 ﻿using BrandUp.Pages.Content;
-using System;
-using System.Collections.Generic;
 
 namespace BrandUp.Pages.Metadata
 {
-    public class PageMetadataProvider : IEquatable<PageMetadataProvider>
-    {
-        private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
+	public class PageMetadataProvider : IEquatable<PageMetadataProvider>
+	{
+		private readonly List<PageMetadataProvider> derivedTypes = new List<PageMetadataProvider>();
 
-        #region Properties
+		#region Properties
 
-        public ContentMetadataProvider ContentMetadata { get; }
-        public string Name => ContentMetadata.Name;
-        public string Title => ContentMetadata.Title;
-        public string Description => ContentMetadata.Description;
-        public Type ContentType => ContentMetadata.ModelType;
-        public PageMetadataProvider ParentMetadata { get; }
-        public IEnumerable<PageMetadataProvider> DerivedTypes => derivedTypes;
-        public bool AllowCreateModel => !ContentMetadata.IsAbstract;
+		public ContentMetadataProvider ContentMetadata { get; }
+		public string Name => ContentMetadata.Name;
+		public string Title => ContentMetadata.Title;
+		public string Description => ContentMetadata.Description;
+		public Type ContentType => ContentMetadata.ModelType;
+		public PageMetadataProvider ParentMetadata { get; }
+		public IEnumerable<PageMetadataProvider> DerivedTypes => derivedTypes;
+		public bool AllowCreateModel => !ContentMetadata.IsAbstract;
 
-        #endregion
+		#endregion
 
-        internal PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
-        {
-            ContentMetadata = contentMetadata;
-            ParentMetadata = parentPageMetadata;
+		internal PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
+		{
+			ContentMetadata = contentMetadata;
+			ParentMetadata = parentPageMetadata;
 
-            if (parentPageMetadata != null)
-                parentPageMetadata.derivedTypes.Add(this);
-        }
+			if (parentPageMetadata != null)
+				parentPageMetadata.derivedTypes.Add(this);
+		}
 
-        #region Methods
+		#region Methods
 
-        public object CreatePageModel()
-        {
-            return ContentMetadata.CreateModelInstance();
-        }
-        public string GetPageHeader(object pageModel)
-        {
-            if (pageModel == null)
-                throw new ArgumentNullException(nameof(pageModel));
+		public object CreatePageModel()
+		{
+			return ContentMetadata.CreateModelInstance();
+		}
+		public string GetPageHeader(object pageModel)
+		{
+			if (pageModel == null)
+				throw new ArgumentNullException(nameof(pageModel));
 
-            return ContentMetadata.GetContentTitle(pageModel);
-        }
-        public void SetPageHeader(object pageModel, string value)
-        {
-            if (pageModel == null)
-                throw new ArgumentNullException(nameof(pageModel));
+			return ContentMetadata.GetContentTitle(pageModel);
+		}
+		public void SetPageHeader(object pageModel, string value)
+		{
+			if (pageModel == null)
+				throw new ArgumentNullException(nameof(pageModel));
 
-            ContentMetadata.SetContentTitle(pageModel, value);
-        }
-        public bool IsInherited(PageMetadataProvider baseMetadataProvider)
-        {
-            if (baseMetadataProvider == null)
-                throw new ArgumentNullException(nameof(baseMetadataProvider));
+			ContentMetadata.SetContentTitle(pageModel, value);
+		}
+		public bool IsInherited(PageMetadataProvider baseMetadataProvider)
+		{
+			if (baseMetadataProvider == null)
+				throw new ArgumentNullException(nameof(baseMetadataProvider));
 
-            return ContentMetadata.IsInherited(baseMetadataProvider.ContentMetadata);
-        }
-        public bool IsInheritedOrEqual(PageMetadataProvider baseMetadataProvider)
-        {
-            if (baseMetadataProvider == null)
-                throw new ArgumentNullException(nameof(baseMetadataProvider));
+			return ContentMetadata.IsInherited(baseMetadataProvider.ContentMetadata);
+		}
+		public bool IsInheritedOrEqual(PageMetadataProvider baseMetadataProvider)
+		{
+			if (baseMetadataProvider == null)
+				throw new ArgumentNullException(nameof(baseMetadataProvider));
 
-            return ContentMetadata.IsInheritedOrEqual(baseMetadataProvider.ContentMetadata);
-        }
+			return ContentMetadata.IsInheritedOrEqual(baseMetadataProvider.ContentMetadata);
+		}
 
-        #endregion
+		#endregion
 
-        #region IEquatable members
+		#region IEquatable members
 
-        public bool Equals(PageMetadataProvider other)
-        {
-            if (other == null || !(other is PageMetadataProvider))
-                return false;
+		public bool Equals(PageMetadataProvider other)
+		{
+			if (other == null || !(other is PageMetadataProvider))
+				return false;
 
-            return ContentType == other.ContentType;
-        }
+			return ContentType == other.ContentType;
+		}
 
-        #endregion
+		#endregion
 
-        #region Object members
+		#region Object members
 
-        public override string ToString()
-        {
-            return Name;
-        }
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as PageMetadataProvider);
-        }
-        public override int GetHashCode()
-        {
-            return ContentType.GetHashCode();
-        }
+		public override string ToString()
+		{
+			return Name;
+		}
+		public override bool Equals(object obj)
+		{
+			return Equals(obj as PageMetadataProvider);
+		}
+		public override int GetHashCode()
+		{
+			return ContentType.GetHashCode();
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

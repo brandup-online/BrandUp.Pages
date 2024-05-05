@@ -1,75 +1,74 @@
-﻿using Microsoft.Extensions.Options;
-using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using Microsoft.Extensions.Options;
 
 namespace BrandUp.Pages.Url
 {
-    public class PageUrlHelper : IPageUrlHelper
-    {
-        private readonly PagesOptions options;
-        private readonly char[] TrimChars = new char[] { ' ', '/', '-', '_' };
-        private static readonly Regex ValidationRegex = new Regex(@"^([\d\w\\_\\-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+	public class PageUrlHelper : IPageUrlHelper
+	{
+		private readonly PagesOptions options;
+		private readonly char[] TrimChars = new char[] { ' ', '/', '-', '_' };
+		private static readonly Regex ValidationRegex = new Regex(@"^([\d\w\\_\\-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
-        public PageUrlHelper(IOptions<PagesOptions> options)
-        {
-            this.options = options.Value ?? throw new ArgumentNullException(nameof(options.Value));
-        }
+		public PageUrlHelper(IOptions<PagesOptions> options)
+		{
+			this.options = options.Value ?? throw new ArgumentNullException(nameof(options.Value));
+		}
 
-        #region IPageUrlHelper members
+		#region IPageUrlHelper members
 
-        public string NormalizeUrlPath(string urlPath)
-        {
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
+		public string NormalizeUrlPath(string urlPath)
+		{
+			if (urlPath == null)
+				throw new ArgumentNullException(nameof(urlPath));
 
-            urlPath = urlPath.Trim(TrimChars).ToLower();
+			urlPath = urlPath.Trim(TrimChars).ToLower();
 
-            return urlPath;
-        }
+			return urlPath;
+		}
 
-        public Result ValidateUrlPath(string urlPath)
-        {
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
+		public Result ValidateUrlPath(string urlPath)
+		{
+			if (urlPath == null)
+				throw new ArgumentNullException(nameof(urlPath));
 
-            if (!ValidationRegex.IsMatch(urlPath))
-                return Result.Failed("Not valid url path.");
+			if (!ValidationRegex.IsMatch(urlPath))
+				return Result.Failed("Not valid url path.");
 
-            return Result.Success;
-        }
+			return Result.Success;
+		}
 
-        public string GetDefaultPagePath()
-        {
-            return NormalizeUrlPath(options.DefaultPagePath);
-        }
+		public string GetDefaultPagePath()
+		{
+			return NormalizeUrlPath(options.DefaultPagePath);
+		}
 
-        public bool IsDefaultUrlPath(string urlPath)
-        {
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
+		public bool IsDefaultUrlPath(string urlPath)
+		{
+			if (urlPath == null)
+				throw new ArgumentNullException(nameof(urlPath));
 
-            var normalizedUrlPath = NormalizeUrlPath(urlPath);
-            var defaultUrlPath = GetDefaultPagePath();
+			var normalizedUrlPath = NormalizeUrlPath(urlPath);
+			var defaultUrlPath = GetDefaultPagePath();
 
-            return normalizedUrlPath == defaultUrlPath;
-        }
+			return normalizedUrlPath == defaultUrlPath;
+		}
 
-        public string ExtendUrlPath(string urlPath, string urlPathName)
-        {
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
-            if (urlPathName == null)
-                throw new ArgumentNullException(nameof(urlPathName));
+		public string ExtendUrlPath(string urlPath, string urlPathName)
+		{
+			if (urlPath == null)
+				throw new ArgumentNullException(nameof(urlPath));
+			if (urlPathName == null)
+				throw new ArgumentNullException(nameof(urlPathName));
 
-            var normalizedUrlPath = NormalizeUrlPath(urlPath);
-            var normalizedUrlPathName = NormalizeUrlPath(urlPathName);
+			var normalizedUrlPath = NormalizeUrlPath(urlPath);
+			var normalizedUrlPathName = NormalizeUrlPath(urlPathName);
 
-            if (normalizedUrlPath == string.Empty)
-                return normalizedUrlPathName;
+			if (normalizedUrlPath == string.Empty)
+				return normalizedUrlPathName;
 
-            return string.Concat(normalizedUrlPath, "/", urlPathName);
-        }
+			return string.Concat(normalizedUrlPath, "/", urlPathName);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

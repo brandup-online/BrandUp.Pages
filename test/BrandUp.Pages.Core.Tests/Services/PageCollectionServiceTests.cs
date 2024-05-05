@@ -5,155 +5,152 @@ using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageCollectionServiceTests : IAsyncLifetime
-    {
-        readonly ServiceProvider serviceProvider;
-        readonly IServiceScope serviceScope;
-        readonly IPageService pageService;
-        readonly IPageCollectionService pageCollectionService;
-        readonly IPageMetadataManager pageMetadataManager;
-        readonly IWebsiteContext websiteContext;
+	public class PageCollectionServiceTests : IAsyncLifetime
+	{
+		readonly ServiceProvider serviceProvider;
+		readonly IServiceScope serviceScope;
+		readonly IPageService pageService;
+		readonly IPageCollectionService pageCollectionService;
+		readonly IPageMetadataManager pageMetadataManager;
+		readonly IWebsiteContext websiteContext;
 
-        public PageCollectionServiceTests()
-        {
-            websiteContext = new TestWebsiteContext("test", "test");
+		public PageCollectionServiceTests()
+		{
+			websiteContext = new TestWebsiteContext("test", "test");
 
-            var services = new ServiceCollection();
+			var services = new ServiceCollection();
 
-            services.AddPages()
-                .AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
-                .AddFakes();
+			services.AddPages()
+				.AddContentTypesFromAssemblies(typeof(TestPageContent).Assembly)
+				.AddFakes();
 
-            services.AddSingleton(websiteContext);
+			services.AddSingleton(websiteContext);
 
-            serviceProvider = services.BuildServiceProvider();
-            serviceScope = serviceProvider.CreateScope();
+			serviceProvider = services.BuildServiceProvider();
+			serviceScope = serviceProvider.CreateScope();
 
-            pageService = serviceScope.ServiceProvider.GetService<IPageService>();
-            pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
-            pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
-        }
+			pageService = serviceScope.ServiceProvider.GetService<IPageService>();
+			pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
+			pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
+		}
 
-        #region IAsyncLifetime members
+		#region IAsyncLifetime members
 
-        async Task IAsyncLifetime.InitializeAsync()
-        {
-            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
-            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
+		async Task IAsyncLifetime.InitializeAsync()
+		{
+			var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
+			var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
 
-            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
 
-            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
+			var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
-            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(mainPage, "index");
-            await pageRepository.UpdatePageAsync(mainPage);
+			var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+			await pageRepository.SetUrlPathAsync(mainPage, "index");
+			await pageRepository.UpdatePageAsync(mainPage);
 
-            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(testPage, "test");
-            await pageRepository.UpdatePageAsync(testPage);
-        }
-        async Task IAsyncLifetime.DisposeAsync()
-        {
-            serviceScope.Dispose();
-            await serviceProvider.DisposeAsync();
-        }
+			var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageType.Name, "test", pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+			await pageRepository.SetUrlPathAsync(testPage, "test");
+			await pageRepository.UpdatePageAsync(testPage);
+		}
+		async Task IAsyncLifetime.DisposeAsync()
+		{
+			serviceScope.Dispose();
+			await serviceProvider.DisposeAsync();
+		}
 
-        #endregion
+		#endregion
 
-        #region Test methods
+		#region Test methods
 
-        [Fact]
-        public async Task CreateCollection_root()
-        {
-            var result = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld);
+		[Fact]
+		public async Task CreateCollection_root()
+		{
+			var result = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld);
 
-            Assert.True(result.IsSuccess);
-            Assert.NotNull(result.Data);
-            Assert.Equal("Test collection", result.Data.Title);
-            Assert.Equal("TestPage", result.Data.PageTypeName);
-            Assert.Null(result.Data.PageId);
-            Assert.Equal(PageSortMode.FirstOld, result.Data.SortMode);
-        }
+			Assert.True(result.IsSuccess);
+			Assert.NotNull(result.Data);
+			Assert.Equal("Test collection", result.Data.Title);
+			Assert.Equal("TestPage", result.Data.PageTypeName);
+			Assert.Null(result.Data.PageId);
+			Assert.Equal(PageSortMode.FirstOld, result.Data.SortMode);
+		}
 
-        [Fact]
-        public async Task CreateCollection_bypage()
-        {
-            var defaultPage = await pageService.GetDefaultPageAsync(websiteContext.Website.Id);
-            var result = await pageCollectionService.CreateCollectionAsync(defaultPage, "Test collection", "TestPage", PageSortMode.FirstOld);
+		[Fact]
+		public async Task CreateCollection_bypage()
+		{
+			var defaultPage = await pageService.GetDefaultPageAsync(websiteContext.Website.Id);
+			var result = await pageCollectionService.CreateCollectionAsync(defaultPage, "Test collection", "TestPage", PageSortMode.FirstOld);
 
-            Assert.True(result.IsSuccess);
-            Assert.NotNull(result.Data);
-            Assert.Equal("Test collection", result.Data.Title);
-            Assert.Equal("TestPage", result.Data.PageTypeName);
-            Assert.Equal(defaultPage.Id, result.Data.PageId);
-            Assert.Equal(PageSortMode.FirstOld, result.Data.SortMode);
-        }
+			Assert.True(result.IsSuccess);
+			Assert.NotNull(result.Data);
+			Assert.Equal("Test collection", result.Data.Title);
+			Assert.Equal("TestPage", result.Data.PageTypeName);
+			Assert.Equal(defaultPage.Id, result.Data.PageId);
+			Assert.Equal(PageSortMode.FirstOld, result.Data.SortMode);
+		}
 
-        [Fact]
-        public async Task CreateCollection_Fail_PageNotPublished()
-        {
-            var parentPageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
-            var page = await pageService.CreatePageAsync(parentPageCollection);
+		[Fact]
+		public async Task CreateCollection_Fail_PageNotPublished()
+		{
+			var parentPageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
+			var page = await pageService.CreatePageAsync(parentPageCollection);
 
-            var pageCollection = await pageCollectionService.CreateCollectionAsync(page, "Test collection", "TestPage", PageSortMode.FirstOld);
+			var pageCollection = await pageCollectionService.CreateCollectionAsync(page, "Test collection", "TestPage", PageSortMode.FirstOld);
 
-            Assert.False(pageCollection.IsSuccess);
-        }
+			Assert.False(pageCollection.IsSuccess);
+		}
 
-        [Fact]
-        public async Task FindCollectiondById()
-        {
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
+		[Fact]
+		public async Task FindCollectiondById()
+		{
+			var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
 
-            var findedPageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id);
+			var findedPageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id);
 
-            Assert.NotNull(findedPageCollection);
-            Assert.Equal(pageCollection.Id, findedPageCollection.Id);
-        }
+			Assert.NotNull(findedPageCollection);
+			Assert.Equal(pageCollection.Id, findedPageCollection.Id);
+		}
 
-        [Fact]
-        public async Task UpdateCollection()
-        {
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
+		[Fact]
+		public async Task UpdateCollection()
+		{
+			var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
 
-            pageCollection.SetTitle("New title");
-            pageCollection.SetSortModel(PageSortMode.FirstNew);
+			pageCollection.SetTitle("New title");
+			pageCollection.SetSortModel(PageSortMode.FirstNew);
 
-            var result = await pageCollectionService.UpdateCollectionAsync(pageCollection);
+			var result = await pageCollectionService.UpdateCollectionAsync(pageCollection);
 
-            Assert.True(result.IsSuccess);
-            Assert.Equal("New title", pageCollection.Title);
-            Assert.Equal(PageSortMode.FirstNew, pageCollection.SortMode);
-        }
+			Assert.True(result.IsSuccess);
+			Assert.Equal("New title", pageCollection.Title);
+			Assert.Equal(PageSortMode.FirstNew, pageCollection.SortMode);
+		}
 
-        [Fact]
-        public async Task DeleteCollection()
-        {
-            var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
+		[Fact]
+		public async Task DeleteCollection()
+		{
+			var pageCollection = (await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "Test collection", "TestPage", PageSortMode.FirstOld)).Data;
 
-            var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
+			var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
-            Assert.True(result.IsSuccess);
-            Assert.Null(await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id));
-        }
+			Assert.True(result.IsSuccess);
+			Assert.Null(await pageCollectionService.FindCollectiondByIdAsync(pageCollection.Id));
+		}
 
-        [Fact]
-        public async Task DeleteCollection_Fail_HavePages()
-        {
-            var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
+		[Fact]
+		public async Task DeleteCollection_Fail_HavePages()
+		{
+			var pageCollection = (await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id)).First();
 
-            var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
+			var result = await pageCollectionService.DeleteCollectionAsync(pageCollection);
 
-            Assert.False(result.IsSuccess);
-        }
+			Assert.False(result.IsSuccess);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

@@ -1,24 +1,21 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace BrandUp.Pages.Identity
+﻿namespace BrandUp.Pages.Identity
 {
-    public interface IAccessProvider
-    {
-        Task<string> GetUserIdAsync(CancellationToken cancellationToken = default);
-        Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default);
-    }
+	public interface IAccessProvider
+	{
+		Task<string> GetUserIdAsync(CancellationToken cancellationToken = default);
+		Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default);
+	}
 
-    public class EmptyAccessProvider : IAccessProvider
-    {
-        public Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(false);
-        }
+	public class EmptyAccessProvider : IAccessProvider
+	{
+		public Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default)
+		{
+			return Task.FromResult(false);
+		}
 
-        public Task<string> GetUserIdAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult<string>(null);
-        }
-    }
+		public Task<string> GetUserIdAsync(CancellationToken cancellationToken = default)
+		{
+			return Task.FromResult<string>(null);
+		}
+	}
 }

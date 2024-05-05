@@ -2,8 +2,8 @@
 
 namespace LandingWebSite.Contents.BannerBlock
 {
-    [ContentType]
-    public abstract class BannerBlockContent : PageBlockContent
-    {
-    }
+	[ContentType]
+	public abstract class BannerBlockContent : PageBlockContent
+	{
+	}
 }

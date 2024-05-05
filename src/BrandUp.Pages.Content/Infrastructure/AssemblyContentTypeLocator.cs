@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace BrandUp.Pages.Content.Infrastructure
 {
-    public class AssemblyContentTypeLocator : IContentTypeLocator
-    {
-        readonly IList<TypeInfo> types = new List<TypeInfo>();
+	public class AssemblyContentTypeLocator : IContentTypeLocator
+	{
+		readonly IList<TypeInfo> types = new List<TypeInfo>();
 
-        public AssemblyContentTypeLocator(Assembly[] assemblies)
-        {
-            if (assemblies == null)
-                throw new ArgumentNullException(nameof(assemblies));
+		public AssemblyContentTypeLocator(Assembly[] assemblies)
+		{
+			if (assemblies == null)
+				throw new ArgumentNullException(nameof(assemblies));
 
-            foreach (var assembly in assemblies)
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    var typeInfo = type.GetTypeInfo();
+			foreach (var assembly in assemblies)
+			{
+				foreach (var type in assembly.GetTypes())
+				{
+					var typeInfo = type.GetTypeInfo();
 
-                    if (!ContentMetadataManager.TypeIsContent(typeInfo) || types.Contains(typeInfo))
-                        continue;
+					if (!ContentMetadataManager.TypeIsContent(typeInfo) || types.Contains(typeInfo))
+						continue;
 
-                    types.Add(typeInfo);
-                }
-            }
-        }
+					types.Add(typeInfo);
+				}
+			}
+		}
 
-        public IEnumerable<TypeInfo> ContentTypes => types;
-    }
+		public IEnumerable<TypeInfo> ContentTypes => types;
+	}
 }
