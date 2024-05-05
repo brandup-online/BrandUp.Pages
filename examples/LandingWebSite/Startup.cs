@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO.Compression;
 using System.Text.Encodings.Web;
 using BrandUp.Extensions.Migrations;
 using BrandUp.Pages.Builder;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.WebEncoders;
+using WebMarkupMin.AspNet.Common.Compressors;
+using WebMarkupMin.AspNetCore8;
 
 namespace LandingWebSite
 {
@@ -53,6 +56,30 @@ namespace LandingWebSite
                 options.SupportedCultures = supportedCultures;
                 options.SupportedUICultures = supportedCultures;
             });
+
+            services
+                .AddWebMarkupMin(options =>
+                {
+                    options.AllowMinificationInDevelopmentEnvironment = true;
+                    options.AllowCompressionInDevelopmentEnvironment = true;
+                    options.DefaultEncoding = System.Text.Encoding.UTF8;
+                })
+                .AddHtmlMinification(options =>
+                {
+                    var settings = options.MinificationSettings;
+                    settings.RemoveRedundantAttributes = true;
+                    settings.RemoveHttpProtocolFromAttributes = true;
+                    settings.RemoveHttpsProtocolFromAttributes = true;
+                })
+                .AddHttpCompression(options =>
+                {
+                    options.CompressorFactories =
+                    [
+                        new BuiltInBrotliCompressorFactory(new BuiltInBrotliCompressionSettings { Level = CompressionLevel.Fastest }),
+                        new DeflateCompressorFactory(new DeflateCompressionSettings { Level = CompressionLevel.Fastest }),
+                        new GZipCompressorFactory(new GZipCompressionSettings { Level = CompressionLevel.Fastest })
+                    ];
+                });
 
             #endregion
 
@@ -135,6 +162,8 @@ namespace LandingWebSite
             app.UseRequestLocalization();
 
             app.UseAuthentication();
+
+            app.UseWebMarkupMin();
 
             app.UseEndpoints(endpoints =>
             {

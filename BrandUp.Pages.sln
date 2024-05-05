@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.Tests", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrandUp.Pages.MongoDb.Tests", "test\BrandUp.Pages.MongoDb.Tests\BrandUp.Pages.MongoDb.Tests.csproj", "{701582C9-B9FC-4431-8100-EFF077030DA8}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "brandup-ui-pages", "src\brandup-ui-pages\brandup-ui-pages.njsproj", "{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "brandup-ui-pages", "src\brandup-ui-pages\brandup-ui-pages.esproj", "{E37A4100-5CF4-47A7-8084-BF05A37F94E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,10 +84,12 @@ Global
 		{701582C9-B9FC-4431-8100-EFF077030DA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{701582C9-B9FC-4431-8100-EFF077030DA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{701582C9-B9FC-4431-8100-EFF077030DA8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E37A4100-5CF4-47A7-8084-BF05A37F94E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E37A4100-5CF4-47A7-8084-BF05A37F94E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E37A4100-5CF4-47A7-8084-BF05A37F94E6}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{E37A4100-5CF4-47A7-8084-BF05A37F94E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E37A4100-5CF4-47A7-8084-BF05A37F94E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E37A4100-5CF4-47A7-8084-BF05A37F94E6}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,7 +105,6 @@ Global
 		{18D51569-E320-40C9-8B76-AF9AFD9320DB} = {DC9CDAD6-6533-4A65-9D2B-63F0EC42BB27}
 		{E8DD5E53-ACDA-4815-B015-D3474B1E7BC6} = {192B395D-1899-43CB-9EED-D2B18D5E3224}
 		{701582C9-B9FC-4431-8100-EFF077030DA8} = {192B395D-1899-43CB-9EED-D2B18D5E3224}
-		{6F86FD97-7A5A-4296-AFE2-6244C32B3E4F} = {DC9CDAD6-6533-4A65-9D2B-63F0EC42BB27}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {80009D74-CAF9-426B-B759-811F2D21C18A}
