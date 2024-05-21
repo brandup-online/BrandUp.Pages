@@ -25,7 +25,9 @@ export class WebSiteToolbar extends UIElement {
 
     readonly isContentPage: boolean;
 
-    get typeName(): string { return "BrandUpPages.WebSiteToolbar"; }
+    get typeName(): string {
+        return "BrandUpPages.WebSiteToolbar";
+    }
 
     constructor(page: Page<PageModel>) {
         super();
@@ -44,17 +46,17 @@ export class WebSiteToolbar extends UIElement {
         const menuItems = [
             // DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus,"Добавить страницу"]),
             // DOM.tag("a", { href: "", command: "bp-page-types" }, [iconStructure,"Структура сайта"]),
-            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite,"Типы контента"]),
-            DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo,"Индексирование страницы"]),
-            DOM.tag("a", { href: "", command: "bp-pages" }, [iconList,"Страницы этого уровня"]),
+            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite, "Типы контента"]),
+            DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
+            DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
         ];
 
         if (this.isContentPage && this.__page.model.parentPageId) {
-            menuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack,"Перейти к родительской странице"]));
+            menuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
         }
 
-        if (this.__page.model.status !== "Published"){
-            menuItems.push(DOM.tag("a", { href: "", command: "bp-publish" }, [iconPublish,"Опубликовать"]));
+        if (this.__page.model.status !== "Published") {
+            menuItems.push(DOM.tag("a", { href: "", command: "bp-publish" }, [iconPublish, "Опубликовать"]));
 
             this.registerCommand("bp-publish", () => {
                 publishPage(this.__page.model.id).then(result => {
@@ -64,13 +66,13 @@ export class WebSiteToolbar extends UIElement {
         }
 
         if (this.isContentPage) {
-            menuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree,"Дочерние страницы"]));
+            menuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
         }
 
         const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
             DOM.tag("button", { class: "bp-widget-button left", command: "bp-actions", title: "Действия" }, iconList),
             DOM.tag("button", { class: "bp-widget-button right", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
-            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems)
+            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems.map((item) => DOM.tag("li", null, item)))
         ]);
 
         document.body.appendChild(widgetElem);
@@ -123,7 +125,7 @@ export class WebSiteToolbar extends UIElement {
         this.registerCommand("bp-seo", () => {
             seoPage(this.__page.model.id).then(() => {
                 this.__page.website.app.reload();
-            })
+            });
         });
 
         this.registerCommand("bp-actions", () => {

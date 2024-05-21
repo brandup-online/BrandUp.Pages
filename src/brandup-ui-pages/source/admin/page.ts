@@ -4,7 +4,7 @@ import { PageDesigner } from "../content/designer/page";
 import { editPage } from "../dialogs/pages/edit";
 import { DOM } from "brandup-ui-dom";
 import { Page, PageModel } from "brandup-ui-website";
-import editBlockIcon from "../svg/new/edit-block.svg"
+import editBlockIcon from "../svg/new/edit-block.svg";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
@@ -26,8 +26,8 @@ export class PageToolbar extends UIElement {
     private __renderUI() {
         const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, [
             DOM.tag("button", { class: "bp-button", command: "bp-commit" }, "Сохранить"),
-                DOM.tag("button", { class: "bp-button secondary red", command: "bp-discard",title: "Редактор контента" }, "Отмена"),
-                DOM.tag("button", { class: "bp-button neutral right", command:"bp-content" }, [editBlockIcon,"Контент"]),
+            DOM.tag("button", { class: "bp-button secondary red", command: "bp-discard", title: "Редактор контента" }, "Отмена"),
+            DOM.tag("button", { class: "bp-button neutral right", command: "bp-content" }, [editBlockIcon, "Контент"]),
         ]);
 
         document.body.appendChild(toolbarElem);
@@ -79,10 +79,9 @@ export class PageToolbar extends UIElement {
 
                     this.__page.website.nav({ url: response.data, replace: true });
                     this.__isLoading = false;
-                }
+                },
             });
         });
-
     }
 
     destroy() {
