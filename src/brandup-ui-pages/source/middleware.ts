@@ -24,8 +24,7 @@ export class PagesMiddleware extends Middleware {
                     page.attachDestroyElement(new d.WebSiteToolbar(page));
                 });
             }
-
-            if (page instanceof ContentPage) {
+            else {
                 import("./admin/page").then(d => {
                     page.attachDestroyElement(new d.PageToolbar(page as ContentPage));
                 });

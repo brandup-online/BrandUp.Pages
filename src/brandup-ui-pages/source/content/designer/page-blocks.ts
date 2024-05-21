@@ -1,11 +1,10 @@
 ﻿import { ModelDesigner } from "./model";
 import { DOM } from "brandup-ui-dom";
 import "./page-blocks.less";
-import iconRefresh from "../../svg/page-blocks-refresh.svg";
-import iconSettings from "../../svg/page-blocks-settings.svg";
-import iconDelete from "../../svg/page-blocks-delete.svg";
-import iconUp from "../../svg/page-blocks-up.svg";
-import iconDown from "../../svg/page-blocks-down.svg";
+import iconRefresh from "../../svg/new/update.svg";
+import iconEddit from "../../svg/new/edit.svg";
+import iconDelete from "../../svg/new/trash.svg";
+import iconSort from "../../svg/new/sort.svg";
 import iconAdd from "../../svg/page-blocks-add.svg";
 
 export class PageBlocksDesigner extends ModelDesigner {
@@ -59,12 +58,12 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "bp-elem page-blocks-designer-item-tools page-blocks-designer-item-tools-right" }, '<ul class="pad">' +
             '   <li data-command="item-refresh" title="Обновить">' + iconRefresh+'</li>' +
-            '   <li data-command="item-settings" title="Изменить параметры">' + iconSettings +'</li>' +
-            '   <li data-command="item-delete" title="Удалить блок">' + iconDelete +'</li>' +
+            '   <li data-command="item-settings" title="Изменить параметры">' + iconEddit +'</li>' +
+            '   <li data-command="item-delete" class="red" title="Удалить блок">' + iconDelete +'</li>' +
             '</ul>' +
             '<ul>' +
-            '   <li data-command="item-up" title="Поднять блок вверх">' + iconUp +'</li>' +
-            '   <li data-command="item-down" title="Опустить блок вниз">' + iconDown +'</li>' +
+            '   <li data-command="item-up" title="Поднять блок вверх">' + iconSort +'</li>' +
+            '   <li data-command="item-down" class="rotate-icon" title="Опустить блок вниз">' + iconSort +'</li>' +
             '</ul>'));
     }
 

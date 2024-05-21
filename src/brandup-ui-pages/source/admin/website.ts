@@ -2,58 +2,91 @@
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
-import iconList from "../svg/toolbar-button-list.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
+import iconPublish from "../svg/toolbar-button-publish.svg";
+import iconSeo from "../svg/toolbar-button-seo.svg";
 import { listContentType } from "../dialogs/content-types/list";
 import { Page, PageModel } from "brandup-ui-website";
 import { DOM } from "brandup-ui-dom";
 import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import iconList from "../svg/new/menu.svg";
+import iconEdit from "../svg/new/edit.svg";
+import iconPlus from "../svg/new/plus.svg";
+import iconStructure from "../svg/new/structure.svg";
+import { publishPage } from "../dialogs/pages/publish";
+import { seoPage } from "../dialogs/pages/seo";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
+    private page: Page<PageModel>;
+    private isLoading: boolean;
+    private __popupElem: HTMLElement;
+
+    readonly isContentPage: boolean;
 
     get typeName(): string { return "BrandUpPages.WebSiteToolbar"; }
 
     constructor(page: Page<PageModel>) {
         super();
 
+        this.page = page;
+        this.isLoading = false;
         document.body.classList.add("bp-state-toolbars");
 
-        const isContentPage = page instanceof ContentPage;
-        const buttons: Array<HTMLElement> = [];
+        this.isContentPage = page instanceof ContentPage;
 
-        if (isContentPage && page.model.parentPageId) {
-            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-back", title: "Перейти к родительской странице" }, iconBack));
+        this.__renderUI();
+        this.__initLogic();
+    }
+
+    private __renderUI() {
+        const menuItems = [
+            // DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus,"Добавить страницу"]),
+            // DOM.tag("a", { href: "", command: "bp-page-types" }, [iconStructure,"Структура сайта"]),
+            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite,"Типы контента"]),
+            DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo,"Индексирование страницы"]),
+            DOM.tag("a", { href: "", command: "bp-pages" }, [iconList,"Страницы этого уровня"]),
+        ];
+
+        if (this.isContentPage && this.page.model.parentPageId) {
+            menuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack,"Перейти к родительской странице"]));
         }
 
-        buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-website", title: "Web-сайт" }, iconWebsite));
-        buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-pages", title: "Страницы этого уровня" }, iconList));
+        if (this.page.model.status !== "Published"){
+            menuItems.push(DOM.tag("a", { href: "", command: "bp-publish" }, [iconPublish,"Опубликовать"]));
 
-        if (isContentPage) {
-            buttons.push(DOM.tag("button", { class: "bp-toolbar-button", "data-command": "bp-pages-child", title: "Дочерние страницы" }, iconTree));
+            this.registerCommand("bp-publish", () => {
+                publishPage(this.page.model.id).then(result => {
+                    this.page.website.nav({ url: result.url, replace: true });
+                });
+            });
         }
 
-        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, buttons);
+        if (this.isContentPage) {
+            menuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree,"Дочерние страницы"]));
+        }
 
-        toolbarElem.appendChild(DOM.tag("div", { class: "bp-toolbar-menu" }, [
-            DOM.tag("a", { href: "", "data-command": "bp-content-types" }, "Типы контента"),
-            //DOM.tag("a", { href: "", "data-command": "bp-page-types" }, "Типы страниц"),
-            //DOM.tag("a", { href: "", "data-command": "bp-recyclebin" }, "Корзина")
-        ]))
+        const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
+            DOM.tag("button", { class: "bp-widget-button left", command: "bp-actions", title: "Действия" }, iconList),
+            DOM.tag("button", { class: "bp-widget-button right", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
+            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems)
+        ]);
 
-        document.body.appendChild(toolbarElem);
-        this.setElement(toolbarElem);
+        document.body.appendChild(widgetElem);
+        this.setElement(widgetElem);
+    }
 
+    private __initLogic() {
         this.registerCommand("bp-back", () => {
             let parentPageId: string = null;
-            if (isContentPage)
-                parentPageId = page.model.parentPageId;
+            if (this.isContentPage)
+                parentPageId = this.page.model.parentPageId;
             if (parentPageId) {
                 ajaxRequest({
                     url: `/brandup.pages/page/${parentPageId}`,
                     success: (response: AjaxResponse<PageModel>) => {
-                        page.website.nav({ url: response.data.url });
+                        this.page.website.nav({ url: response.data.url });
                     }
                 });
             }
@@ -61,20 +94,20 @@ export class WebSiteToolbar extends UIElement {
 
         this.registerCommand("bp-pages", () => {
             let parentPageId: string = null;
-            if (isContentPage)
-                parentPageId = page.model.parentPageId;
+            if (this.isContentPage)
+                parentPageId = this.page.model.parentPageId;
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-pages-child", () => {
             let parentPageId: string = null;
-            if (isContentPage)
-                parentPageId = page.model.id;
+            if (this.isContentPage)
+                parentPageId = this.page.model.id;
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-website", () => {
-            if (!toolbarElem.classList.toggle("opened-menu")) {
+            if (!this.element.classList.toggle("opened-menu")) {
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;
             }
@@ -83,18 +116,113 @@ export class WebSiteToolbar extends UIElement {
         });
 
         this.registerCommand("bp-content-types", () => {
-            toolbarElem.classList.remove("opened-menu");
+            this.element.classList.remove("opened-menu");
             listContentType();
+        });
+
+        this.registerCommand("bp-seo", () => {
+            seoPage(this.page.model.id).then(() => {
+                this.page.website.app.reload();
+            })
+        });
+
+        this.registerCommand("bp-actions", () => {
+            if (!this.element.classList.toggle("opened-menu")) {
+                document.body.removeEventListener("click", this.__closeMenuFunc);
+                return;
+            }
+
+            document.body.addEventListener("click", this.__closeMenuFunc);
+        });
+
+        this.registerCommand("bp-edit", () => {
+            if (this.isLoading)
+                return;
+            this.isLoading = true;
+
+            this.page.website.request({
+                url: "/brandup.pages/page/content/begin",
+                urlParams: { pageId: this.page.model.id },
+                method: "POST",
+                success: (response: AjaxResponse<BeginPageEditResult>) => {
+                    this.isLoading = false;
+
+                    if (response.status !== 200)
+                        throw "";
+
+                    if (response.data.currentDate) {
+                        const popup = DOM.tag("div", { class: "bp-widget-popup" }, [
+                            DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
+                            DOM.tag("div", { class: "buttons" }, [
+                                DOM.tag("button", { "data-command": "continue-edit", "data-value": response.data.url }, "Продолжить"),
+                                DOM.tag("button", { "data-command": "restart-edit" }, "Начать заново")
+                            ])
+                        ])
+
+                        this.element.appendChild(popup);
+
+                        this.setPopup(popup);
+                    }
+                    else
+                        this.page.website.nav({ url: response.data.url, replace: true });
+                }
+            });
+        });
+
+        this.registerCommand("continue-edit", (elem: HTMLElement) => {
+            this.setPopup(null);
+
+            const url = elem.getAttribute("data-value");
+            this.page.website.nav({ url: url, replace: true });
+        });
+
+        this.registerCommand("restart-edit", () => {
+            this.setPopup(null);
+
+            this.page.website.request({
+                url: "/brandup.pages/page/content/begin",
+                urlParams: { pageId: this.page.model.id, force: "true" },
+                method: "POST",
+                success: (response: AjaxResponse<BeginPageEditResult>) => {
+                    this.isLoading = false;
+
+                    if (response.status !== 200)
+                        throw "";
+
+                    this.page.website.nav({ url: response.data.url, replace: true });
+                }
+            });
         });
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
             if (!target.closest(".bp-toolbar-menu")) {
-                toolbarElem.classList.remove("opened-menu");
+                this.element.classList.remove("opened-menu");
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;
             }
         };
+    }
+
+    private __closePopupFunc (e: MouseEvent): void {
+        const t = e.target as HTMLElement;
+
+        if (!t.closest(".bp-toolbar-popup")) {
+            this.__popupElem.remove();
+            this.__popupElem = null;
+            document.body.removeEventListener("click", this.__closePopupFunc);
+        }
+    };
+
+    private setPopup(popup: HTMLElement) {
+        if (this.__popupElem) {
+            document.body.removeEventListener("click", this.__closePopupFunc);
+        }
+
+        if (popup) {
+            this.__popupElem = popup;
+            document.body.addEventListener("click", this.__closePopupFunc);
+        }
     }
 
     destroy() {
@@ -102,4 +230,9 @@ export class WebSiteToolbar extends UIElement {
 
         super.destroy();
     }
+}
+
+export interface BeginPageEditResult {
+    currentDate: string;
+    url: string;
 }
