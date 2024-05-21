@@ -70,6 +70,21 @@
         margin-right: 0;
         padding: 8px 20px;
     }
+
+    .adaptive-tablet-small({
+        padding: 20px;
+    });
+
+    .adaptive-mobile({
+        & button, .right {
+            padding: 8px 10px;
+        }
+
+        & .secondary, .right {
+            font-size: 0;
+            gap: 0;
+        }
+    });
 }
 
 
@@ -79,21 +94,38 @@
     padding: 8px 28px;
     border-radius: @Border-Radius;
     text-transform: uppercase;
-    gap: 10px;
+    gap: 5px;
+
+    & svg {
+        width: 18px;
+        fill: @Main-Color;
+    }
 
     &.secondary {
         background: none;
         border: 1px solid @Accent-Darkest;
         color: @Accent-Darkest;
 
+        & svg {
+            fill: @Accent-Darkest;
+        }
+
         &.red {
             border-color: @Error-Darkest;
             color: @Error-Darkest;
+
+            & svg {
+                fill: @Error-Darkest;
+            }
 
             &:hover {
                 background: none;
                 border: 1px solid @Error-Dark;
                 color: @Error-Dark;
+
+                & svg {
+                    fill: @Error-Dark;
+                }
             }
         }
 
@@ -111,6 +143,10 @@
     &.neutral {
         background: @Neutral-Light;
         color: @Neutral-Darkest;
+
+        & svg {
+            fill: @Text-Color;
+        }
 
         &:hover {
             background: @Neutral-Medium;
@@ -217,21 +253,7 @@
     margin: 0;
 
     & li {
-        &:first-child {
-            border-radius: 10px 10px 0 0;
-        }
-
-        &:last-child {
-            border-radius: 0 0 10px 10px;
-        }
         
-        &:hover {
-            background-color: @Accent-Lightest;
-
-            & a {
-                color: @Text-Color;
-            }
-        }
     }
 
     & a {
@@ -248,6 +270,18 @@
             width: 18px;
         }
 
+        &:first-child {
+            border-radius: 10px 10px 0 0;
+        }
+
+        &:last-child {
+            border-radius: 0 0 10px 10px;
+        }
+        
+        &:hover {
+            background-color: @Accent-Lightest;
+            color: @Text-Color;
+        }
     }
 }
 

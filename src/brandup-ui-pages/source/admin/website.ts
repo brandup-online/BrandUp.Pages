@@ -72,7 +72,7 @@ export class WebSiteToolbar extends UIElement {
         const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
             DOM.tag("button", { class: "bp-widget-button left", command: "bp-actions", title: "Действия" }, iconList),
             DOM.tag("button", { class: "bp-widget-button right", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
-            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems.map((item) => DOM.tag("li", null, item)))
+            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems)
         ]);
 
         document.body.appendChild(widgetElem);
@@ -106,15 +106,6 @@ export class WebSiteToolbar extends UIElement {
             if (this.isContentPage)
                 parentPageId = this.__page.model.id;
             browserPage(parentPageId);
-        });
-
-        this.registerCommand("bp-website", () => {
-            if (!this.element.classList.toggle("opened-menu")) {
-                document.body.removeEventListener("click", this.__closeMenuFunc);
-                return;
-            }
-
-            document.body.addEventListener("click", this.__closeMenuFunc);
         });
 
         this.registerCommand("bp-content-types", () => {
@@ -198,7 +189,8 @@ export class WebSiteToolbar extends UIElement {
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
-            if (!target.closest(".bp-toolbar-menu")) {
+            if (!target.closest(".bp-widget-menu")) {
+                e.stopImmediatePropagation();
                 this.element.classList.remove("opened-menu");
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;

@@ -30,3 +30,53 @@
 
 @Link-Color: @Accent-Color;
 @Link-Color-Hover: darken(@Accent-Color, 8%);
+
+@Adaptive-DesktopSmall-Width: 1650px;
+@Adaptive-Notebook-Width: 1550px;
+@Adaptive-NotebookSmall-Width: 1370px;
+@Adaptive-Tablet-Width: 1030px;
+@Adaptive-TabletSmall-Width: 850px;
+@Adaptive-Mobile-Width: 500px;
+@Adaptive-MobileSmall-Width: 370px;
+
+.adaptive-desktop-small(@rules) {
+	@media all and (max-width: @Adaptive-DesktopSmall-Width) {
+		@rules();
+	}
+}
+
+.adaptive-notebook(@rules) {
+	@media all and (max-width: @Adaptive-Notebook-Width) {
+		@rules();
+	}
+}
+
+.adaptive-notebook-small(@rules) {
+	@media all and (max-width: @Adaptive-NotebookSmall-Width) {
+		@rules();
+	}
+}
+
+.adaptive-tablet(@rules) {
+	@media all and (max-width: @Adaptive-Tablet-Width) {
+		@rules();
+	}
+}
+
+.adaptive-tablet-small(@rules) {
+	@media all and (max-width: @Adaptive-TabletSmall-Width) {
+		@rules();
+	}
+}
+
+.adaptive-mobile(@rules) {
+	@media all and (max-width: @Adaptive-Mobile-Width) {
+		@rules();
+	}
+}
+
+.adaptive-mobile-small(@rules) {
+	@media all and (max-width: @Adaptive-MobileSmall-Width) {
+		@rules();
+	}
+}

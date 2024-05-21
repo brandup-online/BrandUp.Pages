@@ -5,6 +5,8 @@ import { editPage } from "../dialogs/pages/edit";
 import { DOM } from "brandup-ui-dom";
 import { Page, PageModel } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
+import saveIcon from "../svg/toolbar-button-save.svg";
+import cancelIcon from "../svg/new/cancel.svg";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
@@ -25,9 +27,9 @@ export class PageToolbar extends UIElement {
 
     private __renderUI() {
         const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, [
-            DOM.tag("button", { class: "bp-button", command: "bp-commit" }, "Сохранить"),
-            DOM.tag("button", { class: "bp-button secondary red", command: "bp-discard", title: "Редактор контента" }, "Отмена"),
-            DOM.tag("button", { class: "bp-button neutral right", command: "bp-content" }, [editBlockIcon, "Контент"]),
+            DOM.tag("button", { class: "bp-button", command: "bp-commit", title:"Применить изменения на странице" }, [saveIcon, "Сохранить"]),
+            DOM.tag("button", { class: "bp-button secondary red", command: "bp-discard", title:"Отменить изменения на странице" }, [cancelIcon, "Отмена"]),
+            DOM.tag("button", { class: "bp-button neutral right", command: "bp-content", title:"Показать контент страницы" }, [editBlockIcon, "Контент"]),
         ]);
 
         document.body.appendChild(toolbarElem);
