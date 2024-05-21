@@ -19,8 +19,8 @@ import { seoPage } from "../dialogs/pages/seo";
 
 export class WebSiteToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
-    private page: Page<PageModel>;
-    private isLoading: boolean;
+    private __page: Page<PageModel>;
+    private __isLoading: boolean;
     private __popupElem: HTMLElement;
 
     readonly isContentPage: boolean;
@@ -30,8 +30,8 @@ export class WebSiteToolbar extends UIElement {
     constructor(page: Page<PageModel>) {
         super();
 
-        this.page = page;
-        this.isLoading = false;
+        this.__page = page;
+        this.__isLoading = false;
         document.body.classList.add("bp-state-toolbars");
 
         this.isContentPage = page instanceof ContentPage;
@@ -49,16 +49,16 @@ export class WebSiteToolbar extends UIElement {
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList,"Страницы этого уровня"]),
         ];
 
-        if (this.isContentPage && this.page.model.parentPageId) {
+        if (this.isContentPage && this.__page.model.parentPageId) {
             menuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack,"Перейти к родительской странице"]));
         }
 
-        if (this.page.model.status !== "Published"){
+        if (this.__page.model.status !== "Published"){
             menuItems.push(DOM.tag("a", { href: "", command: "bp-publish" }, [iconPublish,"Опубликовать"]));
 
             this.registerCommand("bp-publish", () => {
-                publishPage(this.page.model.id).then(result => {
-                    this.page.website.nav({ url: result.url, replace: true });
+                publishPage(this.__page.model.id).then(result => {
+                    this.__page.website.nav({ url: result.url, replace: true });
                 });
             });
         }
@@ -81,12 +81,12 @@ export class WebSiteToolbar extends UIElement {
         this.registerCommand("bp-back", () => {
             let parentPageId: string = null;
             if (this.isContentPage)
-                parentPageId = this.page.model.parentPageId;
+                parentPageId = this.__page.model.parentPageId;
             if (parentPageId) {
                 ajaxRequest({
                     url: `/brandup.pages/page/${parentPageId}`,
                     success: (response: AjaxResponse<PageModel>) => {
-                        this.page.website.nav({ url: response.data.url });
+                        this.__page.website.nav({ url: response.data.url });
                     }
                 });
             }
@@ -95,14 +95,14 @@ export class WebSiteToolbar extends UIElement {
         this.registerCommand("bp-pages", () => {
             let parentPageId: string = null;
             if (this.isContentPage)
-                parentPageId = this.page.model.parentPageId;
+                parentPageId = this.__page.model.parentPageId;
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-pages-child", () => {
             let parentPageId: string = null;
             if (this.isContentPage)
-                parentPageId = this.page.model.id;
+                parentPageId = this.__page.model.id;
             browserPage(parentPageId);
         });
 
@@ -121,8 +121,8 @@ export class WebSiteToolbar extends UIElement {
         });
 
         this.registerCommand("bp-seo", () => {
-            seoPage(this.page.model.id).then(() => {
-                this.page.website.app.reload();
+            seoPage(this.__page.model.id).then(() => {
+                this.__page.website.app.reload();
             })
         });
 
@@ -136,16 +136,16 @@ export class WebSiteToolbar extends UIElement {
         });
 
         this.registerCommand("bp-edit", () => {
-            if (this.isLoading)
+            if (this.__isLoading)
                 return;
-            this.isLoading = true;
+            this.__isLoading = true;
 
-            this.page.website.request({
+            this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { pageId: this.page.model.id },
+                urlParams: { pageId: this.__page.model.id },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
-                    this.isLoading = false;
+                    this.__isLoading = false;
 
                     if (response.status !== 200)
                         throw "";
@@ -164,7 +164,7 @@ export class WebSiteToolbar extends UIElement {
                         this.setPopup(popup);
                     }
                     else
-                        this.page.website.nav({ url: response.data.url, replace: true });
+                        this.__page.website.nav({ url: response.data.url, replace: true });
                 }
             });
         });
@@ -173,23 +173,23 @@ export class WebSiteToolbar extends UIElement {
             this.setPopup(null);
 
             const url = elem.getAttribute("data-value");
-            this.page.website.nav({ url: url, replace: true });
+            this.__page.website.nav({ url: url, replace: true });
         });
 
         this.registerCommand("restart-edit", () => {
             this.setPopup(null);
 
-            this.page.website.request({
+            this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { pageId: this.page.model.id, force: "true" },
+                urlParams: { pageId: this.__page.model.id, force: "true" },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
-                    this.isLoading = false;
+                    this.__isLoading = false;
 
                     if (response.status !== 200)
                         throw "";
 
-                    this.page.website.nav({ url: response.data.url, replace: true });
+                    this.__page.website.nav({ url: response.data.url, replace: true });
                 }
             });
         });

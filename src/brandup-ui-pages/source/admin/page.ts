@@ -8,7 +8,7 @@ import editBlockIcon from "../svg/new/edit-block.svg"
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
-    private isLoading = false;
+    private __isLoading = false;
 
     readonly __page: Page<PageModel>;
 
@@ -42,9 +42,9 @@ export class PageToolbar extends UIElement {
         });
 
         this.registerCommand("bp-commit", () => {
-            if (this.isLoading)
+            if (this.__isLoading)
                 return;
-            this.isLoading = true;
+            this.__isLoading = true;
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/commit",
@@ -57,15 +57,15 @@ export class PageToolbar extends UIElement {
                         throw "";
 
                     this.__page.website.nav({ url: response.data, replace: true });
-                    this.isLoading = false;
+                    this.__isLoading = false;
                 }
             }, true);
         });
 
         this.registerCommand("bp-discard", () => {
-            if (this.isLoading)
+            if (this.__isLoading)
                 return;
-            this.isLoading = true;
+            this.__isLoading = true;
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/discard",
@@ -78,7 +78,7 @@ export class PageToolbar extends UIElement {
                         throw "";
 
                     this.__page.website.nav({ url: response.data, replace: true });
-                    this.isLoading = false;
+                    this.__isLoading = false;
                 }
             });
         });
