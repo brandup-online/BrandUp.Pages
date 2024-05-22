@@ -5,6 +5,7 @@ import iconRefresh from "../../svg/new/update.svg";
 import iconEddit from "../../svg/new/edit.svg";
 import iconDelete from "../../svg/new/trash.svg";
 import iconSort from "../../svg/new/sort.svg";
+import iconSortDown from "../../svg/new/sort-down.svg";
 import iconAdd from "../../svg/page-blocks-add.svg";
 
 export class PageBlocksDesigner extends ModelDesigner {
@@ -63,7 +64,7 @@ export class PageBlocksDesigner extends ModelDesigner {
             '</ul>' +
             '<ul>' +
             '   <li data-command="item-up" title="Поднять блок вверх">' + iconSort +'</li>' +
-            '   <li data-command="item-down" class="rotate-icon" title="Опустить блок вниз">' + iconSort +'</li>' +
+            '   <li data-command="item-down" title="Опустить блок вниз">' + iconSortDown +'</li>' +
             '</ul>'));
     }
 

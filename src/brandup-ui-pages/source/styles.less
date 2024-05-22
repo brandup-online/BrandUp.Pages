@@ -93,7 +93,7 @@
     background: @Accent-Darkest;
     padding: 8px 28px;
     border-radius: @Border-Radius;
-    text-transform: uppercase;
+    text-transform: capitalize;
     gap: 5px;
 
     & svg {
@@ -133,6 +133,10 @@
             background: none;
             border: 1px solid @Accent-Medium;
             color: @Accent-Medium;
+
+            & svg {
+                fill: @Accent-Medium;
+            }
         }
 
         &:focus,&:active {
@@ -183,21 +187,13 @@
     flex-flow: row nowrap;
     z-index: 500;
     align-items: center;
+    padding: 4px;
+    gap: 17px;
 
     &.opened-menu {
         & .bp-widget-menu {
             display: block;
         }
-    }
-
-    &:after {
-        content: "";
-        position: absolute;
-        background-color: @Main-Color;
-        opacity: 0.5;
-        width: 1px;
-        height: 20px;
-        left: 50%;
     }
 
     @media all and (max-width: 800px) {
@@ -213,8 +209,12 @@
 
 .bp-widget-button {
     background: none;
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    border-radius: 3px;
 
     & svg {
         display: block;
@@ -223,20 +223,54 @@
         fill: #fff;
     }
 
-    &.left {
-        border-radius: 5px 0 0 5px;
-    }
-
-    &.right {
-        border-radius: 0 5px 5px 0;
-    }
-
     &:hover,&:focus {
         background: @Accent-Dark;
     }
 
     &:active {
         background: @Accent-Medium;
+    }
+}
+
+.widget-item {
+    &:not(:first-child):before {
+        content: "";
+        position: absolute;
+        background-color: @Main-Color;
+        opacity: 0.5;
+        width: 1px;
+        height: 20px;
+        left: -10px;
+        margin: auto 0;
+    }
+}
+
+.page-status {
+    display: flex;
+    padding: 0 8px;
+    gap: 2px;
+    align-items: center;
+
+    user-select: none;
+
+    & span {
+        padding: 4px 6px;
+        border-radius: 3px;
+        color: @Main-Color;
+        font-weight: 600;
+        font-size: 12px;
+    }
+
+    &.published {
+        & span {
+            background-color: @Succes-Darkest;
+        }
+    }
+
+    &.draft {
+        & span {
+            background: @Warning-Darkest;
+        }
     }
 }
 
@@ -251,10 +285,6 @@
     border-radius: 10px;
     padding: 0;
     margin: 0;
-
-    & li {
-        
-    }
 
     & a {
         display: flex;
@@ -281,6 +311,14 @@
         &:hover {
             background-color: @Accent-Lightest;
             color: @Text-Color;
+        }
+
+        &:active {
+            color: #6E7072;
+
+            & svg {
+                fill: #6E7072;
+            }
         }
     }
 }

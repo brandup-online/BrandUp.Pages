@@ -4,7 +4,7 @@ import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
 import iconTree from "../svg/toolbar-button-tree.svg";
 import iconWebsite from "../svg/toolbar-button-website.svg";
-import iconPublish from "../svg/toolbar-button-publish.svg";
+import iconPublish from "../svg/new/upload.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
 import { listContentType } from "../dialogs/content-types/list";
 import { Page, PageModel } from "brandup-ui-website";
@@ -55,24 +55,19 @@ export class WebSiteToolbar extends UIElement {
             menuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
         }
 
-        if (this.__page.model.status !== "Published") {
-            menuItems.push(DOM.tag("a", { href: "", command: "bp-publish" }, [iconPublish, "Опубликовать"]));
-
-            this.registerCommand("bp-publish", () => {
-                publishPage(this.__page.model.id).then(result => {
-                    this.__page.website.nav({ url: result.url, replace: true });
-                });
-            });
-        }
-
         if (this.isContentPage) {
             menuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
         }
 
+        const status = this.__page.model.status.toLowerCase();
+
         const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
-            DOM.tag("button", { class: "bp-widget-button left", command: "bp-actions", title: "Действия" }, iconList),
-            DOM.tag("button", { class: "bp-widget-button right", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
-            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems)
+            DOM.tag ("div", { class: "page-status widget-item " + status }, [ DOM.tag("span", null, PageStatus[status]),
+            status !== "published" ? DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать страницу" }, iconPublish) : null,
+        ]),
+            DOM.tag("button", { class: "bp-widget-button widget-item", command: "bp-actions", title: "Действия" }, iconList),
+            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems),
+            DOM.tag("button", { class: "bp-widget-button widget-item", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
         ]);
 
         document.body.appendChild(widgetElem);
@@ -93,6 +88,13 @@ export class WebSiteToolbar extends UIElement {
                 });
             }
         });
+
+        if(this.__page.model.status !== "Published")
+            this.registerCommand("bp-publish", () => {
+                publishPage(this.__page.model.id).then(result => {
+                    this.__page.website.nav({ url: result.url, replace: true });
+                });
+            });
 
         this.registerCommand("bp-pages", () => {
             let parentPageId: string = null;
@@ -226,6 +228,11 @@ export class WebSiteToolbar extends UIElement {
 
         super.destroy();
     }
+}
+
+export enum PageStatus {
+    "published" = "Опубликовано",
+    "draft" = "Черновик",
 }
 
 export interface BeginPageEditResult {
