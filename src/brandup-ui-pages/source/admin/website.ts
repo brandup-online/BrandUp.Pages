@@ -220,6 +220,8 @@ export class WebSiteToolbar extends UIElement {
     }
 
     destroy() {
+        document.body.removeEventListener("click", this.__closeMenuFunc);
+        document.body.removeEventListener("click", this.__closePopupFunc);
         this.element.remove();
 
         super.destroy();
