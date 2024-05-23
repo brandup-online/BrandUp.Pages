@@ -12,6 +12,7 @@ import { DOM } from "brandup-ui-dom";
 import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import iconList from "../svg/new/menu.svg";
 import iconEdit from "../svg/new/edit.svg";
+import iconMore from "../svg/new/more.svg";
 import iconPlus from "../svg/new/plus.svg";
 import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
@@ -43,31 +44,33 @@ export class WebSiteToolbar extends UIElement {
     }
 
     private __renderUI() {
-        const menuItems = [
-            // DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus,"Добавить страницу"]),
-            // DOM.tag("a", { href: "", command: "bp-page-types" }, [iconStructure,"Структура сайта"]),
-            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite, "Типы контента"]),
+        const pageMenuItems = [
             DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
-        ];
+        ]
 
         if (this.isContentPage && this.__page.model.parentPageId) {
-            menuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
+            pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
         }
 
         if (this.isContentPage) {
-            menuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
+            pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
         }
 
         const status = this.__page.model.status.toLowerCase();
+        const published = status === "published";
+
 
         const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
-            DOM.tag ("div", { class: "page-status widget-item " + status }, [ DOM.tag("span", null, PageStatus[status]),
-            status !== "published" ? DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать страницу" }, iconPublish) : null,
-        ]),
-            DOM.tag("button", { class: "bp-widget-button widget-item", command: "bp-actions", title: "Действия" }, iconList),
-            DOM.tag("menu", { class: "bp-widget-menu" }, menuItems),
-            DOM.tag("button", { class: "bp-widget-button widget-item", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
+            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-website", title: "Действия" }, iconList),
+            DOM.tag ("button", { class: "page-status bp-widget-button " + status, command: published ? "" : "bp-publish" }, [ 
+                DOM.tag("span"),
+                published ? null : iconPublish,
+            ]),
+            DOM.tag("button", { class: "bp-widget-button", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
+            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, iconMore),
+            DOM.tag("menu", { class: "bp-widget-menu", id: "website-widget-menu" }, DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite, "Типы контента"])),
+            DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu" }, pageMenuItems),
         ]);
 
         document.body.appendChild(widgetElem);
@@ -121,8 +124,17 @@ export class WebSiteToolbar extends UIElement {
             });
         });
 
-        this.registerCommand("bp-actions", () => {
-            if (!this.element.classList.toggle("opened-menu")) {
+        this.registerCommand("bp-actions-website", () => {
+            if (!this.element.classList.toggle("opened-menu-website")) {
+                document.body.removeEventListener("click", this.__closeMenuFunc);
+                return;
+            }
+
+            document.body.addEventListener("click", this.__closeMenuFunc);
+        });
+
+        this.registerCommand("bp-actions-page", () => {
+            if (!this.element.classList.toggle("opened-menu-page")) {
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;
             }
@@ -191,9 +203,8 @@ export class WebSiteToolbar extends UIElement {
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
-            if (!target.closest(".bp-widget-menu")) {
-                e.stopImmediatePropagation();
-                this.element.classList.remove("opened-menu");
+            if (!target.closest(".bp-widget-menu") && !target.closest(`[data-command="bp-actions-website"]`) && !target.closest(`[data-command="bp-actions-page"]`)) {
+                this.element.classList.remove("opened-menu-website", "opened-menu-page");
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;
             }

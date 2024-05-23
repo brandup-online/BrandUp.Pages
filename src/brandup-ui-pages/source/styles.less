@@ -174,6 +174,10 @@
     &:hover,&:focus {
         background: @Accent-Dark;
     }
+
+    &:active {
+        background: @Accent-Darkest;
+    }
 }
 
 .bp-widget {
@@ -188,10 +192,16 @@
     z-index: 500;
     align-items: center;
     padding: 4px;
-    gap: 17px;
+    gap: 5px;
 
-    &.opened-menu {
-        & .bp-widget-menu {
+    &.opened-menu-website {
+        & #website-widget-menu {
+            display: block;
+        }
+    }
+
+    &.opened-menu-page {
+        & #page-widget-menu {
             display: block;
         }
     }
@@ -209,8 +219,7 @@
 
 .bp-widget-button {
     background: none;
-    width: 42px;
-    height: 42px;
+    padding: 8px;
     display: flex;
     align-items: center;
     position: relative;
@@ -230,45 +239,36 @@
     &:active {
         background: @Accent-Medium;
     }
-}
 
-.widget-item {
-    &:not(:first-child):before {
-        content: "";
-        position: absolute;
-        background-color: @Main-Color;
-        opacity: 0.5;
-        width: 1px;
-        height: 20px;
-        left: -10px;
-        margin: auto 0;
-    }
-}
+    &:first-child {
+        margin-right: 10px;
 
-.page-status {
-    display: flex;
-    padding: 0 8px;
-    gap: 2px;
-    align-items: center;
-
-    user-select: none;
-
-    & span {
-        padding: 4px 6px;
-        border-radius: 3px;
-        color: @Main-Color;
-        font-weight: 600;
-        font-size: 12px;
-    }
-
-    &.published {
-        & span {
-            background-color: @Succes-Darkest;
+        &:after {
+            content: "";
+            position: absolute;
+            background-color: @Main-Color;
+            opacity: 0.5;
+            width: 1px;
+            height: 20px;
+            left: 100% + 20px;
+            margin: auto 0;
         }
     }
 
-    &.draft {
+    &.page-status {
+        gap: 5px;
+    
         & span {
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+        }
+    
+        &.published > span {
+            background-color: @Succes-Darkest;
+        }
+    
+        &.draft > span {
             background: @Warning-Darkest;
         }
     }
@@ -301,11 +301,13 @@
         }
 
         &:first-child {
-            border-radius: 10px 10px 0 0;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
         }
 
         &:last-child {
-            border-radius: 0 0 10px 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
         }
         
         &:hover {
