@@ -126,11 +126,19 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             DOM.empty(this.navElem);
         }
 
-        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav" }, "root")));
         if (model.parents && model.parents.length) {
             for (let i = 0; i < model.parents.length; i++) {
                 let pagePath = model.parents[i];
-                this.navElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, pagePath.header)));
+                const splitUrl = pagePath.url.split("/");
+                this.navElem.appendChild(DOM.tag("li", i === model.parents.length-1 ? {class: "current"} : null, [
+                    DOM.tag("a", { href: pagePath.url, }, [
+                        DOM.tag("bolt", null, splitUrl[splitUrl.length-1] || "root"),
+                        DOM.tag("div", null, [
+                            DOM.tag("span", null, pagePath.header),
+                            DOM.tag("span", null, pagePath.type),
+                        ]),
+                    ]),
+                ]));
             }
         }
 
@@ -189,6 +197,7 @@ interface PagePathModel {
     id: string;
     header: string;
     url: string;
+    type: string;
 }
 
 export var browserPage = (pageId: string) => {

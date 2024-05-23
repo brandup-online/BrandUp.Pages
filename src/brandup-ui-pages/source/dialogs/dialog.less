@@ -81,44 +81,78 @@
         padding: 20px 35px 15px;
         margin: 0;
         font-size: 12px;
-        line-height: 18px;
+        line-height: 130%;
         list-style: none;
         display: flex;
-        flex-flow: row nowrap;
+        flex-flow: column nowrap;
+        gap: 4px;
+        
         overflow: auto;
-        text-transform: lowercase;
 
         & li {
-            padding: 0;
+            padding: 2px 4px;
             margin: 0;
+            line-height: 130%;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            position: relative;
 
-            &:first-child > *:before {
-                display: none;
+            & span:last-child {
+                margin-left: auto;
+                margin-right: 0;
+            }
+
+            & bolt {
+                font-weight: 600;
+                max-width: 100%;
+                text-overflow: ellipsis;
+                overflow: hidden;
+            }
+
+            & div {
+                flex: 1 1 auto;
+                display: flex;
+            }
+
+            &:hover, &.current {
+                background: @Neutral-Light;
+
+                &:before {
+                    content: "❯";
+                    color: @Neutral-Dark;
+                    position: absolute;
+                    left: -10px;
+                    font-weight: 600;
+                    font-size: 8px;
+                }
             }
         }
 
-        & span,
         & a {
-            opacity: 0.6;
-            font-weight: 600;
             text-decoration: none;
+            display: flex;
+            gap: 6px;
+            row-gap: 0;
             color: @Text-Color;
-            display: block;
-            white-space: nowrap;
-            max-width: 120px;
-            text-overflow: ellipsis;
-            overflow: hidden;
+            width: 100%;
+            flex-wrap: wrap;
 
-            &:before {
-                content: '.';
-                padding: 0 5px;
-                color: #aaa;
+            & span {
+                font-weight: 400;
+                opacity: 0.6;
+                white-space: nowrap;
+                max-width: 120px;
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
         }
 
         & a {
             &:hover {
-                opacity: 0.9;
+                & span {
+                    opacity: 0.9;
+                }
             }
         }
     }

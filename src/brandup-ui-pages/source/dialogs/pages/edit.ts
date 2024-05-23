@@ -94,10 +94,15 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         let path = model.path;
         while (path) {
             let title = path.title;
-            if (path.index >= 0)
-                title = `#${path.index + 1} ${title}`;
-
-            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path.modelPath }, title)));
+            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path===model.path ? {class: "current"} : null, [
+                DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path.modelPath }, [
+                    DOM.tag("bolt", null, path.modelPath || "root"),
+                    DOM.tag("div", null, [
+                        DOM.tag("span", null, title),
+                        DOM.tag("span", null, path.name),
+                    ]),
+                ]),
+            ]));
 
             path = path.parent;
         }

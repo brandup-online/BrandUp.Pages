@@ -46,31 +46,42 @@ export class WebSiteToolbar extends UIElement {
     private __renderUI() {
         const pageMenuItems = [
             DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
+            DOM.tag("a", { href: "", command: "bp-edit" }, [iconEdit, "Редактировать страницу"]),
+        ]
+
+        const websiteMenuItems = [
+            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite, "Типы контента"]),
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
         ]
 
         if (this.isContentPage && this.__page.model.parentPageId) {
-            pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
+            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
         }
 
         if (this.isContentPage) {
-            pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
+            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
         }
 
         const status = this.__page.model.status.toLowerCase();
         const published = status === "published";
 
+        if (!published) pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),)
+
 
         const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
-            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-website", title: "Действия" }, iconList),
+            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-website", title: "Действия" }, [
+                iconList,
+                DOM.tag("menu", { class: "bp-widget-menu", id: "website-widget-menu", title: "" }, websiteMenuItems),
+            ]),
             DOM.tag ("button", { class: "page-status bp-widget-button " + status, command: published ? "" : "bp-publish" }, [ 
                 DOM.tag("span"),
                 published ? null : iconPublish,
             ]),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
-            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, iconMore),
-            DOM.tag("menu", { class: "bp-widget-menu", id: "website-widget-menu" }, DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite, "Типы контента"])),
-            DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu" }, pageMenuItems),
+            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, [
+                iconMore,
+                DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu", title: "" }, pageMenuItems),
+            ]),
         ]);
 
         document.body.appendChild(widgetElem);
@@ -203,8 +214,15 @@ export class WebSiteToolbar extends UIElement {
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
-            if (!target.closest(".bp-widget-menu") && !target.closest(`[data-command="bp-actions-website"]`) && !target.closest(`[data-command="bp-actions-page"]`)) {
-                this.element.classList.remove("opened-menu-website", "opened-menu-page");
+            if (!target.closest(".bp-widget-menu")) {
+                if ( target.closest(`[data-command="bp-actions-website"]`)) {
+                    this.element.classList.remove("opened-menu-page");
+                }
+                else if ( target.closest(`[data-command="bp-actions-page"]`)) {
+                    this.element.classList.remove("opened-menu-website");
+                }
+                else
+                    this.element.classList.remove("opened-menu-website", "opened-menu-page");
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;
             }

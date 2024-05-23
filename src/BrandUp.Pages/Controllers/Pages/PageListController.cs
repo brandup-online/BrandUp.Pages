@@ -156,7 +156,8 @@ namespace BrandUp.Pages.Controllers
 			{
 				Id = page.Id,
 				Header = page.Header,
-				Url = await pageLinkGenerator.GetPathAsync(page)
+				Url = await pageLinkGenerator.GetPathAsync(page),
+				Type = page.TypeName,
 			};
 		}
 	}
