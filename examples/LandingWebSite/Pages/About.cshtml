@@ -5,3 +5,5 @@
 <h1>@Model.Title</h1>
 
 <div><a href="#test">hash</a></div>
+@Html.Raw("<h3>123</h3>")
+@await Html.BlockAsync(typeof(LandingWebSite.Contents.TextBlock.TB1))
