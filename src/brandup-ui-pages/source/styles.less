@@ -222,7 +222,6 @@
     padding: 8px;
     display: flex;
     align-items: center;
-    position: relative;
     border-radius: 3px;
 
     & svg {
@@ -250,7 +249,7 @@
             opacity: 0.5;
             width: 1px;
             height: 20px;
-            left: 100% + 20px;
+            left: 53px;
             margin: auto 0;
         }
     }
@@ -330,6 +329,17 @@
             }
         }
     }
+
+    .adaptive-mobile({
+        & a {
+            padding: 15px;
+            font-size: 12px;
+        }
+
+        & svg {
+            width: 16px;
+        }
+    })
 }
 
 .bp-widget-popup {
