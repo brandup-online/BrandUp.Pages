@@ -73,10 +73,8 @@ export class EditorWidget extends UIElement {
                 iconList,
                 DOM.tag("menu", { class: "bp-widget-menu", id: "website-widget-menu", title: "" }, websiteMenuItems),
             ]),
-            DOM.tag ("button", { class: "page-status bp-widget-button " + status, command: published ? "" : "bp-publish" }, [ 
-                DOM.tag("span"),
-                published ? null : iconPublish,
-            ]),
+            DOM.tag ("button", { class: "page-status bp-widget-button " + status }, [DOM.tag("span"),]),
+            published ? null : DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать" }, iconPublish),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, [
                 iconMore,
