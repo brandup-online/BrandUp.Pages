@@ -21,31 +21,48 @@ namespace BrandUp.Pages
             return builder;
         }
 
-        public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, Type modelType, string key = "")
+        public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, Type modelType, string key)
         {
             var viewRenderService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IViewRenderService>();
+            var viewLocator = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IViewLocator>();
             var contentMetadataManager = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IContentMetadataManager>();
             var pageService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
+            var pageContentService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IPageContentService>();
+
+            if (!contentMetadataManager.TryGetMetadata(modelType, out var blockMetadata))
+                throw new InvalidOperationException(); //todo сообщение
+
 
             if (htmlHelper.ViewData.Model is not AppPageModel model)
                 throw new InvalidOperationException(); //todo сообщение
 
             string pagePath = string.Empty;
             var routeData = model.RouteData;
-            if (routeData.Values.TryGetValue("url", out object urlValue) && urlValue != null)
+            if (routeData.Values.TryGetValue("page", out object urlValue) && urlValue != null)
                 pagePath = (string)urlValue;
             var websiteId = model.WebsiteContext.Website.Id;
-            var page = await pageService.FindPageByPathAsync(websiteId, pagePath);
 
-            if (!contentMetadataManager.TryGetMetadata(modelType, out var blockMetadata))
-                throw new InvalidOperationException(); //todo сообщение
+            object pageContent = null;
+            var page = await pageService.FindPageByPathAsync(websiteId, pagePath + key);
+            if (page == null)
+            {
+                var view = viewLocator.FindView(modelType);
+                pageContent = blockMetadata.ConvertDictionaryToContentModel(view.DefaultModelData);
 
-            var pageContent = blockMetadata.CreateModelInstance();
+                page = await pageService.FindPageByPathAsync(websiteId, "index"); // Переделать
+
+                // todo создать страницу 
+            }
+            else
+            {
+                pageContent = pageService.GetPageContentAsync(page);
+            }
 
             var builder = new HtmlContentBuilder();
             var context = new ContentContext(page, pageContent, htmlHelper.ViewContext.HttpContext.RequestServices, false); // todo флаг
             var content = await viewRenderService.RenderToStringAsync(context);
             builder.AppendHtml(content);
+
             return builder;
         }
     }

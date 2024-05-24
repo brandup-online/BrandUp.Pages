@@ -36,8 +36,6 @@ namespace LandingWebSite._migrations
             var newsListPages = await pageService.CreatePageAsync(mainPages, new Contents.Page.NewsListPageContent { Header = "News" });
             await pageService.PublishPageAsync(newsListPages, "news");
 
-            var aboutPage = await pageService.CreatePageAsync(mainPages, new Contents.Page. { Header = "News" });
-            await pageService.PublishPageAsync(aboutPage, "about");
 
             var newsPages = (await pageCollectionService.CreateCollectionAsync(newsListPages, "Actual news", newsPageMetadata.Name, PageSortMode.FirstNew)).Data;
             await pageCollectionService.CreateCollectionAsync(newsListPages, "Archive news", newsPageMetadata.Name, PageSortMode.FirstNew);
