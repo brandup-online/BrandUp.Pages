@@ -20,13 +20,13 @@ export class PagesMiddleware extends Middleware {
         if (items["nav"].enableAdministration) {
             const page = items["page"] as Page<PageModel>;
             if (!page.model.editId) {
-                import("./admin/website").then(d => {
-                    page.attachDestroyElement(new d.WebSiteToolbar(page));
+                import("./admin/widget").then(d => {
+                    page.attachDestroyElement(new d.EditorWidget(page));
                 });
             }
             else {
-                import("./admin/page").then(d => {
-                    page.attachDestroyElement(new d.PageToolbar(page as ContentPage));
+                import("./admin/toolbar").then(d => {
+                    page.attachDestroyElement(new d.EditorToolbar(page as ContentPage));
                 });
             }
         }

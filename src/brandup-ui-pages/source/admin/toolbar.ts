@@ -8,13 +8,13 @@ import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
 
-export class PageToolbar extends UIElement {
+export class EditorToolbar extends UIElement {
     private __designer: PageDesigner;
     private __isLoading = false;
 
     readonly __page: Page<PageModel>;
 
-    get typeName(): string { return "BrandUpPages.PageToolbar"; }
+    get typeName(): string { return "BrandUpPages.EditorToolbar"; }
 
     constructor(page: ContentPage) {
         super();

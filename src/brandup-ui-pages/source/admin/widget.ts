@@ -18,7 +18,7 @@ import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
 
-export class WebSiteToolbar extends UIElement {
+export class EditorWidget extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
     private __page: Page<PageModel>;
     private __isLoading: boolean;
@@ -27,7 +27,7 @@ export class WebSiteToolbar extends UIElement {
     readonly isContentPage: boolean;
 
     get typeName(): string {
-        return "BrandUpPages.WebSiteToolbar";
+        return "BrandUpPages.EditorWidget";
     }
 
     constructor(page: Page<PageModel>) {
