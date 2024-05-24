@@ -2,10 +2,9 @@
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
-import iconTree from "../svg/toolbar-button-tree.svg";
-import iconWebsite from "../svg/toolbar-button-website.svg";
+import iconDown from "../svg/new/arrow-down.svg";
 import iconPublish from "../svg/new/upload.svg";
-import iconSeo from "../svg/toolbar-button-seo.svg";
+import iconSeo from "../svg/new/increase.svg";
 import { listContentType } from "../dialogs/content-types/list";
 import { Page, PageModel } from "brandup-ui-website";
 import { DOM } from "brandup-ui-dom";
@@ -50,7 +49,7 @@ export class EditorWidget extends UIElement {
         ]
 
         const websiteMenuItems = [
-            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconWebsite, "Типы контента"]),
+            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]),
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
         ]
 
@@ -59,7 +58,7 @@ export class EditorWidget extends UIElement {
         }
 
         if (this.isContentPage) {
-            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconTree, "Дочерние страницы"]));
+            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
         }
 
         const status = this.__page.model.status.toLowerCase();
