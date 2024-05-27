@@ -28,13 +28,13 @@ namespace BrandUp.Pages
             var pageService = services.GetRequiredService<IPageService>();
 
             if (htmlHelper.ViewData.Model is not AppPageModel model)
-                throw new InvalidOperationException(); //todo сообщение
+                throw new InvalidOperationException($"Модель страницы должна быть производной от {nameof(AppPageModel)}.");
 
             var page = await GetPageAsync(services, model, modelType, key);
             var pageContent = await pageService.GetPageContentAsync(page);
 
             var builder = new HtmlContentBuilder();
-            var context = new ContentContext(page, pageContent, htmlHelper.ViewContext.HttpContext.RequestServices, false); // todo флаг
+            var context = new ContentContext(page, pageContent, htmlHelper.ViewContext.HttpContext.RequestServices, false);
             var content = await viewRenderService.RenderToStringAsync(context);
             builder.AppendHtml(content);
 
@@ -47,8 +47,8 @@ namespace BrandUp.Pages
         {
             var pageService = services.GetRequiredService<IPageService>();
 
-            string pagePath = string.Empty;
             var routeData = pageModel.RouteData;
+            string pagePath = string.Empty;
             if (routeData.Values.TryGetValue("page", out object urlValue) && urlValue != null)
                 pagePath = ((string)urlValue).Trim('/');
 
@@ -66,8 +66,10 @@ namespace BrandUp.Pages
 
             var publishResult = await pageService.PublishPageAsync(page, pageUrl);
             if (!publishResult.IsSuccess)
-                throw new InvalidOperationException($"Не удалось опубликовать страницу.{publishResult.Errors.FirstOrDefault()}");
-
+            {
+                var error = publishResult.Errors.FirstOrDefault();
+                throw new InvalidOperationException($"Не удалось опубликовать страницу по причине: {error}");
+            }
             return page;
         }
 

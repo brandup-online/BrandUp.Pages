@@ -3,7 +3,7 @@ using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents.Page
 {
-    [PageContent(Title = "Common page")]
+    [PageContent(Title = "Block page")]
     public class BlockModel : PageContent
     {
         [Model]
