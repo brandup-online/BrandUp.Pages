@@ -130,8 +130,8 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             for (let i = 0; i < model.parents.length; i++) {
                 let pagePath = model.parents[i];
                 const splitUrl = pagePath.url.split("/");
-                this.navElem.appendChild(DOM.tag("li", i === model.parents.length-1 ? {class: "current"} : null, [
-                    DOM.tag("a", { href: pagePath.url, }, [
+                this.navElem.appendChild(DOM.tag("li", i === model.parents.length-1 ? { class: "current" } : null, [
+                    DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, [
                         DOM.tag("bolt", null, splitUrl[splitUrl.length-1] || "root"),
                         DOM.tag("div", null, [
                             DOM.tag("span", null, pagePath.header),
