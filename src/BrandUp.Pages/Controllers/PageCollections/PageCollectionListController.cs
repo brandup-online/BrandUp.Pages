@@ -45,11 +45,11 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnBuildListAsync(PageCollectionListModel listModel)
 		{
-			listModel.Parents = new List<string>();
+			listModel.Parents = new List<PagePathModel>();
 
 			if (page != null)
 			{
-				listModel.Parents.Add(page.Header);
+				listModel.Parents.Add(await GetPathModelAsync(page));
 
 				IPage currentPage = page;
 				while (currentPage != null)
@@ -59,11 +59,22 @@ namespace BrandUp.Pages.Controllers
 						break;
 
 					currentPage = await pageService.FindPageByIdAsync(parentPageId.Value);
-					listModel.Parents.Add(currentPage.Header);
+					listModel.Parents.Add(await GetPathModelAsync(currentPage));
 				}
 
 				listModel.Parents.Reverse();
 			}
+		}
+
+		private async Task<PagePathModel> GetPathModelAsync(IPage page)
+		{
+			return new PagePathModel
+			{
+				Id = page.Id,
+				Header = page.Header,
+				Url = await pageLinkGenerator.GetPathAsync(page),
+				Type = page.TypeName,
+			};
 		}
 
 		protected override Guid ParseId(string value)

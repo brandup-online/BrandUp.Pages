@@ -193,7 +193,7 @@ interface PageListModel {
     collections: Array<PageCollectionModel>;
 }
 
-interface PagePathModel {
+export interface PagePathModel {
     id: string;
     header: string;
     url: string;

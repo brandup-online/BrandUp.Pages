@@ -5,9 +5,10 @@ import { updatePageCollection } from "./update";
 import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui-dom";
 import { PageCollectionModel } from "../../typings/models";
+import { PagePathModel } from "../pages/browser";
 
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {
-    readonly pageId: string;
+    private pageId: string;
     private __isModified: boolean = false;
     private navElem: HTMLElement;
 
@@ -43,6 +44,11 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
                 this.__isModified = true;
             });
         });
+        this.registerCommand("nav", (elem) => {
+            let pageId = elem.getAttribute("data-page-id");
+            this.pageId = pageId;
+            this.refresh();
+        });
     }
 
     protected _onClose() {
@@ -68,10 +74,19 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
             DOM.empty(this.navElem);
         }
 
-        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", null, "root")));
         if (model.parents && model.parents.length) {
             for (let i = 0; i < model.parents.length; i++) {
-                this.navElem.appendChild(DOM.tag("li", null, DOM.tag("span", {}, model.parents[i])));
+                let pagePath = model.parents[i];
+                const splitUrl = pagePath.url.split("/");
+                this.navElem.appendChild(DOM.tag("li", i === model.parents.length-1 ? { class: "current" } : null, [
+                    DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, [
+                        DOM.tag("bolt", null, splitUrl[splitUrl.length-1] || "root"),
+                        DOM.tag("div", null, [
+                            DOM.tag("span", null, pagePath.header),
+                            DOM.tag("span", null, pagePath.type),
+                        ]),
+                    ]),
+                ]));
             }
         }
     }
@@ -94,7 +109,7 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
 }
 
 interface PageCollectionListModel {
-    parents: Array<string>;
+    parents: Array<PagePathModel>;
 }
 
 export var listPageCollection = (pageId: string) => {
