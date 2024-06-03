@@ -14,8 +14,8 @@ namespace BrandUp.Pages.Interfaces
         Task<IEnumerable<IPage>> GetPublishedPagesAsync(string webSiteId, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
         Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default);
-        Task<object> GetPageContentAsync(IPage page, CancellationToken cancellationToken = default);
-        Task<object> GetPageContentAsync(string pageUrl, CancellationToken cancellationToken = default);
+        Task<object> GetPageContentAsync(IPage page, string key = "", CancellationToken cancellationToken = default);
+        Task<object> GetPageContentAsync(string webSiteId, string pageUrl, string key = "", CancellationToken cancellationToken = default);
         Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default);
         Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default);
         Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default);

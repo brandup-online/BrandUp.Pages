@@ -1,7 +1,7 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
-using BrandUp.Website.Pages;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,10 +22,10 @@ namespace BrandUp.Pages
         }
 
         /// <summary>
-        /// Ренреринг статического блока.
+        /// Рендеринг статического блока.
         /// </summary>
-        /// <typeparam name="TContent">Тип контента блока.</typeparam>
         /// <param name="htmlHelper">HTML хелпер представления.</param>
+        /// <param name="contentType">Тип контента блока.</param>
         /// <param name="key">Ключ блока.</param>
         /// <returns>HTML контент блока.</returns>
         public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, Type contentType, string key)
@@ -42,13 +42,10 @@ namespace BrandUp.Pages
             if (!contentMetadataManager.TryGetMetadata(contentType, out var contentMetadataProvider))
                 throw new InvalidOperationException("Не зарегистрирован тип контента.");
 
-            var view = viewLocator.FindView(contentMetadataProvider.ModelType);
-            if (view == null)
-                throw new InvalidOperationException();
+            var view = viewLocator.FindView(contentMetadataProvider.ModelType) ?? throw new InvalidOperationException();
 
-            var contentModel = contentMetadataProvider.CreateModelInstance();
-
-            if (view.DefaultModelData != null)
+            var contentModel = FindContentModelAsync(services, htmlHelper.ViewContext, contentMetadataProvider, key);
+            if (contentModel == null && view.DefaultModelData != null)
                 contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
 
             var contentContext = new ContentContext(null, contentModel, services, false);
@@ -57,6 +54,25 @@ namespace BrandUp.Pages
             var pageHtml = await viewRenderService.RenderToStringAsync(contentContext);
             builder.AppendHtml(pageHtml);
             return builder;
+        }
+
+        static async Task<object> FindContentModelAsync(IServiceProvider services, ViewContext viewContext, ContentMetadataProvider contentMetadataProvider, string key, CancellationToken cancellationToken = default)
+        {
+            var pageService = services.GetRequiredService<IPageService>();
+
+            var routeData = viewContext.RouteData;
+            string pagePath = string.Empty;
+            if (routeData.Values.TryGetValue("page", out object urlValue) && urlValue != null)
+                pagePath = ((string)urlValue).Trim('/');
+
+            var pageUrl = pagePath + "\\" + key;
+            var websiteId = viewContext.HttpContext.GetWebsiteContext().Website.Id;
+
+            var content = await pageService.GetPageContentAsync(websiteId, pageUrl, cancellationToken);
+            if (content != null)
+                return content;
+
+            return contentMetadataProvider.CreateModelInstance();
         }
     }
 }
