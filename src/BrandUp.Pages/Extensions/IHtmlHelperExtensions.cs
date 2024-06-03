@@ -1,5 +1,4 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
 using BrandUp.Website.Pages;
@@ -21,93 +20,43 @@ namespace BrandUp.Pages
             builder.AppendHtml(pageHtml);
             return builder;
         }
-        public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, Type modelType, string key)
+
+        /// <summary>
+        /// Ренреринг статического блока.
+        /// </summary>
+        /// <typeparam name="TContent">Тип контента блока.</typeparam>
+        /// <param name="htmlHelper">HTML хелпер представления.</param>
+        /// <param name="key">Ключ блока.</param>
+        /// <returns>HTML контент блока.</returns>
+        public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, Type contentType, string key)
         {
+            ArgumentNullException.ThrowIfNull(nameof(htmlHelper));
+            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
+            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(key));
+
             var services = htmlHelper.ViewContext.HttpContext.RequestServices;
-
+            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
+            var viewLocator = services.GetRequiredService<IViewLocator>();
             var viewRenderService = services.GetRequiredService<IViewRenderService>();
-            var pageService = services.GetRequiredService<IPageService>();
 
-            if (htmlHelper.ViewData.Model is not AppPageModel model)
-                throw new InvalidOperationException($"Модель страницы должна быть производной от {nameof(AppPageModel)}.");
+            if (!contentMetadataManager.TryGetMetadata(contentType, out var contentMetadataProvider))
+                throw new InvalidOperationException("Не зарегистрирован тип контента.");
 
-            var page = await GetPageAsync(htmlHelper.ViewContext, modelType, key);
-            var pageContent = await pageService.GetPageContentAsync(page);
+            var view = viewLocator.FindView(contentMetadataProvider.ModelType);
+            if (view == null)
+                throw new InvalidOperationException();
+
+            var contentModel = contentMetadataProvider.CreateModelInstance();
+
+            if (view.DefaultModelData != null)
+                contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
+
+            var contentContext = new ContentContext(null, contentModel, services, false);
 
             var builder = new HtmlContentBuilder();
-            var context = new ContentContext(page, pageContent, htmlHelper.ViewContext.HttpContext.RequestServices, false);
-            var content = await viewRenderService.RenderToStringAsync(context);
-            builder.AppendHtml(content);
-
+            var pageHtml = await viewRenderService.RenderToStringAsync(contentContext);
+            builder.AppendHtml(pageHtml);
             return builder;
         }
-
-        #region BlockAsync helpers
-
-        static async Task<IPage> GetPageAsync(ViewContext viewContext, Type pageContentType, string key)
-        {
-            var services = viewContext.HttpContext.RequestServices;
-            var pageService = services.GetRequiredService<IPageService>();
-
-            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
-
-            var routeData = viewContext.RouteData;
-            string pagePath = string.Empty;
-            if (routeData.Values.TryGetValue("page", out object urlValue) && urlValue != null)
-                pagePath = ((string)urlValue).Trim('/');
-
-            var pageUrl = pagePath + "\\" + key;
-            var websiteId = viewContext.HttpContext.GetWebsiteContext().Website.Id;
-
-            var page = await pageService.FindPageByPathAsync(websiteId, pageUrl);
-            if (page != null)
-                return page;
-
-            if (!contentMetadataManager.TryGetMetadata(pageContentType, out var blockMetadata))
-                throw new InvalidOperationException("Неизвестный тип модели контента.");
-
-            var collection = await GetPageCollectionAsync(services, websiteId, pagePath, blockMetadata.Name);
-
-            var pageContent = GetContent(services, pageContentType, blockMetadata);
-            page = await pageService.CreatePageAsync(collection, pageContent);
-
-            var publishResult = await pageService.PublishPageAsync(page, pageUrl);
-            if (!publishResult.IsSuccess)
-            {
-                var error = publishResult.Errors.FirstOrDefault();
-                throw new InvalidOperationException($"Не удалось опубликовать страницу по причине: {error}");
-            }
-            return page;
-        }
-
-        static async Task<IPageCollection> GetPageCollectionAsync(IServiceProvider services, string websiteId, string title, string pageTypeName)
-        {
-            var pageCollectionService = services.GetRequiredService<IPageCollectionService>();
-
-            var collections = await pageCollectionService.FindCollectionsAsync(websiteId, pageTypeName, title, false);
-            if (collections != null)
-            {
-                var collection = collections.FirstOrDefault();
-                if (collection != null)
-                    return collection;
-            }
-
-            var collectionResult = await pageCollectionService.CreateCollectionAsync(websiteId, title, pageTypeName, PageSortMode.FirstNew);
-            if (!collectionResult.IsSuccess)
-                throw new Exception();
-
-            return collectionResult.Data;
-        }
-
-        static object GetContent(IServiceProvider services, Type modelType, ContentMetadataProvider blockMetadata)
-        {
-            var viewLocator = services.GetRequiredService<IViewLocator>();
-
-            var view = viewLocator.FindView(modelType);
-
-            return blockMetadata.ConvertDictionaryToContentModel(view.DefaultModelData);
-        }
-
-        #endregion
     }
 }

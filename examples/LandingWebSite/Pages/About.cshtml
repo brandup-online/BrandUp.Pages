@@ -4,6 +4,6 @@
 
 <h1>@Model.Title</h1>
 
-@await Html.BlockAsync(typeof(LandingWebSite.Contents.Page.CommonPageContent), "Block1")
 <div><a href="#test">hash</a></div>
-@await Html.BlockAsync(typeof(LandingWebSite.Contents.Page.CommonPageContent), "Block2")
+
+@await Html.BlockAsync(typeof(Contents.TextBlock.TB1), "test")

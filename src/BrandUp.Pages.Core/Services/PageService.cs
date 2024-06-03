@@ -130,7 +130,7 @@ namespace BrandUp.Pages.Services
 
             pagePath = pageUrlHelper.NormalizeUrlPath(pagePath);
             if (pagePath == string.Empty)
-                return GetDefaultPageAsync(webSiteId);
+                return GetDefaultPageAsync(webSiteId, cancellationToken);
 
             return pageRepositiry.FindPageByPathAsync(webSiteId, pagePath, cancellationToken);
         }
@@ -213,10 +213,6 @@ namespace BrandUp.Pages.Services
 
             return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
         }
-        public Task<object> GetPageContentAsync(string pageUrl, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
         public async Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default)
         {
             if (page == null)
@@ -258,7 +254,7 @@ namespace BrandUp.Pages.Services
             else
                 urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
 
-            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath) != null)
+            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath, cancellationToken) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
             await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);
@@ -311,9 +307,9 @@ namespace BrandUp.Pages.Services
             if (seoOptions == null)
                 throw new ArgumentNullException(nameof(seoOptions));
 
-            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title);
-            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description);
-            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords);
+            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title, cancellationToken);
+            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description, cancellationToken);
+            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords, cancellationToken);
 
             await pageRepositiry.UpdatePageAsync(page, cancellationToken);
         }
