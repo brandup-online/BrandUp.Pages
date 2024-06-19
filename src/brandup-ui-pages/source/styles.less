@@ -10,6 +10,12 @@
     --ck-inner-shadow: none !important;
 }
 
+body:has(.bp-toolbar) {
+    & .app {
+        padding-bottom: 76px;
+    }
+}
+
 .bp-elem {
     font-family: @Font-Family;
     font-size: @Font-Size;
@@ -52,7 +58,7 @@
     }
 }
 
-.bp-toolbar{
+.bp-toolbar {
     background-color: @Main-Color;
     display: flex;
     padding: 20px 100px;
