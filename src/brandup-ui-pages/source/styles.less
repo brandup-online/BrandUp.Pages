@@ -59,7 +59,7 @@ body:has(.bp-toolbar) {
 }
 
 .bp-toolbar {
-    background-color: @Main-Color;
+    background-color: @Neutral-Lightest;
     display: flex;
     padding: 20px 100px;
     flex-wrap: nowrap;
@@ -205,25 +205,19 @@ body:has(.bp-toolbar) {
     padding: 2px 6px;
     gap: 5px;
 
-    &.opened-menu-website {
-        & #website-widget-menu {
+    &.opened-menu {
+        &-website #website-widget-menu {
+            display: block;
+        }
+        &-page #page-widget-menu {
+            display: block;
+        }
+        &-edit #edit-widget-menu {
             display: block;
         }
     }
 
-    &.opened-menu-page {
-        & #page-widget-menu {
-            display: block;
-        }
-    }
-
-    &.opened-menu-edit {
-        & #edit-widget-menu {
-            display: block;
-        }
-    }
-
-    @media all and (max-width: 800px) {
+    @media all and (max-width: 1280px) {
         left: 20px;
         bottom: 20px;
     }
@@ -307,31 +301,49 @@ body:has(.bp-toolbar) {
     border-radius: 10px;
     padding: 0;
     margin: 0;
+    overflow: hidden;
+
+    scrollbar-width: 6px;
+    &::-webkit-scrollbar {
+        width: 6px;
+        height: 5px;
+        background: none;
+    }
+
+    &::-webkit-scrollbar-track {
+        border-radius: 3px;
+        background-color: transparent;
+        cursor: default;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #8696a0;
+        border-radius: 3px;
+        cursor: default;
+    }
 
     & a {
         align-items: center;
         display: flex;
         flex-wrap: nowrap;
         gap: 12px;
-        padding: 20px 16px;
+        padding: 14px 16px;
         color: @Text-Color;
         text-decoration: none;
         text-wrap: nowrap;
-        text-transform: uppercase;
+        font-weight: 600;
+
+        &:first-child {
+            padding-top: 18px;
+        }
+
+        &:last-child {
+            padding-bottom: 18px;
+        }
 
         & svg {
             width: 18px;
             fill: @Text-Color;
-        }
-
-        &:first-child {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-        }
-
-        &:last-child {
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
         }
         
         &:hover {
@@ -352,31 +364,10 @@ body:has(.bp-toolbar) {
         max-height: 400px;
         overflow: auto;
 
-        scrollbar-width: 6px;
-        &::-webkit-scrollbar {
-            width: 6px;
-            height: 5px;
-            background: none;
-        }
-
-        &::-webkit-scrollbar-track {
-            border-radius: 3px;
-            background-color: transparent;
-            cursor: default;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background-color: #8696a0;
-            border-radius: 3px;
-            cursor: default;
-        }
-
         & a {
             flex-direction: column;
             align-items: flex-start;
             gap: 3px;
-            text-transform: capitalize;
-            padding-block: 15px;
 
             & span {
                 font-size: 10px;

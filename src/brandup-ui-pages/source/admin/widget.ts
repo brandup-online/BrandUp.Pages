@@ -33,7 +33,6 @@ export class EditorWidget extends UIElement {
     private __page: Page<PageModel>;
     private __isLoading: boolean;
     private __popupElem: HTMLElement;
-    private __editMenuElem: HTMLElement;
 
     readonly isContentPage: boolean;
 
@@ -77,7 +76,11 @@ export class EditorWidget extends UIElement {
             ]),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
-                this.__editMenuElem = DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }),
+                DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }, statickContentMock.map(item => 
+                    DOM.tag("a", { href: "", "data-key": item.key, command: "bp-edit" }, [
+                        item.title, DOM.tag('span', null, item.key),
+                    ]))
+                ),
             ]),
         ]
         
@@ -105,13 +108,6 @@ export class EditorWidget extends UIElement {
         }
 
         const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, widgetButtons);
-
-        const fragment = document.createDocumentFragment();
-        statickContentMock.forEach(item=> fragment.appendChild(DOM.tag("a", { href: "", "data-key": item.key, command: "bp-edit" }, [
-            item.title, DOM.tag('span', null, item.key),
-        ])));
-        
-        this.__editMenuElem.appendChild(fragment);
 
         document.body.appendChild(widgetElem);
         this.setElement(widgetElem);
@@ -182,7 +178,9 @@ export class EditorWidget extends UIElement {
             document.body.addEventListener("click", this.__closeMenuFunc);
         });
 
-        this.registerCommand("bp-actions-edit", () => {
+        this.registerCommand("bp-actions-edit", (elem) => {
+            if (elem.closest(".bp-widget-menu")) this.__closeMenu();
+
             if (!this.element.classList.toggle("opened-menu-edit")) {
                 document.body.removeEventListener("click", this.__closeMenuFunc);
                 return;
@@ -260,10 +258,7 @@ export class EditorWidget extends UIElement {
             const button = target.closest(`.bp-widget-button`);
             if (button) {
                 const menuName = button.getAttribute('data-command')?.replace('bp-actions-',"");
-                this.element.classList.forEach((value: string) => {
-                    if (value.indexOf('opened-menu-') >= 0 && value !== `opened-menu-${menuName}`)
-                        this.element.classList.remove(value);
-                })
+                this.__closeMenu(menuName);
             }
             else {
                 this.element.classList.remove("opened-menu-website", "opened-menu-page", "opened-menu-edit");
@@ -271,6 +266,15 @@ export class EditorWidget extends UIElement {
             document.body.removeEventListener("click", this.__closeMenuFunc);
             return;
         };
+    }
+
+    private __closeMenu(menuName?: string) {
+        let className = "";
+        if (menuName) className = `opened-menu-${menuName}`;
+        this.element.classList.forEach((value: string) => {
+            if (value.indexOf('opened-menu-') >= 0 && value !== className)
+                this.element.classList.remove(value);
+        })
     }
 
     private __closePopupFunc (e: MouseEvent): void {
