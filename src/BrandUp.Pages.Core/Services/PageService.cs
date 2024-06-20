@@ -4,33 +4,15 @@ using Microsoft.Extensions.Options;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageService : IPageService
+    public class PageService(
+        IPageRepository pageRepository,
+        IPageCollectionRepository pageCollectionRepository,
+        IPageMetadataManager pageMetadataManager,
+        Url.IPageUrlHelper pageUrlHelper,
+        Views.IViewLocator viewLocator,
+        IOptions<PagesOptions> options) : IPageService
     {
-        readonly IPageRepository pageRepositiry;
-        readonly IPageCollectionRepository pageCollectionRepositiry;
-        readonly IPageMetadataManager pageMetadataManager;
-        readonly Url.IPageUrlHelper pageUrlHelper;
-        readonly Views.IViewLocator viewLocator;
-        readonly PagesOptions options;
-
-        public PageService(
-            IPageRepository pageRepositiry,
-            IPageCollectionRepository pageCollectionRepositiry,
-            IPageMetadataManager pageMetadataManager,
-            Url.IPageUrlHelper pageUrlHelper,
-            Views.IViewLocator viewLocator,
-            IOptions<PagesOptions> options)
-        {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
-
-            this.pageRepositiry = pageRepositiry ?? throw new ArgumentNullException(nameof(pageRepositiry));
-            this.pageCollectionRepositiry = pageCollectionRepositiry ?? throw new ArgumentNullException(nameof(pageCollectionRepositiry));
-            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
-            this.pageUrlHelper = pageUrlHelper ?? throw new ArgumentNullException(nameof(pageUrlHelper));
-            this.viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
-            this.options = options.Value;
-        }
+        readonly PagesOptions options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
         public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
         {
@@ -48,7 +30,7 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepositiry.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -94,7 +76,7 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepositiry.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -119,7 +101,7 @@ namespace BrandUp.Pages.Services
         }
         public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return pageRepositiry.FindPageByIdAsync(id, cancellationToken);
+            return pageRepository.FindPageByIdAsync(id, cancellationToken);
         }
         public Task<IPage> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default)
         {
@@ -132,7 +114,7 @@ namespace BrandUp.Pages.Services
             if (pagePath == string.Empty)
                 return GetDefaultPageAsync(webSiteId, cancellationToken);
 
-            return pageRepositiry.FindPageByPathAsync(webSiteId, pagePath, cancellationToken);
+            return pageRepository.FindPageByPathAsync(webSiteId, pagePath, cancellationToken);
         }
         public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
@@ -145,21 +127,21 @@ namespace BrandUp.Pages.Services
             if (path == string.Empty)
                 path = pageUrlHelper.GetDefaultPagePath();
 
-            return pageRepositiry.FindUrlByPathAsync(webSiteId, path, cancellationToken);
+            return pageRepository.FindUrlByPathAsync(webSiteId, path, cancellationToken);
         }
         public Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default)
         {
             if (webSiteId == null)
                 throw new ArgumentNullException(nameof(webSiteId));
 
-            return pageRepositiry.FindPageByPathAsync(webSiteId, pageUrlHelper.GetDefaultPagePath(), cancellationToken);
+            return pageRepository.FindPageByPathAsync(webSiteId, pageUrlHelper.GetDefaultPagePath(), cancellationToken);
         }
         public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
 
-            var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(options.CollectionId);
+            var collection = await pageCollectionRepository.FindCollectiondByIdAsync(options.CollectionId);
             if (collection == null)
                 throw new InvalidOperationException();
 
@@ -169,14 +151,14 @@ namespace BrandUp.Pages.Services
             if (!options.CustomSorting.HasValue)
                 options.CustomSorting = collection.CustomSorting;
 
-            return await pageRepositiry.GetPagesAsync(options, cancellationToken);
+            return await pageRepository.GetPagesAsync(options, cancellationToken);
         }
         public Task<IEnumerable<IPage>> GetPublishedPagesAsync(string webSiteId, CancellationToken cancellationToken = default)
         {
             if (webSiteId == null)
                 throw new ArgumentNullException(nameof(webSiteId));
 
-            return pageRepositiry.GetPublishedPagesAsync(webSiteId, cancellationToken);
+            return pageRepository.GetPublishedPagesAsync(webSiteId, cancellationToken);
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
@@ -189,7 +171,7 @@ namespace BrandUp.Pages.Services
             if (pagination == null)
                 throw new ArgumentNullException(nameof(pagination));
 
-            return pageRepositiry.SearchPagesAsync(webSiteId, title, pagination, cancellationToken);
+            return pageRepository.SearchPagesAsync(webSiteId, title, pagination, cancellationToken);
         }
         public Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default)
         {
@@ -201,17 +183,23 @@ namespace BrandUp.Pages.Services
                 throw new InvalidOperationException($"Тип страницы {page.TypeName} не зарегистрирован.");
             return Task.FromResult(pageType);
         }
-        public async Task<object> GetPageContentAsync(IPage page, CancellationToken cancellationToken = default)
+        public async Task<object> GetPageContentAsync(IPage page, string key = "", CancellationToken cancellationToken = default) // todo : придумать как хранить тег в бд.
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            var contentData = await pageRepositiry.GetContentAsync(page.Id, cancellationToken);
+            var contentData = await pageRepository.GetContentAsync(page.Id, cancellationToken);
             if (contentData == null)
                 throw new InvalidOperationException("Для страницы не задан контент.");
             var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
 
             return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
+        }
+        public async Task<object> GetPageContentAsync(string webSiteId, string pageUrl, string key = "", CancellationToken cancellationToken = default)
+        {
+            var page = await pageRepository.FindPageByPathAsync(webSiteId, pageUrl, cancellationToken);
+
+            return await GetPageContentAsync(page, key, cancellationToken);
         }
         public async Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default)
         {
@@ -225,7 +213,7 @@ namespace BrandUp.Pages.Services
             var pageTitle = pageMetadata.GetPageHeader(contentModel);
             var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await pageRepositiry.SetContentAsync(page.Id, pageTitle, pageData, cancellationToken);
+            await pageRepository.SetContentAsync(page.Id, pageTitle, pageData, cancellationToken);
 
             page.Header = pageTitle;
         }
@@ -243,10 +231,10 @@ namespace BrandUp.Pages.Services
             if (!urlPathValidationResult.IsSuccess)
                 return urlPathValidationResult;
 
-            var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
+            var collection = await pageCollectionRepository.FindCollectiondByIdAsync(page.OwnCollectionId);
             if (collection.PageId.HasValue)
             {
-                var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value, cancellationToken);
+                var parentPage = await pageRepository.FindPageByIdAsync(collection.PageId.Value, cancellationToken);
                 if (!parentPage.IsPublished)
                     return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
                 urlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);
@@ -254,11 +242,11 @@ namespace BrandUp.Pages.Services
             else
                 urlPath = pageUrlHelper.NormalizeUrlPath(urlPath);
 
-            if (await pageRepositiry.FindPageByPathAsync(page.WebsiteId, urlPath, cancellationToken) != null)
+            if (await pageRepository.FindPageByPathAsync(page.WebsiteId, urlPath, cancellationToken) != null)
                 return Result.Failed("Страница с таким url уже существует.");
 
-            await pageRepositiry.SetUrlPathAsync(page, urlPath, cancellationToken);
-            await pageRepositiry.UpdatePageAsync(page, cancellationToken);
+            await pageRepository.SetUrlPathAsync(page, urlPath, cancellationToken);
+            await pageRepository.UpdatePageAsync(page, cancellationToken);
 
             return Result.Success;
         }
@@ -269,7 +257,7 @@ namespace BrandUp.Pages.Services
 
             try
             {
-                await pageRepositiry.DeletePageAsync(page, cancellationToken);
+                await pageRepository.DeletePageAsync(page, cancellationToken);
 
                 return Result.Success;
             }
@@ -283,7 +271,7 @@ namespace BrandUp.Pages.Services
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
 
-            var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
+            var pageCollection = await pageCollectionRepository.FindCollectiondByIdAsync(page.OwnCollectionId);
             return pageCollection.PageId;
         }
         public async Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default)
@@ -293,9 +281,9 @@ namespace BrandUp.Pages.Services
 
             var result = new PageSeoOptions
             {
-                Title = await pageRepositiry.GetPageTitleAsync(page, cancellationToken),
-                Description = await pageRepositiry.GetPageDescriptionAsync(page, cancellationToken),
-                Keywords = await pageRepositiry.GetPageKeywordsAsync(page, cancellationToken)
+                Title = await pageRepository.GetPageTitleAsync(page, cancellationToken),
+                Description = await pageRepository.GetPageDescriptionAsync(page, cancellationToken),
+                Keywords = await pageRepository.GetPageKeywordsAsync(page, cancellationToken)
             };
 
             return result;
@@ -307,19 +295,19 @@ namespace BrandUp.Pages.Services
             if (seoOptions == null)
                 throw new ArgumentNullException(nameof(seoOptions));
 
-            await pageRepositiry.SetPageTitleAsync(page, seoOptions.Title, cancellationToken);
-            await pageRepositiry.SetPageDescriptionAsync(page, seoOptions.Description, cancellationToken);
-            await pageRepositiry.SetPageKeywordsAsync(page, seoOptions.Keywords, cancellationToken);
+            await pageRepository.SetPageTitleAsync(page, seoOptions.Title, cancellationToken);
+            await pageRepository.SetPageDescriptionAsync(page, seoOptions.Description, cancellationToken);
+            await pageRepository.SetPageKeywordsAsync(page, seoOptions.Keywords, cancellationToken);
 
-            await pageRepositiry.UpdatePageAsync(page, cancellationToken);
+            await pageRepository.UpdatePageAsync(page, cancellationToken);
         }
         public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
         {
-            return pageRepositiry.UpPagePositionAsync(page, beforePage, cancellationToken);
+            return pageRepository.UpPagePositionAsync(page, beforePage, cancellationToken);
         }
         public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
         {
-            return pageRepositiry.DownPagePositionAsync(page, afterPage, cancellationToken);
+            return pageRepository.DownPagePositionAsync(page, afterPage, cancellationToken);
         }
 
         private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
