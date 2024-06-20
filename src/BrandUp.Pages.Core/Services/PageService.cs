@@ -183,7 +183,7 @@ namespace BrandUp.Pages.Services
                 throw new InvalidOperationException($"Тип страницы {page.TypeName} не зарегистрирован.");
             return Task.FromResult(pageType);
         }
-        public async Task<object> GetPageContentAsync(IPage page, string key = "", CancellationToken cancellationToken = default) // todo : придумать как хранить тег в бд.
+        public async Task<object> GetPageContentAsync(IPage page, CancellationToken cancellationToken = default) // todo : придумать как хранить тег в бд.
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
@@ -194,12 +194,6 @@ namespace BrandUp.Pages.Services
             var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
 
             return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
-        }
-        public async Task<object> GetPageContentAsync(string webSiteId, string pageUrl, string key = "", CancellationToken cancellationToken = default)
-        {
-            var page = await pageRepository.FindPageByPathAsync(webSiteId, pageUrl, cancellationToken);
-
-            return await GetPageContentAsync(page, key, cancellationToken);
         }
         public async Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default)
         {
