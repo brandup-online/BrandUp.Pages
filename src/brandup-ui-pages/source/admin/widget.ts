@@ -43,7 +43,7 @@ export class EditorWidget extends UIElement {
 
     constructor(page: Page<PageModel>) {
         super();
-        statickContentMock[0].key = page.model.id;
+        statickContentMock[0].key = page.model.id || statickContentMock[0].key;
 
         this.__page = page;
         this.__isLoading = false;
@@ -56,11 +56,7 @@ export class EditorWidget extends UIElement {
     }
 
     private __renderUI() {
-        const pageMenuItems = [
-            DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
-            DOM.tag("a", { href: "", command: "bp-actions-edit" }, [iconEdit, "Редактировать страницу"]),
-        ]
-
+        const isDynamic = !!this.__page.model.id; //TODO Определяем тип статичная страница или нет. Поменять по готовности бека
         const websiteMenuItems = [
             DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]),
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
@@ -74,28 +70,41 @@ export class EditorWidget extends UIElement {
             websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
         }
 
-        const status = this.__page.model.status.toLowerCase();
-        const published = status === "published";
-
-        if (!published) pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),)
-
-
-        const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, [
+        let widgetButtons = [
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-website", title: "Действия" }, [
                 iconList,
                 DOM.tag("menu", { class: "bp-widget-menu", id: "website-widget-menu", title: "" }, websiteMenuItems),
             ]),
-            DOM.tag ("button", { class: "page-status bp-widget-button " + status }, [DOM.tag("span"),]),
-            published ? null : DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать" }, iconPublish),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
                 this.__editMenuElem = DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }),
             ]),
-            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, [
-                iconMore,
-                DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu", title: "" }, pageMenuItems),
-            ]),
-        ]);
+        ]
+        
+        if (isDynamic) {
+            const pageMenuItems = [
+                DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
+                DOM.tag("a", { href: "", command: "bp-actions-edit" }, [iconEdit, "Редактировать страницу"]),
+            ];
+            const status = this.__page.model.status?.toLowerCase();
+            const published = status === "published";
+
+            if (!published) 
+                pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),);
+
+            widgetButtons = widgetButtons.slice(0, 1).concat([
+                    DOM.tag ("button", { class: "page-status bp-widget-button " + status }, [DOM.tag("span"),]),
+                    (published ? null : DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)),
+                ],
+                widgetButtons.slice(1),
+                DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, [
+                    iconMore,
+                    DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu", title: "" }, pageMenuItems),
+                ])
+            );
+        }
+
+        const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, widgetButtons);
 
         const fragment = document.createDocumentFragment();
         statickContentMock.forEach(item=> fragment.appendChild(DOM.tag("a", { href: "", "data-key": item.key, command: "bp-edit" }, [
