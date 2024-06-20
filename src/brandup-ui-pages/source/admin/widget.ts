@@ -17,11 +17,23 @@ import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
 
+export const statickContentMock = [ // TODO имитация ответа от сервера. Удалить после появления api.
+    { title: 'Текущая страница', key: '1' },
+    { title: 'Блок 1', key: '2' },
+    { title: 'Блок 2', key: '3' },
+    { title: 'Блок 3', key: '4' },
+    { title: 'Блок 4', key: '5' },
+    { title: 'Блок 5', key: '6' },
+    { title: 'Блок 6', key: '7' },
+    { title: 'Блок 7', key: '8' },
+]
+
 export class EditorWidget extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
     private __page: Page<PageModel>;
     private __isLoading: boolean;
     private __popupElem: HTMLElement;
+    private __editMenuElem: HTMLElement;
 
     readonly isContentPage: boolean;
 
@@ -31,6 +43,7 @@ export class EditorWidget extends UIElement {
 
     constructor(page: Page<PageModel>) {
         super();
+        statickContentMock[0].key = page.model.id;
 
         this.__page = page;
         this.__isLoading = false;
@@ -45,7 +58,7 @@ export class EditorWidget extends UIElement {
     private __renderUI() {
         const pageMenuItems = [
             DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
-            DOM.tag("a", { href: "", command: "bp-edit" }, [iconEdit, "Редактировать страницу"]),
+            DOM.tag("a", { href: "", command: "bp-actions-edit" }, [iconEdit, "Редактировать страницу"]),
         ]
 
         const websiteMenuItems = [
@@ -74,12 +87,22 @@ export class EditorWidget extends UIElement {
             ]),
             DOM.tag ("button", { class: "page-status bp-widget-button " + status }, [DOM.tag("span"),]),
             published ? null : DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать" }, iconPublish),
-            DOM.tag("button", { class: "bp-widget-button", command: "bp-edit", title: "Редактировать контент страницы" }, iconEdit),
+            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
+                iconEdit,
+                this.__editMenuElem = DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }),
+            ]),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, [
                 iconMore,
                 DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu", title: "" }, pageMenuItems),
             ]),
         ]);
+
+        const fragment = document.createDocumentFragment();
+        statickContentMock.forEach(item=> fragment.appendChild(DOM.tag("a", { href: "", "data-key": item.key, command: "bp-edit" }, [
+            item.title, DOM.tag('span', null, item.key),
+        ])));
+        
+        this.__editMenuElem.appendChild(fragment);
 
         document.body.appendChild(widgetElem);
         this.setElement(widgetElem);
@@ -150,20 +173,31 @@ export class EditorWidget extends UIElement {
             document.body.addEventListener("click", this.__closeMenuFunc);
         });
 
-        this.registerCommand("bp-edit", () => {
+        this.registerCommand("bp-actions-edit", () => {
+            if (!this.element.classList.toggle("opened-menu-edit")) {
+                document.body.removeEventListener("click", this.__closeMenuFunc);
+                return;
+            }
+            document.body.addEventListener("click", this.__closeMenuFunc);
+        });
+
+        this.registerAsyncCommand("bp-edit", (context)=> {
             if (this.__isLoading)
                 return;
             this.__isLoading = true;
+            const key = context.target.getAttribute("data-key");
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { pageId: this.__page.model.id },
+                urlParams: { pageId: key }, // TODO Поменять pageId на другой параметр под api
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
                     this.__isLoading = false;
 
-                    if (response.status !== 200)
+                    if (response.status !== 200) {
+                        context.complate();
                         throw "";
+                    }
 
                     if (response.data.currentDate) {
                         const popup = DOM.tag("div", { class: "bp-widget-popup" }, [
@@ -180,9 +214,10 @@ export class EditorWidget extends UIElement {
                     }
                     else
                         this.__page.website.nav({ url: response.data.url, replace: true });
-                }
+                    context.complate();
+                },
             });
-        });
+        })
 
         this.registerCommand("continue-edit", (elem: HTMLElement) => {
             this.setPopup(null);
@@ -211,18 +246,21 @@ export class EditorWidget extends UIElement {
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
-            if (!target.closest(".bp-widget-menu")) {
-                if ( target.closest(`[data-command="bp-actions-website"]`)) {
-                    this.element.classList.remove("opened-menu-page");
-                }
-                else if ( target.closest(`[data-command="bp-actions-page"]`)) {
-                    this.element.classList.remove("opened-menu-website");
-                }
-                else
-                    this.element.classList.remove("opened-menu-website", "opened-menu-page");
-                document.body.removeEventListener("click", this.__closeMenuFunc);
-                return;
+            if (target.closest(".bp-widget-menu")) return;
+
+            const button = target.closest(`.bp-widget-button`);
+            if (button) {
+                const menuName = button.getAttribute('data-command')?.replace('bp-actions-',"");
+                this.element.classList.forEach((value: string) => {
+                    if (value.indexOf('opened-menu-') >= 0 && value !== `opened-menu-${menuName}`)
+                        this.element.classList.remove(value);
+                })
             }
+            else {
+                this.element.classList.remove("opened-menu-website", "opened-menu-page", "opened-menu-edit");
+            }
+            document.body.removeEventListener("click", this.__closeMenuFunc);
+            return;
         };
     }
 
