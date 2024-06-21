@@ -55,7 +55,7 @@ namespace BrandUp.Pages.Url
 				return pageUrlHelper.NormalizeUrlPath(page.UrlPath);
 		}
 
-		public Task<string> GetPathAsync(IEditSession pageEditSession, CancellationToken cancellationToken = default)
+		public Task<string> GetPathAsync(IContentEdit pageEditSession, CancellationToken cancellationToken = default)
 		{
 			if (pageEditSession == null)
 				throw new ArgumentNullException(nameof(pageEditSession));
@@ -65,7 +65,7 @@ namespace BrandUp.Pages.Url
 			return Task.FromResult(url);
 		}
 
-		public Task<string> GetUriAsync(IEditSession pageEditSession, CancellationToken cancellationToken = default)
+		public Task<string> GetUriAsync(IContentEdit pageEditSession, CancellationToken cancellationToken = default)
 		{
 			if (pageEditSession == null)
 				throw new ArgumentNullException(nameof(pageEditSession));

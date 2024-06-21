@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace BrandUp.Pages.MongoDb.Documents
 {
     [MongoDB.MongoCollection(CollectionName = "BrandUpPages.contents")]
-    public class PageContentDocument
+    public class ContentDocument
     {
         [BsonId, BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }

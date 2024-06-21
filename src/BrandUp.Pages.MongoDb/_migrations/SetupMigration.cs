@@ -72,10 +72,10 @@ namespace BrandUp.Pages.MongoDb._migrations
 		{
 			await dbContext.Contents.Indexes.DropAllAsync();
 
-			var pageIdIndex = Builders<PageContentDocument>.IndexKeys.Ascending(it => it.PageId);
+			var pageIdIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.PageId);
 
-			await ApplyIndexes(dbContext.Contents, new CreateIndexModel<PageContentDocument>[] {
-				new CreateIndexModel<PageContentDocument>(pageIdIndex, new CreateIndexOptions { Name = "Page", Unique = true })
+			await ApplyIndexes(dbContext.Contents, new CreateIndexModel<ContentDocument>[] {
+				new CreateIndexModel<ContentDocument>(pageIdIndex, new CreateIndexOptions { Name = "Page", Unique = true })
 			});
 		}
 		async Task CreateIndexes_PageUrlAsync()
@@ -96,14 +96,14 @@ namespace BrandUp.Pages.MongoDb._migrations
 		{
 			await dbContext.PageEditSessions.Indexes.DropAllAsync();
 
-			var versionIndex = Builders<EditSessionDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
-			var userIndex = Builders<EditSessionDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.UserId);
-			var websiteIndex = Builders<EditSessionDocument>.IndexKeys.Ascending(it => it.WebsiteId);
+			var versionIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+			var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.UserId);
+			var websiteIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.WebsiteId);
 
-			await ApplyIndexes(dbContext.PageEditSessions, new CreateIndexModel<EditSessionDocument>[] {
-				new CreateIndexModel<EditSessionDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
-				new CreateIndexModel<EditSessionDocument>(userIndex, new CreateIndexOptions { Name = "User" }),
-				new CreateIndexModel<EditSessionDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
+			await ApplyIndexes(dbContext.PageEditSessions, new CreateIndexModel<ContentEditDocument>[] {
+				new CreateIndexModel<ContentEditDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
+				new CreateIndexModel<ContentEditDocument>(userIndex, new CreateIndexOptions { Name = "User" }),
+				new CreateIndexModel<ContentEditDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
 			});
 		}
 		async Task CreateIndexes_PageRecyclebinAsync()

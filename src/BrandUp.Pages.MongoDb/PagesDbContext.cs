@@ -8,8 +8,8 @@ namespace BrandUp.Pages.MongoDb
 	{
 		public IMongoCollection<PageCollectionDocument> PageCollections => GetCollection<PageCollectionDocument>();
 		public IMongoCollection<PageDocument> Pages => GetCollection<PageDocument>();
-		public IMongoCollection<EditSessionDocument> PageEditSessions => GetCollection<EditSessionDocument>();
-		public IMongoCollection<PageContentDocument> Contents => GetCollection<PageContentDocument>();
+		public IMongoCollection<ContentEditDocument> PageEditSessions => GetCollection<ContentEditDocument>();
+		public IMongoCollection<ContentDocument> Contents => GetCollection<ContentDocument>();
 		public IMongoCollection<PageRecyclebinDocument> PageRecyclebin => GetCollection<PageRecyclebinDocument>();
 		public IMongoCollection<PageUrlDocument> PageUrls => GetCollection<PageUrlDocument>();
 	}

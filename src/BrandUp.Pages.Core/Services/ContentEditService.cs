@@ -2,13 +2,13 @@
 
 namespace BrandUp.Pages.Services
 {
-    public class EditSessionService(IEditSessionRepository editSessionRepository, IPageService pageService, Identity.IAccessProvider signInManager) : IEditSessionService
+    public class ContentEditService(IContentEditRepository editSessionRepository, IPageService pageService, Identity.IAccessProvider signInManager) : IContentEditService
     {
-        readonly IEditSessionRepository editSessionRepository = editSessionRepository ?? throw new ArgumentNullException(nameof(editSessionRepository));
+        readonly IContentEditRepository editSessionRepository = editSessionRepository ?? throw new ArgumentNullException(nameof(editSessionRepository));
         readonly IPageService pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
         readonly Identity.IAccessProvider signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
 
-        public async Task<IEditSession> BeginEditAsync(IPage page, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> BeginEditAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (page == null)
                 throw new ArgumentNullException(nameof(page));
@@ -17,17 +17,17 @@ namespace BrandUp.Pages.Services
 
             return await editSessionRepository.CreateEditAsync(page, editorId, cancellationToken);
         }
-        public Task<IEditSession> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return editSessionRepository.FindEditByIdAsync(id, cancellationToken);
         }
-        public async Task<IEditSession> FindEditByUserAsync(IPage page, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var userId = await GetEditorIdAsync(cancellationToken);
 
             return await editSessionRepository.FindEditByUserAsync(page, userId, cancellationToken);
         }
-        public async Task<object> GetContentAsync(IEditSession editSession, CancellationToken cancellationToken = default)
+        public async Task<object> GetContentAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
@@ -38,7 +38,7 @@ namespace BrandUp.Pages.Services
 
             return pageMetadataProvider.ContentMetadata.ConvertDictionaryToContentModel(pageContentData);
         }
-        public async Task SetContentAsync(IEditSession editSession, object content, CancellationToken cancellationToken = default)
+        public async Task SetContentAsync(IContentEdit editSession, object content, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
@@ -50,7 +50,7 @@ namespace BrandUp.Pages.Services
 
             await editSessionRepository.SetContentAsync(editSession, contentData, cancellationToken);
         }
-        public async Task CommitEditAsync(IEditSession editSession, CancellationToken cancellationToken = default)
+        public async Task CommitEditAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));
@@ -64,7 +64,7 @@ namespace BrandUp.Pages.Services
 
             await editSessionRepository.DeleteEditAsync(editSession, cancellationToken);
         }
-        public Task DiscardEditAsync(IEditSession editSession, CancellationToken cancellationToken = default)
+        public Task DiscardEditAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
         {
             if (editSession == null)
                 throw new ArgumentNullException(nameof(editSession));

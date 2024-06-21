@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    public class EditSession : IEditSession
+    public class ContentEdit : IContentEdit
     {
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
@@ -13,7 +13,7 @@ namespace BrandUp.Pages.MongoDb.Documents
     }
 
     [MongoDB.MongoCollection(CollectionName = "BrandUpPages.edits")]
-    public class EditSessionDocument : Document
+    public class ContentEditDocument : Document
     {
         [BsonRequired]
         public string WebsiteId { get; set; }

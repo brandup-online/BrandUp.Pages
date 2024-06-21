@@ -9,9 +9,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
 	public class PageRepository : IPageRepository
 	{
 		readonly IMongoCollection<PageDocument> pageDocuments;
-		readonly IMongoCollection<PageContentDocument> contentDocuments;
+		readonly IMongoCollection<ContentDocument> contentDocuments;
 		readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments;
-		readonly IMongoCollection<EditSessionDocument> editDocuments;
+		readonly IMongoCollection<ContentEditDocument> editDocuments;
 		readonly IMongoCollection<PageUrlDocument> urlDocuments;
 
 		public PageRepository(IPagesDbContext dbContext)
@@ -44,7 +44,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 				Status = PageStatus.Draft
 			};
 
-			var contentDocument = new PageContentDocument
+			var contentDocument = new ContentDocument
 			{
 				Id = Guid.NewGuid(),
 				PageId = pageId,
@@ -220,7 +220,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 				if (pageUpdateResult.MatchedCount != 1)
 					throw new InvalidOperationException();
 
-				var contentUpdateResult = await contentDocuments.UpdateOneAsync(session, it => it.PageId == pageId, Builders<PageContentDocument>.Update
+				var contentUpdateResult = await contentDocuments.UpdateOneAsync(session, it => it.PageId == pageId, Builders<ContentDocument>.Update
 					.Set(it => it.Data, contentDataDocument), cancellationToken: cancellationToken);
 				if (contentUpdateResult.MatchedCount != 1)
 					throw new InvalidOperationException();

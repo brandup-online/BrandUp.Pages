@@ -8,10 +8,10 @@ namespace BrandUp.Pages.Controllers
 	public class PageContentController : Controller
 	{
 		readonly IPageService pageService;
-		readonly IEditSessionService pageContentService;
+		readonly IContentEditService pageContentService;
 		readonly Url.IPageLinkGenerator pageLinkGenerator;
 
-		public PageContentController(IPageService pageService, IEditSessionService pageContentService, Url.IPageLinkGenerator pageLinkGenerator)
+		public PageContentController(IPageService pageService, IContentEditService pageContentService, Url.IPageLinkGenerator pageLinkGenerator)
 		{
 			this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
 			this.pageContentService = pageContentService ?? throw new ArgumentNullException(nameof(pageContentService));
