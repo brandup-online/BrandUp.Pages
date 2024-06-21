@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
 			services.AddSingleton<IPageRepository, FakePageRepositiry>();
 			services.AddSingleton<IPageCollectionRepository, FakePageCollectionRepositiry>();
-			services.AddSingleton<IPageContentRepository, FakePageContentRepository>();
+			services.AddSingleton<IEditSessionRepository, FakePageContentRepository>();
 			services.AddSingleton<BrandUp.Pages.Files.IFileRepository, FakePageFileRepository>();
 			services.AddSingleton<BrandUp.Pages.Views.IViewLocator, BrandUp.Pages.Views.FakeViewLocator>();
 

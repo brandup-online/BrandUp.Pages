@@ -8,7 +8,7 @@ namespace BrandUp.Pages.MongoDb
 		IMongoCollection<Documents.PageCollectionDocument> PageCollections { get; }
 		IMongoCollection<Documents.PageDocument> Pages { get; }
 		IMongoCollection<Documents.PageContentDocument> Contents { get; }
-		IMongoCollection<Documents.PageEditDocument> PageEditSessions { get; }
+		IMongoCollection<Documents.EditSessionDocument> PageEditSessions { get; }
 		IMongoCollection<Documents.PageRecyclebinDocument> PageRecyclebin { get; }
 		IMongoCollection<Documents.PageUrlDocument> PageUrls { get; }
 	}

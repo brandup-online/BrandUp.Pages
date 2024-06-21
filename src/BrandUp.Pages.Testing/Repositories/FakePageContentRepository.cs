@@ -2,7 +2,7 @@
 
 namespace BrandUp.Pages.Repositories
 {
-    public class FakePageContentRepository : IPageContentRepository
+    public class FakePageContentRepository : IEditSessionRepository
     {
         IPageRepository pageRepository;
         readonly Dictionary<string, PageEdit> edits = new Dictionary<string, PageEdit>();
@@ -13,7 +13,7 @@ namespace BrandUp.Pages.Repositories
             this.pageRepository = pageRepository;
         }
 
-        public async Task<IPageEdit> CreateEditAsync(IPage page, string userId, CancellationToken cancellationToken = default)
+        public async Task<IEditSession> CreateEditAsync(IPage page, string userId, CancellationToken cancellationToken = default)
         {
             var content = await pageRepository.GetContentAsync(page.Id, cancellationToken);
 
@@ -34,36 +34,36 @@ namespace BrandUp.Pages.Repositories
             return edit;
         }
 
-        public Task DeleteEditAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
+        public Task DeleteEditAsync(IEditSession pageEdit, CancellationToken cancellationToken = default)
         {
             edits.Remove(GetId(pageEdit));
 
             return Task.CompletedTask;
         }
 
-        public Task<IPageEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public Task<IEditSession> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (!ids.TryGetValue(id, out string uniqueId))
-                return Task.FromResult<IPageEdit>(null);
+                return Task.FromResult<IEditSession>(null);
 
             edits.TryGetValue(uniqueId, out PageEdit pageEdit);
 
-            return Task.FromResult<IPageEdit>(pageEdit);
+            return Task.FromResult<IEditSession>(pageEdit);
         }
 
-        public Task<IPageEdit> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
+        public Task<IEditSession> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
         {
             var uniqueId = GetId(page, userId);
             edits.TryGetValue(uniqueId, out PageEdit pageEdit);
-            return Task.FromResult<IPageEdit>(pageEdit);
+            return Task.FromResult<IEditSession>(pageEdit);
         }
 
-        public Task<IDictionary<string, object>> GetContentAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
+        public Task<IDictionary<string, object>> GetContentAsync(IEditSession pageEdit, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(((PageEdit)pageEdit).Content);
         }
 
-        public Task SetContentAsync(IPageEdit pageEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public Task SetContentAsync(IEditSession pageEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             ((PageEdit)pageEdit).Content = contentData;
 
@@ -74,7 +74,7 @@ namespace BrandUp.Pages.Repositories
         {
             return GetId(page.Id, userId);
         }
-        private static string GetId(IPageEdit editPage)
+        private static string GetId(IEditSession editPage)
         {
             return GetId(editPage.PageId, editPage.UserId);
         }
@@ -83,7 +83,7 @@ namespace BrandUp.Pages.Repositories
             return pageId.ToString() + "-" + userId;
         }
 
-        class PageEdit : IPageEdit
+        class PageEdit : IEditSession
         {
             public Guid Id { get; set; }
             public DateTime CreatedDate { get; set; }

@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Builder
 			services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
 			services.AddScoped<IPageCollectionService, PageCollectionService>();
 			services.AddScoped<IPageService, PageService>();
-			services.AddScoped<IPageContentService, PageContentService>();
+			services.AddScoped<IEditSessionService, EditSessionService>();
 
 			services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
 			services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();

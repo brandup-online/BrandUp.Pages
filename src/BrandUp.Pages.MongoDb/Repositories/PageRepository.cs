@@ -11,7 +11,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 		readonly IMongoCollection<PageDocument> pageDocuments;
 		readonly IMongoCollection<PageContentDocument> contentDocuments;
 		readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments;
-		readonly IMongoCollection<PageEditDocument> editDocuments;
+		readonly IMongoCollection<EditSessionDocument> editDocuments;
 		readonly IMongoCollection<PageUrlDocument> urlDocuments;
 
 		public PageRepository(IPagesDbContext dbContext)
