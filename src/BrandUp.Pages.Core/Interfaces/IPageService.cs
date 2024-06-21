@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Interfaces
         Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default);
         Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default);
         Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<IPage> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default);
+        Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
         Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
         Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default);
         Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);

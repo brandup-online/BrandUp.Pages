@@ -10,6 +10,7 @@ namespace BrandUp.Pages.Services
 
         public async Task<object> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default) // todo : придумать как хранить тег в бд.
         {
+            ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
 
             var contentData = await contentRepository.GetContentAsync(websiteId, key, cancellationToken);
@@ -27,6 +28,7 @@ namespace BrandUp.Pages.Services
 
         public async Task SetContentAsync(string websiteId, string key, object contentModel, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
             ArgumentNullException.ThrowIfNull(contentModel);
 

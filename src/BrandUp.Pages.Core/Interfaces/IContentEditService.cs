@@ -2,9 +2,9 @@
 {
     public interface IContentEditService
     {
-        Task<IContentEdit> BeginEditAsync(IPage page, CancellationToken cancellationToken = default);
+        Task<IContentEdit> BeginEditAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default);
         Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default);
-        Task<IContentEdit> FindEditByUserAsync(IPage page, CancellationToken cancellationToken = default);
+        Task<IContentEdit> FindEditByUserAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default);
         Task<object> GetContentAsync(IContentEdit editSession, CancellationToken cancellationToken = default);
         Task SetContentAsync(IContentEdit editSession, object content, CancellationToken cancellationToken = default);
         Task DiscardEditAsync(IContentEdit editSession, CancellationToken cancellationToken = default);
@@ -15,7 +15,8 @@
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }
-        Guid PageId { get; }
+        string WebsiteId { get; }
+        string ContentKey { get; }
         string UserId { get; }
     }
 }

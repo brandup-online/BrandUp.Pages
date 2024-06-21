@@ -12,7 +12,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         readonly IMongoCollection<PageDocument> pageDocuments = dbContext.Pages;
         readonly IMongoCollection<ContentDocument> contentDocuments = dbContext.Contents;
         readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments = dbContext.PageRecyclebin;
-        readonly IMongoCollection<ContentEditDocument> editDocuments = dbContext.PageEditSessions;
+        readonly IMongoCollection<ContentEditDocument> editDocuments = dbContext.ContentEdits;
         readonly IMongoCollection<PageUrlDocument> urlDocuments = dbContext.PageUrls;
 
         public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, Guid pageId, string typeName, string pageHeader, string contentKey, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
@@ -206,7 +206,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             using var transaction = await mongoDbSession.BeginAsync(cancellationToken);
 
-            var pageContent = await contentDocuments.FindOneAndDeleteAsync(mongoDbSession.Current, it => it.Key == contentKey, cancellationToken: cancellationToken);
+            var pageContent = await contentDocuments.FindOneAndDeleteAsync(mongoDbSession.Current, it => it.WebsiteId == page.WebsiteId && it.Key == contentKey, cancellationToken: cancellationToken);
             if (pageContent == null)
                 throw new InvalidOperationException("Не найден контент страницы.");
 
@@ -232,7 +232,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             if (urlDeleteResult.DeletedCount != 1)
                 throw new InvalidOperationException("Не удалось удалить url страницы.");
 
-            await editDocuments.DeleteManyAsync(mongoDbSession.Current, it => it.PageId == page.Id, cancellationToken: cancellationToken);
+            await editDocuments.DeleteManyAsync(mongoDbSession.Current, it => it.WebsiteId == page.WebsiteId && it.ContentKey == contentKey, cancellationToken: cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
         }

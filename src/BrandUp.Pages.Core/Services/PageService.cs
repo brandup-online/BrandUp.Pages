@@ -20,8 +20,8 @@ namespace BrandUp.Pages.Services
         }
         public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
         {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+            ArgumentNullException.ThrowIfNull(collection);
+            ArgumentNullException.ThrowIfNull(pageContent);
 
             var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
             var pageMetadata = pageMetadataManager.GetMetadata(pageContent.GetType());
@@ -61,11 +61,9 @@ namespace BrandUp.Pages.Services
         }
         public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default)
         {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+            ArgumentNullException.ThrowIfNull(collection);
 
-            if (pageType == null)
-                pageType = collection.PageTypeName;
+            pageType ??= collection.PageTypeName;
 
             var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
             var pageMetadata = pageMetadataManager.GetMetadata(pageType);
@@ -111,25 +109,21 @@ namespace BrandUp.Pages.Services
         {
             return pageRepository.FindPageByIdAsync(id, cancellationToken);
         }
-        public Task<IPage> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default)
+        public Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
-            if (pagePath == null)
-                throw new ArgumentNullException(nameof(pagePath));
+            ArgumentNullException.ThrowIfNull(webSiteId);
+            ArgumentNullException.ThrowIfNull(path);
 
-            pagePath = pageUrlHelper.NormalizeUrlPath(pagePath);
-            if (pagePath == string.Empty)
+            path = pageUrlHelper.NormalizeUrlPath(path);
+            if (path == string.Empty)
                 return GetDefaultPageAsync(webSiteId, cancellationToken);
 
-            return pageRepository.FindPageByPathAsync(webSiteId, pagePath, cancellationToken);
+            return pageRepository.FindPageByPathAsync(webSiteId, path, cancellationToken);
         }
         public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            ArgumentNullException.ThrowIfNull(webSiteId);
+            ArgumentNullException.ThrowIfNull(path);
 
             path = pageUrlHelper.NormalizeUrlPath(path);
             if (path == string.Empty)
@@ -139,15 +133,13 @@ namespace BrandUp.Pages.Services
         }
         public Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
+            ArgumentNullException.ThrowIfNull(webSiteId);
 
             return pageRepository.FindPageByPathAsync(webSiteId, pageUrlHelper.GetDefaultPagePath(), cancellationToken);
         }
         public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
 
             var collection = await pageCollectionRepository.FindCollectiondByIdAsync(options.CollectionId);
             if (collection == null)
@@ -163,28 +155,24 @@ namespace BrandUp.Pages.Services
         }
         public Task<IEnumerable<IPage>> GetPublishedPagesAsync(string webSiteId, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
+            ArgumentNullException.ThrowIfNull(webSiteId);
 
             return pageRepository.GetPublishedPagesAsync(webSiteId, cancellationToken);
         }
         public Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
-            if (title == null)
-                throw new ArgumentNullException(nameof(title));
+            ArgumentNullException.ThrowIfNull(webSiteId);
+            ArgumentNullException.ThrowIfNull(title);
+            ArgumentNullException.ThrowIfNull(pagination);
+
             if (title.Length < 3)
                 throw new ArgumentOutOfRangeException(nameof(title));
-            if (pagination == null)
-                throw new ArgumentNullException(nameof(pagination));
 
             return pageRepository.SearchPagesAsync(webSiteId, title, pagination, cancellationToken);
         }
         public Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
+            ArgumentNullException.ThrowIfNull(page);
 
             var pageType = pageMetadataManager.FindPageMetadataByName(page.TypeName);
             if (pageType == null)
@@ -193,10 +181,8 @@ namespace BrandUp.Pages.Services
         }
         public async Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-            if (urlPath == null)
-                throw new ArgumentNullException(nameof(urlPath));
+            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(urlPath);
 
             if (page.IsPublished)
                 return Result.Failed("Страница уже опубликована.");
@@ -236,16 +222,14 @@ namespace BrandUp.Pages.Services
         }
         public async Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
+            ArgumentNullException.ThrowIfNull(page);
 
             var pageCollection = await pageCollectionRepository.FindCollectiondByIdAsync(page.OwnCollectionId);
             return pageCollection.PageId;
         }
         public async Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
+            ArgumentNullException.ThrowIfNull(page);
 
             var result = new PageSeoOptions
             {
@@ -258,10 +242,8 @@ namespace BrandUp.Pages.Services
         }
         public async Task UpdatePageSeoOptionsAsync(IPage page, PageSeoOptions seoOptions, CancellationToken cancellationToken = default)
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-            if (seoOptions == null)
-                throw new ArgumentNullException(nameof(seoOptions));
+            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(seoOptions);
 
             await pageRepository.SetPageTitleAsync(page, seoOptions.Title, cancellationToken);
             await pageRepository.SetPageDescriptionAsync(page, seoOptions.Description, cancellationToken);
@@ -271,15 +253,24 @@ namespace BrandUp.Pages.Services
         }
         public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(beforePage);
+
             return pageRepository.UpPagePositionAsync(page, beforePage, cancellationToken);
         }
         public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(afterPage);
+
             return pageRepository.DownPagePositionAsync(page, afterPage, cancellationToken);
         }
 
         private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
         {
+            ArgumentNullException.ThrowIfNull(pageMetadataProvider);
+            ArgumentNullException.ThrowIfNull(contentModel);
+
             if (string.IsNullOrEmpty(header) && !string.IsNullOrEmpty(options.DefaultPageHeader))
                 pageMetadataProvider.SetPageHeader(contentModel, options.DefaultPageHeader);
 

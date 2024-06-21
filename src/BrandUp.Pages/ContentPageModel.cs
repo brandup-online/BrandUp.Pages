@@ -53,7 +53,13 @@ namespace BrandUp.Pages
                     return;
                 }
 
-                page = await PageService.FindPageByIdAsync(editSession.PageId, CancellationToken);
+                if (!editSession.ContentKey.StartsWith("page-"))
+                    throw new InvalidOperationException();
+
+                if (!Guid.TryParse(editSession.ContentKey.Substring(5), out var pageId))
+                    throw new InvalidOperationException();
+
+                page = await PageService.FindPageByIdAsync(pageId, CancellationToken);
                 if (page == null)
                 {
                     context.Result = NotFound();

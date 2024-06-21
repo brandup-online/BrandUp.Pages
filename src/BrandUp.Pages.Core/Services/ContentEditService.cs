@@ -3,25 +3,25 @@ using BrandUp.Pages.Interfaces;
 
 namespace BrandUp.Pages.Services
 {
-    public class ContentEditService(IContentEditRepository editSessionRepository, IPageService pageService, Identity.IAccessProvider accessProvider, ContentService contentService, IContentMetadataManager contentMetadataManager) : IContentEditService
+    public class ContentEditService(IContentEditRepository editSessionRepository, Identity.IAccessProvider accessProvider, ContentService contentService, IContentMetadataManager contentMetadataManager) : IContentEditService
     {
-        readonly IContentEditRepository editSessionRepository = editSessionRepository ?? throw new ArgumentNullException(nameof(editSessionRepository));
-        readonly IPageService pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-        readonly ContentService contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-        readonly Identity.IAccessProvider accessProvider = accessProvider ?? throw new ArgumentNullException(nameof(accessProvider));
-
-        public async Task<IContentEdit> BeginEditAsync(IPage page, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(websiteId);
+            ArgumentNullException.ThrowIfNull(key);
+
+            var contentModel = await contentService.GetContentAsync(websiteId, key, cancellationToken);
+            if (contentModel == null)
+                return null;
+
+            if (!contentMetadataManager.TryGetMetadata(contentModel, out var metadata))
+                throw new InvalidOperationException();
 
             var editorId = await GetEditorIdAsync(cancellationToken);
-            var pageContent = await contentService.GetContentAsync(page.WebsiteId, await pageService.GetContentKeyAsync(page.Id, cancellationToken), cancellationToken);
 
-            if (!contentMetadataManager.TryGetMetadata(pageContent, out var metadata))
-                throw new InvalidOperationException();
-            var contentData = metadata.ConvertContentModelToDictionary(pageContent);
+            var contentData = metadata.ConvertContentModelToDictionary(contentModel);
 
-            return await editSessionRepository.CreateEditAsync(page, editorId, contentData, cancellationToken);
+            return await editSessionRepository.CreateEditAsync(websiteId, key, editorId, contentData, cancellationToken);
         }
 
         public Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -29,24 +29,28 @@ namespace BrandUp.Pages.Services
             return editSessionRepository.FindEditByIdAsync(id, cancellationToken);
         }
 
-        public async Task<IContentEdit> FindEditByUserAsync(IPage page, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(page);
+            ArgumentNullException.ThrowIfNull(websiteId);
+            ArgumentNullException.ThrowIfNull(key);
 
             var userId = await GetEditorIdAsync(cancellationToken);
 
-            return await editSessionRepository.FindEditByUserAsync(page, userId, cancellationToken);
+            return await editSessionRepository.FindEditByUserAsync(websiteId, key, userId, cancellationToken);
         }
 
         public async Task<object> GetContentAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(editSession);
 
-            var page = await pageService.FindPageByIdAsync(editSession.PageId, cancellationToken);
-            var pageMetadataProvider = await pageService.GetPageTypeAsync(page, cancellationToken);
-            var pageContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
+            var contentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
+            if (!contentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
+                throw new InvalidOperationException($"Not found content type name.");
 
-            return pageMetadataProvider.ContentMetadata.ConvertDictionaryToContentModel(pageContentData);
+            if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
+                throw new InvalidOperationException($"Not found content type by name {contentTypeName}.");
+
+            return metadata.ConvertDictionaryToContentModel(contentData);
         }
 
         public async Task SetContentAsync(IContentEdit editSession, object content, CancellationToken cancellationToken = default)
@@ -54,10 +58,10 @@ namespace BrandUp.Pages.Services
             ArgumentNullException.ThrowIfNull(editSession);
             ArgumentNullException.ThrowIfNull(content);
 
-            var page = await pageService.FindPageByIdAsync(editSession.PageId, cancellationToken);
-            var pageMetadata = await pageService.GetPageTypeAsync(page, cancellationToken);
+            if (!contentMetadataManager.TryGetMetadata(content, out var metadata))
+                throw new InvalidOperationException($"Not found content type by type {content.GetType().AssemblyQualifiedName}.");
 
-            var contentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(content);
+            var contentData = metadata.ConvertContentModelToDictionary(content);
 
             await editSessionRepository.SetContentAsync(editSession, contentData, cancellationToken);
         }
@@ -66,13 +70,16 @@ namespace BrandUp.Pages.Services
         {
             ArgumentNullException.ThrowIfNull(editSession);
 
-            var page = await pageService.FindPageByIdAsync(editSession.PageId, cancellationToken);
-            var pageMetadata = await pageService.GetPageTypeAsync(page, cancellationToken);
             var newContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
-            var pageContentModel = pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(newContentData);
+            if (!newContentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
+                throw new InvalidOperationException($"Not found content type name.");
 
-            var pageContentKey = await pageService.GetContentKeyAsync(page.Id, cancellationToken);
-            await contentService.SetContentAsync(page.WebsiteId, pageContentKey, pageContentModel, cancellationToken);
+            if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
+                throw new InvalidOperationException($"Not found content type by name {contentTypeName}.");
+
+            var newContentModel = metadata.ConvertDictionaryToContentModel(newContentData);
+
+            await contentService.SetContentAsync(editSession.WebsiteId, editSession.ContentKey, newContentModel, cancellationToken);
 
             await editSessionRepository.DeleteEditAsync(editSession, cancellationToken);
         }

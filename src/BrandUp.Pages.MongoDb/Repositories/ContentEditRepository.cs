@@ -8,7 +8,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
     public class ContentEditRepository(IPagesDbContext dbContext) : IContentEditRepository
     {
         static readonly Expression<Func<ContentEditDocument, ContentEdit>> ProjectionExpression;
-        readonly IMongoCollection<ContentEditDocument> documents = dbContext.PageEditSessions;
+        readonly IMongoCollection<ContentEditDocument> documents = dbContext.ContentEdits;
 
         static ContentEditRepository()
         {
@@ -16,12 +16,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = it.Id,
                 CreatedDate = it.CreatedDate,
-                PageId = it.PageId,
+                WebsiteId = it.WebsiteId,
+                ContentKey = it.ContentKey,
                 UserId = it.UserId
             };
         }
 
-        public async Task<IContentEdit> CreateEditAsync(IPage page, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> CreateEditAsync(string websiteId, string contentKey, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
@@ -31,8 +32,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Id = Guid.NewGuid(),
                 CreatedDate = createdDate,
                 Version = 1,
-                WebsiteId = page.WebsiteId,
-                PageId = page.Id,
+                WebsiteId = websiteId,
+                ContentKey = contentKey,
                 UserId = userId,
                 Content = contentDataDocument
             };
@@ -43,7 +44,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = document.Id,
                 CreatedDate = createdDate,
-                PageId = document.PageId,
+                WebsiteId = document.WebsiteId,
+                ContentKey = document.ContentKey,
                 UserId = document.UserId
             };
         }
@@ -55,9 +57,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IContentEdit> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string contentKey, string userId, CancellationToken cancellationToken = default)
         {
-            var cursor = await documents.Find(it => it.PageId == page.Id && it.UserId == userId).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
+            var cursor = await documents.Find(it => it.WebsiteId == websiteId && it.ContentKey == contentKey && it.UserId == userId).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }

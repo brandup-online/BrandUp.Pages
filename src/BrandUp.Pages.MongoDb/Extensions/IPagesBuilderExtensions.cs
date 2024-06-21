@@ -37,7 +37,7 @@ namespace BrandUp.Pages.Builder
         {
             services.AddScoped<IPageCollectionRepository, PageCollectionRepository>();
             services.AddScoped<IPageRepository, PageRepository>();
-            services.AddScoped<IFileRepository, PageFileRepository>();
+            services.AddScoped<IFileRepository, FileRepository>();
             services.AddScoped<IContentEditRepository, ContentEditRepository>();
             services.AddScoped<IContentRepository, ContentRepository>();
         }

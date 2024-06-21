@@ -64,12 +64,12 @@ namespace BrandUp.Pages.Services
             await pageRepository.SetUrlPathAsync(testPage, "test");
             await pageRepository.UpdatePageAsync(testPage);
         }
-        Task IAsyncLifetime.DisposeAsync()
+        async Task IAsyncLifetime.DisposeAsync()
         {
             serviceScope.Dispose();
             serviceProvider.Dispose();
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         #endregion
@@ -79,19 +79,24 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task BeginEdit()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
 
-            var edit = await contentEditService.BeginEditAsync(page);
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
             Assert.NotNull(edit);
-            Assert.Equal(page.Id, edit.PageId);
+            Assert.Equal(websiteId, edit.WebsiteId);
+            Assert.Equal(contentKey, edit.ContentKey);
         }
 
         [Fact]
         public async Task FindEditById()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-            var edit = await contentEditService.BeginEditAsync(page);
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
             var result = await contentEditService.FindEditByIdAsync(edit.Id);
 
@@ -102,20 +107,19 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task FindEditById_ReturnNull()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-
             var result = await contentEditService.FindEditByIdAsync(Guid.NewGuid());
-
             Assert.Null(result);
         }
 
         [Fact]
         public async Task FindEditByUser()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-            var edit = await contentEditService.BeginEditAsync(page);
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
-            var result = await contentEditService.FindEditByUserAsync(page);
+            var result = await contentEditService.FindEditByUserAsync(websiteId, contentKey);
 
             Assert.NotNull(result);
             Assert.Equal(edit.Id, result.Id);
@@ -124,18 +128,20 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task FindEditByUser_ReturnNull()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
+            var websiteId = "test";
+            var contentKey = "test";
 
-            var result = await contentEditService.FindEditByUserAsync(page);
-
+            var result = await contentEditService.FindEditByUserAsync(websiteId, contentKey);
             Assert.Null(result);
         }
 
         [Fact]
         public async Task GetContent()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-            var edit = await contentEditService.BeginEditAsync(page);
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
             var contentData = (TestPageContent)await contentEditService.GetContentAsync(edit);
 
@@ -146,8 +152,10 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task SetContent()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-            var edit = await contentEditService.BeginEditAsync(page);
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
@@ -160,8 +168,10 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CommitEdit()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-            var edit = await contentEditService.BeginEditAsync(page);
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
@@ -169,7 +179,7 @@ namespace BrandUp.Pages.Services
 
             Assert.Null(await contentEditService.FindEditByIdAsync(edit.Id));
 
-            var contentData = (TestPageContent)await contentService.GetContentAsync(page.WebsiteId, await pageService.GetContentKeyAsync(page.Id));
+            var contentData = (TestPageContent)await contentService.GetContentAsync(edit.WebsiteId, edit.ContentKey);
             Assert.NotNull(contentData);
             Assert.Equal("test2", contentData.Title);
         }
@@ -177,8 +187,10 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task DiscardEdit()
         {
-            var page = await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test");
-            var edit = await contentEditService.BeginEditAsync(page);
+            var websiteId = "test";
+            var contentKey = "test";
+            await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
@@ -186,7 +198,7 @@ namespace BrandUp.Pages.Services
 
             Assert.Null(await contentEditService.FindEditByIdAsync(edit.Id));
 
-            var contentData = (TestPageContent)await contentService.GetContentAsync(page.WebsiteId, await pageService.GetContentKeyAsync(page.Id));
+            var contentData = (TestPageContent)await contentService.GetContentAsync(edit.WebsiteId, edit.ContentKey);
             Assert.NotNull(contentData);
             Assert.Equal("test", contentData.Title);
         }

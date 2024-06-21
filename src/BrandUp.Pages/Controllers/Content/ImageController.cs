@@ -4,74 +4,65 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BrandUp.Pages.Controllers
 {
-	public class ImageController : FieldController<IImageField>
-	{
-		readonly FileService fileService;
-		readonly Files.IFileUrlGenerator fileUrlGenerator;
+    public class ImageController(FileService fileService, IFileUrlGenerator fileUrlGenerator) : FieldController<IImageField>
+    {
+        [HttpPost]
+        public async Task<IActionResult> PostAsync([FromQuery] string fileName, [FromQuery] string width = null, [FromQuery] string height = null)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                return BadRequest();
 
-		public ImageController(FileService fileService, Files.IFileUrlGenerator fileUrlGenerator)
-		{
-			this.fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-			this.fileUrlGenerator = fileUrlGenerator ?? throw new ArgumentNullException(nameof(fileUrlGenerator));
-		}
+            var contentType = Request.ContentType;
+            if (!contentType.StartsWith("image"))
+                return BadRequest();
 
-		[HttpPost]
-		public async Task<IActionResult> PostAsync([FromQuery] string fileName, [FromQuery] string width = null, [FromQuery] string height = null)
-		{
-			if (string.IsNullOrEmpty(fileName))
-				return BadRequest();
+            var file = await fileService.UploadFileAsync(ContentEdit.WebsiteId, ContentEdit.ContentKey, fileName, contentType, Request.Body);
 
-			var contentType = Request.ContentType;
-			if (!contentType.StartsWith("image"))
-				return BadRequest();
+            var modelValue = new ImageValue(file.Id);
+            Field.SetModelValue(ContentContext.Content, modelValue);
 
-			var file = await fileService.UploadFileAsync(Page, fileName, contentType, Request.Body);
+            await SaveChangesAsync();
 
-			var modelValue = new ImageValue(file.Id);
-			Field.SetModelValue(ContentContext.Content, modelValue);
+            if (width != null && height != null)
+            {
+                var fielUrl = await fileUrlGenerator.GetImageUrlAsync(modelValue, int.Parse(width), int.Parse(height));
+                return Ok(fielUrl);
+            }
 
-			await SaveChangesAsync();
+            return await FormValueAsync();
+        }
 
-			if (width != null && height != null)
-			{
-				var fielUrl = await fileUrlGenerator.GetImageUrlAsync(modelValue, int.Parse(width), int.Parse(height));
-				return Ok(fielUrl);
-			}
+        [HttpPost("url")]
+        public async Task<IActionResult> UrlAsync([FromQuery] string url, [FromQuery] string width = null, [FromQuery] string height = null)
+        {
+            if (string.IsNullOrEmpty(url))
+                return BadRequest();
 
-			return await FormValueAsync();
-		}
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+                if (response.StatusCode != System.Net.HttpStatusCode.OK)
+                    return BadRequest();
 
-		[HttpPost("url")]
-		public async Task<IActionResult> UrlAsync([FromQuery] string url, [FromQuery] string width = null, [FromQuery] string height = null)
-		{
-			if (string.IsNullOrEmpty(url))
-				return BadRequest();
+                var contentType = response.Content.Headers.ContentType.MediaType;
+                if (!contentType.StartsWith("image"))
+                    return BadRequest();
 
-			using (var client = new HttpClient())
-			{
-				var response = await client.GetAsync(url);
-				if (response.StatusCode != System.Net.HttpStatusCode.OK)
-					return BadRequest();
+                var file = await fileService.UploadFileAsync(ContentEdit.WebsiteId, ContentEdit.ContentKey, url, contentType, await response.Content.ReadAsStreamAsync());
 
-				var contentType = response.Content.Headers.ContentType.MediaType;
-				if (!contentType.StartsWith("image"))
-					return BadRequest();
+                var modelValue = new ImageValue(file.Id);
+                Field.SetModelValue(ContentContext.Content, modelValue);
 
-				var file = await fileService.UploadFileAsync(Page, url, contentType, await response.Content.ReadAsStreamAsync());
+                await SaveChangesAsync();
 
-				var modelValue = new ImageValue(file.Id);
-				Field.SetModelValue(ContentContext.Content, modelValue);
+                if (width != null && height != null)
+                {
+                    var fielUrl = await fileUrlGenerator.GetImageUrlAsync(modelValue, int.Parse(width), int.Parse(height));
+                    return Ok(fielUrl);
+                }
+            }
 
-				await SaveChangesAsync();
-
-				if (width != null && height != null)
-				{
-					var fielUrl = await fileUrlGenerator.GetImageUrlAsync(modelValue, int.Parse(width), int.Parse(height));
-					return Ok(fielUrl);
-				}
-			}
-
-			return await FormValueAsync();
-		}
-	}
+            return await FormValueAsync();
+        }
+    }
 }

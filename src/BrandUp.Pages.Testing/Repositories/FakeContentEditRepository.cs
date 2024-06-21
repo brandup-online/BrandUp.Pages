@@ -7,19 +7,20 @@ namespace BrandUp.Pages.Repositories
         readonly Dictionary<string, PageEdit> edits = [];
         readonly Dictionary<Guid, string> ids = [];
 
-        public async Task<IContentEdit> CreateEditAsync(IPage page, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> CreateEditAsync(string websiteId, string key, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var editId = Guid.NewGuid();
             var edit = new PageEdit
             {
                 Id = editId,
                 CreatedDate = DateTime.UtcNow,
-                PageId = page.Id,
+                WebsiteId = websiteId,
+                ContentKey = key,
                 UserId = userId,
                 Content = contentData
             };
 
-            var uniqueId = GetId(page, userId);
+            var uniqueId = GetId(websiteId, key, userId);
             edits.Add(uniqueId, edit);
             ids.Add(editId, uniqueId);
 
@@ -43,9 +44,9 @@ namespace BrandUp.Pages.Repositories
             return await Task.FromResult<IContentEdit>(pageEdit);
         }
 
-        public async Task<IContentEdit> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string key, string userId, CancellationToken cancellationToken = default)
         {
-            var uniqueId = GetId(page, userId);
+            var uniqueId = GetId(websiteId, key, userId);
             edits.TryGetValue(uniqueId, out PageEdit pageEdit);
             return await Task.FromResult<IContentEdit>(pageEdit);
         }
@@ -62,24 +63,25 @@ namespace BrandUp.Pages.Repositories
             await Task.CompletedTask;
         }
 
-        private static string GetId(IPage page, string userId)
+        private static string GetId(IPage page, string key, string userId)
         {
-            return GetId(page.Id, userId);
+            return GetId(page.WebsiteId, key, userId);
         }
         private static string GetId(IContentEdit editPage)
         {
-            return GetId(editPage.PageId, editPage.UserId);
+            return GetId(editPage.WebsiteId, editPage.ContentKey, editPage.UserId);
         }
-        private static string GetId(Guid pageId, string userId)
+        private static string GetId(string websiteId, string key, string userId)
         {
-            return pageId.ToString() + "-" + userId;
+            return $"{websiteId}-{key}-{userId}";
         }
 
         class PageEdit : IContentEdit
         {
             public Guid Id { get; set; }
             public DateTime CreatedDate { get; set; }
-            public Guid PageId { get; set; }
+            public string WebsiteId { get; set; }
+            public string ContentKey { get; set; }
             public string UserId { get; set; }
             public IDictionary<string, object> Content { get; set; }
         }

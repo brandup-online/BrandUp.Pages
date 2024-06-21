@@ -14,6 +14,8 @@ namespace BrandUp.Pages.MongoDb._migrations
 
         async Task IMigrationHandler.UpAsync(CancellationToken cancellationToken)
         {
+            #region Contents
+
             // Delete old index
             await dbContext.Contents.Indexes.DropIfExistAsync("Page", cancellationToken: cancellationToken);
 
@@ -57,6 +59,23 @@ namespace BrandUp.Pages.MongoDb._migrations
             await dbContext.Contents.Indexes.ApplyIndexes([
                 new CreateIndexModel<ContentDocument>(keyIndex, new CreateIndexOptions { Name = "Key", Unique = true })
             ], true, cancellationToken);
+
+            #endregion
+
+            #region Content edits
+
+            // Delete all edit sessions by pageId
+            await dbContext.ContentEdits.DeleteManyAsync(Builders<ContentEditDocument>.Filter.Exists("pageId", true), cancellationToken);
+
+            await dbContext.ContentEdits.Indexes.DropIfExistAsync("Website", cancellationToken: cancellationToken);
+
+            // Recreate edit index
+            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.ContentKey).Ascending(it => it.UserId);
+            await dbContext.ContentEdits.Indexes.ApplyIndexes([
+                new CreateIndexModel<ContentEditDocument>(userIndex, new CreateIndexOptions { Name = "User", Unique = true })
+            ], true, cancellationToken);
+
+            #endregion
         }
 
         Task IMigrationHandler.DownAsync(CancellationToken cancellationToken)

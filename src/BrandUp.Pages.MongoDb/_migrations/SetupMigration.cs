@@ -18,7 +18,7 @@ namespace BrandUp.Pages.MongoDb._migrations
             await CreateIndexes_PageAsync(cancellationToken);
             await CreateIndexes_ContentAsync(cancellationToken);
             await CreateIndexes_PageUrlAsync(cancellationToken);
-            await CreateIndexes_PageEditAsync(cancellationToken);
+            await CreateIndexes_ContentEditsAsync(cancellationToken);
             await CreateIndexes_PageRecyclebinAsync(cancellationToken);
         }
         Task IMigrationHandler.DownAsync(CancellationToken cancellationToken)
@@ -62,15 +62,6 @@ namespace BrandUp.Pages.MongoDb._migrations
             ], true, cancellationToken);
         }
 
-        async Task CreateIndexes_ContentAsync(CancellationToken cancellationToken)
-        {
-            var keyIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.Key);
-
-            await dbContext.Contents.Indexes.ApplyIndexes([
-                new CreateIndexModel<ContentDocument>(keyIndex, new CreateIndexOptions { Name = "Key", Unique = true })
-            ], true, cancellationToken);
-        }
-
         async Task CreateIndexes_PageUrlAsync(CancellationToken cancellationToken)
         {
             var pathIndex = Builders<PageUrlDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.Path);
@@ -84,19 +75,6 @@ namespace BrandUp.Pages.MongoDb._migrations
             ], true, cancellationToken);
         }
 
-        async Task CreateIndexes_PageEditAsync(CancellationToken cancellationToken)
-        {
-            var versionIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
-            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.UserId);
-            var websiteIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.WebsiteId);
-
-            await dbContext.PageEditSessions.Indexes.ApplyIndexes([
-                new CreateIndexModel<ContentEditDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
-                new CreateIndexModel<ContentEditDocument>(userIndex, new CreateIndexOptions { Name = "User" }),
-                new CreateIndexModel<ContentEditDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
-            ], true, cancellationToken);
-        }
-
         async Task CreateIndexes_PageRecyclebinAsync(CancellationToken cancellationToken)
         {
             var versionIndex = Builders<PageRecyclebinDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
@@ -105,6 +83,26 @@ namespace BrandUp.Pages.MongoDb._migrations
             await dbContext.PageRecyclebin.Indexes.ApplyIndexes([
                 new CreateIndexModel<PageRecyclebinDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
                 new CreateIndexModel<PageRecyclebinDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
+            ], true, cancellationToken);
+        }
+
+        async Task CreateIndexes_ContentAsync(CancellationToken cancellationToken)
+        {
+            var keyIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.Key);
+
+            await dbContext.Contents.Indexes.ApplyIndexes([
+                new CreateIndexModel<ContentDocument>(keyIndex, new CreateIndexOptions { Name = "Key", Unique = true })
+            ], true, cancellationToken);
+        }
+
+        async Task CreateIndexes_ContentEditsAsync(CancellationToken cancellationToken)
+        {
+            var versionIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.ContentKey).Ascending(it => it.UserId);
+
+            await dbContext.ContentEdits.Indexes.ApplyIndexes([
+                new CreateIndexModel<ContentEditDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
+                new CreateIndexModel<ContentEditDocument>(userIndex, new CreateIndexOptions { Name = "User", Unique = true })
             ], true, cancellationToken);
         }
     }
