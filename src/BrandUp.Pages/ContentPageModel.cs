@@ -11,7 +11,7 @@ namespace BrandUp.Pages
     public sealed class ContentPageModel : AppPageModel
     {
         IPage page;
-        IPageEdit editSession;
+        IEditSession editSession;
         PageSeoOptions pageSeo;
 
         #region Properties
@@ -44,7 +44,7 @@ namespace BrandUp.Pages
 
             if (EditId.HasValue)
             {
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageContentService>();
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IEditSessionService>();
                 editSession = await pageEditingService.FindEditByIdAsync(EditId.Value);
                 if (editSession == null)
                 {
@@ -121,7 +121,7 @@ namespace BrandUp.Pages
 
             if (editSession != null)
             {
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IPageContentService>();
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IEditSessionService>();
                 PageContent = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
             }
             else

@@ -96,14 +96,14 @@ namespace BrandUp.Pages.MongoDb._migrations
 		{
 			await dbContext.PageEditSessions.Indexes.DropAllAsync();
 
-			var versionIndex = Builders<PageEditDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
-			var userIndex = Builders<PageEditDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.UserId);
-			var websiteIndex = Builders<PageEditDocument>.IndexKeys.Ascending(it => it.WebsiteId);
+			var versionIndex = Builders<EditSessionDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
+			var userIndex = Builders<EditSessionDocument>.IndexKeys.Ascending(it => it.PageId).Ascending(it => it.UserId);
+			var websiteIndex = Builders<EditSessionDocument>.IndexKeys.Ascending(it => it.WebsiteId);
 
-			await ApplyIndexes(dbContext.PageEditSessions, new CreateIndexModel<PageEditDocument>[] {
-				new CreateIndexModel<PageEditDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
-				new CreateIndexModel<PageEditDocument>(userIndex, new CreateIndexOptions { Name = "User" }),
-				new CreateIndexModel<PageEditDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
+			await ApplyIndexes(dbContext.PageEditSessions, new CreateIndexModel<EditSessionDocument>[] {
+				new CreateIndexModel<EditSessionDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),
+				new CreateIndexModel<EditSessionDocument>(userIndex, new CreateIndexOptions { Name = "User" }),
+				new CreateIndexModel<EditSessionDocument>(websiteIndex, new CreateIndexOptions { Name = "Website" })
 			});
 		}
 		async Task CreateIndexes_PageRecyclebinAsync()

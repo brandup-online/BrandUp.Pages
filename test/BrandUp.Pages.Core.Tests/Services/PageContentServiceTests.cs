@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Services
 		private readonly IServiceScope serviceScope;
 		private readonly IPageService pageService;
 		private readonly IPageCollectionService pageCollectionService;
-		private readonly IPageContentService pageContentService;
+		private readonly IEditSessionService pageContentService;
 		private IPageMetadataManager pageMetadataManager;
 		readonly IWebsiteContext websiteContext;
 
@@ -35,7 +35,7 @@ namespace BrandUp.Pages.Services
 
 			pageService = serviceScope.ServiceProvider.GetService<IPageService>();
 			pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
-			pageContentService = serviceScope.ServiceProvider.GetService<IPageContentService>();
+			pageContentService = serviceScope.ServiceProvider.GetService<IEditSessionService>();
 			pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
 		}
 
