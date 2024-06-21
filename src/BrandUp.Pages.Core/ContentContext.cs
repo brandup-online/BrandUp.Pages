@@ -6,6 +6,10 @@ namespace BrandUp.Pages
 {
     public class ContentContext
     {
+        /// <summary>
+        /// Ключ контента.
+        /// </summary>
+        public string Key { get; }
         public IPage Page { get; }
         public ContentExplorer Explorer { get; }
         public IServiceProvider Services { get; }
@@ -14,8 +18,11 @@ namespace BrandUp.Pages
 
         public ContentContext(IPage page, object contentModel, IServiceProvider services, bool isDesigner)
         {
+            ArgumentNullException.ThrowIfNull(page);
             ArgumentNullException.ThrowIfNull(contentModel);
+            ArgumentNullException.ThrowIfNull(services);
 
+            Key = $"page-{page.Id}";
             Page = page;
             Services = services ?? throw new ArgumentNullException(nameof(services));
 
@@ -25,8 +32,24 @@ namespace BrandUp.Pages
             IsDesigner = isDesigner;
         }
 
+        public ContentContext(string key, object contentModel, IServiceProvider services, bool isDesigner)
+        {
+            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(contentModel);
+            ArgumentNullException.ThrowIfNull(services);
+
+            Key = key;
+            Services = services;
+
+            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
+
+            Explorer = ContentExplorer.Create(contentMetadataManager, contentModel);
+            IsDesigner = isDesigner;
+        }
+
         private ContentContext(ContentContext parent, ContentExplorer contentExplorer)
         {
+            Key = parent.Key;
             Page = parent.Page;
             Services = parent.Services;
             Explorer = contentExplorer;

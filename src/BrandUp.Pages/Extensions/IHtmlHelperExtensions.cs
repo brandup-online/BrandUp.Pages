@@ -22,15 +22,15 @@ namespace BrandUp.Pages
         /// <summary>
         /// Ренреринг статического блока.
         /// </summary>
-        /// <typeparam name="TContent">Тип контента блока.</typeparam>
         /// <param name="htmlHelper">HTML хелпер представления.</param>
         /// <param name="key">Ключ блока.</param>
+        /// <param name="contentType">Тип контента блока.</param>
         /// <returns>HTML контент блока.</returns>
-        public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, Type contentType, string key)
+        public static async Task<IHtmlContent> BlockAsync(this IHtmlHelper htmlHelper, string key, Type contentType)
         {
             ArgumentNullException.ThrowIfNull(nameof(htmlHelper));
-            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(key));
+            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
 
             var services = htmlHelper.ViewContext.HttpContext.RequestServices;
             var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
@@ -49,7 +49,7 @@ namespace BrandUp.Pages
             if (view.DefaultModelData != null)
                 contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
 
-            var contentContext = new ContentContext(null, contentModel, services, false);
+            var contentContext = new ContentContext(key, contentModel, services, false);
 
             var builder = new HtmlContentBuilder();
             var pageHtml = await viewRenderService.RenderToStringAsync(contentContext);

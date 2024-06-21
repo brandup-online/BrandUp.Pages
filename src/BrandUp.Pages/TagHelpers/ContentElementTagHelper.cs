@@ -5,31 +5,31 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace BrandUp.Pages.TagHelpers
 {
-	[HtmlTargetElement("content-element", TagStructure = TagStructure.NormalOrSelfClosing)]
-	public class ContentElementTagHelper : TagHelper
-	{
-		[HtmlAttributeName("tag")]
-		public string HtmlTag { get; set; } = "div";
+    [HtmlTargetElement("content-element", TagStructure = TagStructure.NormalOrSelfClosing)]
+    public class ContentElementTagHelper : TagHelper
+    {
+        [HtmlAttributeName("tag")]
+        public string HtmlTag { get; set; } = "div";
 
-		[HtmlAttributeName("class")]
-		public string CssClass { get; set; }
+        [HtmlAttributeName("class")]
+        public string CssClass { get; set; }
 
-		[HtmlAttributeName("script")]
-		public string ScriptName { get; set; }
+        [HtmlAttributeName("script")]
+        public string ScriptName { get; set; }
 
-		[HtmlAttributeNotBound, ViewContext]
-		public ViewContext ViewContext { get; set; }
+        [HtmlAttributeNotBound, ViewContext]
+        public ViewContext ViewContext { get; set; }
 
-		public override void Process(TagHelperContext context, TagHelperOutput output)
-		{
-			if (!(ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is ViewRenderingContext contentRenderingContext))
-				throw new InvalidOperationException();
+        public override void Process(TagHelperContext context, TagHelperOutput output)
+        {
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ViewRenderingContext contentRenderingContext)
+                throw new InvalidOperationException("Not found content view rendering context.");
 
-			output.SuppressOutput();
+            output.SuppressOutput();
 
-			contentRenderingContext.HtmlTag = HtmlTag;
-			contentRenderingContext.CssClass = CssClass;
-			contentRenderingContext.ScriptName = ScriptName;
-		}
-	}
+            contentRenderingContext.HtmlTag = HtmlTag;
+            contentRenderingContext.CssClass = CssClass;
+            contentRenderingContext.ScriptName = ScriptName;
+        }
+    }
 }
