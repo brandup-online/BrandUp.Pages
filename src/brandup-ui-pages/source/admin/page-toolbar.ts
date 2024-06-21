@@ -17,18 +17,7 @@ import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
 
-export const statickContentMock = [ // TODO имитация ответа от сервера. Удалить после появления api.
-    { title: 'Текущая страница', key: '1' },
-    { title: 'Блок 1', key: '2' },
-    { title: 'Блок 2', key: '3' },
-    { title: 'Блок 3', key: '4' },
-    { title: 'Блок 4', key: '5' },
-    { title: 'Блок 5', key: '6' },
-    { title: 'Блок 6', key: '7' },
-    { title: 'Блок 7', key: '8' },
-]
-
-export class EditorWidget extends UIElement {
+export class PageToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
     private __page: Page<PageModel>;
     private __isLoading: boolean;
@@ -42,7 +31,6 @@ export class EditorWidget extends UIElement {
 
     constructor(page: Page<PageModel>) {
         super();
-        statickContentMock[0].key = page.model.id || statickContentMock[0].key;
 
         this.__page = page;
         this.__isLoading = false;
@@ -55,19 +43,12 @@ export class EditorWidget extends UIElement {
     }
 
     private __renderUI() {
-        const isDynamic = !!this.__page.model.id; //TODO Определяем тип статичная страница или нет. Поменять по готовности бека
+        const editableStaticBlocks: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[content-root]"));
+
         const websiteMenuItems = [
             DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]),
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
         ]
-
-        if (this.isContentPage && this.__page.model.parentPageId) {
-            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
-        }
-
-        if (this.isContentPage) {
-            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
-        }
 
         let widgetButtons = [
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-website", title: "Действия" }, [
@@ -76,19 +57,28 @@ export class EditorWidget extends UIElement {
             ]),
             DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
-                DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }, statickContentMock.map(item => 
-                    DOM.tag("a", { href: "", "data-key": item.key, command: "bp-edit" }, [
-                        item.title, DOM.tag('span', null, item.key),
-                    ]))
-                ),
+                DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }, editableStaticBlocks.map(block => {
+                    const key = block.getAttribute("content-root");
+                    if (key === "") return null;
+                    return DOM.tag("a", { href: "", "data-key": key, command: "bp-edit" }, [
+                        key, DOM.tag('span', null, key),
+                    ])
+                })),
             ]),
         ]
         
-        if (isDynamic) {
+        // Если страница динамическая
+        if (this.isContentPage) {
+            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
+            if (this.__page.model.parentPageId) {
+                websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
+            }
+
             const pageMenuItems = [
                 DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
                 DOM.tag("a", { href: "", command: "bp-actions-edit" }, [iconEdit, "Редактировать страницу"]),
             ];
+
             const status = this.__page.model.status?.toLowerCase();
             const published = status === "published";
 
