@@ -14,6 +14,10 @@ namespace BrandUp.Pages.Services
     {
         readonly PagesOptions options = options?.Value ?? throw new ArgumentNullException(nameof(options));
 
+        public async Task<string> GetContentKeyAsync(Guid pageId, CancellationToken cancellationToken = default)
+        {
+            return await Task.FromResult($"page-{pageId}");
+        }
         public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
         {
             if (collection == null)
@@ -30,7 +34,9 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var pageId = Guid.NewGuid();
+            var pageContentKey = await GetContentKeyAsync(pageId, cancellationToken);
+            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, pageContentKey, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -76,7 +82,9 @@ namespace BrandUp.Pages.Services
             var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             pageHeader = pageMetadata.GetPageHeader(pageContent);
 
-            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
+            var pageId = Guid.NewGuid();
+            var pageContentKey = await GetContentKeyAsync(pageId, cancellationToken);
+            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, pageContentKey, pageContentData, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -183,34 +191,6 @@ namespace BrandUp.Pages.Services
                 throw new InvalidOperationException($"Тип страницы {page.TypeName} не зарегистрирован.");
             return Task.FromResult(pageType);
         }
-        public async Task<object> GetPageContentAsync(IPage page, CancellationToken cancellationToken = default) // todo : придумать как хранить тег в бд.
-        {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-
-            var contentData = await pageRepository.GetContentAsync(page.Id, cancellationToken);
-            if (contentData == null)
-                throw new InvalidOperationException("Для страницы не задан контент.");
-            var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
-
-            return pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(contentData);
-        }
-        public async Task SetPageContentAsync(IPage page, object contentModel, CancellationToken cancellationToken = default)
-        {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
-
-            var pageMetadata = await GetPageTypeAsync(page, cancellationToken);
-            if (contentModel.GetType() != pageMetadata.ContentType)
-                throw new ArgumentException();
-
-            var pageTitle = pageMetadata.GetPageHeader(contentModel);
-            var pageData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(contentModel);
-
-            await pageRepository.SetContentAsync(page.Id, pageTitle, pageData, cancellationToken);
-
-            page.Header = pageTitle;
-        }
         public async Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
             if (page == null)
@@ -246,19 +226,13 @@ namespace BrandUp.Pages.Services
         }
         public async Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
-            if (page == null)
-                throw new ArgumentNullException(nameof(page));
+            ArgumentNullException.ThrowIfNull(page);
 
-            try
-            {
-                await pageRepository.DeletePageAsync(page, cancellationToken);
+            var pageContentKey = await GetContentKeyAsync(page.Id, cancellationToken);
 
-                return Result.Success;
-            }
-            catch (Exception ex)
-            {
-                return Result.Failed(ex);
-            }
+            await pageRepository.DeletePageAsync(page, pageContentKey, cancellationToken);
+
+            return Result.Success;
         }
         public async Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default)
         {

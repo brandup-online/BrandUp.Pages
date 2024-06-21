@@ -5,13 +5,12 @@ using MongoDB.Driver;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-    public class PageContentRepository : IContentEditRepository
+    public class ContentEditRepository(IPagesDbContext dbContext) : IContentEditRepository
     {
-        private static readonly Expression<Func<ContentEditDocument, ContentEdit>> ProjectionExpression;
-        readonly IMongoCollection<ContentEditDocument> documents;
-        readonly IMongoCollection<ContentDocument> contentDocuments;
+        static readonly Expression<Func<ContentEditDocument, ContentEdit>> ProjectionExpression;
+        readonly IMongoCollection<ContentEditDocument> documents = dbContext.PageEditSessions;
 
-        static PageContentRepository()
+        static ContentEditRepository()
         {
             ProjectionExpression = it => new ContentEdit
             {
@@ -22,15 +21,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
         }
 
-        public PageContentRepository(IPagesDbContext dbContext)
+        public async Task<IContentEdit> CreateEditAsync(IPage page, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
-            documents = dbContext.PageEditSessions;
-            contentDocuments = dbContext.Contents;
-        }
-
-        public async Task<IContentEdit> CreateEditAsync(IPage page, string userId, CancellationToken cancellationToken = default)
-        {
-            var pageContent = await (await contentDocuments.FindAsync(it => it.PageId == page.Id, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
             var createdDate = DateTime.UtcNow;
             var document = new ContentEditDocument
@@ -41,7 +34,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 WebsiteId = page.WebsiteId,
                 PageId = page.Id,
                 UserId = userId,
-                Content = pageContent.Data
+                Content = contentDataDocument
             };
 
             await documents.InsertOneAsync(document, cancellationToken: cancellationToken);
