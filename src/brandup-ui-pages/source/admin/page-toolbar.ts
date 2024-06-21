@@ -26,7 +26,7 @@ export class PageToolbar extends UIElement {
     readonly isContentPage: boolean;
 
     get typeName(): string {
-        return "BrandUpPages.EditorWidget";
+        return "BrandUpPages.PageToolbar";
     }
 
     constructor(page: Page<PageModel>) {
@@ -50,14 +50,14 @@ export class PageToolbar extends UIElement {
             DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
         ]
 
-        let widgetButtons = [
-            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-website", title: "Действия" }, [
+        let toolbarButtons = [
+            DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-website", title: "Действия" }, [
                 iconList,
-                DOM.tag("menu", { class: "bp-widget-menu", id: "website-widget-menu", title: "" }, websiteMenuItems),
+                DOM.tag("menu", { class: "page-toolbar-menu", id: "website-toolbar-menu", title: "" }, websiteMenuItems),
             ]),
-            DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
+            DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
-                DOM.tag("menu", { class: "bp-widget-menu edit-menu", id: "edit-widget-menu", title: "" }, editableStaticBlocks.map(block => {
+                DOM.tag("menu", { class: "page-toolbar-menu edit-menu", id: "edit-toolbar-menu", title: "" }, editableStaticBlocks.map(block => {
                     const key = block.getAttribute("content-root");
                     if (key === "") return null;
                     return DOM.tag("a", { href: "", "data-key": key, command: "bp-edit" }, [
@@ -70,6 +70,7 @@ export class PageToolbar extends UIElement {
         // Если страница динамическая
         if (this.isContentPage) {
             websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
+            
             if (this.__page.model.parentPageId) {
                 websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
             }
@@ -85,22 +86,22 @@ export class PageToolbar extends UIElement {
             if (!published) 
                 pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),);
 
-            widgetButtons = widgetButtons.slice(0, 1).concat([
-                    DOM.tag ("button", { class: "page-status bp-widget-button " + status }, [DOM.tag("span"),]),
-                    (published ? null : DOM.tag("button", { class: "bp-widget-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)),
+            toolbarButtons = toolbarButtons.slice(0, 1).concat([
+                    DOM.tag ("button", { class: "page-status page-toolbar-button " + status }, [DOM.tag("span"),]),
+                    (published ? null : DOM.tag("button", { class: "page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)),
                 ],
-                widgetButtons.slice(1),
-                DOM.tag("button", { class: "bp-widget-button", command: "bp-actions-page", title: "Действия над страницей" }, [
+                toolbarButtons.slice(1),
+                DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-page", title: "Действия над страницей" }, [
                     iconMore,
-                    DOM.tag("menu", { class: "bp-widget-menu", id: "page-widget-menu", title: "" }, pageMenuItems),
+                    DOM.tag("menu", { class: "page-toolbar-menu", id: "page-toolbar-menu", title: "" }, pageMenuItems),
                 ])
             );
         }
 
-        const widgetElem = DOM.tag("div", { class: "bp-elem bp-widget" }, widgetButtons);
+        const toolbarElem = DOM.tag("div", { class: "bp-elem page-toolbar" }, toolbarButtons);
 
-        document.body.appendChild(widgetElem);
-        this.setElement(widgetElem);
+        document.body.appendChild(toolbarElem);
+        this.setElement(toolbarElem);
     }
 
     private __initLogic() {
@@ -169,7 +170,7 @@ export class PageToolbar extends UIElement {
         });
 
         this.registerCommand("bp-actions-edit", (elem) => {
-            if (elem.closest(".bp-widget-menu")) this.__closeMenu();
+            if (elem.closest(".page-toolbar-menu")) this.__closeMenu();
 
             if (!this.element.classList.toggle("opened-menu-edit")) {
                 document.body.removeEventListener("click", this.__closeMenuFunc);
@@ -197,7 +198,7 @@ export class PageToolbar extends UIElement {
                     }
 
                     if (response.data.currentDate) {
-                        const popup = DOM.tag("div", { class: "bp-widget-popup" }, [
+                        const popup = DOM.tag("div", { class: "page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
                                 DOM.tag("button", { "data-command": "continue-edit", "data-value": response.data.url }, "Продолжить"),
@@ -243,9 +244,9 @@ export class PageToolbar extends UIElement {
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
-            if (target.closest(".bp-widget-menu")) return;
+            if (target.closest(".page-toolbar-menu")) return;
 
-            const button = target.closest(`.bp-widget-button`);
+            const button = target.closest(`.page-toolbar-button`);
             if (button) {
                 const menuName = button.getAttribute('data-command')?.replace('bp-actions-',"");
                 this.__closeMenu(menuName);

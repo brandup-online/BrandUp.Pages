@@ -26,7 +26,7 @@ export class EditorToolbar extends UIElement {
     }
 
     private __renderUI() {
-        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-toolbar" }, [
+        const toolbarElem = DOM.tag("div", { class: "bp-elem editor-toolbar" }, [
             DOM.tag("button", { class: "bp-button", command: "bp-commit", title:"Применить изменения на странице" }, [saveIcon, "Сохранить"]),
             DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title:"Отменить изменения на странице" }, [cancelIcon, "Отмена"]),
             DOM.tag("button", { class: "bp-button neutral right", command: "bp-content", title:"Показать контент страницы" }, [editBlockIcon, "Контент"]),
