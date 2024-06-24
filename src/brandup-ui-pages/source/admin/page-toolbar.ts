@@ -194,7 +194,7 @@ export class PageToolbar extends UIElement {
             const contentType = context.target.dataset["contentType"];
             if (!contentKey || !contentType)
                 throw "Not set content edit parameters.";
-
+                
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
                 urlParams: { key: contentKey, type: contentType },
@@ -211,7 +211,7 @@ export class PageToolbar extends UIElement {
                         const popup = DOM.tag("div", { class: "page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
-                                DOM.tag("button", { "data-command": "continue-edit", dataset: { editId: response.data.editId } }, "Продолжить"),
+                                DOM.tag("button", { "data-command": "continue-edit", dataset: { editId: response.data.editId, contentKey } }, "Продолжить"),
                                 DOM.tag("button", { "data-command": "restart-edit", dataset: { contentKey, contentType } }, "Начать заново")
                             ])
                         ])
@@ -222,7 +222,7 @@ export class PageToolbar extends UIElement {
                     }
                     else {
                         // редирект на страницу редактирования контента
-                        this.__navToEdit(response.data.editId);
+                        this.__navToEdit(response.data.editId, contentKey);
                     }
 
                     context.complate();
@@ -234,7 +234,8 @@ export class PageToolbar extends UIElement {
             this.setPopup(null);
 
             const editId = elem.dataset["editId"];
-            this.__navToEdit(editId);
+            const contentKey = elem.dataset["contentKey"];
+            this.__navToEdit(editId, contentKey);
         });
 
         this.registerCommand("restart-edit", (elem: HTMLElement) => {
@@ -252,7 +253,7 @@ export class PageToolbar extends UIElement {
                     if (response.status !== 200)
                         throw "Error begin content edit.";
                         
-                    this.__navToEdit(response.data.editId);
+                    this.__navToEdit(response.data.editId, contentKey);
                 }
             });
         });
@@ -274,7 +275,11 @@ export class PageToolbar extends UIElement {
         };
     }
 
-    private __navToEdit(editId: string) {
+    private __navToEdit(editId: string, contentKey: string) {
+        const contentElem = DOM.queryElement(document.body, `[content-root='${contentKey}']`);
+
+        contentElem.dataset["contentEditId"] = editId;
+
         this.__page.website.nav({ url: this.__page.buildUrl({ editid: editId }), replace: true });
     }
 

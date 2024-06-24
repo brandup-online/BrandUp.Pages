@@ -7,48 +7,41 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace BrandUp.Pages.TagHelpers
 {
-	[HtmlTargetElement(Attributes = "content-object")]
-	public class ContentTagHelper : FieldTagHelper<IModelField>
-	{
-		private readonly IViewRenderService viewRenderService;
+    [HtmlTargetElement(Attributes = "content-object")]
+    public class ContentTagHelper(IViewRenderService viewRenderService) : FieldTagHelper<IModelField>
+    {
+        [HtmlAttributeName("content-object")]
+        public override ModelExpression FieldName { get; set; }
 
-		[HtmlAttributeName("content-object")]
-		public override ModelExpression FieldName { get; set; }
+        protected override async Task RenderContentAsync(TagHelperOutput output)
+        {
+            output.TagMode = TagMode.StartTagAndEndTag;
 
-		public ContentTagHelper(IViewRenderService viewRenderService)
-		{
-			this.viewRenderService = viewRenderService ?? throw new ArgumentNullException(nameof(viewRenderService));
-		}
+            if (Field.IsListValue)
+            {
+                var list = Field.GetModelValue(Content) as IList;
+                if (Field.HasValue(list))
+                {
+                    for (var i = 0; i < list.Count; i++)
+                    {
+                        var itemContentContext = ContentContext.Navigate($"{FieldName.Name}[{i}]");
+                        var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
 
-		protected override async Task RenderContentAsync(TagHelperOutput output)
-		{
-			output.TagMode = TagMode.StartTagAndEndTag;
+                        output.Content.AppendHtmlLine(itemHtml);
+                    }
+                }
+            }
+            else
+            {
+                var value = Field.GetModelValue(Content);
+                if (Field.HasValue(value))
+                {
+                    var itemContentContext = ContentContext.Navigate(FieldName.Name);
+                    var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
 
-			if (Field.IsListValue)
-			{
-				var list = Field.GetModelValue(Content) as IList;
-				if (Field.HasValue(list))
-				{
-					for (var i = 0; i < list.Count; i++)
-					{
-						var itemContentContext = ContentContext.Navigate($"{FieldName.Name}[{i}]");
-						var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
-
-						output.Content.AppendHtmlLine(itemHtml);
-					}
-				}
-			}
-			else
-			{
-				var value = Field.GetModelValue(Content);
-				if (Field.HasValue(value))
-				{
-					var itemContentContext = ContentContext.Navigate(FieldName.Name);
-					var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
-
-					output.Content.AppendHtmlLine(itemHtml);
-				}
-			}
-		}
-	}
+                    output.Content.AppendHtmlLine(itemHtml);
+                }
+            }
+        }
+    }
 }

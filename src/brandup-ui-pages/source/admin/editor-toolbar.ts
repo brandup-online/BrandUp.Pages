@@ -82,6 +82,8 @@ export class EditorToolbar extends UIElement {
     }
 
     private __complateEdit() {
+        delete this.__designer.contentElem.dataset["contentEditId"];
+
         const url = new URL(location.href);
         url.searchParams.delete("editid");
 

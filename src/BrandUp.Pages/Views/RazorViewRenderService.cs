@@ -27,7 +27,7 @@ namespace BrandUp.Pages.Views
 
             var contentView = viewLocator.FindView(contentContext.Explorer.Metadata.ModelType);
             if (contentView == null)
-                throw new InvalidOperationException($"Couldn't find content view {contentView.Name}");
+                throw new InvalidOperationException($"Couldn't find content view {contentContext.Explorer.Metadata.Name}");
 
             var viewEngineResult = viewEngine.GetView("~/", contentView.Name, false);
             if (!viewEngineResult.Success)

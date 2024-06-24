@@ -98,6 +98,9 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     destroy() {
+        this.element.classList.remove("html-designer");
+        this.element.removeAttribute("data-placeholder");
+
         this.__editor.destroy().then(() => {
             super.destroy();
         });

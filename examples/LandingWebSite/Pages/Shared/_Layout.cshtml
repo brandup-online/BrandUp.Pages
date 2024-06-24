@@ -10,30 +10,7 @@
     <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
 
     <div class="app">
-        <nav class="app-top">
-            <div class="content-width">
-                <a asp-page-path="/" class="logo">BrandUp.Pages</a>
-                <ul>
-                    <li><a asp-page-path="/news">News</a></li>
-                    <li><a asp-page="/about">About</a></li>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li><a href="#" data-command="signout">Sign out</a></li>
-                    }
-                    else
-                    {
-                        <li><a href="#" data-command="signin">Sign in</a></li>
-                    }
-                    <li class="menu">
-                        <a href="" data-command="toggle-app-menu">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
-                                <path d="M 0 7.5 L 0 12.5 L 50 12.5 L 50 7.5 L 0 7.5 z M 0 22.5 L 0 27.5 L 50 27.5 L 50 22.5 L 0 22.5 z M 0 37.5 L 0 42.5 L 50 42.5 L 50 37.5 L 0 37.5 z"></path>
-                            </svg>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        @await Html.BlockAsync("page-nav", typeof(PageNavContent))
         <main role="main" class="content-width app-content" page-content>
             @RenderBody()
         </main>

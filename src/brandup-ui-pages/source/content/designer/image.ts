@@ -7,6 +7,8 @@ import { AjaxResponse } from "brandup-ui-ajax";
 
 export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     private __fileInputElem: HTMLInputElement;
+    private __menuElem: HTMLElement;
+    private __progressElem: HTMLElement;
     private __button: HTMLElement;
     private __closeFunc: (e: MouseEvent) => void;
 
@@ -15,7 +17,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         elem.classList.add("image-designer");
 
         let textInput: HTMLInputElement;
-        elem.appendChild(DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
+        elem.appendChild(this.__menuElem = DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
             DOM.tag("ul", { class: "field-designer-popup" }, [
                 //DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "open-editor" }, "Редактор")),
                 //DOM.tag("li", { class: "split" }),
@@ -25,7 +27,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             textInput = DOM.tag("input", { type: "text" }) as HTMLInputElement
         ]));
 
-        elem.appendChild(DOM.tag("div", { class: "bp-elem image-designer-progress" }));
+        elem.appendChild(this.__progressElem = DOM.tag("div", { class: "bp-elem image-designer-progress" }));
 
         this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement;
         this.__fileInputElem.addEventListener("change", () => {
@@ -171,5 +173,15 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         else {
             this.element.classList.remove("uploading");
         }
+    }
+
+    destroy() {
+        this.element.classList.remove("image-designer");
+
+        this.__menuElem.remove();
+        this.__fileInputElem.remove();
+        this.__progressElem.remove();
+
+        super.destroy();
     }
 }

@@ -1,0 +1,15 @@
+{
+  "LogoText": "BrandUp.Pages",
+  "Items": [
+    {
+      "_type": "PageNavMenuItem",
+      "Text": "News",
+      "Url": "url(/news)"
+    },
+    {
+      "_type": "PageNavMenuItem",
+      "Text": "About",
+      "Url": "url(/about)"
+    }
+  ]
+}

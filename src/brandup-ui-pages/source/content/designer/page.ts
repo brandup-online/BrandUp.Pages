@@ -105,6 +105,8 @@ export class PageDesigner implements IPageDesigner {
         }
         this.__fields = null;
 
+        this.contentElem.classList.remove("page-designer");
+
         document.body.classList.remove("bp-state-design");
     }
 }
