@@ -52,23 +52,24 @@ namespace BrandUp.Pages.Content
         #region IContentMetadataManager members
 
         public IEnumerable<ContentMetadataProvider> MetadataProviders => metadataProviders;
+
         public bool IsRegisterdContentType(Type contentType)
         {
-            if (contentType == null)
-                throw new ArgumentNullException(nameof(contentType));
+            ArgumentNullException.ThrowIfNull(contentType);
 
             return contentTypes.ContainsKey(contentType);
         }
+
         public ContentMetadataProvider GetMetadata(Type contentType)
         {
             if (!TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata))
                 throw new ArgumentException($"Тип \"{contentType.AssemblyQualifiedName}\" не является контентом.");
             return contentMetadata;
         }
+
         public bool TryGetMetadata(Type contentType, out ContentMetadataProvider metadata)
         {
-            if (contentType == null)
-                throw new ArgumentNullException(nameof(contentType));
+            ArgumentNullException.ThrowIfNull(contentType);
 
             if (!contentTypes.TryGetValue(contentType, out int index))
             {
@@ -79,10 +80,10 @@ namespace BrandUp.Pages.Content
             metadata = metadataProviders[index];
             return true;
         }
+
         public bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata)
         {
-            if (contentTypeName == null)
-                throw new ArgumentNullException(nameof(contentTypeName));
+            ArgumentNullException.ThrowIfNull(contentTypeName);
 
             if (!contentNames.TryGetValue(contentTypeName.ToLower(), out int index))
             {
@@ -93,10 +94,10 @@ namespace BrandUp.Pages.Content
             metadata = metadataProviders[index];
             return true;
         }
+
         public object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary));
+            ArgumentNullException.ThrowIfNull(dictionary);
 
             if (!dictionary.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object contentTypeNameValue))
                 throw new InvalidOperationException();

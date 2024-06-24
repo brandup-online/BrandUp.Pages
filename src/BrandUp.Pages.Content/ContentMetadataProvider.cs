@@ -63,7 +63,7 @@ namespace BrandUp.Pages.Content
 
         #region Methods
 
-        private void InitializeInjectProperties()
+        void InitializeInjectProperties()
         {
             foreach (var propery in ModelType.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.GetProperty | BindingFlags.SetProperty))
             {
@@ -109,7 +109,7 @@ namespace BrandUp.Pages.Content
                 var titleAttribute = field.Binding.Member.GetCustomAttribute<TitleAttribute>(true);
                 if (titleAttribute != null)
                 {
-                    if (!(field is ITextField title))
+                    if (field is not ITextField title)
                         throw new InvalidOperationException();
 
                     titleField = title;
@@ -117,27 +117,20 @@ namespace BrandUp.Pages.Content
                 }
             }
         }
-        private void InitializeField(FieldProviderAttribute field, MemberInfo fieldMember)
+        void InitializeField(FieldProviderAttribute field, MemberInfo fieldMember)
         {
-            IModelBinding modelBinding;
-
-            switch (fieldMember.MemberType)
+            IModelBinding modelBinding = fieldMember.MemberType switch
             {
-                case MemberTypes.Field:
-                    modelBinding = new FieldModelBinding((FieldInfo)fieldMember);
-                    break;
-                case MemberTypes.Property:
-                    modelBinding = new PropertyModelBinding((PropertyInfo)fieldMember);
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
+                MemberTypes.Field => new FieldModelBinding((FieldInfo)fieldMember),
+                MemberTypes.Property => new PropertyModelBinding((PropertyInfo)fieldMember),
+                _ => throw new InvalidOperationException(),
+            };
 
             field.Initialize(this, modelBinding);
 
             AddField(field);
         }
-        private void AddField(FieldProviderAttribute field)
+        void AddField(FieldProviderAttribute field)
         {
             var fieldName = field.Name.ToLower();
             if (fieldNames.ContainsKey(fieldName))
@@ -150,8 +143,7 @@ namespace BrandUp.Pages.Content
         [System.Diagnostics.DebuggerStepThrough]
         public bool TryGetField(string fieldName, out IFieldProvider field)
         {
-            if (fieldName == null)
-                throw new ArgumentNullException(nameof(fieldName));
+            ArgumentNullException.ThrowIfNull(fieldName);
 
             if (!fieldNames.TryGetValue(fieldName.ToLower(), out int index))
             {
@@ -167,14 +159,12 @@ namespace BrandUp.Pages.Content
             if (modelConstructor == null)
                 throw new InvalidOperationException($"Content type {Name} is abstract.");
 
-            return modelConstructor.Invoke(new object[0]);
+            return modelConstructor.Invoke([]);
         }
         public void ApplyInjections(object model, IServiceProvider serviceProvider, bool injectInnerModels)
         {
-            if (model == null)
-                throw new ArgumentNullException(nameof(model));
-            if (serviceProvider == null)
-                throw new ArgumentNullException(nameof(serviceProvider));
+            ArgumentNullException.ThrowIfNull(model);
+            ArgumentNullException.ThrowIfNull(serviceProvider);
             if (model.GetType() != ModelType)
                 throw new ArgumentException();
             if (ModelType.IsAbstract)
@@ -213,8 +203,7 @@ namespace BrandUp.Pages.Content
         }
         public IDictionary<string, object> ConvertContentModelToDictionary(object contentModel)
         {
-            if (contentModel == null)
-                throw new ArgumentNullException(nameof(contentModel));
+            ArgumentNullException.ThrowIfNull(contentModel);
 
             var contentModelType = contentModel.GetType();
             var isSubClass = contentModelType.IsSubclassOf(ModelType);
@@ -246,8 +235,7 @@ namespace BrandUp.Pages.Content
         }
         public object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary));
+            ArgumentNullException.ThrowIfNull(dictionary);
 
             if (dictionary.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
             {
@@ -281,10 +269,8 @@ namespace BrandUp.Pages.Content
         }
         public object ApplyDataToModel(IDictionary<string, object> data, object contentModel)
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-            if (contentModel == null)
-                throw new ArgumentNullException(nameof(contentModel));
+            ArgumentNullException.ThrowIfNull(data);
+            ArgumentNullException.ThrowIfNull(contentModel);
 
             if (data.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
             {
@@ -307,15 +293,13 @@ namespace BrandUp.Pages.Content
         }
         public bool IsInherited(ContentMetadataProvider baseMetadataProvider)
         {
-            if (baseMetadataProvider == null)
-                throw new ArgumentNullException(nameof(baseMetadataProvider));
+            ArgumentNullException.ThrowIfNull(baseMetadataProvider);
 
             return IsInherited(baseMetadataProvider.ModelType);
         }
         public bool IsInherited(Type baseModelType)
         {
-            if (baseModelType == null)
-                throw new ArgumentNullException(nameof(baseModelType));
+            ArgumentNullException.ThrowIfNull(baseModelType);
 
             return ModelType.IsSubclassOf(baseModelType);
         }
@@ -329,8 +313,7 @@ namespace BrandUp.Pages.Content
         }
         public string GetContentTitle(object contentModel)
         {
-            if (contentModel == null)
-                throw new ArgumentNullException(nameof(contentModel));
+            ArgumentNullException.ThrowIfNull(contentModel);
 
             if (titleField != null)
                 return (string)titleField.GetModelValue(contentModel);
@@ -338,8 +321,8 @@ namespace BrandUp.Pages.Content
         }
         public void SetContentTitle(object contentModel, string title)
         {
-            if (contentModel == null)
-                throw new ArgumentNullException(nameof(contentModel));
+            ArgumentNullException.ThrowIfNull(contentModel);
+
             if (!IsDefinedTitleField)
                 throw new InvalidOperationException($"Title field is not defined by content type {Name}.");
 
