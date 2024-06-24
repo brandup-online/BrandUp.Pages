@@ -45,15 +45,16 @@ export class PageToolbar extends UIElement {
     private __renderUI() {
         const editableStaticBlocks: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[content-root]"));
 
-        const websiteMenuItems = [
-            DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]),
-            DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]),
-        ]
+        const websiteMenuItems = document.createDocumentFragment();
+        websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]));
+        websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-pages" }, [iconList, "Страницы этого уровня"]));
+
+        let websiteMenu: HTMLElement;
 
         let toolbarButtons = [
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-website", title: "Действия" }, [
                 iconList,
-                DOM.tag("menu", { class: "page-toolbar-menu", id: "website-toolbar-menu", title: "" }, websiteMenuItems),
+                websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu", id: "website-toolbar-menu", title: "" }),
             ]),
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
@@ -69,10 +70,10 @@ export class PageToolbar extends UIElement {
         
         // Если страница динамическая
         if (this.isContentPage) {
-            websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
+            websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-pages-child" }, [iconDown, "Дочерние страницы"]));
             
             if (this.__page.model.parentPageId) {
-                websiteMenuItems.push(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
+                websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-back" }, [iconBack, "Перейти к родительской странице"]));
             }
 
             const pageMenuItems = [
@@ -97,6 +98,7 @@ export class PageToolbar extends UIElement {
                 ])
             );
         }
+        websiteMenu.append(websiteMenuItems);
 
         const toolbarElem = DOM.tag("div", { class: "bp-elem page-toolbar" }, toolbarButtons);
 
@@ -187,7 +189,7 @@ export class PageToolbar extends UIElement {
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { pageId: key }, // TODO Поменять pageId на другой параметр под api
+                urlParams: { key },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
                     this.__isLoading = false;
@@ -201,8 +203,8 @@ export class PageToolbar extends UIElement {
                         const popup = DOM.tag("div", { class: "page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
-                                DOM.tag("button", { "data-command": "continue-edit", "data-value": response.data.url }, "Продолжить"),
-                                DOM.tag("button", { "data-command": "restart-edit" }, "Начать заново")
+                                DOM.tag("button", { "data-command": "continue-edit", "data-value": response.data.url, "data-key": key }, "Продолжить"),
+                                DOM.tag("button", { "data-command": "restart-edit", "data-key": key }, "Начать заново")
                             ])
                         ])
 
@@ -224,12 +226,13 @@ export class PageToolbar extends UIElement {
             this.__page.website.nav({ url: url, replace: true });
         });
 
-        this.registerCommand("restart-edit", () => {
+        this.registerCommand("restart-edit", (elem: HTMLElement) => {
             this.setPopup(null);
+            const key = elem.getAttribute("data-key");
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { pageId: this.__page.model.id, force: "true" },
+                urlParams: { key, force: "true" },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
                     this.__isLoading = false;
@@ -272,7 +275,7 @@ export class PageToolbar extends UIElement {
         const t = e.target as HTMLElement;
 
         if (!t.closest(".bp-toolbar-popup")) {
-            this.__popupElem.remove();
+            this.__popupElem?.remove();
             this.__popupElem = null;
             document.body.removeEventListener("click", this.__closePopupFunc);
         }
