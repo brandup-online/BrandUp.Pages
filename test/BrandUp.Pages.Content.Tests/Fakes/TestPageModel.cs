@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Content;
+﻿using System.ComponentModel.DataAnnotations;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Views;
 
@@ -10,7 +11,7 @@ namespace BrandUp.Pages.ContentModels
         public const string ContentTypeTitle = "Test page";
         public const string ContentTypeDescription = "Test page description";
 
-        [Title, Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Title, Text(Title = "Название", AllowMultiline = false, Placeholder = "Укажите название"), Required]
         public string Title { get; set; } = "Test";
 
         [Model(Title = "Шапка страницы")]
@@ -47,7 +48,7 @@ namespace BrandUp.Pages.ContentModels
     [ContentType(Title = "Article"), View]
     public class ArticlePage : TestPageContent
     {
-        [Text(DisplayBeforeField = nameof(Header))]
+        [Text]
         public string SubHeader { get; set; }
     }
 
@@ -60,7 +61,7 @@ namespace BrandUp.Pages.ContentModels
     [ContentType(Title = "Заголовок", Description = "Заголовок страницы")]
     public class PageHeaderContent
     {
-        [Text(Title = "Название", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
+        [Text(Title = "Название", AllowMultiline = false, Placeholder = "Укажите название"), Required]
         public string Title { get; set; } = "Test";
 
         [ContentInject]
