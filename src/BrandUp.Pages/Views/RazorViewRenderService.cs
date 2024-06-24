@@ -77,5 +77,10 @@ namespace BrandUp.Pages.Views
         }
 
         #endregion
+
+        class JsonContentModel
+        {
+
+        }
     }
 }

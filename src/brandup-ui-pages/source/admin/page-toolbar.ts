@@ -54,16 +54,19 @@ export class PageToolbar extends UIElement {
         let toolbarButtons = [
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-website", title: "Действия" }, [
                 iconList,
-                websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu", id: "website-toolbar-menu", title: "" }),
+                websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu", id: "website-toolbar-menu" })
             ]),
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
-                DOM.tag("menu", { class: "page-toolbar-menu edit-menu", id: "edit-toolbar-menu", title: "" }, contentElements.map(elem => {
-                    const key = elem.getAttribute("content-root");
-                    if (!key) throw "Not set content root value.";
+                DOM.tag("menu", { class: "page-toolbar-menu edit-menu", id: "edit-toolbar-menu" }, contentElements.map(elem => {
+                    const contentKey = elem.getAttribute("content-root");
+                    if (!contentKey) throw "Not set content root value.";
 
-                    return DOM.tag("a", { href: "", "data-key": key, command: "bp-edit" }, [
-                        key, DOM.tag('span', null, key),
+                    const contentType = elem.getAttribute("content-type");
+                    if (!contentType) throw "Not set content type value.";
+
+                    return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
+                        contentKey, DOM.tag('span', null, contentKey),
                     ])
                 }))
             ])
@@ -187,11 +190,14 @@ export class PageToolbar extends UIElement {
                 return;
             this.__isLoading = true;
 
-            const key = context.target.getAttribute("data-key");
+            const contentKey = context.target.dataset["contentKey"];
+            const contentType = context.target.dataset["contentType"];
+            if (!contentKey || !contentType)
+                throw "Not set content edit parameters.";
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { key },
+                urlParams: { key: contentKey, type: contentType },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
                     this.__isLoading = false;
@@ -205,8 +211,8 @@ export class PageToolbar extends UIElement {
                         const popup = DOM.tag("div", { class: "page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
-                                DOM.tag("button", { "data-command": "continue-edit", "data-editid": response.data.editId }, "Продолжить"),
-                                DOM.tag("button", { "data-command": "restart-edit", "data-content-key": key }, "Начать заново")
+                                DOM.tag("button", { "data-command": "continue-edit", dataset: { editId: response.data.editId } }, "Продолжить"),
+                                DOM.tag("button", { "data-command": "restart-edit", dataset: { contentKey } }, "Начать заново")
                             ])
                         ])
 
@@ -227,13 +233,13 @@ export class PageToolbar extends UIElement {
         this.registerCommand("continue-edit", (elem: HTMLElement) => {
             this.setPopup(null);
 
-            const editId = elem.getAttribute("data-editid");
+            const editId = elem.dataset["editId"];
             this.__navToEdit(editId);
         });
 
         this.registerCommand("restart-edit", (elem: HTMLElement) => {
             this.setPopup(null);
-            const contentKey = elem.getAttribute("data-content-key");
+            const contentKey = elem.dataset["contentKey"];
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",

@@ -1,25 +1,31 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Views;
 
 namespace BrandUp.Pages.Services
 {
-    public class ContentEditService(IContentEditRepository editSessionRepository, Identity.IAccessProvider accessProvider, ContentService contentService, IContentMetadataManager contentMetadataManager) : IContentEditService
+    public class ContentEditService(IContentEditRepository editSessionRepository, Identity.IAccessProvider accessProvider, ContentService contentService, IContentMetadataManager contentMetadataManager, IViewLocator viewLocator) : IContentEditService
     {
-        public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, ContentMetadataProvider metadataProvider, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(metadataProvider);
 
             var contentModel = await contentService.GetContentAsync(websiteId, key, cancellationToken);
             if (contentModel == null)
-                throw new InvalidOperationException($"Not found content {key} for edit.");
+            {
+                var contentView = viewLocator.FindView(metadataProvider.ModelType);
+                if (contentView == null)
+                    throw new InvalidOperationException();
 
-            if (!contentMetadataManager.TryGetMetadata(contentModel, out var metadata))
+                contentModel = metadataProvider.ConvertDictionaryToContentModel(contentView.DefaultModelData);
+            }
+            else if (metadataProvider.ModelType != contentModel.GetType())
                 throw new InvalidOperationException();
 
             var editorId = await GetEditorIdAsync(cancellationToken);
-
-            var contentData = metadata.ConvertContentModelToDictionary(contentModel);
+            var contentData = metadataProvider.ConvertContentModelToDictionary(contentModel);
 
             return await editSessionRepository.CreateEditAsync(websiteId, key, editorId, contentData, cancellationToken);
         }

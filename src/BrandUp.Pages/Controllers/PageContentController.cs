@@ -9,8 +9,14 @@ namespace BrandUp.Pages.Controllers
     public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext, Url.IPageLinkGenerator pageLinkGenerator) : Controller
     {
         [HttpPost("begin")]
-        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] bool force)
+        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] IContentMetadataManager contentMetadataManager)
         {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(type))
+                return BadRequest();
+
+            if (!contentMetadataManager.TryGetMetadata(type, out var contentMetadata))
+                return BadRequest();
+
             var websiteId = websiteContext.Website.Id;
 
             var result = new Models.BeginPageEditResult();
@@ -29,7 +35,7 @@ namespace BrandUp.Pages.Controllers
 
             if (currentEdit == null)
             {
-                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, HttpContext.RequestAborted);
+                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, contentMetadata, HttpContext.RequestAborted);
                 if (currentEdit == null)
                     return NotFound();
             }
