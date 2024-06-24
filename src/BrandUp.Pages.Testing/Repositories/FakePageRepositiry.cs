@@ -9,8 +9,10 @@ namespace BrandUp.Pages.Repositories
         readonly Dictionary<Guid, int> pageIds = [];
         readonly Dictionary<string, int> pagePaths = [];
 
-        public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, Guid pageId, string typeName, string pageHeader, string contentKey, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, Guid pageId, string typeName, string pageHeader, CancellationToken cancellationToken = default)
         {
+            await Task.CompletedTask;
+
             if (pageId == Guid.Empty)
                 pageId = Guid.NewGuid();
 
@@ -22,8 +24,6 @@ namespace BrandUp.Pages.Repositories
             pageIds.Add(page.Id, index);
             pagePaths.Add(page.WebsiteId.ToLower() + ":" + page.UrlPath.ToLower(), index);
             pages.Add(pageIndex, page);
-
-            await contentRepository.SetContentAsync(websiteId, contentKey, contentData, cancellationToken);
 
             pageHierarhy.OnAddPage(page);
 

@@ -10,6 +10,7 @@ namespace BrandUp.Pages.Services
         IPageMetadataManager pageMetadataManager,
         Url.IPageUrlHelper pageUrlHelper,
         Views.IViewLocator viewLocator,
+        ContentService contentService,
         IOptions<PagesOptions> options) : IPageService
     {
         readonly PagesOptions options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -31,12 +32,13 @@ namespace BrandUp.Pages.Services
             if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
                 throw new ArgumentException($"Тип страницы {pageMetadata.Name} не подходит для коллекции {collection.Title} ({collection.Id}).");
 
-            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
             var pageId = Guid.NewGuid();
             var pageContentKey = await GetContentKeyAsync(pageId, cancellationToken);
-            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, pageContentKey, pageContentData, cancellationToken);
+            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, cancellationToken);
+
+            await contentService.SetContentAsync(collection.WebsiteId, pageContentKey, pageContent, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -73,16 +75,15 @@ namespace BrandUp.Pages.Services
             if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
                 throw new ArgumentException($"Тип страницы {pageType} не подходит для коллекции {collection.Title} ({collection.Id}).");
 
-            var pageContent = pageMetadata.CreatePageModel();
+            //var pageContent = pageMetadata.CreatePageModel();
 
-            ApplyDefaultDataToContentModel(pageMetadata, pageContent, pageHeader);
+            //ApplyDefaultDataToContentModel(pageMetadata, pageContent, pageHeader);
 
-            var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
-            pageHeader = pageMetadata.GetPageHeader(pageContent);
+            //var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
+            //pageHeader = pageMetadata.GetPageHeader(pageContent);
 
             var pageId = Guid.NewGuid();
-            var pageContentKey = await GetContentKeyAsync(pageId, cancellationToken);
-            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, pageContentKey, pageContentData, cancellationToken);
+            var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -266,7 +267,7 @@ namespace BrandUp.Pages.Services
             return pageRepository.DownPagePositionAsync(page, afterPage, cancellationToken);
         }
 
-        private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
+        void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
         {
             ArgumentNullException.ThrowIfNull(pageMetadataProvider);
             ArgumentNullException.ThrowIfNull(contentModel);

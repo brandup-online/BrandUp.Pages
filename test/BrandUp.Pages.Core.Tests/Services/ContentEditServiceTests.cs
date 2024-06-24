@@ -48,24 +48,7 @@ namespace BrandUp.Pages.Services
 
         async Task IAsyncLifetime.InitializeAsync()
         {
-            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
-            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
-
-            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
-
-            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
-
-            var pageId = Guid.NewGuid();
-            var contentKey = await pageService.GetContentKeyAsync(pageId);
-            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test", contentKey, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(mainPage, "index");
-            await pageRepository.UpdatePageAsync(mainPage);
-
-            pageId = Guid.NewGuid();
-            contentKey = await pageService.GetContentKeyAsync(pageId);
-            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test", contentKey, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(testPage, "test");
-            await pageRepository.UpdatePageAsync(testPage);
+            await Task.CompletedTask;
         }
 
         async Task IAsyncLifetime.DisposeAsync()

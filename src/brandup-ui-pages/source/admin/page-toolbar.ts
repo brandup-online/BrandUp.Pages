@@ -82,8 +82,7 @@ export class PageToolbar extends UIElement {
             }
 
             const pageMenuItems = [
-                DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"]),
-                DOM.tag("a", { href: "", command: "bp-actions-edit" }, [iconEdit, "Редактировать страницу"]),
+                DOM.tag("a", { href: "", command: "bp-seo" }, [iconSeo, "Индексирование страницы"])
             ];
 
             const status = this.__page.model.status?.toLowerCase();

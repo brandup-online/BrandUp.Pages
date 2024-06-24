@@ -1,4 +1,4 @@
-﻿import { Middleware } from "brandup-ui-app";
+﻿import { Middleware, NavigateContext } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
 import { DOM } from "brandup-ui-dom";
 
@@ -9,9 +9,9 @@ export class PagesMiddleware extends Middleware {
         this._showUI(context.items);
     }
 
-    navigate(context, next) {
+    navigate(context: NavigateContext, next) {
         next();
-
+        
         this._showUI(context.items);
     }
 

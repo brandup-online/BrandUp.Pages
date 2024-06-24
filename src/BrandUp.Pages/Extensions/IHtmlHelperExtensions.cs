@@ -46,10 +46,6 @@ namespace BrandUp.Pages
             if (!contentMetadataManager.TryGetMetadata(contentType, out var contentMetadataProvider))
                 throw new InvalidOperationException($"Type {contentType.AssemblyQualifiedName} is not registered as content.");
 
-            var view = viewLocator.FindView(contentMetadataProvider.ModelType);
-            if (view == null)
-                throw new InvalidOperationException($"Not found view for content type {contentMetadataProvider.Name}.");
-
             var viewRenderService = services.GetRequiredService<IViewRenderService>();
             var websiteContext = services.GetRequiredService<IWebsiteContext>();
 
@@ -68,6 +64,10 @@ namespace BrandUp.Pages
                 if (contentModel == null)
                 {
                     contentModel = contentMetadataProvider.CreateModelInstance();
+
+                    var view = viewLocator.FindView(contentMetadataProvider.ModelType);
+                    if (view == null)
+                        throw new InvalidOperationException($"Not found view for content type {contentMetadataProvider.Name}.");
 
                     if (view.DefaultModelData != null)
                         contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);

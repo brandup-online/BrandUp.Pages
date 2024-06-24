@@ -3,6 +3,7 @@ using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
+using BrandUp.Pages.Views;
 using BrandUp.Website;
 using BrandUp.Website.Pages;
 using Microsoft.Extensions.DependencyInjection;
@@ -112,6 +113,21 @@ namespace BrandUp.Pages
             {
                 var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
                 contentModel = await contentService.GetContentAsync(PageEntry.WebsiteId, pageContentKey, CancellationToken);
+                if (contentModel == null)
+                {
+                    var viewLocator = httpContext.RequestServices.GetRequiredService<IViewLocator>();
+
+                    contentModel = PageMetadata.ContentMetadata.CreateModelInstance();
+
+                    var view = viewLocator.FindView(PageMetadata.ContentMetadata.ModelType);
+                    if (view == null)
+                        throw new InvalidOperationException($"Not found view for content type {PageMetadata.ContentMetadata.Name}.");
+
+                    if (view.DefaultModelData != null)
+                        PageMetadata.ContentMetadata.ApplyDataToModel(view.DefaultModelData, contentModel);
+
+                    PageMetadata.SetPageHeader(contentModel, page.Header);
+                }
             }
 
             if (contentModel == null)
