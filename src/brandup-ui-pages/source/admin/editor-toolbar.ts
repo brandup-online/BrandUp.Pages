@@ -53,13 +53,10 @@ export class EditorToolbar extends UIElement {
                 urlParams: { editId: this.__page.model.editId },
                 method: "POST",
                 success: (response) => {
-                    //cancelNav = false;
-
                     if (response.status !== 200)
-                        throw "";
+                        throw "Error commit content editing.";
 
-                    this.__page.website.nav({ url: response.data, replace: true });
-                    this.__isLoading = false;
+                    this.__complateEdit();
                 }
             }, true);
         });
@@ -74,16 +71,21 @@ export class EditorToolbar extends UIElement {
                 urlParams: { editId: this.__page.model.editId },
                 method: "POST",
                 success: (response) => {
-                    //cancelNav = false;
-
                     if (response.status !== 200)
-                        throw "";
+                        throw "Error discard content editing.";
 
-                    this.__page.website.nav({ url: response.data, replace: true });
-                    this.__isLoading = false;
+                    this.__complateEdit();
                 },
             });
         });
+    }
+
+    private __complateEdit() {
+        const url = new URL(location.href);
+        url.searchParams.delete("editid");
+
+        this.__page.website.nav({ url: url.toString(), replace: true });
+        this.__isLoading = false;
     }
 
     destroy() {
