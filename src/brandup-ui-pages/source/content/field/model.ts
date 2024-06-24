@@ -13,8 +13,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
     private __value: ModelFieldFormValue;
     private __itemsElem: HTMLElement;
 
-    constructor(form: IContentForm, name: string, options: ModelDesignerOptions) {
-        super(name, options);
+    constructor (form: IContentForm, name: string, errors: string[], options: ModelDesignerOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }

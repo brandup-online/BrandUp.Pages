@@ -6,12 +6,13 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     readonly name: string;
     private __errorsElem: HTMLElement;
 
-    constructor(name: string, options: TOptions) {
+    constructor(name: string, errors: string[], options: TOptions) {
         super(options);
 
         this.__errorsElem = DOM.tag("ul", { class: "field-errors" });
         this.element.insertAdjacentElement("afterend", this.__errorsElem);
         this.name = name;
+        this.setErrors(errors);
     }
 
     protected _onRender() {

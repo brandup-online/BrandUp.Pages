@@ -112,27 +112,27 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
             switch (fieldModel.type.toLowerCase()) {
                 case "text": {
-                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, [], fieldModel.options)); //TODO заменить пустой массив на список ошибок с сервера
                     break;
                 }
                 case "html": {
-                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "image": {
-                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "model": {
-                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "hyperlink": {
-                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "pages": {
-                    this.addField(fieldModel.title, new PagesContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new PagesContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 default: {

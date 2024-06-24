@@ -5,8 +5,8 @@ import { AjaxResponse } from "brandup-ui-ajax";
 export class TextContent extends Textbox implements IContentField {
     readonly form: IContentForm;
 
-    constructor(form: IContentForm, name: string, options: TextboxOptions) {
-        super(name, options);
+    constructor(form: IContentForm, name: string, errors: string[], options: TextboxOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }
@@ -27,7 +27,7 @@ export class TextContent extends Textbox implements IContentField {
                     this.setErrors([]);
                 }
                 else {
-                    this.setErrors([ "error" ]);
+                    this.setErrors([ "error" ]); // TODO список ошибок с сервера
                 }
             }
         });

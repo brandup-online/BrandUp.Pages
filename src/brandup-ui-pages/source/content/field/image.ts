@@ -11,8 +11,8 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
 
-    constructor(form: IContentForm, name: string, options: ImageFieldOptions) {
-        super(name, options);
+    constructor (form: IContentForm, name: string, errors: string[], options: ImageFieldOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }

@@ -11,8 +11,8 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
     private __editor: ContentEditor;
     private __editorPromise: Promise<any>;
 
-    constructor(form: IContentForm, name: string, options: HtmlFieldFormOptions) {
-        super(name, options);
+    constructor(form: IContentForm, name: string, errors: string[], options: HtmlFieldFormOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }
@@ -95,7 +95,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
                     this.setErrors([]);
                 }
                 else {
-                    this.setErrors(["error"]);
+                    this.setErrors(["error"]); // TODO список ошибок с сервера
                 }
             }
         });
