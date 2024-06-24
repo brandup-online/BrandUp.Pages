@@ -1,4 +1,6 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Filters;
+using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Services;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
@@ -12,7 +14,8 @@ namespace BrandUp.Pages
     {
         public static async Task<IHtmlContent> RenderPageAsync(this IHtmlHelper<ContentPageModel> htmlHelper)
         {
-            var viewRenderService = htmlHelper.ViewContext.HttpContext.RequestServices.GetRequiredService<IViewRenderService>();
+            var httpContext = htmlHelper.ViewContext.HttpContext;
+            var viewRenderService = httpContext.RequestServices.GetRequiredService<IViewRenderService>();
             var pageModel = htmlHelper.ViewData.Model;
 
             var builder = new HtmlContentBuilder();
@@ -34,8 +37,9 @@ namespace BrandUp.Pages
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(key));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
 
-            var cancellationToken = htmlHelper.ViewContext.HttpContext.RequestAborted;
-            var services = htmlHelper.ViewContext.HttpContext.RequestServices;
+            var httpContext = htmlHelper.ViewContext.HttpContext;
+            var cancellationToken = httpContext.RequestAborted;
+            var services = httpContext.RequestServices;
             var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
             var viewLocator = services.GetRequiredService<IViewLocator>();
 
@@ -46,20 +50,31 @@ namespace BrandUp.Pages
             if (view == null)
                 throw new InvalidOperationException($"Not found view for content type {contentMetadataProvider.Name}.");
 
-            var contentService = services.GetRequiredService<ContentService>();
             var viewRenderService = services.GetRequiredService<IViewRenderService>();
             var websiteContext = services.GetRequiredService<IWebsiteContext>();
 
-            var contentModel = await contentService.GetContentAsync(websiteContext.Website.Id, key, cancellationToken);
-            if (contentModel == null)
+            object contentModel;
+            IContentEdit contentEdit = null;
+            var contentEditFeature = httpContext.Features.Get<ContentEditFeature>();
+            if (contentEditFeature != null && contentEditFeature.IsEdit(key))
             {
-                contentModel = contentMetadataProvider.CreateModelInstance();
+                contentModel = contentEditFeature.Content;
+                contentEdit = contentEditFeature.Edit;
+            }
+            else
+            {
+                var contentService = services.GetRequiredService<ContentService>();
+                contentModel = await contentService.GetContentAsync(websiteContext.Website.Id, key, cancellationToken);
+                if (contentModel == null)
+                {
+                    contentModel = contentMetadataProvider.CreateModelInstance();
 
-                if (view.DefaultModelData != null)
-                    contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
+                    if (view.DefaultModelData != null)
+                        contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
+                }
             }
 
-            var contentContext = new ContentContext(key, contentModel, services, false);
+            var contentContext = new ContentContext(key, contentModel, services, contentEdit);
 
             var builder = new HtmlContentBuilder();
             var pageHtml = await viewRenderService.RenderToStringAsync(contentContext);

@@ -14,25 +14,10 @@ namespace BrandUp.Pages
         public ContentExplorer Explorer { get; }
         public IServiceProvider Services { get; }
         public object Content => Explorer.Model;
-        public bool IsDesigner { get; }
+        public Guid? EditId { get; }
+        public bool IsDesigner => EditId.HasValue;
 
-        public ContentContext(IPage page, object contentModel, IServiceProvider services, bool isDesigner)
-        {
-            ArgumentNullException.ThrowIfNull(page);
-            ArgumentNullException.ThrowIfNull(contentModel);
-            ArgumentNullException.ThrowIfNull(services);
-
-            Key = $"page-{page.Id}";
-            Page = page;
-            Services = services ?? throw new ArgumentNullException(nameof(services));
-
-            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
-
-            Explorer = ContentExplorer.Create(contentMetadataManager, contentModel);
-            IsDesigner = isDesigner;
-        }
-
-        public ContentContext(string key, object contentModel, IServiceProvider services, bool isDesigner)
+        public ContentContext(string key, object contentModel, IServiceProvider services, IContentEdit contentEdit)
         {
             ArgumentNullException.ThrowIfNull(key);
             ArgumentNullException.ThrowIfNull(contentModel);
@@ -44,7 +29,7 @@ namespace BrandUp.Pages
             var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
 
             Explorer = ContentExplorer.Create(contentMetadataManager, contentModel);
-            IsDesigner = isDesigner;
+            EditId = contentEdit?.Id;
         }
 
         private ContentContext(ContentContext parent, ContentExplorer contentExplorer)
@@ -53,7 +38,7 @@ namespace BrandUp.Pages
             Page = parent.Page;
             Services = parent.Services;
             Explorer = contentExplorer;
-            IsDesigner = parent.IsDesigner;
+            EditId = parent.EditId;
         }
 
         public ContentContext Navigate(string path)

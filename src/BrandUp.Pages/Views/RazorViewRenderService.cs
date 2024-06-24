@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Views
 {
@@ -42,7 +41,6 @@ namespace BrandUp.Pages.Views
             viewData.Add(ViewData_ViewRenderingContextKeyName, itemRenderingContext);
 
             using var contentOutput = new StringWriter();
-            var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
 
             var viewContext = new ViewContext
             {
@@ -66,7 +64,11 @@ namespace BrandUp.Pages.Views
                 tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
 
             if (contentContext.Explorer.IsRoot)
+            {
                 tag.Attributes.Add("content-root", contentContext.Key);
+                if (contentContext.IsDesigner)
+                    tag.Attributes.Add("data-content-edit-id", contentContext.EditId.Value.ToString());
+            }
             tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);
             tag.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
             tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());

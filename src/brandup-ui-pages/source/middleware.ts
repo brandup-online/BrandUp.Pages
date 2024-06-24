@@ -1,7 +1,6 @@
 ﻿import { Middleware } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
-import ContentPage from "./pages/content";
-import "./styles.less";
+import { DOM } from "brandup-ui-dom";
 
 export class PagesMiddleware extends Middleware {
     start(context, next) {
@@ -19,14 +18,15 @@ export class PagesMiddleware extends Middleware {
     private _showUI(items: { [key: string]: any }) {
         if (items["nav"].enableAdministration) {
             const page = items["page"] as Page<PageModel>;
-            if (!page.model.editId) {
+            const editingContentElem = DOM.queryElement(document.body, "[data-content-edit-id]");
+            if (!editingContentElem) {
                 import("./admin/page-toolbar").then(d => {
                     page.attachDestroyElement(new d.PageToolbar(page));
                 });
             }
             else {
                 import("./admin/editor-toolbar").then(d => {
-                    page.attachDestroyElement(new d.EditorToolbar(page as ContentPage));
+                    page.attachDestroyElement(new d.EditorToolbar(page, editingContentElem));
                 });
             }
         }

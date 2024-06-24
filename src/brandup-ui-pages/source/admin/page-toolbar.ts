@@ -16,6 +16,7 @@ import iconPlus from "../svg/new/plus.svg";
 import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
+import "../styles.less";
 
 export class PageToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -212,7 +213,7 @@ export class PageToolbar extends UIElement {
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
                                 DOM.tag("button", { "data-command": "continue-edit", dataset: { editId: response.data.editId } }, "Продолжить"),
-                                DOM.tag("button", { "data-command": "restart-edit", dataset: { contentKey } }, "Начать заново")
+                                DOM.tag("button", { "data-command": "restart-edit", dataset: { contentKey, contentType } }, "Начать заново")
                             ])
                         ])
 
@@ -240,10 +241,11 @@ export class PageToolbar extends UIElement {
         this.registerCommand("restart-edit", (elem: HTMLElement) => {
             this.setPopup(null);
             const contentKey = elem.dataset["contentKey"];
+            const contentType = elem.dataset["contentType"];
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { key: contentKey, force: "true" },
+                urlParams: { key: contentKey, type: contentType, force: "true" },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
                     this.__isLoading = false;

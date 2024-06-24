@@ -48,14 +48,14 @@ namespace BrandUp.Pages.Controllers
         [HttpGet("form")]
         public async Task<IActionResult> GetFormAsync([FromQuery] Guid editId, [FromQuery] string modelPath)
         {
-            var editSession = await contentEditService.FindEditByIdAsync(editId);
+            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
             modelPath ??= string.Empty;
 
             var pageContent = await contentEditService.GetContentAsync(editSession);
-            var pageContentContext = new ContentContext(editSession.ContentKey, pageContent, HttpContext.RequestServices, true);
+            var pageContentContext = new ContentContext(editSession.ContentKey, pageContent, HttpContext.RequestServices, editSession);
 
             var contentContext = pageContentContext.Navigate(modelPath);
             if (contentContext == null)

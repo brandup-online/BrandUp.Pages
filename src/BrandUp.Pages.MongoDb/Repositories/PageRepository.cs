@@ -48,6 +48,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var contentDocument = new ContentDocument
             {
                 Id = Guid.NewGuid(),
+                WebsiteId = websiteId,
                 Key = contentKey.ToLower().Trim(),
                 Data = new BsonDocument(contentData)
             };

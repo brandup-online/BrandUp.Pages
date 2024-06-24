@@ -7,7 +7,6 @@ class ContentPage extends Page<ContentPageModel> {
 export interface ContentPageModel extends PageModel {
     id: string;
     parentPageId: string;
-    editId: string;
     status: "Draft" | "Published";
 }
 
