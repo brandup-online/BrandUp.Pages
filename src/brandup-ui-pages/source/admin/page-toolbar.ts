@@ -43,7 +43,7 @@ export class PageToolbar extends UIElement {
     }
 
     private __renderUI() {
-        const editableStaticBlocks: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[content-root]"));
+        const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[content-root]"));
 
         const websiteMenuItems = document.createDocumentFragment();
         websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]));
@@ -58,15 +58,16 @@ export class PageToolbar extends UIElement {
             ]),
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
-                DOM.tag("menu", { class: "page-toolbar-menu edit-menu", id: "edit-toolbar-menu", title: "" }, editableStaticBlocks.map(block => {
-                    const key = block.getAttribute("content-root");
-                    if (key === "") return null;
+                DOM.tag("menu", { class: "page-toolbar-menu edit-menu", id: "edit-toolbar-menu", title: "" }, contentElements.map(elem => {
+                    const key = elem.getAttribute("content-root");
+                    if (!key) throw "Not set content root value.";
+
                     return DOM.tag("a", { href: "", "data-key": key, command: "bp-edit" }, [
                         key, DOM.tag('span', null, key),
                     ])
-                })),
-            ]),
-        ]
+                }))
+            ])
+        ];
         
         // Если страница динамическая
         if (this.isContentPage) {

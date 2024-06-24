@@ -56,7 +56,7 @@ namespace BrandUp.Pages
                 if (!editSession.ContentKey.StartsWith("page-"))
                     throw new InvalidOperationException();
 
-                if (!Guid.TryParse(editSession.ContentKey.Substring(5), out var pageId))
+                if (!Guid.TryParse(editSession.ContentKey[5..], out var pageId))
                     throw new InvalidOperationException();
 
                 page = await PageService.FindPageByIdAsync(pageId, CancellationToken);

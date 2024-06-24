@@ -1,5 +1,7 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Services;
 using BrandUp.Pages.Views;
+using BrandUp.Website;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,22 +34,30 @@ namespace BrandUp.Pages
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(key));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
 
+            var cancellationToken = htmlHelper.ViewContext.HttpContext.RequestAborted;
             var services = htmlHelper.ViewContext.HttpContext.RequestServices;
             var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
             var viewLocator = services.GetRequiredService<IViewLocator>();
-            var viewRenderService = services.GetRequiredService<IViewRenderService>();
 
             if (!contentMetadataManager.TryGetMetadata(contentType, out var contentMetadataProvider))
-                throw new InvalidOperationException("Не зарегистрирован тип контента.");
+                throw new InvalidOperationException($"Type {contentType.AssemblyQualifiedName} is not registered as content.");
 
             var view = viewLocator.FindView(contentMetadataProvider.ModelType);
             if (view == null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"Not found view for content type {contentMetadataProvider.Name}.");
 
-            var contentModel = contentMetadataProvider.CreateModelInstance();
+            var contentService = services.GetRequiredService<ContentService>();
+            var viewRenderService = services.GetRequiredService<IViewRenderService>();
+            var websiteContext = services.GetRequiredService<IWebsiteContext>();
 
-            if (view.DefaultModelData != null)
-                contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
+            var contentModel = await contentService.GetContentAsync(websiteContext.Website.Id, key, cancellationToken);
+            if (contentModel == null)
+            {
+                contentModel = contentMetadataProvider.CreateModelInstance();
+
+                if (view.DefaultModelData != null)
+                    contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
+            }
 
             var contentContext = new ContentContext(key, contentModel, services, false);
 
