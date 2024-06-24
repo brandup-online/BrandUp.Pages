@@ -34,6 +34,7 @@ namespace BrandUp.Pages.Controllers
                     return NotFound();
             }
 
+            result.EditId = currentEdit.Id;
             result.Url = await pageLinkGenerator.GetPathAsync(currentEdit, HttpContext.RequestAborted);
 
             return Ok(result);
@@ -142,7 +143,7 @@ namespace BrandUp.Pages.Controllers
 
             await contentEditService.CommitEditAsync(editSession);
 
-            return Ok(""); // TODO: redirect
+            return Ok();
         }
 
         [HttpPost("discard")]
@@ -154,7 +155,7 @@ namespace BrandUp.Pages.Controllers
 
             await contentEditService.DiscardEditAsync(editSession);
 
-            return Ok("/"); // TODO: redirect
+            return Ok();
         }
     }
 }

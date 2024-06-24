@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Services
 
             var contentModel = await contentService.GetContentAsync(websiteId, key, cancellationToken);
             if (contentModel == null)
-                return null;
+                throw new InvalidOperationException($"Not found content {key} for edit.");
 
             if (!contentMetadataManager.TryGetMetadata(contentModel, out var metadata))
                 throw new InvalidOperationException();

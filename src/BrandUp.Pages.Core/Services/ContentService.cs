@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Services
 
             var contentData = await contentRepository.GetContentAsync(websiteId, key, cancellationToken);
             if (contentData == null)
-                throw new InvalidOperationException($"Not found content by key {key}.");
+                return null; // throw new InvalidOperationException($"Not found content by key {key}.");
 
             if (!contentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
                 throw new InvalidOperationException($"Not found content type name.");

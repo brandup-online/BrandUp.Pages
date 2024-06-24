@@ -185,6 +185,7 @@ export class PageToolbar extends UIElement {
             if (this.__isLoading)
                 return;
             this.__isLoading = true;
+
             const key = context.target.getAttribute("data-key");
 
             this.__page.website.request({
@@ -196,15 +197,15 @@ export class PageToolbar extends UIElement {
 
                     if (response.status !== 200) {
                         context.complate();
-                        throw "";
+                        throw "Error begin content edit.";
                     }
 
                     if (response.data.currentDate) {
                         const popup = DOM.tag("div", { class: "page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
-                                DOM.tag("button", { "data-command": "continue-edit", "data-value": response.data.url, "data-key": key }, "Продолжить"),
-                                DOM.tag("button", { "data-command": "restart-edit", "data-key": key }, "Начать заново")
+                                DOM.tag("button", { "data-command": "continue-edit", "data-editid": response.data.editId }, "Продолжить"),
+                                DOM.tag("button", { "data-command": "restart-edit", "data-content-key": key }, "Начать заново")
                             ])
                         ])
 
@@ -212,8 +213,11 @@ export class PageToolbar extends UIElement {
 
                         this.setPopup(popup);
                     }
-                    else
-                        this.__page.website.nav({ url: response.data.url, replace: true });
+                    else {
+                        // редирект на страницу редактирования контента
+                        this.__navToEdit(response.data.editId);
+                    }
+
                     context.complate();
                 },
             });
@@ -222,25 +226,25 @@ export class PageToolbar extends UIElement {
         this.registerCommand("continue-edit", (elem: HTMLElement) => {
             this.setPopup(null);
 
-            const url = elem.getAttribute("data-value");
-            this.__page.website.nav({ url: url, replace: true });
+            const editId = elem.getAttribute("data-editid");
+            this.__navToEdit(editId);
         });
 
         this.registerCommand("restart-edit", (elem: HTMLElement) => {
             this.setPopup(null);
-            const key = elem.getAttribute("data-key");
+            const contentKey = elem.getAttribute("data-content-key");
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { key, force: "true" },
+                urlParams: { key: contentKey, force: "true" },
                 method: "POST",
                 success: (response: AjaxResponse<BeginPageEditResult>) => {
                     this.__isLoading = false;
 
                     if (response.status !== 200)
-                        throw "";
-
-                    this.__page.website.nav({ url: response.data.url, replace: true });
+                        throw "Error begin content edit.";
+                        
+                    this.__navToEdit(response.data.editId);
                 }
             });
         });
@@ -260,6 +264,10 @@ export class PageToolbar extends UIElement {
             document.body.removeEventListener("click", this.__closeMenuFunc);
             return;
         };
+    }
+
+    private __navToEdit(editId: string) {
+        this.__page.website.nav({ url: this.__page.buildUrl({ editid: editId }), replace: true });
     }
 
     private __closeMenu(menuName?: string) {
@@ -307,6 +315,7 @@ export enum PageStatus {
 }
 
 export interface BeginPageEditResult {
+    editId: string;
     currentDate: string;
     url: string;
 }
