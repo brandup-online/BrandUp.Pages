@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/content"), Filters.Administration]
-    public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext, Url.IPageLinkGenerator pageLinkGenerator) : Controller
+    public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
     {
         [HttpPost("begin")]
         public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] IContentMetadataManager contentMetadataManager)
@@ -41,7 +41,6 @@ namespace BrandUp.Pages.Controllers
             }
 
             result.EditId = currentEdit.Id;
-            result.Url = await pageLinkGenerator.GetPathAsync(currentEdit, HttpContext.RequestAborted);
 
             return Ok(result);
         }

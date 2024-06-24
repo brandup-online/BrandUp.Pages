@@ -14,10 +14,10 @@ namespace BrandUp.Pages.Views
         public const string ViewData_ContentContextKeyName = "_ContentContext_";
         public const string ViewData_ViewRenderingContextKeyName = "_ViewRenderingContext_";
 
-        private readonly ICompositeViewEngine viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
-        private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        private readonly IViewLocator viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
-        private readonly HtmlEncoder htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
+        readonly ICompositeViewEngine viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
+        readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        readonly IViewLocator viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
+        readonly HtmlEncoder htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
 
         #region IViewRenderService members
 
@@ -77,10 +77,5 @@ namespace BrandUp.Pages.Views
         }
 
         #endregion
-
-        class JsonContentModel
-        {
-
-        }
     }
 }

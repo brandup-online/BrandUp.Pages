@@ -22,6 +22,5 @@ namespace BrandUp.Pages.Models
     {
         public Guid EditId { get; set; }
         public DateTime? CurrentDate { get; set; }
-        public string Url { get; set; }
     }
 }
