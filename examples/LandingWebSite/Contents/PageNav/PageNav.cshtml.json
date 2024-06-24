@@ -2,12 +2,12 @@
   "LogoText": "BrandUp.Pages",
   "Items": [
     {
-      "_type": "PageNavMenuItem",
+      "_type": "PageNav.MenuItem",
       "Text": "News",
       "Url": "url(/news)"
     },
     {
-      "_type": "PageNavMenuItem",
+      "_type": "PageNav.MenuItem",
       "Text": "About",
       "Url": "url(/about)"
     }

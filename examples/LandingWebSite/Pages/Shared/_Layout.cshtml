@@ -10,7 +10,7 @@
     <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
 
     <div class="app">
-        @await Html.BlockAsync("page-nav", typeof(PageNavContent))
+        @await Html.BlockAsync("page-nav", typeof(Contents.PageNav.PageNavContent))
         <main role="main" class="content-width app-content" page-content>
             @RenderBody()
         </main>

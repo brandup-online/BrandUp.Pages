@@ -31,16 +31,15 @@ namespace BrandUp.Pages.Content
 
             if (!modelType.IsAbstract)
             {
-                modelConstructor = modelType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[0], null);
+                modelConstructor = modelType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, [], null);
                 if (modelConstructor == null)
                     throw new InvalidOperationException($"Тип модели контента \"{modelType}\" не содержит публичный конструктор без параметров.");
 
-                injectProperties = new List<PropertyInfo>();
+                injectProperties = [];
                 InitializeInjectProperties();
             }
 
-            if (baseMetadata != null)
-                baseMetadata.derivedContents.Add(this);
+            baseMetadata?.derivedContents.Add(this);
 
             Name = contentTypeAttribute.Name ?? GetTypeName(modelType);
             Title = contentTypeAttribute.Title ?? Name;
@@ -354,11 +353,22 @@ namespace BrandUp.Pages.Content
         static string GetTypeName(Type type)
         {
             var name = type.Name;
+
             foreach (var namePrefix in ContentTypePrefixes)
             {
-                if (name.EndsWith(namePrefix))
-                    return type.Name.Substring(0, type.Name.LastIndexOf(namePrefix));
+                if (name.EndsWith(namePrefix, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    name = type.Name[..type.Name.LastIndexOf(namePrefix)];
+                    break;
+                }
             }
+
+            if (type.IsNestedPublic)
+            {
+                var nestedName = GetTypeName(type.ReflectedType);
+                return $"{nestedName}.{name}";
+            }
+
             return name;
         }
 
