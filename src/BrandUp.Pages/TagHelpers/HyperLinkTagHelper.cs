@@ -8,56 +8,63 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace BrandUp.Pages.TagHelpers
 {
-	[HtmlTargetElement(Attributes = "content-link")]
-	public class HyperLinkTagHelper : FieldTagHelper<IHyperLinkField>
-	{
-		private readonly IPageService pageService;
-		private readonly IPageLinkGenerator pageLinkGenerator;
-		private readonly HtmlEncoder htmlEncoder;
+    [HtmlTargetElement(Attributes = "content-link")]
+    public class HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, IPageService pageService, HtmlEncoder htmlEncoder) : FieldTagHelper<IHyperLinkField>
+    {
+        [HtmlAttributeName("content-link")]
+        public override ModelExpression FieldName { get; set; }
 
-		[HtmlAttributeName("content-link")]
-		public override ModelExpression FieldName { get; set; }
+        protected override async Task RenderContentAsync(TagHelperOutput output)
+        {
+            var value = Field.GetModelValue(Content);
+            if (!Field.HasValue(value))
+                return;
 
-		public HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, IPageService pageService, HtmlEncoder htmlEncoder)
-		{
-			this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
-			this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-			this.htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
-		}
+            var hyperLink = (HyperLinkValue)value;
 
-		protected override async Task RenderContentAsync(TagHelperOutput output)
-		{
-			var value = Field.GetModelValue(Content);
-			if (Field.HasValue(value))
-			{
-				var hyperLinkValue = (HyperLinkValue)value;
+            string url;
+            string path = null;
+            switch (hyperLink.ValueType)
+            {
+                case HyperLinkType.Url:
+                    var uri = (Uri)hyperLink;
+                    url = uri.OriginalString;
+                    if (!uri.IsAbsoluteUri)
+                    {
+                        path = uri.OriginalString;
+                        output.AddClass("applink", htmlEncoder);
+                    }
+                    break;
+                case HyperLinkType.Page:
+                    if (!Guid.TryParse(hyperLink.Value, out var pageId))
+                        throw new InvalidOperationException($"Unable to parse page ID from {typeof(HyperLinkValue).Name} value.");
+                    var page = await pageService.FindPageByIdAsync(pageId, ViewContext.HttpContext.RequestAborted);
+                    if (page == null)
+                        return;
+                    if (!page.IsPublished)
+                        return;
+                    url = path = await pageLinkGenerator.GetPathAsync(page);
 
-				string url;
-				switch (hyperLinkValue.ValueType)
-				{
-					case HyperLinkType.Url:
-						var uri = (Uri)hyperLinkValue;
-						url = uri.OriginalString;
-						if (!uri.IsAbsoluteUri)
-							output.AddClass("applink", htmlEncoder);
-						break;
-					case HyperLinkType.Page:
-						var page = await pageService.FindPageByIdAsync(Guid.Parse(hyperLinkValue.Value));
-						if (page == null)
-							return;
-						if (!page.IsPublished)
-							return;
-						url = await pageLinkGenerator.GetPathAsync(page);
+                    output.AddClass("applink", htmlEncoder);
 
-						output.AddClass("applink", htmlEncoder);
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown {typeof(HyperLinkType).Name} value.");
+            }
 
-						break;
-					default:
-						throw new InvalidOperationException();
-				}
+            if (path != null)
+            {
+                string requestPath;
+                if (ViewContext.HttpContext.Request.Path.HasValue)
+                    requestPath = ViewContext.HttpContext.Request.Path.Value;
+                else
+                    requestPath = string.Empty;
 
-				output.Attributes.Add("href", url);
-			}
-		}
-	}
+                if (requestPath.StartsWith(path))
+                    output.AddClass("selected", htmlEncoder);
+            }
+
+            output.Attributes.Add("href", url);
+        }
+    }
 }
