@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using BrandUp.Pages.Content.Fields;
 
@@ -16,6 +17,7 @@ namespace BrandUp.Pages.Content
         readonly Dictionary<string, int> fieldNames = [];
         ITextField titleField;
         readonly List<PropertyInfo> injectProperties;
+        readonly bool isValidatable = false;
 
         #endregion
 
@@ -39,6 +41,9 @@ namespace BrandUp.Pages.Content
                 InitializeInjectProperties();
             }
 
+            if (typeof(IValidatableObject).IsAssignableFrom(modelType))
+                isValidatable = true;
+
             baseMetadata?.derivedContents.Add(this);
 
             Name = contentTypeAttribute.Name ?? GetTypeName(modelType);
@@ -57,6 +62,7 @@ namespace BrandUp.Pages.Content
         public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
         public IEnumerable<FieldProviderAttribute> Fields => fields;
         public bool IsAbstract => ModelType.IsAbstract;
+        public bool IsValidatable => isValidatable;
         public bool IsDefinedTitleField => Title != null;
 
         #endregion
