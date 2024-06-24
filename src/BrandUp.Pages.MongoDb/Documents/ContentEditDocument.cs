@@ -4,21 +4,22 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    public class EditSession : IEditSession
+    public class ContentEdit : IContentEdit
     {
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
-        public Guid PageId { get; set; }
+        public string WebsiteId { get; set; }
+        public string ContentKey { get; set; }
         public string UserId { get; set; }
     }
 
     [MongoDB.MongoCollection(CollectionName = "BrandUpPages.edits")]
-    public class EditSessionDocument : Document
+    public class ContentEditDocument : Document
     {
         [BsonRequired]
         public string WebsiteId { get; set; }
-        [BsonRequired, BsonRepresentation(BsonType.String)]
-        public Guid PageId { get; set; }
+        [BsonRequired]
+        public string ContentKey { get; set; }
         [BsonRequired]
         public string UserId { get; set; }
         [BsonRequired]

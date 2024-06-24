@@ -6,8 +6,8 @@ namespace BrandUp.Pages.Url
 	{
 		Task<string> GetPathAsync(IPage page, CancellationToken cancellationToken = default);
 		Task<string> GetUriAsync(IPage page, CancellationToken cancellationToken = default);
-		Task<string> GetPathAsync(IEditSession pageEditSession, CancellationToken cancellationToken = default);
-		Task<string> GetUriAsync(IEditSession pageEditSession, CancellationToken cancellationToken = default);
+		Task<string> GetPathAsync(IContentEdit pageEditSession, CancellationToken cancellationToken = default);
+		Task<string> GetUriAsync(IContentEdit pageEditSession, CancellationToken cancellationToken = default);
 		Task<string> GetPathAsync(string pagePath, CancellationToken cancellationToken = default);
 		Task<string> GetUriAsync(string pagePath, CancellationToken cancellationToken = default);
 	}

@@ -11,16 +11,14 @@ namespace BrandUp.Pages.Controllers
     public abstract class FieldController<TField> : Controller, IAsyncActionFilter
         where TField : class, IFieldProvider
     {
-        private IPageService pageService;
-        private IEditSessionService pageEditingService;
-        private IPage page;
-        private IEditSession editSession;
-        private ContentContext contentContext;
-        private TField field;
-        private ContentContext rootContentContext;
+        IPageService pageService;
+        IContentEditService pageEditingService;
+        IContentEdit editSession;
+        ContentContext contentContext;
+        TField field;
+        ContentContext rootContentContext;
 
-        public IPage Page => page;
-        public IEditSession ContentEdit => editSession;
+        public IContentEdit ContentEdit => editSession;
         public TField Field => field;
         public ContentContext ContentContext => contentContext;
 
@@ -29,7 +27,7 @@ namespace BrandUp.Pages.Controllers
         async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             pageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
-            pageEditingService = HttpContext.RequestServices.GetRequiredService<IEditSessionService>();
+            pageEditingService = HttpContext.RequestServices.GetRequiredService<IContentEditService>();
 
             if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))
             {
@@ -44,16 +42,9 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            page = await pageService.FindPageByIdAsync(editSession.PageId);
-            if (page == null)
-            {
-                context.Result = BadRequest();
-                return;
-            }
-
             var content = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
 
-            rootContentContext = new ContentContext(page, content, HttpContext.RequestServices, true);
+            rootContentContext = new ContentContext(editSession.ContentKey, content, HttpContext.RequestServices, true);
 
             string modelPath = string.Empty;
             if (Request.Query.TryGetValue("path", out Microsoft.Extensions.Primitives.StringValues pathValue))

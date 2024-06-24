@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
 using BrandUp.Website.Pages;
@@ -11,7 +12,7 @@ namespace BrandUp.Pages
     public sealed class ContentPageModel : AppPageModel
     {
         IPage page;
-        IEditSession editSession;
+        IContentEdit editSession;
         PageSeoOptions pageSeo;
 
         #region Properties
@@ -44,15 +45,21 @@ namespace BrandUp.Pages
 
             if (EditId.HasValue)
             {
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IEditSessionService>();
-                editSession = await pageEditingService.FindEditByIdAsync(EditId.Value);
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IContentEditService>();
+                editSession = await pageEditingService.FindEditByIdAsync(EditId.Value, CancellationToken);
                 if (editSession == null)
                 {
                     context.Result = NotFound();
                     return;
                 }
 
-                page = await PageService.FindPageByIdAsync(editSession.PageId);
+                if (!editSession.ContentKey.StartsWith("page-"))
+                    throw new InvalidOperationException();
+
+                if (!Guid.TryParse(editSession.ContentKey.Substring(5), out var pageId))
+                    throw new InvalidOperationException();
+
+                page = await PageService.FindPageByIdAsync(pageId, CancellationToken);
                 if (page == null)
                 {
                     context.Result = NotFound();
@@ -60,11 +67,11 @@ namespace BrandUp.Pages
                 }
 
                 var accessProvider = HttpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
-                if (!await accessProvider.CheckAccessAsync() || await accessProvider.GetUserIdAsync() != editSession.UserId)
+                if (!await accessProvider.CheckAccessAsync(CancellationToken) || await accessProvider.GetUserIdAsync(CancellationToken) != editSession.UserId)
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 
-                    context.Result = RedirectPermanent(await pageLinkGenerator.GetPathAsync(page));
+                    context.Result = RedirectPermanent(await pageLinkGenerator.GetPathAsync(page, CancellationToken));
                     return;
                 }
             }
@@ -76,7 +83,7 @@ namespace BrandUp.Pages
                 if (routeData.Values.TryGetValue("url", out object urlValue) && urlValue != null)
                     pagePath = (string)urlValue;
 
-                var url = await PageService.FindUrlByPathAsync(WebsiteContext.Website.Id, pagePath);
+                var url = await PageService.FindUrlByPathAsync(WebsiteContext.Website.Id, pagePath, CancellationToken);
                 if (url == null)
                 {
                     context.Result = NotFound();
@@ -85,7 +92,7 @@ namespace BrandUp.Pages
 
                 if (url.PageId.HasValue)
                 {
-                    page = await PageService.FindPageByIdAsync(url.PageId.Value);
+                    page = await PageService.FindPageByIdAsync(url.PageId.Value, CancellationToken);
                     if (page == null)
                     {
                         context.Result = NotFound();
@@ -95,7 +102,7 @@ namespace BrandUp.Pages
                     if (!page.IsPublished)
                     {
                         var accessProvider = HttpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
-                        if (!await accessProvider.CheckAccessAsync())
+                        if (!await accessProvider.CheckAccessAsync(CancellationToken))
                         {
                             context.Result = NotFound();
                             return;
@@ -105,7 +112,7 @@ namespace BrandUp.Pages
                 else
                 {
                     var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
-                    var redirectUrl = await pageLinkGenerator.GetPathAsync(url.Redirect.Path);
+                    var redirectUrl = await pageLinkGenerator.GetPathAsync(url.Redirect.Path, CancellationToken);
 
                     if (url.Redirect.IsPermament)
                         context.Result = RedirectPermanent(redirectUrl);
@@ -115,24 +122,29 @@ namespace BrandUp.Pages
                 }
             }
 
-            PageMetadata = await PageService.GetPageTypeAsync(page, HttpContext.RequestAborted);
+            PageMetadata = await PageService.GetPageTypeAsync(page, CancellationToken);
 
-            pageSeo = await PageService.GetPageSeoOptionsAsync(page, HttpContext.RequestAborted);
+            pageSeo = await PageService.GetPageSeoOptionsAsync(page, CancellationToken);
+            var pageContentKey = await PageService.GetContentKeyAsync(page.Id, CancellationToken);
 
             if (editSession != null)
             {
-                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IEditSessionService>();
-                PageContent = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
+                var pageEditingService = HttpContext.RequestServices.GetRequiredService<IContentEditService>();
+                PageContent = await pageEditingService.GetContentAsync(editSession, CancellationToken);
             }
             else
-                PageContent = await PageService.GetPageContentAsync(page, HttpContext.RequestAborted);
-            if (PageContent == null)
-                throw new InvalidOperationException();
+            {
+                var contentService = HttpContext.RequestServices.GetRequiredService<ContentService>();
+                PageContent = await contentService.GetContentAsync(page.WebsiteId, pageContentKey, CancellationToken);
+            }
 
-            ContentContext = new ContentContext(page, PageContent, HttpContext.RequestServices, editSession != null);
+            if (PageContent == null)
+                throw new InvalidOperationException($"Not set page content.");
+
+            ContentContext = new ContentContext(pageContentKey, PageContent, HttpContext.RequestServices, editSession != null);
 
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
-            ParentPageId = await PageService.GetParentPageIdAsync(page, HttpContext.RequestAborted);
+            ParentPageId = await PageService.GetParentPageIdAsync(page, CancellationToken);
         }
 
         #endregion

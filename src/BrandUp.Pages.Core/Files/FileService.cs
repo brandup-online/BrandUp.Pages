@@ -1,53 +1,44 @@
-﻿using BrandUp.Pages.Interfaces;
-
-namespace BrandUp.Pages.Files
+﻿namespace BrandUp.Pages.Files
 {
-	public class FileService
-	{
-		private readonly IFileRepository repository;
+    public class FileService(IFileRepository repository)
+    {
+        public Task<IFile> UploadFileAsync(string websiteId, string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(websiteId);
+            ArgumentNullException.ThrowIfNull(contentKey);
+            ArgumentNullException.ThrowIfNull(fileName);
+            ArgumentNullException.ThrowIfNull(contentType);
+            ArgumentNullException.ThrowIfNull(stream);
 
-		public FileService(IFileRepository repository)
-		{
-			this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
-		}
+            return repository.UploadFileAsync(websiteId, contentKey, fileName, contentType, stream, cancellationToken);
+        }
 
-		public Task<IFile> UploadFileAsync(IPage page, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
-		{
-			if (page == null)
-				throw new ArgumentNullException(nameof(page));
-			if (contentType == null)
-				throw new ArgumentNullException(nameof(contentType));
-			if (stream == null)
-				throw new ArgumentNullException(nameof(stream));
-			if (fileName == null)
-				throw new ArgumentNullException(nameof(fileName));
+        public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            if (fileId == Guid.Empty)
+                throw new ArgumentException();
 
-			return repository.UploadFileAsync(page.Id, fileName, contentType, stream, cancellationToken);
-		}
-		public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
-		{
-			if (fileId == Guid.Empty)
-				throw new ArgumentException();
+            return repository.FindFileByIdAsync(fileId, cancellationToken);
+        }
 
-			return repository.FindFileByIdAsync(fileId, cancellationToken);
-		}
-		public Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
-		{
-			if (fileId == Guid.Empty)
-				throw new ArgumentException();
+        public Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            if (fileId == Guid.Empty)
+                throw new ArgumentException();
 
-			return repository.ReadFileAsync(fileId, cancellationToken);
-		}
-		public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
-		{
-			return repository.DeleteFileAsync(fileId, cancellationToken);
-		}
-		public string GetFileExtension(IFile file)
-		{
-			if (file == null)
-				throw new ArgumentNullException(nameof(file));
+            return repository.ReadFileAsync(fileId, cancellationToken);
+        }
 
-			return Path.GetExtension(file.Name);
-		}
-	}
+        public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            return repository.DeleteFileAsync(fileId, cancellationToken);
+        }
+
+        public string GetFileExtension(IFile file)
+        {
+            ArgumentNullException.ThrowIfNull(file);
+
+            return Path.GetExtension(file.Name);
+        }
+    }
 }

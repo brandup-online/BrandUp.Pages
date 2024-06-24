@@ -6,21 +6,8 @@ using BrandUp.Website;
 namespace LandingWebSite._migrations
 {
     [Setup]
-    public class SetupMigration : IMigrationHandler
+    public class SetupMigration(IPageCollectionService pageCollectionService, IPageMetadataManager pageMetadataManager, IPageService pageService, IWebsiteStore websiteStore) : IMigrationHandler
     {
-        readonly IPageCollectionService pageCollectionService;
-        readonly IPageMetadataManager pageMetadataManager;
-        readonly IPageService pageService;
-        readonly IWebsiteStore websiteStore;
-
-        public SetupMigration(IPageCollectionService pageCollectionService, IPageMetadataManager pageMetadataManager, IPageService pageService, IWebsiteStore websiteStore)
-        {
-            this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
-            this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
-            this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            this.websiteStore = websiteStore ?? throw new ArgumentNullException(nameof(websiteStore));
-        }
-
         public async Task UpAsync(CancellationToken cancellationToken = default)
         {
             var website = await websiteStore.FindByNameAsync(string.Empty);
@@ -46,9 +33,9 @@ namespace LandingWebSite._migrations
             await pageService.PublishPageAsync(newsPage2, "second-news", cancellationToken);
         }
 
-        public Task DownAsync(CancellationToken cancellationToken = default)
+        public async Task DownAsync(CancellationToken cancellationToken = default)
         {
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
 }
