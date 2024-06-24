@@ -9,6 +9,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
     private __isChanged: boolean;
     private __value: HTMLElement;
     private __editor: ContentEditor;
+    private __editorPromise: Promise<any>;
 
     constructor(form: IContentForm, name: string, options: HtmlFieldFormOptions) {
         super(name, options);
@@ -28,7 +29,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         if (this.options.placeholder)
             this.__value.setAttribute("data-placeholder", this.options.placeholder);
 
-        ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
+        this.__editorPromise = ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
             .then(editor => {
                 this.__editor = editor;
 
@@ -59,7 +60,9 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         const data = this.__editor.data.get();
         return data ? data : null;
     }
-    setValue(value: string) {
+
+    async setValue(value: string) {
+        await this.__editorPromise; // если editor еще не создался - ждем
         if (this.__editor) {
             this.__editor.data.set(value ? value : "");
             this.__refreshUI();
@@ -89,6 +92,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
             success: (response) => {
                 if (response.status === 200) {
                     this.setValue(response.data);
+                    this.setErrors([]);
                 }
                 else {
                     this.setErrors(["error"]);

@@ -24,6 +24,7 @@ export class TextContent extends Textbox implements IContentField {
             success: (response: AjaxResponse<string>) => {
                 if (response.status === 200) {
                     this.setValue(response.data);
+                    this.setErrors([]);
                 }
                 else {
                     this.setErrors([ "error" ]);
