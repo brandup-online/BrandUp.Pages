@@ -35,6 +35,7 @@ export class Editor extends UIElement implements IPageDesigner {
         this.queue = new AjaxQueue();
 
         this.render();
+        this.__renderToolbar();
         this.__initLogic();
 
         document.body.classList.add("bp-state-design");
@@ -65,7 +66,7 @@ export class Editor extends UIElement implements IPageDesigner {
         }
     }
 
-    render() {
+    private __renderToolbar() {
         const toolbarElem = DOM.tag("div", { class: "bp-elem editor-toolbar" }, [
             DOM.tag("button", { class: "bp-button", command: "bp-commit", title:"Применить изменения" }, [saveIcon, "Сохранить"]),
             DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title:"Отменить изменения" }, [cancelIcon, "Отмена"]),
@@ -74,7 +75,9 @@ export class Editor extends UIElement implements IPageDesigner {
 
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem)
+    }
 
+    render() {
         const fieldElements = DOM.queryElements(this.contentElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
             const fieldElem = fieldElements.item(i);
