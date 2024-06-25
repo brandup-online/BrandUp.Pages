@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Services
         readonly IServiceScope serviceScope;
         readonly IPageService pageService;
         readonly IPageCollectionService pageCollectionService;
-        private IPageMetadataManager pageMetadataManager;
+        private PageMetadataManager pageMetadataManager;
         readonly IWebsiteContext websiteContext;
 
         public PageServiceTests()
@@ -44,7 +44,7 @@ namespace BrandUp.Pages.Services
 
         async Task IAsyncLifetime.InitializeAsync()
         {
-            pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
+            pageMetadataManager = serviceScope.ServiceProvider.GetService<PageMetadataManager>();
             var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
             var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
 

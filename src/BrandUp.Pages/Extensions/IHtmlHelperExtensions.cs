@@ -1,7 +1,5 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Filters;
-using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Services;
+using BrandUp.Pages.Features;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Html;
@@ -63,14 +61,8 @@ namespace BrandUp.Pages
                 contentModel = await contentService.GetContentAsync(websiteContext.Website.Id, key, cancellationToken);
                 if (contentModel == null)
                 {
-                    contentModel = contentMetadataProvider.CreateModelInstance();
-
-                    var view = viewLocator.FindView(contentMetadataProvider.ModelType);
-                    if (view == null)
-                        throw new InvalidOperationException($"Not found view for content type {contentMetadataProvider.Name}.");
-
-                    if (view.DefaultModelData != null)
-                        contentMetadataProvider.ApplyDataToModel(view.DefaultModelData, contentModel);
+                    contentModel = await contentService.CreateDefaultAsync(contentMetadataProvider, cancellationToken);
+                    contentModel ??= contentMetadataProvider.CreateModelInstance();
                 }
             }
 

@@ -27,7 +27,7 @@ namespace BrandUp.Pages.Builder
         {
             services.AddSingleton<ContentMetadataManager>();
 
-            services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
+            services.AddSingleton<PageMetadataManager, PageMetadataManager>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
             services.AddScoped<ContentEditService>();

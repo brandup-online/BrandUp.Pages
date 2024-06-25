@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Services
     public class PageService(
         IPageRepository pageRepository,
         IPageCollectionRepository pageCollectionRepository,
-        IPageMetadataManager pageMetadataManager,
+        PageMetadataManager pageMetadataManager,
         Url.IPageUrlHelper pageUrlHelper,
         Views.IViewLocator viewLocator,
         ContentService contentService,

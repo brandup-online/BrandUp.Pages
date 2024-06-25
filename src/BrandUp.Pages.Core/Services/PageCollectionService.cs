@@ -3,7 +3,7 @@ using BrandUp.Pages.Metadata;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageCollectionService(IPageCollectionRepository repositiry, IPageRepository pageRepositiry, IPageMetadataManager pageMetadataManager) : IPageCollectionService
+    public class PageCollectionService(IPageCollectionRepository repositiry, IPageRepository pageRepositiry, PageMetadataManager pageMetadataManager) : IPageCollectionService
     {
         public async Task<Result<IPageCollection>> CreateCollectionAsync(string websiteId, string title, string pageTypeName, PageSortMode sortMode)
         {

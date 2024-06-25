@@ -133,11 +133,6 @@ namespace BrandUp.Pages.Controllers
 
             contentExplorer.Field.ChangeType(contentExplorer.Model, modelType);
 
-            var newItem = newModelType.CreateModelInstance();
-            var view = viewLocator.FindView(newModelType.ModelType);
-            if (view != null && view.DefaultModelData != null)
-                newItem = newModelType.ConvertDictionaryToContentModel(view.DefaultModelData);
-
             return Ok();
         }
 

@@ -1,7 +1,5 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +10,6 @@ namespace BrandUp.Pages.Controllers
     public abstract class FieldController<TField> : Controller, IAsyncActionFilter
         where TField : class, IFieldProvider
     {
-        IPageService pageService;
         ContentEditService contentEditService;
         IContentEdit editSession;
         ContentContext contentContext;
@@ -27,7 +24,6 @@ namespace BrandUp.Pages.Controllers
 
         async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            pageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
             contentEditService = HttpContext.RequestServices.GetRequiredService<ContentEditService>();
 
             if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))

@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,9 @@ namespace BrandUp.Pages.Filters
         {
             var httpContext = context.HttpContext;
             var cancellationToken = httpContext.RequestAborted;
+            var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
 
-            if (httpContext.Request.Query.TryGetValue("editid", out string editIdValue) && Guid.TryParse(editIdValue, out var editId))
+            if (await accessProvider.CheckAccessAsync(cancellationToken) && httpContext.Request.Query.TryGetValue("editid", out string editIdValue) && Guid.TryParse(editIdValue, out var editId))
             {
                 var contentEditService = httpContext.RequestServices.GetRequiredService<ContentEditService>();
                 var editSession = await contentEditService.FindEditByIdAsync(editId, cancellationToken);
@@ -27,8 +29,8 @@ namespace BrandUp.Pages.Filters
                     return;
                 }
 
-                var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
-                if (!await accessProvider.CheckAccessAsync(cancellationToken) || await accessProvider.GetUserIdAsync(cancellationToken) != editSession.UserId)
+                var userId = await accessProvider.GetUserIdAsync(cancellationToken);
+                if (!editSession.UserId.Equals(userId, StringComparison.InvariantCultureIgnoreCase))
                 {
                     context.Result = new NotFoundResult();
                     return;
@@ -56,22 +58,5 @@ namespace BrandUp.Pages.Filters
         #endregion
     }
 
-    internal class ContentEditFeature
-    {
-        public IContentEdit Edit { get; }
-        public object Content { get; }
 
-        public ContentEditFeature(IContentEdit contentEdit, object content)
-        {
-            Edit = contentEdit;
-            Content = content;
-        }
-
-        public bool IsEdit(string contentKey)
-        {
-            ArgumentNullException.ThrowIfNull(contentKey);
-
-            return contentKey.Equals(Edit.ContentKey, StringComparison.InvariantCultureIgnoreCase);
-        }
-    }
 }

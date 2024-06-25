@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Controllers
 		readonly IPageService pageService;
 		readonly IPageCollectionService pageCollectionService;
 		readonly IPageLinkGenerator pageLinkGenerator;
-		readonly IPageMetadataManager pageMetadataManager;
+		readonly PageMetadataManager pageMetadataManager;
 		readonly IWebsiteContext websiteContext;
 		private IPage page;
 
@@ -25,7 +25,7 @@ namespace BrandUp.Pages.Controllers
 			IPageService pageService,
 			IPageCollectionService pageCollectionService,
 			IPageLinkGenerator pageLinkGenerator,
-			IPageMetadataManager pageMetadataManager,
+			PageMetadataManager pageMetadataManager,
 			IWebsiteContext websiteContext)
 		{
 			this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));

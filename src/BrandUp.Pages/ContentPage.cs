@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Features;
+using BrandUp.Pages.Interfaces;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,7 +8,6 @@ namespace BrandUp.Pages
     public abstract class ContentPage<TModel> : RazorPage<TModel>
     {
         public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext;
-        public IPage Page => Content.Page;
 
         public Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference)
         {
@@ -21,6 +21,8 @@ namespace BrandUp.Pages
 
         public async Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference, int offset, int limit)
         {
+            ArgumentNullException.ThrowIfNull(pageCollectionReference);
+
             var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
 
             if (pageCollectionReference.CollectionId == Guid.Empty)
@@ -41,8 +43,11 @@ namespace BrandUp.Pages
 
         public async Task<IEnumerable<IPage>> EachParentPagesAsync(IPage page, bool includeCurrentPage = false)
         {
+            ArgumentNullException.ThrowIfNull(page);
+
             var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
             var result = new List<IPage>();
+
             if (includeCurrentPage)
                 result.Add(page);
 
@@ -62,9 +67,13 @@ namespace BrandUp.Pages
             return result;
         }
 
-        public Task<IEnumerable<IPage>> EachParentPagesAsync(bool includeCurrentPage = false)
+        public async Task<IEnumerable<IPage>> EachParentPagesAsync(bool includeCurrentPage = false)
         {
-            return EachParentPagesAsync(Content.Page, includeCurrentPage);
+            var contentPageFeature = ViewContext.HttpContext.Features.Get<ContentPageFeature>();
+            if (contentPageFeature != null)
+                return await EachParentPagesAsync(contentPageFeature.Page, includeCurrentPage);
+            else
+                return [];
         }
     }
 }

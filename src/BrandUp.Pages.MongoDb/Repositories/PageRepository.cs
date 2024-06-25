@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using BrandUp.MongoDB;
+﻿using BrandUp.MongoDB;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
@@ -361,8 +360,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var updateResult = await pageDocuments.UpdateOneAsync(session, it => it.Id == page.Id, updateDefinition, cancellationToken: cancellationToken);
             if (updateResult.MatchedCount != 1)
                 throw new Exception();
-
-            Debug.WriteLine($"{page.Header} - {order}");
         }
     }
 }

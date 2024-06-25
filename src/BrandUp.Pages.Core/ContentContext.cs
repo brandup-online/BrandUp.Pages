@@ -1,6 +1,4 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages
@@ -11,7 +9,6 @@ namespace BrandUp.Pages
         /// Ключ контента.
         /// </summary>
         public string Key { get; }
-        public IPage Page { get; }
         public ContentExplorer Explorer { get; }
         public IServiceProvider Services { get; }
         public object Content => Explorer.Model;
@@ -36,7 +33,6 @@ namespace BrandUp.Pages
         private ContentContext(ContentContext parent, ContentExplorer contentExplorer)
         {
             Key = parent.Key;
-            Page = parent.Page;
             Services = parent.Services;
             Explorer = contentExplorer;
             EditId = parent.EditId;

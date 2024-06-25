@@ -3,7 +3,7 @@ using BrandUp.Pages.Content;
 
 namespace BrandUp.Pages.Metadata
 {
-    public class PageMetadataManager : IPageMetadataManager
+    public class PageMetadataManager
     {
         readonly List<PageMetadataProvider> metadataProviders = [];
         readonly Dictionary<string, int> typeNames = [];
