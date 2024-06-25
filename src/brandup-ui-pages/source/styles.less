@@ -205,6 +205,25 @@ body:has(.editor-toolbar) {
     padding: 2px 6px;
     gap: 5px;
 
+    & div:has(&-button) {
+        &:first-child {
+            padding-right: 10px;
+            position: relative;
+    
+            &:after {
+                content: "";
+                position: absolute;
+                background-color: @Main-Color;
+                opacity: 0.5;
+                width: 1px;
+                height: 20px;
+                right: 3px;
+                top: 10px;
+                bottom: 10px;
+            }
+        }
+    }
+
     &-button {
         background: none;
         padding: 8px;
@@ -218,6 +237,10 @@ body:has(.editor-toolbar) {
             height: 22px;
             fill: #fff;
         }
+
+        &.active ~ menu {
+            display: block;
+        }
     
         &:hover,&:focus {
             background: @Accent-Dark;
@@ -225,21 +248,6 @@ body:has(.editor-toolbar) {
     
         &:active {
             background: @Accent-Medium;
-        }
-    
-        &:first-child {
-            margin-right: 10px;
-    
-            &:after {
-                content: "";
-                position: absolute;
-                background-color: @Main-Color;
-                opacity: 0.5;
-                width: 1px;
-                height: 20px;
-                left: 53px;
-                margin: auto 0;
-            }
         }
     
         &.page-status {
@@ -398,18 +406,6 @@ body:has(.editor-toolbar) {
                 margin: 0 5px;
                 cursor: pointer;
             }
-        }
-    }
-
-    &.opened-menu {
-        &-website .website-menu {
-            display: block;
-        }
-        &-page .page-menu {
-            display: block;
-        }
-        &-edit .edit-menu {
-            display: block;
         }
     }
 

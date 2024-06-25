@@ -53,24 +53,28 @@ export class PageToolbar extends UIElement {
         let websiteMenu: HTMLElement;
 
         let toolbarButtons = [
-            DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-website", title: "Действия" }, [
-                iconList,
+            DOM.tag("div", null, [
+                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия" }, [
+                    iconList,
+                ]),
+                websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu" }),
             ]),
-            websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu website-menu" }),
-            DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
-                iconEdit,
+            DOM.tag("div", null, [
+                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, [
+                    iconEdit,
+                ]),
+                DOM.tag("menu", { class: "page-toolbar-menu edit-menu" }, contentElements.map(elem => {
+                    const contentKey = elem.getAttribute("content-root");
+                    if (!contentKey) throw "Not set content root value.";
+    
+                    const contentType = elem.getAttribute("content-type");
+                    if (!contentType) throw "Not set content type value.";
+    
+                    return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
+                        contentKey, DOM.tag('span', null, contentKey),
+                    ])
+                }))
             ]),
-            DOM.tag("menu", { class: "page-toolbar-menu edit-menu" }, contentElements.map(elem => {
-                const contentKey = elem.getAttribute("content-root");
-                if (!contentKey) throw "Not set content root value.";
-
-                const contentType = elem.getAttribute("content-type");
-                if (!contentType) throw "Not set content type value.";
-
-                return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
-                    contentKey, DOM.tag('span', null, contentKey),
-                ])
-            }))
         ];
         
         // Если страница динамическая
@@ -92,14 +96,16 @@ export class PageToolbar extends UIElement {
                 pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),);
 
             toolbarButtons = toolbarButtons.slice(0, 2).concat([
-                    DOM.tag ("button", { class: "page-status page-toolbar-button " + status }, [DOM.tag("span"),]),
-                    (published ? null : DOM.tag("button", { class: "page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)),
+                    DOM.tag("div", null, DOM.tag ("button", { class: "page-status page-toolbar-button " + status }, [DOM.tag("span"),])),
+                    (published ? null : DOM.tag("div", null, DOM.tag("button", { class: "page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish))),
                 ],
                 toolbarButtons.slice(2),
-                DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-page", title: "Действия над страницей" }, [
-                    iconMore,
+                DOM.tag("div", null, [
+                    DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, [
+                        iconMore,
+                    ]),
+                    DOM.tag("menu", { class: "page-toolbar-menu", title: "" }, pageMenuItems),
                 ]),
-                DOM.tag("menu", { class: "page-toolbar-menu page-menu", title: "" }, pageMenuItems),
             );
         }
         websiteMenu.append(websiteMenuItems);
@@ -111,6 +117,15 @@ export class PageToolbar extends UIElement {
     }
 
     private __initLogic() {
+        this.registerCommand("show-menu", (elem) => {
+            if (!elem.classList.toggle("active")) {
+                document.body.removeEventListener("click", this.__closeMenuFunc);
+                return;
+            }
+
+            document.body.addEventListener("click", this.__closeMenuFunc);
+        });
+
         this.registerCommand("bp-back", () => {
             let parentPageId: string = null;
             if (this.isContentPage)
@@ -155,34 +170,6 @@ export class PageToolbar extends UIElement {
             seoPage(this.__page.model.id).then(() => {
                 this.__page.website.app.reload();
             });
-        });
-
-        this.registerCommand("bp-actions-website", () => {
-            if (!this.element.classList.toggle("opened-menu-website")) {
-                document.body.removeEventListener("click", this.__closeMenuFunc);
-                return;
-            }
-
-            document.body.addEventListener("click", this.__closeMenuFunc);
-        });
-
-        this.registerCommand("bp-actions-page", () => {
-            if (!this.element.classList.toggle("opened-menu-page")) {
-                document.body.removeEventListener("click", this.__closeMenuFunc);
-                return;
-            }
-
-            document.body.addEventListener("click", this.__closeMenuFunc);
-        });
-
-        this.registerCommand("bp-actions-edit", (elem) => {
-            if (elem.closest(".page-toolbar-menu")) this.__closeMenu();
-
-            if (!this.element.classList.toggle("opened-menu-edit")) {
-                document.body.removeEventListener("click", this.__closeMenuFunc);
-                return;
-            }
-            document.body.addEventListener("click", this.__closeMenuFunc);
         });
 
         this.registerAsyncCommand("bp-edit", (context)=> {
@@ -263,15 +250,12 @@ export class PageToolbar extends UIElement {
             if (target.closest(".page-toolbar-menu")) return;
 
             const button = target.closest(`.page-toolbar-button`);
-            if (button) {
-                const menuName = button.getAttribute('data-command')?.replace('bp-actions-',"");
-                this.__closeMenu(menuName);
-            }
-            else {
-                this.element.classList.remove("opened-menu-website", "opened-menu-page", "opened-menu-edit");
-            }
+            const buttons = DOM.queryElements(this.element, '.page-toolbar-button');
+            buttons.forEach(item => {
+                if (button && item === button) return; 
+                else item.classList.remove("active");
+            })
             document.body.removeEventListener("click", this.__closeMenuFunc);
-            return;
         };
     }
 
