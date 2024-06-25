@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content.Repositories;
+using BrandUp.Pages.Interfaces;
 
 namespace BrandUp.Pages.Repositories
 {

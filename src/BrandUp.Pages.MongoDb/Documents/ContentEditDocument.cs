@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 

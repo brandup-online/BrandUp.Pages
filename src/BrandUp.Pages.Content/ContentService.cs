@@ -1,10 +1,19 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content.Infrastructure;
+using BrandUp.Pages.Content.Repositories;
 
-namespace BrandUp.Pages.Services
+namespace BrandUp.Pages.Content
 {
-    public class ContentService(ContentMetadataManager contentMetadataManager, IContentRepository contentRepository)
+    public class ContentService(ContentMetadataManager contentMetadataManager, IContentRepository contentRepository, IDefaultContentDataProvider defaultContentDataProvider)
     {
+        public async Task<object> CreateDefaultAsync(ContentMetadataProvider contentMetadata, CancellationToken cancellationToken = default)
+        {
+            var contentData = await defaultContentDataProvider.GetDefaultAsync(contentMetadata);
+            if (contentData == null)
+                return null;
+
+            return contentMetadata.ConvertDictionaryToContentModel(contentData);
+        }
+
         public async Task<object> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);

@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Builder
             services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IContentEditService, ContentEditService>();
+            services.AddScoped<ContentEditService>();
             services.AddScoped<ContentService>();
 
             services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
@@ -39,6 +39,7 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<Files.FileService>();
 
             services.AddSingleton<Content.Infrastructure.IContentTypeLocator>(new Content.Infrastructure.EmptyContentTypeLocator());
+            services.AddScoped<Content.Infrastructure.IDefaultContentDataProvider, ViewDefaultContentDataProvider>();
 
             services.AddSingleton<IAccessProvider, EmptyAccessProvider>();
         }

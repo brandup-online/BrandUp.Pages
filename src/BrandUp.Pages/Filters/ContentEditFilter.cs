@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Filters
 
             if (httpContext.Request.Query.TryGetValue("editid", out string editIdValue) && Guid.TryParse(editIdValue, out var editId))
             {
-                var contentEditService = httpContext.RequestServices.GetRequiredService<IContentEditService>();
+                var contentEditService = httpContext.RequestServices.GetRequiredService<ContentEditService>();
                 var editSession = await contentEditService.FindEditByIdAsync(editId, cancellationToken);
                 if (editSession == null)
                 {

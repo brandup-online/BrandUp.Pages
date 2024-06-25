@@ -1,33 +1,29 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Views;
+﻿using BrandUp.Pages.Content.Repositories;
 
-namespace BrandUp.Pages.Services
+namespace BrandUp.Pages.Content
 {
-    public class ContentEditService(IContentEditRepository editSessionRepository, Identity.IAccessProvider accessProvider, ContentService contentService, ContentMetadataManager contentMetadataManager, IViewLocator viewLocator) : IContentEditService
+    public class ContentEditService(IContentEditRepository editSessionRepository, ContentService contentService, ContentMetadataManager contentMetadataManager)
     {
-        public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, ContentMetadataProvider metadataProvider, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, string userId, ContentMetadataProvider contentMetadata, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
-            ArgumentNullException.ThrowIfNull(metadataProvider);
+            ArgumentNullException.ThrowIfNull(userId);
+            ArgumentNullException.ThrowIfNull(contentMetadata);
 
             var contentModel = await contentService.GetContentAsync(websiteId, key, cancellationToken);
             if (contentModel == null)
             {
-                var contentView = viewLocator.FindView(metadataProvider.ModelType);
-                if (contentView == null)
-                    throw new InvalidOperationException();
-
-                contentModel = metadataProvider.ConvertDictionaryToContentModel(contentView.DefaultModelData);
+                contentModel = await contentService.CreateDefaultAsync(contentMetadata, cancellationToken);
+                if (contentModel == null)
+                    throw new InvalidOperationException($"Not found default data for content type {contentMetadata.Name}.");
             }
-            else if (!metadataProvider.IsInheritedOrEqual(contentModel.GetType()))
+            else if (!contentMetadata.IsInheritedOrEqual(contentModel.GetType()))
                 throw new InvalidOperationException();
 
-            var editorId = await GetEditorIdAsync(cancellationToken);
-            var contentData = metadataProvider.ConvertContentModelToDictionary(contentModel);
+            var contentData = contentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            return await editSessionRepository.CreateEditAsync(websiteId, key, editorId, contentData, cancellationToken);
+            return await editSessionRepository.CreateEditAsync(websiteId, key, userId, contentData, cancellationToken);
         }
 
         public Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -35,12 +31,11 @@ namespace BrandUp.Pages.Services
             return editSessionRepository.FindEditByIdAsync(id, cancellationToken);
         }
 
-        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string key, string userId, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
-
-            var userId = await GetEditorIdAsync(cancellationToken);
+            ArgumentNullException.ThrowIfNull(userId);
 
             return await editSessionRepository.FindEditByUserAsync(websiteId, key, userId, cancellationToken);
         }
@@ -92,13 +87,14 @@ namespace BrandUp.Pages.Services
 
             return editSessionRepository.DeleteEditAsync(editSession, cancellationToken);
         }
+    }
 
-        async Task<string> GetEditorIdAsync(CancellationToken cancellationToken = default)
-        {
-            var userId = await accessProvider.GetUserIdAsync(cancellationToken);
-            if (userId == null)
-                throw new InvalidOperationException();
-            return userId;
-        }
+    public interface IContentEdit
+    {
+        Guid Id { get; }
+        DateTime CreatedDate { get; }
+        string WebsiteId { get; }
+        string ContentKey { get; }
+        string UserId { get; }
     }
 }

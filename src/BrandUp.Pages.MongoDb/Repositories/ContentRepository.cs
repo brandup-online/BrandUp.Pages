@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content.Repositories;
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
 

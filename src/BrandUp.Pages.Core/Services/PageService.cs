@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using Microsoft.Extensions.Options;
 

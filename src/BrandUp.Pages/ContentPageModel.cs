@@ -1,7 +1,7 @@
-﻿using BrandUp.Pages.Filters;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Filters;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
-using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
@@ -106,8 +106,8 @@ namespace BrandUp.Pages
 
                 contentEdit = contentEditFeature.Edit;
 
-                var pageEditingService = httpContext.RequestServices.GetRequiredService<IContentEditService>();
-                contentModel = await pageEditingService.GetContentAsync(contentEditFeature.Edit, CancellationToken);
+                var contentEditService = httpContext.RequestServices.GetRequiredService<ContentEditService>();
+                contentModel = await contentEditService.GetContentAsync(contentEditFeature.Edit, CancellationToken);
             }
             else
             {

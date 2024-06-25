@@ -1,5 +1,6 @@
 ﻿using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
+using BrandUp.Pages.Content.Repositories;
 using BrandUp.Pages.Files;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Repositories;

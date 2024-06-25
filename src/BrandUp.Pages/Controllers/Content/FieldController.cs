@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ namespace BrandUp.Pages.Controllers
         where TField : class, IFieldProvider
     {
         IPageService pageService;
-        IContentEditService pageEditingService;
+        ContentEditService contentEditService;
         IContentEdit editSession;
         ContentContext contentContext;
         TField field;
@@ -27,7 +28,7 @@ namespace BrandUp.Pages.Controllers
         async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             pageService = HttpContext.RequestServices.GetRequiredService<IPageService>();
-            pageEditingService = HttpContext.RequestServices.GetRequiredService<IContentEditService>();
+            contentEditService = HttpContext.RequestServices.GetRequiredService<ContentEditService>();
 
             if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))
             {
@@ -35,14 +36,14 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            editSession = await pageEditingService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
             {
                 context.Result = BadRequest();
                 return;
             }
 
-            var content = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
+            var content = await contentEditService.GetContentAsync(editSession, HttpContext.RequestAborted);
 
             rootContentContext = new ContentContext(editSession.ContentKey, content, HttpContext.RequestServices, editSession);
 
@@ -83,7 +84,7 @@ namespace BrandUp.Pages.Controllers
 
         protected async Task SaveChangesAsync()
         {
-            await pageEditingService.SetContentAsync(ContentEdit, rootContentContext.Content);
+            await contentEditService.SetContentAsync(ContentEdit, rootContentContext.Content);
         }
 
         protected async Task<IActionResult> FormValueAsync()
