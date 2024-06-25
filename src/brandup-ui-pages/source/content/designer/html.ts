@@ -104,8 +104,6 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
         this.__editor.destroy().then(() => {
             super.destroy();
         });
-
-        super.destroy();
     }
 }
 

@@ -61,14 +61,15 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         return data ? data : null;
     }
 
-    async setValue(value: string) {
-        await this.__editorPromise; // если editor еще не создался - ждем
-        if (this.__editor) {
-            this.__editor.data.set(value ? value : "");
-            this.__refreshUI();
-        }
-        else
-            this.__value.innerHTML = value ? value : "";
+    setValue(value: string) {
+        this.__editorPromise.then (()=> { // если editor еще не создался - ждем
+            if (this.__editor) {
+                this.__editor.data.set(value ? value : "");
+                this.__refreshUI();
+            }
+            else
+                this.__value.innerHTML = value ? value : "";
+        });
     }
     hasValue(): boolean {
         const value = this.normalizeValue(this.__value.innerText);

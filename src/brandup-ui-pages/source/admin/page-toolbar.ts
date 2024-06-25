@@ -55,22 +55,22 @@ export class PageToolbar extends UIElement {
         let toolbarButtons = [
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-website", title: "Действия" }, [
                 iconList,
-                websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu", id: "website-toolbar-menu" })
             ]),
+            websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu website-menu" }),
             DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-edit", title: "Редактировать контент страницы" }, [
                 iconEdit,
-                DOM.tag("menu", { class: "page-toolbar-menu edit-menu", id: "edit-toolbar-menu" }, contentElements.map(elem => {
-                    const contentKey = elem.getAttribute("content-root");
-                    if (!contentKey) throw "Not set content root value.";
+            ]),
+            DOM.tag("menu", { class: "page-toolbar-menu edit-menu" }, contentElements.map(elem => {
+                const contentKey = elem.getAttribute("content-root");
+                if (!contentKey) throw "Not set content root value.";
 
-                    const contentType = elem.getAttribute("content-type");
-                    if (!contentType) throw "Not set content type value.";
+                const contentType = elem.getAttribute("content-type");
+                if (!contentType) throw "Not set content type value.";
 
-                    return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
-                        contentKey, DOM.tag('span', null, contentKey),
-                    ])
-                }))
-            ])
+                return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
+                    contentKey, DOM.tag('span', null, contentKey),
+                ])
+            }))
         ];
         
         // Если страница динамическая
@@ -91,15 +91,15 @@ export class PageToolbar extends UIElement {
             if (!published) 
                 pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),);
 
-            toolbarButtons = toolbarButtons.slice(0, 1).concat([
+            toolbarButtons = toolbarButtons.slice(0, 2).concat([
                     DOM.tag ("button", { class: "page-status page-toolbar-button " + status }, [DOM.tag("span"),]),
                     (published ? null : DOM.tag("button", { class: "page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)),
                 ],
-                toolbarButtons.slice(1),
+                toolbarButtons.slice(2),
                 DOM.tag("button", { class: "page-toolbar-button", command: "bp-actions-page", title: "Действия над страницей" }, [
                     iconMore,
-                    DOM.tag("menu", { class: "page-toolbar-menu", id: "page-toolbar-menu", title: "" }, pageMenuItems),
-                ])
+                ]),
+                DOM.tag("menu", { class: "page-toolbar-menu page-menu", title: "" }, pageMenuItems),
             );
         }
         websiteMenu.append(websiteMenuItems);
