@@ -1,46 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using BrandUp.Pages.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Builder
 {
-	public static class IPagesBuilderExtensions
-	{
-		public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder)
-		{
-			return AddRazorContentPage(builder, options => { });
-		}
+    public static class IPagesBuilderExtensions
+    {
+        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder)
+        {
+            return AddRazorContentPage(builder, options => { });
+        }
 
-		public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<ContentPageOptions> optionAction)
-		{
-			var contentPageOptions = new ContentPageOptions();
-			optionAction?.Invoke(contentPageOptions);
+        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<ContentPageOptions> optionAction)
+        {
+            var contentPageOptions = new ContentPageOptions();
+            optionAction?.Invoke(contentPageOptions);
 
-			var services = builder.Services;
+            var services = builder.Services;
 
-			services.AddHttpContextAccessor();
+            services.AddHttpContextAccessor();
 
-			services.Configure<RazorPagesOptions>(options =>
-			{
-				options.Conventions.AddPageRoute(contentPageOptions.ContentPageName, "{**url}");
-			});
+            services.Configure<RazorPagesOptions>(options =>
+            {
+                options.Conventions.AddPageRoute(contentPageOptions.ContentPageName, "{**url}");
+            });
 
-			services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
-			services.AddTransient<Files.IFileUrlGenerator, Url.FileUrlGenerator>();
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new ContentEditFilter());
+            });
 
-			services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
-			services.AddScoped<Views.IViewRenderService, Views.RazorViewRenderService>();
+            services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
+            services.AddTransient<Files.IFileUrlGenerator, Url.FileUrlGenerator>();
 
-			services.Configure(optionAction);
+            services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
+            services.AddScoped<Views.IViewRenderService, Views.RazorViewRenderService>();
 
-			return builder;
-		}
+            services.Configure(optionAction);
 
-		public static IPagesBuilder AddImageResizer<T>(this IPagesBuilder builder)
-			where T : class, Images.IImageResizer
-		{
-			builder.Services.AddTransient<Images.IImageResizer, T>();
+            return builder;
+        }
 
-			return builder;
-		}
-	}
+        public static IPagesBuilder AddImageResizer<T>(this IPagesBuilder builder)
+            where T : class, Images.IImageResizer
+        {
+            builder.Services.AddTransient<Images.IImageResizer, T>();
+
+            return builder;
+        }
+    }
 }

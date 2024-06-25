@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Views
 {
@@ -14,10 +13,10 @@ namespace BrandUp.Pages.Views
         public const string ViewData_ContentContextKeyName = "_ContentContext_";
         public const string ViewData_ViewRenderingContextKeyName = "_ViewRenderingContext_";
 
-        private readonly ICompositeViewEngine viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
-        private readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        private readonly IViewLocator viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
-        private readonly HtmlEncoder htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
+        readonly ICompositeViewEngine viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
+        readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+        readonly IViewLocator viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
+        readonly HtmlEncoder htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
 
         #region IViewRenderService members
 
@@ -28,7 +27,7 @@ namespace BrandUp.Pages.Views
 
             var contentView = viewLocator.FindView(contentContext.Explorer.Metadata.ModelType);
             if (contentView == null)
-                throw new InvalidOperationException($"Couldn't find content view {contentView.Name}");
+                throw new InvalidOperationException($"Couldn't find content view {contentContext.Explorer.Metadata.Name}");
 
             var viewEngineResult = viewEngine.GetView("~/", contentView.Name, false);
             if (!viewEngineResult.Success)
@@ -42,7 +41,6 @@ namespace BrandUp.Pages.Views
             viewData.Add(ViewData_ViewRenderingContextKeyName, itemRenderingContext);
 
             using var contentOutput = new StringWriter();
-            var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
 
             var viewContext = new ViewContext
             {
@@ -66,7 +64,11 @@ namespace BrandUp.Pages.Views
                 tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
 
             if (contentContext.Explorer.IsRoot)
+            {
                 tag.Attributes.Add("content-root", contentContext.Key);
+                if (contentContext.IsDesigner)
+                    tag.Attributes.Add("data-content-edit-id", contentContext.EditId.Value.ToString());
+            }
             tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);
             tag.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
             tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());

@@ -2,7 +2,6 @@
 using BrandUp.MongoDB;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Documents;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace BrandUp.Pages.MongoDb.Repositories
@@ -15,7 +14,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         readonly IMongoCollection<ContentEditDocument> editDocuments = dbContext.ContentEdits;
         readonly IMongoCollection<PageUrlDocument> urlDocuments = dbContext.PageUrls;
 
-        public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, Guid pageId, string typeName, string pageHeader, string contentKey, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, Guid pageId, string typeName, string pageHeader, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
 
@@ -45,17 +44,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Path = pageDocument.UrlPath
             };
 
-            var contentDocument = new ContentDocument
-            {
-                Id = Guid.NewGuid(),
-                Key = contentKey.ToLower().Trim(),
-                Data = new BsonDocument(contentData)
-            };
-
             using var transaction = await mongoDbSession.BeginAsync(cancellationToken);
 
             await pageDocuments.InsertOneAsync(mongoDbSession.Current, pageDocument, cancellationToken: cancellationToken);
-            await contentDocuments.InsertOneAsync(mongoDbSession.Current, contentDocument, cancellationToken: cancellationToken);
             await urlDocuments.InsertOneAsync(mongoDbSession.Current, urlDocument, cancellationToken: cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);

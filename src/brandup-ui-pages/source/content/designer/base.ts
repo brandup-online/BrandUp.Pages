@@ -41,4 +41,10 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
     }
 
     abstract hasValue(): boolean;
+
+    destroy() {
+        this.element.classList.remove("field-designer");
+
+        super.destroy();
+    }
 }

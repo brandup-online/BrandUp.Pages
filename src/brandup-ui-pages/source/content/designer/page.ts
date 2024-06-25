@@ -5,25 +5,25 @@ import { HtmlDesigner } from "./html";
 import { ModelDesigner } from "./model";
 import { ImageDesigner } from "./image";
 import { PageBlocksDesigner } from "./page-blocks";
-import ContentPage from "../../pages/content";
-import "./page.less";
 import { AjaxQueue } from "brandup-ui-ajax";
+import { Page } from "brandup-ui-website";
+import "./page.less";
 
 export class PageDesigner implements IPageDesigner {
-    readonly page: ContentPage;
+    readonly page: Page;
+    readonly contentElem: HTMLElement;
     readonly editId: string;
     readonly queue: AjaxQueue;
     private __fields: { [key: string]: IContentFieldDesigner } = {};
-    private __rootElem: HTMLElement;
     private __accentedField: IContentFieldDesigner = null;
 
-    constructor(page: ContentPage) {
+    constructor(page: Page, contentElem: HTMLElement) {
         this.page = page;
-        this.editId = page.model.editId;
+        this.contentElem = contentElem;
+        this.contentElem.classList.add("page-designer");
+        this.editId = contentElem.dataset["contentEditId"];
 
         this.queue = new AjaxQueue();
-        this.__rootElem = DOM.queryElement(document.body, "[content-root]");
-        this.__rootElem.classList.add("page-designer");
 
         this.render();
 
@@ -34,7 +34,7 @@ export class PageDesigner implements IPageDesigner {
         if (this.__accentedField)
             throw "";
 
-        this.__rootElem.classList.add("accented");
+        this.contentElem.classList.add("accented");
 
         for (const key in this.__fields) {
             const f = this.__fields[key];
@@ -47,7 +47,7 @@ export class PageDesigner implements IPageDesigner {
     }
     clearAccent() {
         if (this.__accentedField) {
-            this.__rootElem.classList.remove("accented");
+            this.contentElem.classList.remove("accented");
 
             for (const key in this.__fields) {
                 const f = this.__fields[key];
@@ -59,7 +59,7 @@ export class PageDesigner implements IPageDesigner {
     }
 
     render() {
-        const fieldElements = DOM.queryElements(this.__rootElem, "[content-field]");
+        const fieldElements = DOM.queryElements(this.contentElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
             const fieldElem = fieldElements.item(i);
             if (!fieldElem.hasAttribute("content-field-model") || !fieldElem.hasAttribute("content-designer") || fieldElem.classList.contains("field-designer"))
@@ -104,6 +104,8 @@ export class PageDesigner implements IPageDesigner {
             this.__fields[key].destroy();
         }
         this.__fields = null;
+
+        this.contentElem.classList.remove("page-designer");
 
         document.body.classList.remove("bp-state-design");
     }

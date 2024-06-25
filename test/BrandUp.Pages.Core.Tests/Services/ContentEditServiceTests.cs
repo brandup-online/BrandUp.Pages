@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Builder;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Helpers;
 using BrandUp.Pages.Interfaces;
@@ -18,6 +19,7 @@ namespace BrandUp.Pages.Services
         readonly ContentService contentService;
         readonly IPageMetadataManager pageMetadataManager;
         readonly IWebsiteContext websiteContext;
+        readonly IContentMetadataManager contentMetadataManager;
 
         public ContentEditServiceTests()
         {
@@ -39,31 +41,16 @@ namespace BrandUp.Pages.Services
             contentEditService = serviceScope.ServiceProvider.GetService<IContentEditService>();
             contentService = serviceScope.ServiceProvider.GetService<ContentService>();
             pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
+            contentMetadataManager = serviceScope.ServiceProvider.GetRequiredService<IContentMetadataManager>();
         }
 
         #region IAsyncLifetime members
 
         async Task IAsyncLifetime.InitializeAsync()
         {
-            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
-            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
-
-            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
-
-            var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
-
-            var pageId = Guid.NewGuid();
-            var contentKey = await pageService.GetContentKeyAsync(pageId);
-            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test", contentKey, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(mainPage, "index");
-            await pageRepository.UpdatePageAsync(mainPage);
-
-            pageId = Guid.NewGuid();
-            contentKey = await pageService.GetContentKeyAsync(pageId);
-            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test", contentKey, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
-            await pageRepository.SetUrlPathAsync(testPage, "test");
-            await pageRepository.UpdatePageAsync(testPage);
+            await Task.CompletedTask;
         }
+
         async Task IAsyncLifetime.DisposeAsync()
         {
             serviceScope.Dispose();
@@ -82,8 +69,9 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
 
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             Assert.NotNull(edit);
             Assert.Equal(websiteId, edit.WebsiteId);
@@ -96,7 +84,8 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             var result = await contentEditService.FindEditByIdAsync(edit.Id);
 
@@ -117,7 +106,8 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             var result = await contentEditService.FindEditByUserAsync(websiteId, contentKey);
 
@@ -141,7 +131,8 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             var contentData = (TestPageContent)await contentEditService.GetContentAsync(edit);
 
@@ -155,7 +146,8 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
@@ -171,7 +163,8 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
@@ -190,7 +183,8 @@ namespace BrandUp.Pages.Services
             var websiteId = "test";
             var contentKey = "test";
             await contentService.SetContentAsync(websiteId, contentKey, TestPageContent.CreateWithOnlyTitle("test"));
-            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey);
+            var pageContentMetadata = contentMetadataManager.GetMetadata<TestPageContent>();
+            var edit = await contentEditService.BeginEditAsync(websiteId, contentKey, pageContentMetadata);
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);

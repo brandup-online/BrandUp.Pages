@@ -22,7 +22,7 @@
 	<ItemGroup>
 		<PackageReference Include="BrandUp.Extensions.Migrations" Version="8.0.4" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.4" />
-		<PackageReference Include="WebMarkupMin.AspNetCore8" Version="2.16.0" />
+		<PackageReference Include="WebMarkupMin.AspNetCore8" Version="2.16.1" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -8,31 +8,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.TagHelpers
 {
-	[HtmlTargetElement("a", Attributes = "asp-page-path", TagStructure = TagStructure.NormalOrSelfClosing)]
-	public class PageLinkTagHelper : TagHelper
-	{
-		private readonly HtmlEncoder htmlEncoder;
+    [HtmlTargetElement("a", Attributes = "asp-page-path", TagStructure = TagStructure.NormalOrSelfClosing)]
+    public class PageLinkTagHelper(HtmlEncoder htmlEncoder) : TagHelper
+    {
+        [HtmlAttributeName("asp-page-path")]
+        public string PagePath { get; set; }
+        [ViewContext, HtmlAttributeNotBound]
+        public ViewContext ViewContext { get; set; }
 
-		[HtmlAttributeName("asp-page-path")]
-		public string PagePath { get; set; }
-		[ViewContext, HtmlAttributeNotBound]
-		public ViewContext ViewContext { get; set; }
+        public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        {
+            var pageLinkGenerator = ViewContext.HttpContext.RequestServices.GetService<IPageLinkGenerator>();
+            if (pageLinkGenerator == null)
+                return;
 
-		public PageLinkTagHelper(HtmlEncoder htmlEncoder)
-		{
-			this.htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
-		}
+            var pagePath = await pageLinkGenerator.GetPathAsync(PagePath);
 
-		public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
-		{
-			var pageLinkGenerator = ViewContext.HttpContext.RequestServices.GetService<IPageLinkGenerator>();
-			if (pageLinkGenerator == null)
-				return;
-
-			var pagePath = await pageLinkGenerator.GetPathAsync(PagePath);
-
-			output.Attributes.SetAttribute("href", pagePath);
-			output.AddClass("applink", htmlEncoder);
-		}
-	}
+            output.Attributes.SetAttribute("href", pagePath);
+            output.AddClass("applink", htmlEncoder);
+        }
+    }
 }

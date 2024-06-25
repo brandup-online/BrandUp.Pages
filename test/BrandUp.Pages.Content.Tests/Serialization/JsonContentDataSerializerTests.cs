@@ -27,7 +27,7 @@ namespace BrandUp.Pages.Content.Serialization
 			var contentMetadata = metadataManager.GetMetadata(content.GetType());
 			var contentData = contentMetadata.ConvertContentModelToDictionary(content);
 
-			var json = JsonContentDataSerializer.SerializeToString(contentData);
+			var json = JsonContentSerializer.Serialize(contentData);
 			Assert.NotNull(json);
 		}
 
@@ -42,9 +42,9 @@ namespace BrandUp.Pages.Content.Serialization
 			};
 			var contentMetadata = metadataManager.GetMetadata(content.GetType());
 			var contentData = contentMetadata.ConvertContentModelToDictionary(content);
-			var json = JsonContentDataSerializer.SerializeToString(contentData);
+			var json = JsonContentSerializer.Serialize(contentData);
 
-			var deserializedContentData = JsonContentDataSerializer.DeserializeFromString(json);
+			var deserializedContentData = JsonContentSerializer.Deserialize(json);
 			var deserializedContent = (TestPageContent)contentMetadata.ConvertDictionaryToContentModel(deserializedContentData);
 
 			Assert.NotNull(deserializedContent);

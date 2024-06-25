@@ -225,6 +225,12 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             }
         });
     }
+
+    destroy() {
+        this.element.classList.remove("content-designer");
+
+        super.destroy();
+    }
 }
 
 export interface ModelDesignerOptions {

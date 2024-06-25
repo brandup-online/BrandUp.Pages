@@ -1,5 +1,4 @@
 ﻿import { UIElement } from "brandup-ui";
-import ContentPage from "../pages/content";
 import { PageDesigner } from "../content/designer/page";
 import { editPage } from "../dialogs/pages/edit";
 import { DOM } from "brandup-ui-dom";
@@ -7,6 +6,7 @@ import { Page, PageModel } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
+import "../styles.less";
 
 export class EditorToolbar extends UIElement {
     private __designer: PageDesigner;
@@ -16,10 +16,11 @@ export class EditorToolbar extends UIElement {
 
     get typeName(): string { return "BrandUpPages.EditorToolbar"; }
 
-    constructor(page: ContentPage) {
+    constructor(page: Page<PageModel>, contentEditElem: HTMLElement) {
         super();
         this.__page = page;
-        this.__designer = new PageDesigner(page);
+        
+        this.__designer = new PageDesigner(page, contentEditElem);
 
         this.__initLogic();
         this.__renderUI();
@@ -38,7 +39,7 @@ export class EditorToolbar extends UIElement {
 
     private __initLogic() {
         this.registerCommand("bp-content", () => {
-            editPage(this.__page.model.editId).then(() => {
+            editPage(this.__designer.editId).then(() => {
                 this.__page.website.app.reload();
             });
         });
@@ -50,7 +51,7 @@ export class EditorToolbar extends UIElement {
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/commit",
-                urlParams: { editId: this.__page.model.editId },
+                urlParams: { editId: this.__designer.editId },
                 method: "POST",
                 success: (response) => {
                     if (response.status !== 200)
@@ -68,7 +69,7 @@ export class EditorToolbar extends UIElement {
 
             this.__page.website.request({
                 url: "/brandup.pages/page/content/discard",
-                urlParams: { editId: this.__page.model.editId },
+                urlParams: { editId: this.__designer.editId },
                 method: "POST",
                 success: (response) => {
                     if (response.status !== 200)
@@ -81,6 +82,8 @@ export class EditorToolbar extends UIElement {
     }
 
     private __complateEdit() {
+        delete this.__designer.contentElem.dataset["contentEditId"];
+
         const url = new URL(location.href);
         url.searchParams.delete("editid");
 

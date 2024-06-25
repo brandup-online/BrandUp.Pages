@@ -6,11 +6,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/content"), Filters.Administration]
-    public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext, Url.IPageLinkGenerator pageLinkGenerator) : Controller
+    public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
     {
         [HttpPost("begin")]
-        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] bool force)
+        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] IContentMetadataManager contentMetadataManager)
         {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(type))
+                return BadRequest();
+
+            if (!contentMetadataManager.TryGetMetadata(type, out var contentMetadata))
+                return BadRequest();
+
             var websiteId = websiteContext.Website.Id;
 
             var result = new Models.BeginPageEditResult();
@@ -29,13 +35,12 @@ namespace BrandUp.Pages.Controllers
 
             if (currentEdit == null)
             {
-                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, HttpContext.RequestAborted);
+                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, contentMetadata, HttpContext.RequestAborted);
                 if (currentEdit == null)
                     return NotFound();
             }
 
             result.EditId = currentEdit.Id;
-            result.Url = await pageLinkGenerator.GetPathAsync(currentEdit, HttpContext.RequestAborted);
 
             return Ok(result);
         }
@@ -43,14 +48,14 @@ namespace BrandUp.Pages.Controllers
         [HttpGet("form")]
         public async Task<IActionResult> GetFormAsync([FromQuery] Guid editId, [FromQuery] string modelPath)
         {
-            var editSession = await contentEditService.FindEditByIdAsync(editId);
+            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
             modelPath ??= string.Empty;
 
             var pageContent = await contentEditService.GetContentAsync(editSession);
-            var pageContentContext = new ContentContext(editSession.ContentKey, pageContent, HttpContext.RequestServices, true);
+            var pageContentContext = new ContentContext(editSession.ContentKey, pageContent, HttpContext.RequestServices, editSession);
 
             var contentContext = pageContentContext.Navigate(modelPath);
             if (contentContext == null)

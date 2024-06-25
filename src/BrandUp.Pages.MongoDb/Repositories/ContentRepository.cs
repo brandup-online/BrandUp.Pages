@@ -34,7 +34,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 var contentUpdateResult = await contentDocuments.UpdateOneAsync(it => it.WebsiteId == websiteId && it.Key == key, Builders<ContentDocument>.Update
                         .Set(it => it.Data, contentDataDocument), cancellationToken: cancellationToken);
                 if (contentUpdateResult.MatchedCount != 1)
-                    await contentDocuments.InsertOneAsync(new ContentDocument { Key = key, Data = contentDataDocument }, cancellationToken: cancellationToken);
+                    await contentDocuments.InsertOneAsync(new ContentDocument { WebsiteId = websiteId, Key = key, Data = contentDataDocument }, cancellationToken: cancellationToken);
             }
             else
                 await contentDocuments.DeleteOneAsync(it => it.WebsiteId == websiteId && it.Key == key, cancellationToken: cancellationToken);

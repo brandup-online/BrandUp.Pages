@@ -1,8 +1,10 @@
-﻿namespace BrandUp.Pages.Interfaces
+﻿using BrandUp.Pages.Content;
+
+namespace BrandUp.Pages.Interfaces
 {
     public interface IContentEditService
     {
-        Task<IContentEdit> BeginEditAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default);
+        Task<IContentEdit> BeginEditAsync(string websiteId, string contentKey, ContentMetadataProvider metadataProvider, CancellationToken cancellationToken = default);
         Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IContentEdit> FindEditByUserAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default);
         Task<object> GetContentAsync(IContentEdit editSession, CancellationToken cancellationToken = default);

@@ -3,257 +3,271 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Content
 {
-	public class ContentMetadataProviderTests
-	{
-		private readonly IContentMetadataManager metadataManager;
+    public class ContentMetadataProviderTests
+    {
+        private readonly IContentMetadataManager metadataManager;
 
-		public ContentMetadataProviderTests()
-		{
-			var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+        public ContentMetadataProviderTests()
+        {
+            var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator([typeof(TestPageContent).Assembly]);
 
-			metadataManager = new ContentMetadataManager(contentTypeResolver);
-		}
+            metadataManager = new ContentMetadataManager(contentTypeResolver);
+        }
 
-		#region Test methods
+        #region Test methods
 
-		[Fact]
-		public void Properties()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+        [Fact]
+        public void TryGetMetadata()
+        {
+            var result = metadataManager.TryGetMetadata(typeof(TestPageContent), out var metadataProvider);
+            Assert.True(result);
+            Assert.NotNull(metadataProvider);
 
-			Assert.Equal(metadataManager, contentMetadata.Manager);
-			Assert.Equal(typeof(TestPageContent), contentMetadata.ModelType);
-			Assert.Equal("TestPage", contentMetadata.Name);
-			Assert.Equal(contentMetadata.Name, contentMetadata.ToString());
-			Assert.Equal(TestPageContent.ContentTypeTitle, contentMetadata.Title);
-			Assert.Equal(TestPageContent.ContentTypeDescription, contentMetadata.Description);
-			Assert.Null(contentMetadata.BaseMetadata);
-			Assert.NotEmpty(contentMetadata.DerivedContents);
-			Assert.NotEmpty(contentMetadata.Fields);
-		}
+            result = metadataManager.TryGetMetadata(typeof(TestPageContent.ButtonContent), out metadataProvider);
+            Assert.True(result);
+            Assert.NotNull(metadataProvider);
+        }
 
-		[Fact]
-		public void TryGetField_name_is_original()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var fieldName = "Title";
-			var result = contentMetadata.TryGetField(fieldName, out Fields.FieldProviderAttribute field);
+        [Fact]
+        public void Properties()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
 
-			Assert.True(result);
-			Assert.NotNull(field);
-			Assert.Equal(fieldName, field.Name);
-			Assert.Equal("Название", field.Title);
-		}
+            Assert.Equal(metadataManager, contentMetadata.Manager);
+            Assert.Equal(typeof(TestPageContent), contentMetadata.ModelType);
+            Assert.Equal("TestPage", contentMetadata.Name);
+            Assert.Equal(contentMetadata.Name, contentMetadata.ToString());
+            Assert.Equal(TestPageContent.ContentTypeTitle, contentMetadata.Title);
+            Assert.Equal(TestPageContent.ContentTypeDescription, contentMetadata.Description);
+            Assert.Null(contentMetadata.BaseMetadata);
+            Assert.NotEmpty(contentMetadata.DerivedContents);
+            Assert.NotEmpty(contentMetadata.Fields);
+        }
 
-		[Fact]
-		public void TryGetField_name_is_lowercase()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var result = contentMetadata.TryGetField("title", out Fields.FieldProviderAttribute field);
+        [Fact]
+        public void Properties_Nested()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent.ButtonContent>();
 
-			Assert.True(result);
-			Assert.NotNull(field);
-		}
+            Assert.Equal(metadataManager, contentMetadata.Manager);
+            Assert.Equal(typeof(TestPageContent.ButtonContent), contentMetadata.ModelType);
+            Assert.Equal("TestPage.Button", contentMetadata.Name);
+            Assert.Equal(contentMetadata.Name, contentMetadata.ToString());
+            Assert.Equal("TestPage.Button", contentMetadata.Title);
+            Assert.Null(contentMetadata.Description);
+            Assert.Null(contentMetadata.BaseMetadata);
+            Assert.Empty(contentMetadata.DerivedContents);
+            Assert.NotEmpty(contentMetadata.Fields);
+        }
 
-		[Fact]
-		public void CreateModelInstance()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var model = contentMetadata.CreateModelInstance();
+        [Fact]
+        public void TryGetField_name_is_original()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var fieldName = "Title";
+            var result = contentMetadata.TryGetField(fieldName, out Fields.FieldProviderAttribute field);
 
-			Assert.NotNull(model);
-			Assert.IsType(contentMetadata.ModelType, model);
-		}
+            Assert.True(result);
+            Assert.NotNull(field);
+            Assert.Equal(fieldName, field.Name);
+            Assert.Equal("Название", field.Title);
+        }
 
-		[Fact]
-		public void ConvertContentModelToDictionary()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var data = contentMetadata.ConvertContentModelToDictionary(new TestPageContent { Title = "test" });
+        [Fact]
+        public void TryGetField_name_is_lowercase()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var result = contentMetadata.TryGetField("title", out Fields.FieldProviderAttribute field);
 
-			Assert.NotNull(data);
-			Assert.True(data.Count > 0);
-			Assert.True(data.ContainsKey(ContentMetadataProvider.ContentTypeNameDataKey));
-			Assert.True(data.ContainsKey("title"));
-		}
+            Assert.True(result);
+            Assert.NotNull(field);
+        }
 
-		[Fact]
-		public void ConvertDictionaryToContentModel()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var sourceModel = new TestPageContent { Title = "test" };
-			var data = contentMetadata.ConvertContentModelToDictionary(sourceModel);
+        [Fact]
+        public void CreateModelInstance()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var model = contentMetadata.CreateModelInstance();
 
-			var model = contentMetadata.ConvertDictionaryToContentModel(data) as TestPageContent;
+            Assert.NotNull(model);
+            Assert.IsType(contentMetadata.ModelType, model);
+        }
 
-			Assert.NotNull(model);
-			Assert.Equal(model.GetType(), sourceModel.GetType());
-			Assert.Equal(model.Title, sourceModel.Title);
-		}
+        [Fact]
+        public void ConvertContentModelToDictionary()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var data = contentMetadata.ConvertContentModelToDictionary(new TestPageContent { Title = "test" });
 
-		[Fact]
-		public void GetDerivedMetadataWithHierarhy()
-		{
-			var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
-			var derivedMetadata = contentMetadata.GetDerivedMetadataWithHierarhy(false);
+            Assert.NotNull(data);
+            Assert.True(data.Count > 0);
+            Assert.True(data.ContainsKey(ContentMetadataProvider.ContentTypeNameDataKey));
+            Assert.True(data.ContainsKey("title"));
+        }
 
-			Assert.Single(derivedMetadata);
-			Assert.Equal(derivedMetadata.First(), metadataManager.GetMetadata<NewsPage>());
-		}
+        [Fact]
+        public void ConvertDictionaryToContentModel()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var sourceModel = new TestPageContent { Title = "test" };
+            var data = contentMetadata.ConvertContentModelToDictionary(sourceModel);
 
-		[Fact]
-		public void GetDerivedMetadataWithHierarhy_IncludeCurrent()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var derivedMetadata = contentMetadata.GetDerivedMetadataWithHierarhy(true).ToList();
+            var model = contentMetadata.ConvertDictionaryToContentModel(data) as TestPageContent;
 
-			Assert.Equal(3, derivedMetadata.Count);
-			Assert.Equal(derivedMetadata[0], metadataManager.GetMetadata<TestPageContent>());
-			Assert.Equal(derivedMetadata[1], metadataManager.GetMetadata<ArticlePage>());
-			Assert.Equal(derivedMetadata[2], metadataManager.GetMetadata<NewsPage>());
-		}
+            Assert.NotNull(model);
+            Assert.Equal(model.GetType(), sourceModel.GetType());
+            Assert.Equal(model.Title, sourceModel.Title);
+        }
 
-		[Fact]
-		public void IsInherited()
-		{
-			var contentMetadata1 = metadataManager.GetMetadata<ArticlePage>();
-			var contentMetadata2 = metadataManager.GetMetadata<NewsPage>();
+        [Fact]
+        public void GetDerivedMetadataWithHierarhy()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+            var derivedMetadata = contentMetadata.GetDerivedMetadataWithHierarhy(false);
 
-			Assert.False(contentMetadata1.IsInherited(contentMetadata1));
-			Assert.False(contentMetadata1.IsInherited(contentMetadata2));
-			Assert.True(contentMetadata2.IsInherited(contentMetadata1));
-		}
+            Assert.Single(derivedMetadata);
+            Assert.Equal(derivedMetadata.First(), metadataManager.GetMetadata<NewsPage>());
+        }
 
-		[Fact]
-		public void IsInheritedOrEqual()
-		{
-			var contentMetadata1 = metadataManager.GetMetadata<ArticlePage>();
-			var contentMetadata2 = metadataManager.GetMetadata<NewsPage>();
+        [Fact]
+        public void GetDerivedMetadataWithHierarhy_IncludeCurrent()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var derivedMetadata = contentMetadata.GetDerivedMetadataWithHierarhy(true).ToList();
 
-			Assert.True(contentMetadata1.IsInheritedOrEqual(contentMetadata1));
-			Assert.False(contentMetadata1.IsInheritedOrEqual(contentMetadata2));
-			Assert.True(contentMetadata2.IsInheritedOrEqual(contentMetadata1));
-		}
+            Assert.Equal(3, derivedMetadata.Count);
+            Assert.Equal(derivedMetadata[0], metadataManager.GetMetadata<TestPageContent>());
+            Assert.Equal(derivedMetadata[1], metadataManager.GetMetadata<ArticlePage>());
+            Assert.Equal(derivedMetadata[2], metadataManager.GetMetadata<NewsPage>());
+        }
 
-		[Fact]
-		public void GetContentTitle()
-		{
-			var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+        [Fact]
+        public void IsInherited()
+        {
+            var contentMetadata1 = metadataManager.GetMetadata<ArticlePage>();
+            var contentMetadata2 = metadataManager.GetMetadata<NewsPage>();
 
-			var content = new ArticlePage { Title = "test" };
-			var contentTitle = contentMetadata.GetContentTitle(content);
+            Assert.False(contentMetadata1.IsInherited(contentMetadata1));
+            Assert.False(contentMetadata1.IsInherited(contentMetadata2));
+            Assert.True(contentMetadata2.IsInherited(contentMetadata1));
+        }
 
-			Assert.Equal(content.Title, contentTitle);
-		}
+        [Fact]
+        public void IsInheritedOrEqual()
+        {
+            var contentMetadata1 = metadataManager.GetMetadata<ArticlePage>();
+            var contentMetadata2 = metadataManager.GetMetadata<NewsPage>();
 
-		[Fact]
-		public void GetContentTitle_NoAttr()
-		{
-			var contentMetadata = metadataManager.GetMetadata<PageHeaderContent>();
+            Assert.True(contentMetadata1.IsInheritedOrEqual(contentMetadata1));
+            Assert.False(contentMetadata1.IsInheritedOrEqual(contentMetadata2));
+            Assert.True(contentMetadata2.IsInheritedOrEqual(contentMetadata1));
+        }
 
-			var content = new PageHeaderContent();
-			var contentTitle = contentMetadata.GetContentTitle(content);
+        [Fact]
+        public void GetContentTitle()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
 
-			Assert.Equal(contentMetadata.Title, contentTitle);
-		}
+            var content = new ArticlePage { Title = "test" };
+            var contentTitle = contentMetadata.GetContentTitle(content);
 
-		[Fact]
-		public void SetContentTitle()
-		{
-			var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+            Assert.Equal(content.Title, contentTitle);
+        }
 
-			var content = new ArticlePage { Title = "test" };
-			contentMetadata.SetContentTitle(content, "test2");
+        [Fact]
+        public void GetContentTitle_NoAttr()
+        {
+            var contentMetadata = metadataManager.GetMetadata<PageHeaderContent>();
 
-			Assert.Equal("test2", content.Title);
-		}
+            var content = new PageHeaderContent();
+            var contentTitle = contentMetadata.GetContentTitle(content);
 
-		[Fact]
-		public void Implicit_Type()
-		{
-			var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
-			var type = (Type)contentMetadata;
+            Assert.Equal(contentMetadata.Title, contentTitle);
+        }
 
-			Assert.True(contentMetadata == typeof(ArticlePage));
-			Assert.Equal(typeof(ArticlePage), type);
-		}
+        [Fact]
+        public void SetContentTitle()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
 
-		[Fact]
-		public void Implicit_Null_Type()
-		{
-			ContentMetadataProvider contentMetadata = null;
-			var type = (Type)contentMetadata;
+            var content = new ArticlePage { Title = "test" };
+            contentMetadata.SetContentTitle(content, "test2");
 
-			Assert.Null(type);
-		}
+            Assert.Equal("test2", content.Title);
+        }
 
-		[Fact]
-		public void ApplyInjections()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var services = new ServiceCollection().AddScoped<TestService>();
-			using (var serviceProvider = services.BuildServiceProvider())
-			{
-				using (var serviceScope = serviceProvider.CreateScope())
-				{
-					var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
+        [Fact]
+        public void Implicit_Type()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+            var type = (Type)contentMetadata;
 
-					contentMetadata.ApplyInjections(page, serviceScope.ServiceProvider, false);
+            Assert.True(contentMetadata == typeof(ArticlePage));
+            Assert.Equal(typeof(ArticlePage), type);
+        }
 
-					Assert.NotNull(page.Service);
-					Assert.Null(page.Header.Service);
-					Assert.Null(page.Headers[0].Service);
-				}
-			}
-		}
+        [Fact]
+        public void Implicit_Null_Type()
+        {
+            ContentMetadataProvider contentMetadata = null;
+            var type = (Type)contentMetadata;
 
-		[Fact]
-		public void ApplyInjections_WithInnerModels()
-		{
-			var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-			var services = new ServiceCollection().AddScoped<TestService>();
-			using (var serviceProvider = services.BuildServiceProvider())
-			{
-				using (var serviceScope = serviceProvider.CreateScope())
-				{
-					var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
+            Assert.Null(type);
+        }
 
-					contentMetadata.ApplyInjections(page, serviceScope.ServiceProvider, true);
+        [Fact]
+        public void ApplyInjections()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var services = new ServiceCollection().AddScoped<TestService>();
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                using (var serviceScope = serviceProvider.CreateScope())
+                {
+                    var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
 
-					Assert.NotNull(page.Service);
-					Assert.NotNull(page.Header.Service);
-					Assert.NotNull(page.Headers[0].Service);
-				}
-			}
-		}
+                    contentMetadata.ApplyInjections(page, serviceScope.ServiceProvider, false);
 
-		[Fact]
-		public void Fields_DefaultSorting()
-		{
-			var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+                    Assert.NotNull(page.Service);
+                    Assert.Null(page.Header.Service);
+                    Assert.Null(page.Headers[0].Service);
+                }
+            }
+        }
 
-			var fields = contentMetadata.Fields.ToList();
+        [Fact]
+        public void ApplyInjections_WithInnerModels()
+        {
+            var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
+            var services = new ServiceCollection().AddScoped<TestService>();
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                using (var serviceScope = serviceProvider.CreateScope())
+                {
+                    var page = TestPageContent.Create("test", new PageHeaderContent(), new List<PageHeaderContent> { new PageHeaderContent() });
 
-			Assert.Equal("Title", fields[0].Name);
-			Assert.Equal("Header", fields[1].Name);
-			Assert.Equal("Headers", fields[2].Name);
-			Assert.Equal("SubHeader", fields[3].Name);
-		}
+                    contentMetadata.ApplyInjections(page, serviceScope.ServiceProvider, true);
 
-		//[Fact]
-		//public void Fields_CustomSorting()
-		//{
-		//    var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
+                    Assert.NotNull(page.Service);
+                    Assert.NotNull(page.Header.Service);
+                    Assert.NotNull(page.Headers[0].Service);
+                }
+            }
+        }
 
-		//    var fields = contentMetadata.Fields.ToList();
-		//    fields.Sort();
+        [Fact]
+        public void Fields_DefaultSorting()
+        {
+            var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
 
-		//    Assert.Equal("Title", fields[0].Name);
-		//    Assert.Equal("SubHeader", fields[1].Name);
-		//    Assert.Equal("Header", fields[2].Name);
-		//    Assert.Equal("Headers", fields[3].Name);
-		//}
+            var fields = contentMetadata.Fields.ToList();
 
-		#endregion
-	}
+            Assert.Equal("Title", fields[0].Name);
+            Assert.Equal("Header", fields[1].Name);
+            Assert.Equal("Headers", fields[2].Name);
+            Assert.Equal("SubHeader", fields[3].Name);
+        }
+
+        #endregion
+    }
 }

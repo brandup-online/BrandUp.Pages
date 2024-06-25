@@ -44,7 +44,7 @@ namespace BrandUp.Pages.Controllers
 
             var content = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
 
-            rootContentContext = new ContentContext(editSession.ContentKey, content, HttpContext.RequestServices, true);
+            rootContentContext = new ContentContext(editSession.ContentKey, content, HttpContext.RequestServices, editSession);
 
             string modelPath = string.Empty;
             if (Request.Query.TryGetValue("path", out Microsoft.Extensions.Primitives.StringValues pathValue))

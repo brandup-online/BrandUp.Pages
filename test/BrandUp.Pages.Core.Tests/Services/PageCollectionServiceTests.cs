@@ -49,14 +49,12 @@ namespace BrandUp.Pages.Services
             var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
             var pageId = Guid.NewGuid();
-            var contentKey = await pageService.GetContentKeyAsync(pageId);
-            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test", contentKey, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var mainPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test");
             await pageRepository.SetUrlPathAsync(mainPage, "index");
             await pageRepository.UpdatePageAsync(mainPage);
 
             pageId = Guid.NewGuid();
-            contentKey = await pageService.GetContentKeyAsync(pageId);
-            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test", contentKey, pageType.ContentMetadata.ConvertContentModelToDictionary(TestPageContent.CreateWithOnlyTitle("test")));
+            var testPage = await pageRepository.CreatePageAsync("test", pageCollection.Id, pageId, pageType.Name, "test");
             await pageRepository.SetUrlPathAsync(testPage, "test");
             await pageRepository.UpdatePageAsync(testPage);
         }
