@@ -19,7 +19,7 @@ export class EditorToolbar extends UIElement {
     constructor(page: Page<PageModel>, contentEditElem: HTMLElement) {
         super();
         this.__page = page;
-        
+
         this.__designer = new PageDesigner(page, contentEditElem);
 
         this.__initLogic();
@@ -55,7 +55,7 @@ export class EditorToolbar extends UIElement {
                 method: "POST",
                 success: (response) => {
                     if (response.status !== 200)
-                        throw "Error commit content editing.";
+                        throw "Error commit content editing."; // TODO получаем список ошибок и рисуем модалку
 
                     this.__complateEdit();
                 }

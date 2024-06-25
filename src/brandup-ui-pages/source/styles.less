@@ -205,22 +205,20 @@ body:has(.editor-toolbar) {
     padding: 2px 6px;
     gap: 5px;
 
-    & div:has(&-button) {
-        &:first-child {
-            padding-right: 10px;
-            position: relative;
-    
-            &:after {
-                content: "";
-                position: absolute;
-                background-color: @Main-Color;
-                opacity: 0.5;
-                width: 1px;
-                height: 20px;
-                right: 3px;
-                top: 10px;
-                bottom: 10px;
-            }
+    & .first-button {
+        padding-right: 10px;
+        position: relative;
+
+        &:after {
+            content: "";
+            position: absolute;
+            background-color: @Main-Color;
+            opacity: 0.5;
+            width: 1px;
+            height: 20px;
+            right: 2px;
+            top: 10px;
+            bottom: 10px;
         }
     }
 

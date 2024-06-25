@@ -40,6 +40,10 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         this.page.queue.push(options);
     }
 
+    setValid(val: boolean) {
+        val ? this.element.classList.remove("invalid") : this.element.classList.add("invalid");
+    }
+
     abstract hasValue(): boolean;
 
     destroy() {

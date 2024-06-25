@@ -53,7 +53,7 @@ export class PageToolbar extends UIElement {
         let websiteMenu: HTMLElement;
 
         let toolbarButtons = [
-            DOM.tag("div", null, [
+            DOM.tag("div", {class: "first-button"}, [
                 DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия" }, [
                     iconList,
                 ]),
@@ -93,9 +93,9 @@ export class PageToolbar extends UIElement {
             const published = status === "published";
 
             if (!published) 
-                pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]),);
+                pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]));
 
-            toolbarButtons = toolbarButtons.slice(0, 1).concat([
+                toolbarButtons = toolbarButtons.slice(0, 1).concat([
                     DOM.tag("div", null, DOM.tag ("button", { class: "page-status page-toolbar-button " + status }, [DOM.tag("span"),])),
                     (published ? null : DOM.tag("div", null, DOM.tag("button", { class: "page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish))),
                 ],

@@ -1,7 +1,9 @@
 ﻿@import "../../vars.less";
 
 .field-designer {
-
+    &.invalid, &.ck.ck-editor__editable_inline.invalid {
+        outline: @Error-Darkest dotted 1px;
+    }
 }
 
 .field-designer-popup {

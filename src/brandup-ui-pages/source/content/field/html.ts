@@ -93,10 +93,9 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
             success: (response) => {
                 if (response.status === 200) {
                     this.setValue(response.data);
-                    this.setErrors([]);
                 }
                 else {
-                    this.setErrors(["error"]); // TODO список ошибок с сервера
+                    this.setErrors([]); // TODO список ошибок с сервера
                 }
             }
         });
