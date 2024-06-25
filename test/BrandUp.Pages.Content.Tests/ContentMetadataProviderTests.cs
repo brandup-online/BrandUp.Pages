@@ -5,7 +5,7 @@ namespace BrandUp.Pages.Content
 {
     public class ContentMetadataProviderTests
     {
-        private readonly IContentMetadataManager metadataManager;
+        private readonly ContentMetadataManager metadataManager;
 
         public ContentMetadataProviderTests()
         {
@@ -182,7 +182,7 @@ namespace BrandUp.Pages.Content
             var content = new PageHeaderContent();
             var contentTitle = contentMetadata.GetContentTitle(content);
 
-            Assert.Equal(contentMetadata.Title, contentTitle);
+            Assert.Null(contentTitle);
         }
 
         [Fact]

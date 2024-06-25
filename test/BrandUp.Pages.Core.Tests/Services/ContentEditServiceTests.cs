@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Services
         readonly ContentService contentService;
         readonly IPageMetadataManager pageMetadataManager;
         readonly IWebsiteContext websiteContext;
-        readonly IContentMetadataManager contentMetadataManager;
+        readonly ContentMetadataManager contentMetadataManager;
 
         public ContentEditServiceTests()
         {
@@ -41,7 +41,7 @@ namespace BrandUp.Pages.Services
             contentEditService = serviceScope.ServiceProvider.GetService<IContentEditService>();
             contentService = serviceScope.ServiceProvider.GetService<ContentService>();
             pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
-            contentMetadataManager = serviceScope.ServiceProvider.GetRequiredService<IContentMetadataManager>();
+            contentMetadataManager = serviceScope.ServiceProvider.GetRequiredService<ContentMetadataManager>();
         }
 
         #region IAsyncLifetime members

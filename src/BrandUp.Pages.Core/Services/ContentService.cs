@@ -3,27 +3,20 @@ using BrandUp.Pages.Interfaces;
 
 namespace BrandUp.Pages.Services
 {
-    public class ContentService(IContentRepository contentRepository, IContentMetadataManager contentMetadataManager)
+    public class ContentService(ContentMetadataManager contentMetadataManager, IContentRepository contentRepository)
     {
-        readonly IContentRepository contentRepository = contentRepository ?? throw new ArgumentNullException(nameof(contentRepository));
-        readonly IContentMetadataManager contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
-
-        public async Task<object> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default) // todo : придумать как хранить тег в бд.
+        public async Task<object> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
 
-            var contentData = await contentRepository.GetContentAsync(websiteId, key, cancellationToken);
+            var contentData = await contentRepository.GetDataAsync(websiteId, key, cancellationToken);
             if (contentData == null)
-                return null; // throw new InvalidOperationException($"Not found content by key {key}.");
+                return null;
 
-            if (!contentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
-                throw new InvalidOperationException($"Not found content type name.");
+            var contentMetadata = contentMetadataManager.GetMetadata(contentData);
 
-            if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
-                throw new InvalidOperationException($"Not found content type by name {contentTypeName}.");
-
-            return metadata.ConvertDictionaryToContentModel(contentData);
+            return contentMetadata.ConvertDictionaryToContentModel(contentData);
         }
 
         public async Task SetContentAsync(string websiteId, string key, object contentModel, CancellationToken cancellationToken = default)
@@ -32,12 +25,13 @@ namespace BrandUp.Pages.Services
             ArgumentNullException.ThrowIfNull(key);
             ArgumentNullException.ThrowIfNull(contentModel);
 
-            if (!contentMetadataManager.TryGetMetadata(contentModel, out var metadata))
+            if (!contentMetadataManager.TryGetMetadata(contentModel, out var contentMetadata))
                 throw new InvalidOperationException($"Not found content type by type {contentModel.GetType().AssemblyQualifiedName}.");
 
-            var contentData = metadata.ConvertContentModelToDictionary(contentModel);
+            var contentTitle = contentMetadata.GetContentTitle(contentModel);
+            var contentData = contentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await contentRepository.SetContentAsync(websiteId, key, contentData, cancellationToken);
+            await contentRepository.SetDataAsync(websiteId, key, contentMetadata.Name, contentTitle, contentData, cancellationToken);
         }
     }
 }

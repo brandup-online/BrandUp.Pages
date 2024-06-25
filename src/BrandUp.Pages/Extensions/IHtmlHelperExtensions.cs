@@ -40,7 +40,7 @@ namespace BrandUp.Pages
             var httpContext = htmlHelper.ViewContext.HttpContext;
             var cancellationToken = httpContext.RequestAborted;
             var services = httpContext.RequestServices;
-            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
+            var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();
             var viewLocator = services.GetRequiredService<IViewLocator>();
 
             if (!contentMetadataManager.TryGetMetadata(contentType, out var contentMetadataProvider))

@@ -8,12 +8,16 @@ namespace BrandUp.Pages.MongoDb.Documents
     {
         [BsonId, BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
-        [BsonRepresentation(BsonType.String), Obsolete]
-        public Guid? PageId { get; set; }
+        //[BsonRepresentation(BsonType.String), Obsolete]
+        //public Guid? PageId { get; set; }
         [BsonRequired]
         public string WebsiteId { get; set; }
         [BsonRequired]
         public string Key { get; set; }
+        public string Type { get; set; }
+        public string Title { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public Guid Version { get; set; }
         [BsonRequired]
         public BsonDocument Data { get; set; }
     }

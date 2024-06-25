@@ -8,7 +8,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
     {
         readonly IMongoCollection<ContentDocument> contentDocuments = dbContext.Contents;
 
-        public async Task<IDictionary<string, object>> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<IDictionary<string, object>> GetDataAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(key);
 
@@ -21,7 +21,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return MongoDbHelper.BsonDocumentToDictionary(content.Data);
         }
 
-        public async Task SetContentAsync(string websiteId, string key, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task SetDataAsync(string websiteId, string key, string type, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(key);
 
@@ -31,8 +31,15 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
-                var contentUpdateResult = await contentDocuments.UpdateOneAsync(it => it.WebsiteId == websiteId && it.Key == key, Builders<ContentDocument>.Update
-                        .Set(it => it.Data, contentDataDocument), cancellationToken: cancellationToken);
+                var updateDef = Builders<ContentDocument>.Update
+                        .Set(it => it.Type, type)
+                        .Set(it => it.Title, title)
+                        .Set(it => it.Version, Guid.NewGuid())
+                        .Set(it => it.Data, contentDataDocument);
+
+                var contentUpdateResult = await contentDocuments.UpdateOneAsync(
+                    it => it.WebsiteId == websiteId && it.Key == key,
+                    updateDef, cancellationToken: cancellationToken);
                 if (contentUpdateResult.MatchedCount != 1)
                     await contentDocuments.InsertOneAsync(new ContentDocument { WebsiteId = websiteId, Key = key, Data = contentDataDocument }, cancellationToken: cancellationToken);
             }

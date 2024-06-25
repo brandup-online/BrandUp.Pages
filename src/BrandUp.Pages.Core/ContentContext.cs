@@ -26,7 +26,7 @@ namespace BrandUp.Pages
             Key = key;
             Services = services;
 
-            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
+            var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();
 
             Explorer = ContentExplorer.Create(contentMetadataManager, contentModel);
             EditId = contentEdit?.Id;

@@ -4,7 +4,7 @@ namespace BrandUp.Pages.Content.Serialization
 {
 	public class JsonContentDataSerializerTests
 	{
-		private readonly IContentMetadataManager metadataManager;
+		private readonly ContentMetadataManager metadataManager;
 
 		public JsonContentDataSerializerTests()
 		{

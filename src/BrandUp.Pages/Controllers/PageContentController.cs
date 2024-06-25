@@ -9,7 +9,7 @@ namespace BrandUp.Pages.Controllers
     public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
     {
         [HttpPost("begin")]
-        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] IContentMetadataManager contentMetadataManager)
+        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] ContentMetadataManager contentMetadataManager)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(type))
                 return BadRequest();
@@ -109,7 +109,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("changeType")]
-        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] IContentMetadataManager contentMetadataManager, [FromServices] Views.IViewLocator viewLocator)
+        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] ContentMetadataManager contentMetadataManager, [FromServices] Views.IViewLocator viewLocator)
         {
             if (modelType == null)
                 return BadRequest();

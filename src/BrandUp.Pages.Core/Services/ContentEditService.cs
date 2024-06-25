@@ -4,7 +4,7 @@ using BrandUp.Pages.Views;
 
 namespace BrandUp.Pages.Services
 {
-    public class ContentEditService(IContentEditRepository editSessionRepository, Identity.IAccessProvider accessProvider, ContentService contentService, IContentMetadataManager contentMetadataManager, IViewLocator viewLocator) : IContentEditService
+    public class ContentEditService(IContentEditRepository editSessionRepository, Identity.IAccessProvider accessProvider, ContentService contentService, ContentMetadataManager contentMetadataManager, IViewLocator viewLocator) : IContentEditService
     {
         public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, ContentMetadataProvider metadataProvider, CancellationToken cancellationToken = default)
         {
@@ -21,7 +21,7 @@ namespace BrandUp.Pages.Services
 
                 contentModel = metadataProvider.ConvertDictionaryToContentModel(contentView.DefaultModelData);
             }
-            else if (metadataProvider.ModelType != contentModel.GetType())
+            else if (!metadataProvider.IsInheritedOrEqual(contentModel.GetType()))
                 throw new InvalidOperationException();
 
             var editorId = await GetEditorIdAsync(cancellationToken);
@@ -77,13 +77,9 @@ namespace BrandUp.Pages.Services
             ArgumentNullException.ThrowIfNull(editSession);
 
             var newContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
-            if (!newContentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
-                throw new InvalidOperationException($"Not found content type name.");
+            var contentMetadata = contentMetadataManager.GetMetadata(newContentData);
 
-            if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
-                throw new InvalidOperationException($"Not found content type by name {contentTypeName}.");
-
-            var newContentModel = metadata.ConvertDictionaryToContentModel(newContentData);
+            var newContentModel = contentMetadata.ConvertDictionaryToContentModel(newContentData);
 
             await contentService.SetContentAsync(editSession.WebsiteId, editSession.ContentKey, newContentModel, cancellationToken);
 
@@ -97,7 +93,7 @@ namespace BrandUp.Pages.Services
             return editSessionRepository.DeleteEditAsync(editSession, cancellationToken);
         }
 
-        private async Task<string> GetEditorIdAsync(CancellationToken cancellationToken = default)
+        async Task<string> GetEditorIdAsync(CancellationToken cancellationToken = default)
         {
             var userId = await accessProvider.GetUserIdAsync(cancellationToken);
             if (userId == null)

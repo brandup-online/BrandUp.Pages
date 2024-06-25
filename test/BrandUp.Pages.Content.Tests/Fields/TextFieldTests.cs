@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Content.Fields
 	{
 		private ServiceProvider serviceProvider;
 		private IServiceScope serviceScope;
-		private IContentMetadataManager metadataManager;
+		private ContentMetadataManager metadataManager;
 		private ITextField field;
 
 		#region IAsyncLifetime members
@@ -19,13 +19,13 @@ namespace BrandUp.Pages.Content.Fields
 
 			var services = new ServiceCollection();
 
-			services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
+			services.AddSingleton<ContentMetadataManager, ContentMetadataManager>();
 			services.AddSingleton<Infrastructure.IContentTypeLocator>(contentTypeResolver);
 
 			serviceProvider = services.BuildServiceProvider();
 			serviceScope = serviceProvider.CreateScope();
 
-			metadataManager = serviceScope.ServiceProvider.GetRequiredService<IContentMetadataManager>();
+			metadataManager = serviceScope.ServiceProvider.GetRequiredService<ContentMetadataManager>();
 
 			var metadataProvider = metadataManager.GetMetadata<TestContent>();
 			if (!metadataProvider.TryGetField("Text", out field))

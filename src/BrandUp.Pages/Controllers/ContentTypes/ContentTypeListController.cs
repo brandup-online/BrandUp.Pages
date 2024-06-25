@@ -7,10 +7,10 @@ namespace BrandUp.Pages.Controllers
 	[Route("brandup.pages/content-type/list", Name = "BrandUp.Pages.ContentType.List"), Filters.Administration]
 	public class ContentTypeListController : ListController<ContentTypeListModel, ContentTypeItemModel, ContentMetadataProvider, string>
 	{
-		readonly IContentMetadataManager contentMetadataManager;
+		readonly ContentMetadataManager contentMetadataManager;
 		private ContentMetadataProvider contentMetadataProvider;
 
-		public ContentTypeListController(IContentMetadataManager contentMetadataManager)
+		public ContentTypeListController(ContentMetadataManager contentMetadataManager)
 		{
 			this.contentMetadataManager = contentMetadataManager ?? throw new ArgumentNullException(nameof(contentMetadataManager));
 		}

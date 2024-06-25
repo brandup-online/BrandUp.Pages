@@ -88,12 +88,14 @@ namespace BrandUp.Pages.Repositories
             pageIds.Remove(page.Id);
             pagePaths.Remove(page.UrlPath.ToLower());
 
-            await contentRepository.SetContentAsync(page.WebsiteId, contentKey, null, cancellationToken);
+            await contentRepository.SetDataAsync(page.WebsiteId, contentKey, null, null, null, cancellationToken);
         }
+
         public Task<bool> HasPagesAsync(Guid ownCollectionId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult(pageHierarhy.HasPages(ownCollectionId));
         }
+
         public Task UpdatePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(page.Id, out int index))
@@ -108,6 +110,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
+
         public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
             if (urlPath == null)
@@ -120,6 +123,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.CompletedTask;
         }
+
         public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var p = (Page)page;

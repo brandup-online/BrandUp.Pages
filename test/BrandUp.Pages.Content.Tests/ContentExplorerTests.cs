@@ -4,7 +4,7 @@ namespace BrandUp.Pages.Content
 {
 	public class ContentExplorerTests
 	{
-		private readonly IContentMetadataManager metadataManager;
+		private readonly ContentMetadataManager metadataManager;
 
 		public ContentExplorerTests()
 		{
