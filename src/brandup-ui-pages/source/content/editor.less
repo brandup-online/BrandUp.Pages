@@ -1,0 +1,48 @@
+﻿@import "../vars.less";
+@import "../styles.less";
+
+.root-designer {
+    &.accented {
+
+    }
+}
+
+.editor-toolbar {
+    background-color: @Neutral-Lightest;
+    display: flex;
+    padding: 20px 100px;
+    flex-wrap: nowrap;
+    align-items: center;
+    box-shadow: 0px -4px 8px 0px rgba(0, 0, 0, 0.08);
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    gap: 12px;
+    box-sizing: border-box;
+
+    & button {
+        padding: 8px 28px;
+        height: auto;
+    }
+
+    & .right {
+        margin-left:auto;
+        margin-right: 0;
+        padding: 8px 20px;
+    }
+
+    .adaptive-tablet-small({
+        padding: 20px;
+    });
+
+    .adaptive-mobile({
+        & button, .right {
+            padding: 8px 10px;
+        }
+
+        & .secondary, .right {
+            font-size: 0;
+            gap: 0;
+        }
+    });
+}

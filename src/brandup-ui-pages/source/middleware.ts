@@ -25,8 +25,8 @@ export class PagesMiddleware extends Middleware {
                 });
             }
             else {
-                import("./admin/editor-toolbar").then(d => {
-                    page.attachDestroyElement(new d.EditorToolbar(page, editingContentElem));
+                import("./content/editor").then(d => {
+                    page.attachDestroyElement(new d.Editor(page, editingContentElem));
                 });
             }
         }
