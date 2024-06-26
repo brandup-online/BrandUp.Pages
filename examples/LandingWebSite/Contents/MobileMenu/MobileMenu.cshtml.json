@@ -1,0 +1,14 @@
+{
+  "Items": [
+    {
+      "_type": "MobileMenu.MenuItem",
+      "Text": "News",
+      "Url": "url(/news)"
+    },
+    {
+      "_type": "MobileMenu.MenuItem",
+      "Text": "About",
+      "Url": "url(/about)"
+    }
+  ]
+}

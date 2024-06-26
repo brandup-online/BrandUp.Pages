@@ -15,23 +15,7 @@
             @RenderBody()
         </main>
     </div>
-    <div class="app-menu">
-        <div class="close" data-command="toggle-app-menu"></div>
-        <div class="content">
-            <ul class="menu">
-                <li><a asp-page-path="/">Home</a></li>
-                <li><a asp-page-path="/news">News</a></li>
-                <li><a asp-page="/about">About</a></li>
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <li><a href="#" data-command="signout">Sign out</a></li>
-                }
-                else
-                {
-                    <li><a href="#" data-command="signin">Sign in</a></li>
-                }
-            </ul>
-        </div>
-    </div>
+
+    @await Html.BlockAsync("mobile-menu", typeof(Contents.MobileMenu.MobileMenuContent))
 </body>
 </html>
