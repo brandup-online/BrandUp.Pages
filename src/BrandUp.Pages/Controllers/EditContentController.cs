@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/content"), Filters.Administration]
-    public class PageContentController(ContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
+    public class EditContentController(ContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
     {
         #region Actions
 
         [HttpPost("begin")]
-        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] ContentMetadataManager contentMetadataManager, [FromServices] IAccessProvider accessProvider)
+        public async Task<IActionResult> BeginAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] ContentMetadataManager contentMetadataManager, [FromServices] IAccessProvider accessProvider)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(type))
                 return BadRequest();
@@ -127,7 +127,7 @@ namespace BrandUp.Pages.Controllers
             if (modelType == null)
                 return BadRequest();
 
-            var editSession = await contentEditService.FindEditByIdAsync(editId);
+            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
@@ -135,7 +135,7 @@ namespace BrandUp.Pages.Controllers
 
             var newModelType = contentMetadataManager.GetMetadata(modelType);
 
-            var pageContent = await contentEditService.GetContentAsync(editSession);
+            var pageContent = await contentEditService.GetContentAsync(editSession, HttpContext.RequestAborted);
             var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContent);
 
             var contentExplorer = pageContentExplorer.Navigate(modelPath);
@@ -148,25 +148,37 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpPost("commit")]
-        public async Task<IActionResult> CommitEditAsync([FromQuery] Guid editId)
+        public async Task<IActionResult> CommitAsync([FromQuery] Guid editId, [FromServices] ContentMetadataManager contentMetadataManager)
         {
-            var editSession = await contentEditService.FindEditByIdAsync(editId);
-            if (editSession == null)
+            var contentEdit = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            if (contentEdit == null)
                 return BadRequest();
 
-            await contentEditService.CommitEditAsync(editSession);
+            var contentModel = await contentEditService.GetContentAsync(contentEdit, HttpContext.RequestAborted);
+            var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
 
-            return Ok();
+            var result = new Models.Contents.CommitResult { IsSuccess = false, Validation = [] };
+
+            await ValidateContentsAsync(contentExplorer, result.Validation);
+            if (result.Validation.Count > 0)
+                return Ok(result);
+
+            await contentEditService.CommitEditAsync(contentEdit, HttpContext.RequestAborted);
+
+            result.IsSuccess = true;
+            result.Validation = null;
+
+            return Ok(result);
         }
 
         [HttpPost("discard")]
-        public async Task<IActionResult> DiscardEditAsync([FromQuery] Guid editId)
+        public async Task<IActionResult> DiscardAsync([FromQuery] Guid editId)
         {
-            var editSession = await contentEditService.FindEditByIdAsync(editId);
+            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
-            await contentEditService.DiscardEditAsync(editSession);
+            await contentEditService.DiscardEditAsync(editSession, HttpContext.RequestAborted);
 
             return Ok();
         }
@@ -175,7 +187,7 @@ namespace BrandUp.Pages.Controllers
 
         #region Helpers
 
-        async Task EnsureContentsAsync(ContentExplorer contentExplorer, List<Models.Contents.ContentModel> output)
+        async Task EnsureContentsAsync(ContentExplorer contentExplorer, ICollection<Models.Contents.ContentModel> output)
         {
             ArgumentNullException.ThrowIfNull(contentExplorer);
             ArgumentNullException.ThrowIfNull(output);
@@ -229,6 +241,70 @@ namespace BrandUp.Pages.Controllers
                     {
                         var childContentExplorer = contentExplorer.Navigate(modelField.Name);
                         await EnsureContentsAsync(childContentExplorer, output);
+                    }
+                }
+            }
+        }
+
+        async Task ValidateContentsAsync(ContentExplorer contentExplorer, ICollection<Models.Contents.ContentValidationResult> output)
+        {
+            ArgumentNullException.ThrowIfNull(contentExplorer);
+            ArgumentNullException.ThrowIfNull(output);
+
+            if (output.Count == 0 && !contentExplorer.IsRoot)
+                throw new ArgumentException("Начать заполнение моделей контента можно только с рутового контента.");
+
+            var validationContext = new ValidationContext(contentExplorer.Model, HttpContext.RequestServices, null);
+
+            var content = new Models.Contents.ContentValidationResult
+            {
+                Path = contentExplorer.ModelPath,
+                Index = contentExplorer.Index,
+                TypeName = contentExplorer.Metadata.Name,
+                TypeTitle = contentExplorer.Metadata.Title,
+                Fields = []
+            };
+
+            if (contentExplorer.Metadata.IsValidatable)
+                content.Errors = contentExplorer.Metadata.Validate(validationContext, contentExplorer.Model);
+
+            foreach (var field in contentExplorer.Metadata.Fields)
+            {
+                var errors = field.GetErrors(contentExplorer.Model, validationContext);
+                if (errors.Count == 0)
+                    continue;
+
+                var fieldModel = new Models.Contents.FieldValidationResult
+                {
+                    Name = field.Name,
+                    Title = field.Title,
+                    Errors = errors
+                };
+                content.Fields.Add(fieldModel);
+            }
+
+            if (content.Errors.Count > 0 || content.Fields.Count > 0)
+                output.Add(content);
+
+            foreach (var field in contentExplorer.Metadata.Fields)
+            {
+                var modelValue = field.GetModelValue(contentExplorer.Model);
+                if (field is IModelField modelField && modelField.HasValue(modelValue))
+                {
+                    if (modelField.IsListValue)
+                    {
+                        var i = 0;
+                        foreach (var item in (IList)modelValue)
+                        {
+                            var childContentExplorer = contentExplorer.Navigate($"{modelField.Name}[{i}]");
+                            await ValidateContentsAsync(childContentExplorer, output);
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        var childContentExplorer = contentExplorer.Navigate(modelField.Name);
+                        await ValidateContentsAsync(childContentExplorer, output);
                     }
                 }
             }

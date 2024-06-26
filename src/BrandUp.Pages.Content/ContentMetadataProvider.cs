@@ -349,6 +349,28 @@ namespace BrandUp.Pages.Content
             titleField.SetModelValue(contentModel, title);
         }
 
+        public List<string> Validate(ValidationContext validationContext, object contentModel)
+        {
+            ArgumentNullException.ThrowIfNull(contentModel);
+
+            if (!IsValidatable)
+                return [];
+
+            var validatableObject = (IValidatableObject)contentModel;
+
+            var result = validatableObject.Validate(validationContext);
+            if (result == null || !result.Any())
+                return [];
+
+            var errors = new List<string>();
+            foreach (var item in result)
+            {
+                var message = item.ErrorMessage ?? "Content validation error";
+                errors.Add(message);
+            }
+            return errors;
+        }
+
         #endregion
 
         #region Helper methods
