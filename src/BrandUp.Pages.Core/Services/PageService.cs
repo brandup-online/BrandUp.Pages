@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using Microsoft.Extensions.Options;
 
@@ -7,7 +8,7 @@ namespace BrandUp.Pages.Services
     public class PageService(
         IPageRepository pageRepository,
         IPageCollectionRepository pageCollectionRepository,
-        IPageMetadataManager pageMetadataManager,
+        PageMetadataManager pageMetadataManager,
         Url.IPageUrlHelper pageUrlHelper,
         Views.IViewLocator viewLocator,
         ContentService contentService,

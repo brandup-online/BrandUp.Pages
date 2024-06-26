@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Content
         public object Model { get; }
         public string ModelPath { get; }
         public string FieldPath { get; }
-        public string Title => Metadata.GetContentTitle(Model);
+        public string Title => Metadata.GetContentTitle(Model) ?? Metadata.Title;
         public ContentExplorer Root => rootExplorer;
         public ContentExplorer Parent { get; }
         public int Index { get; } = -1;
@@ -59,7 +59,7 @@ namespace BrandUp.Pages.Content
             name = rootExplorer.name + ":" + ModelPath;
         }
 
-        public static ContentExplorer Create(IContentMetadataManager metadataManager, object model)
+        public static ContentExplorer Create(ContentMetadataManager metadataManager, object model)
         {
             ArgumentNullException.ThrowIfNull(metadataManager);
             ArgumentNullException.ThrowIfNull(model);
@@ -67,7 +67,7 @@ namespace BrandUp.Pages.Content
             var contentMetadata = metadataManager.GetMetadata(model.GetType());
             return new ContentExplorer(model, contentMetadata);
         }
-        public static ContentExplorer Create(IContentMetadataManager metadataManager, object model, string modelPath)
+        public static ContentExplorer Create(ContentMetadataManager metadataManager, object model, string modelPath)
         {
             var explorer = Create(metadataManager, model);
             return explorer.Navigate(modelPath);

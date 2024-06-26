@@ -1,9 +1,8 @@
-﻿using BrandUp.Pages.Filters;
+﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Features;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
-using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
-using BrandUp.Pages.Views;
 using BrandUp.Website;
 using BrandUp.Website.Pages;
 using Microsoft.Extensions.DependencyInjection;
@@ -84,6 +83,8 @@ namespace BrandUp.Pages
                 return;
             }
 
+            HttpContext.Features.Set(new ContentPageFeature(page));
+
             PageMetadata = await pageService.GetPageTypeAsync(page, CancellationToken);
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
             ParentPageId = await pageService.GetParentPageIdAsync(page, CancellationToken);
@@ -106,8 +107,8 @@ namespace BrandUp.Pages
 
                 contentEdit = contentEditFeature.Edit;
 
-                var pageEditingService = httpContext.RequestServices.GetRequiredService<IContentEditService>();
-                contentModel = await pageEditingService.GetContentAsync(contentEditFeature.Edit, CancellationToken);
+                var contentEditService = httpContext.RequestServices.GetRequiredService<ContentEditService>();
+                contentModel = await contentEditService.GetContentAsync(contentEditFeature.Edit, CancellationToken);
             }
             else
             {
@@ -115,16 +116,9 @@ namespace BrandUp.Pages
                 contentModel = await contentService.GetContentAsync(PageEntry.WebsiteId, pageContentKey, CancellationToken);
                 if (contentModel == null)
                 {
-                    var viewLocator = httpContext.RequestServices.GetRequiredService<IViewLocator>();
-
-                    contentModel = PageMetadata.ContentMetadata.CreateModelInstance();
-
-                    var view = viewLocator.FindView(PageMetadata.ContentMetadata.ModelType);
-                    if (view == null)
-                        throw new InvalidOperationException($"Not found view for content type {PageMetadata.ContentMetadata.Name}.");
-
-                    if (view.DefaultModelData != null)
-                        PageMetadata.ContentMetadata.ApplyDataToModel(view.DefaultModelData, contentModel);
+                    contentModel = contentService.CreateDefaultAsync(PageMetadata.ContentMetadata, CancellationToken);
+                    if (contentModel == null)
+                        throw new InvalidOperationException($"Not found default data for page type {PageMetadata.Name}.");
 
                     PageMetadata.SetPageHeader(contentModel, page.Header);
                 }

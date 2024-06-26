@@ -6,9 +6,9 @@ namespace BrandUp.Pages.Controllers
 	[ApiController, Filters.Administration]
 	public class PageTypeController : ControllerBase
 	{
-		private readonly IPageMetadataManager pageMetadataManager;
+		private readonly PageMetadataManager pageMetadataManager;
 
-		public PageTypeController(IPageMetadataManager pageMetadataManager)
+		public PageTypeController(PageMetadataManager pageMetadataManager)
 		{
 			this.pageMetadataManager = pageMetadataManager ?? throw new ArgumentNullException(nameof(pageMetadataManager));
 		}

@@ -1,48 +1,59 @@
 ﻿namespace BrandUp.Pages.Content
 {
-	public static class IContentMetadataManagerExtensions
-	{
-		public static ContentMetadataProvider GetMetadata<T>(this IContentMetadataManager contentMetadataManager)
-			where T : class
-		{
-			return contentMetadataManager.GetMetadata(typeof(T));
-		}
+    public static class IContentMetadataManagerExtensions
+    {
+        public static ContentMetadataProvider GetMetadata<T>(this ContentMetadataManager contentMetadataManager)
+            where T : class
+        {
+            return contentMetadataManager.GetMetadata(typeof(T));
+        }
 
-		public static ContentMetadataProvider GetMetadata(this IContentMetadataManager contentMetadataManager, object model)
-		{
-			if (model == null)
-				throw new ArgumentNullException(nameof(model));
-			return contentMetadataManager.GetMetadata(model.GetType());
-		}
+        public static ContentMetadataProvider GetMetadata(this ContentMetadataManager contentMetadataManager, IDictionary<string, object> contentData)
+        {
+            ArgumentNullException.ThrowIfNull(contentData);
 
-		public static bool TryGetMetadata(this IContentMetadataManager contentMetadataManager, object model, out ContentMetadataProvider contentMetadataProvider)
-		{
-			if (model == null)
-				throw new ArgumentNullException(nameof(model));
-			return contentMetadataManager.TryGetMetadata(model.GetType(), out contentMetadataProvider);
-		}
+            if (!contentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
+                throw new ArgumentException($"Not found content type name.", nameof(contentData));
 
-		public static ContentMetadataProvider GetMetadataByModelData(this IContentMetadataManager contentMetadataManager, IDictionary<string, object> modelData)
-		{
-			if (modelData == null)
-				throw new ArgumentNullException(nameof(modelData));
-			if (!modelData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object typeNameValue))
-				return null;
+            if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
+                throw new InvalidOperationException($"Not found content type by name {contentTypeName}.");
 
-			contentMetadataManager.TryGetMetadata((string)typeNameValue, out ContentMetadataProvider contentMetadata);
-			return contentMetadata;
-		}
+            return metadata;
+        }
 
-		public static void ApplyInjections(this IContentMetadataManager contentMetadataManager, object model, IServiceProvider serviceProvider, bool injectInnerModels)
-		{
-			if (model == null)
-				throw new ArgumentNullException(nameof(model));
-			if (serviceProvider == null)
-				throw new ArgumentNullException(nameof(serviceProvider));
-			if (!contentMetadataManager.TryGetMetadata(model, out ContentMetadataProvider contentMetadataProvider))
-				throw new ArgumentException();
+        public static ContentMetadataProvider GetMetadata(this ContentMetadataManager contentMetadataManager, object model)
+        {
+            ArgumentNullException.ThrowIfNull(model);
 
-			contentMetadataProvider.ApplyInjections(model, serviceProvider, injectInnerModels);
-		}
-	}
+            return contentMetadataManager.GetMetadata(model.GetType());
+        }
+
+        public static bool TryGetMetadata(this ContentMetadataManager contentMetadataManager, object model, out ContentMetadataProvider contentMetadataProvider)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+
+            return contentMetadataManager.TryGetMetadata(model.GetType(), out contentMetadataProvider);
+        }
+
+        public static ContentMetadataProvider GetMetadataByModelData(this ContentMetadataManager contentMetadataManager, IDictionary<string, object> modelData)
+        {
+            ArgumentNullException.ThrowIfNull(modelData);
+
+            if (!modelData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object typeNameValue))
+                return null;
+
+            contentMetadataManager.TryGetMetadata((string)typeNameValue, out ContentMetadataProvider contentMetadata);
+            return contentMetadata;
+        }
+
+        public static void ApplyInjections(this ContentMetadataManager contentMetadataManager, object model, IServiceProvider serviceProvider, bool injectInnerModels)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+            if (!contentMetadataManager.TryGetMetadata(model, out ContentMetadataProvider contentMetadataProvider))
+                throw new ArgumentException($"Type {model.GetType().AssemblyQualifiedName} is not registered as content type.");
+
+            contentMetadataProvider.ApplyInjections(model, serviceProvider, injectInnerModels);
+        }
+    }
 }

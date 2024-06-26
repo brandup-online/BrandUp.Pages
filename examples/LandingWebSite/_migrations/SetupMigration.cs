@@ -6,7 +6,7 @@ using BrandUp.Website;
 namespace LandingWebSite._migrations
 {
     [Setup]
-    public class SetupMigration(IPageCollectionService pageCollectionService, IPageMetadataManager pageMetadataManager, IPageService pageService, IWebsiteStore websiteStore) : IMigrationHandler
+    public class SetupMigration(IPageCollectionService pageCollectionService, PageMetadataManager pageMetadataManager, IPageService pageService, IWebsiteStore websiteStore) : IMigrationHandler
     {
         public async Task UpAsync(CancellationToken cancellationToken = default)
         {

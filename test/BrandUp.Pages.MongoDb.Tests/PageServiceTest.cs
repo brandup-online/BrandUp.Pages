@@ -14,7 +14,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
 			var pageService = Services.GetRequiredService<IPageService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -40,7 +40,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
 			var pageService = Services.GetRequiredService<IPageService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);

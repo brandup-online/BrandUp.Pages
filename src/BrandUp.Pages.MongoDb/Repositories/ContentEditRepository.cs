@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
-using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Repositories;
 using BrandUp.Pages.MongoDb.Documents;
 using MongoDB.Driver;
 

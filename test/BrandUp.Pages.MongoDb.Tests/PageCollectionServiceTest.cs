@@ -11,7 +11,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task CreateCollection()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -31,7 +31,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
 			var pageService = Services.GetRequiredService<IPageService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -56,7 +56,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
 			var pageService = Services.GetRequiredService<IPageService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -72,7 +72,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task FindCollectiondById()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -87,7 +87,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task ListCollections_Root_Empty()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 
 			var collections = await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
 			Assert.Empty(collections);
@@ -97,7 +97,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task ListCollections_Root_Single()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -114,7 +114,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
 			var pageService = Services.GetRequiredService<IPageService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -132,7 +132,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
 			var pageService = Services.GetRequiredService<IPageService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 
 			var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
@@ -154,7 +154,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task FindCollections_Empty()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 			var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
@@ -169,7 +169,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task FindCollections_NotDerived_Success()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 			var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
@@ -187,7 +187,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task FindCollections_Derived_Success()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 			var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
@@ -204,7 +204,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task FindCollections_Text_Success()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 			var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 
@@ -221,7 +221,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 		public async Task FindCollections_Text_Empty()
 		{
 			var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-			var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
+			var pageMetadataManager = Services.GetRequiredService<PageMetadataManager>();
 			var pageContentType = pageMetadataManager.GetMetadata<TestPageContent>();
 			var articleContentType = pageMetadataManager.GetMetadata<ArticlePageContent>();
 

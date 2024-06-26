@@ -14,7 +14,7 @@ namespace BrandUp.Pages.Services
         readonly IServiceScope serviceScope;
         readonly IPageService pageService;
         readonly IPageCollectionService pageCollectionService;
-        readonly IPageMetadataManager pageMetadataManager;
+        readonly PageMetadataManager pageMetadataManager;
         readonly IWebsiteContext websiteContext;
 
         public PageCollectionServiceTests()
@@ -34,7 +34,7 @@ namespace BrandUp.Pages.Services
 
             pageService = serviceScope.ServiceProvider.GetService<IPageService>();
             pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
-            pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
+            pageMetadataManager = serviceScope.ServiceProvider.GetService<PageMetadataManager>();
         }
 
         #region IAsyncLifetime members

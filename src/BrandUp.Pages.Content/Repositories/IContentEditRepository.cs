@@ -1,4 +1,4 @@
-﻿namespace BrandUp.Pages.Interfaces
+﻿namespace BrandUp.Pages.Content.Repositories
 {
     public interface IContentEditRepository
     {

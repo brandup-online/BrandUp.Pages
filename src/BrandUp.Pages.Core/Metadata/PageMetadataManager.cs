@@ -3,113 +3,115 @@ using BrandUp.Pages.Content;
 
 namespace BrandUp.Pages.Metadata
 {
-	public class PageMetadataManager : IPageMetadataManager
-	{
-		readonly List<PageMetadataProvider> metadataProviders = new List<PageMetadataProvider>();
-		readonly Dictionary<string, int> typeNames = new Dictionary<string, int>();
-		readonly Dictionary<Type, int> typeObjectTypes = new Dictionary<Type, int>();
+    public class PageMetadataManager
+    {
+        readonly List<PageMetadataProvider> metadataProviders = [];
+        readonly Dictionary<string, int> typeNames = [];
+        readonly Dictionary<Type, int> typeObjectTypes = [];
 
-		public PageMetadataManager(IContentMetadataManager contentManager)
-		{
-			if (contentManager == null)
-				throw new ArgumentNullException(nameof(contentManager));
+        public PageMetadataManager(ContentMetadataManager contentManager)
+        {
+            ArgumentNullException.ThrowIfNull(contentManager);
 
-			foreach (var contentMetadataProvider in contentManager.MetadataProviders)
-				TryRegisterPageType(contentMetadataProvider, out _);
-		}
+            foreach (var contentMetadataProvider in contentManager.MetadataProviders)
+                TryRegisterPageType(contentMetadataProvider, out _);
+        }
 
-		#region IPageMetadataManager members
+        #region IPageMetadataManager members
 
-		public IEnumerable<PageMetadataProvider> MetadataProviders => metadataProviders;
-		public PageMetadataProvider FindPageMetadataByContentType(Type contentType)
-		{
-			if (contentType == null)
-				throw new ArgumentNullException(nameof(contentType));
+        public IEnumerable<PageMetadataProvider> MetadataProviders => metadataProviders;
 
-			if (!typeObjectTypes.TryGetValue(contentType, out int index))
-				return null;
+        public PageMetadataProvider FindPageMetadataByContentType(Type contentType)
+        {
+            ArgumentNullException.ThrowIfNull(contentType);
 
-			return metadataProviders[index];
-		}
-		public PageMetadataProvider FindPageMetadataByName(string name)
-		{
-			if (name == null)
-				throw new ArgumentNullException(nameof(name));
+            if (!typeObjectTypes.TryGetValue(contentType, out int index))
+                return null;
 
-			if (!typeNames.TryGetValue(name.ToLower(), out int index))
-				return null;
+            return metadataProviders[index];
+        }
 
-			return metadataProviders[index];
-		}
+        public PageMetadataProvider FindPageMetadataByName(string name)
+        {
+            ArgumentNullException.ThrowIfNull(name);
 
-		#endregion
+            if (!typeNames.TryGetValue(name.ToLower(), out int index))
+                return null;
 
-		#region Helpers
+            return metadataProviders[index];
+        }
 
-		private bool TryRegisterPageType(ContentMetadataProvider contentMetadata, out PageMetadataProvider pageMetadataProvider)
-		{
-			if (TryGetPageMetadataByContentType(contentMetadata.ModelType, out pageMetadataProvider))
-				return true;
+        #endregion
 
-			if (!IsPageType(contentMetadata.ModelType.GetTypeInfo()))
-			{
-				pageMetadataProvider = null;
-				return false;
-			}
+        #region Helpers
 
-			var pageAttribute = contentMetadata.ModelType.GetCustomAttribute<PageContentAttribute>(false);
-			if (pageAttribute == null)
-			{
-				pageMetadataProvider = null;
-				return false;
-			}
+        bool TryRegisterPageType(ContentMetadataProvider contentMetadata, out PageMetadataProvider pageMetadataProvider)
+        {
+            if (TryGetPageMetadataByContentType(contentMetadata.ModelType, out pageMetadataProvider))
+                return true;
 
-			PageMetadataProvider parentPageMetadata = null;
-			if (contentMetadata.BaseMetadata != null)
-				TryRegisterPageType(contentMetadata.BaseMetadata, out parentPageMetadata);
+            if (!IsPageType(contentMetadata.ModelType.GetTypeInfo()))
+            {
+                pageMetadataProvider = null;
+                return false;
+            }
 
-			pageMetadataProvider = AddPageType(contentMetadata, pageAttribute, parentPageMetadata);
-			return true;
-		}
-		private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
-		{
-			if (!contentMetadataProvider.IsDefinedTitleField)
-				throw new InvalidOperationException("Тип контента не может быть контентом страницы, так как для него не определено поле заголовка.");
+            var pageAttribute = contentMetadata.ModelType.GetCustomAttribute<PageContentAttribute>(false);
+            if (pageAttribute == null)
+            {
+                pageMetadataProvider = null;
+                return false;
+            }
 
-			var pageMetadata = new PageMetadataProvider(contentMetadataProvider, parentPageMetadata);
+            PageMetadataProvider parentPageMetadata = null;
+            if (contentMetadata.BaseMetadata != null)
+                TryRegisterPageType(contentMetadata.BaseMetadata, out parentPageMetadata);
 
-			var index = metadataProviders.Count;
+            pageMetadataProvider = AddPageType(contentMetadata, pageAttribute, parentPageMetadata);
+            return true;
+        }
 
-			metadataProviders.Add(pageMetadata);
-			typeNames.Add(contentMetadataProvider.Name.ToLower(), index);
-			typeObjectTypes.Add(contentMetadataProvider.ModelType, index);
+        PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
+        {
+            if (!contentMetadataProvider.IsDefinedTitleField)
+                throw new InvalidOperationException("Тип контента не может быть контентом страницы, так как для него не определено поле заголовка.");
 
-			return pageMetadata;
-		}
-		private bool TryGetPageMetadataByContentType(Type contentType, out PageMetadataProvider pageMetadataProvider)
-		{
-			if (!typeObjectTypes.TryGetValue(contentType, out int index))
-			{
-				pageMetadataProvider = null;
-				return false;
-			}
+            var pageMetadata = new PageMetadataProvider(contentMetadataProvider, parentPageMetadata);
 
-			pageMetadataProvider = metadataProviders[index];
-			return true;
-		}
-		public static bool IsPageType(TypeInfo typeInfo)
-		{
-			if (!typeInfo.IsClass)
-				return false;
-			if (!typeInfo.IsPublic)
-				return false;
-			if (typeInfo.ContainsGenericParameters)
-				return false;
-			if (!typeInfo.IsDefined(typeof(PageContentAttribute), false))
-				return false;
-			return true;
-		}
+            var index = metadataProviders.Count;
 
-		#endregion
-	}
+            metadataProviders.Add(pageMetadata);
+            typeNames.Add(contentMetadataProvider.Name.ToLower(), index);
+            typeObjectTypes.Add(contentMetadataProvider.ModelType, index);
+
+            return pageMetadata;
+        }
+
+        bool TryGetPageMetadataByContentType(Type contentType, out PageMetadataProvider pageMetadataProvider)
+        {
+            if (!typeObjectTypes.TryGetValue(contentType, out int index))
+            {
+                pageMetadataProvider = null;
+                return false;
+            }
+
+            pageMetadataProvider = metadataProviders[index];
+            return true;
+        }
+
+        public static bool IsPageType(TypeInfo typeInfo)
+        {
+            if (!typeInfo.IsClass)
+                return false;
+            if (!typeInfo.IsPublic && !typeInfo.IsNestedPublic)
+                return false;
+            if (typeInfo.ContainsGenericParameters)
+                return false;
+            if (!typeInfo.IsDefined(typeof(PageContentAttribute), false))
+                return false;
+            return true;
+        }
+
+        #endregion
+    }
 }

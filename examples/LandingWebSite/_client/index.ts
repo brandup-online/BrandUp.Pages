@@ -2,6 +2,7 @@
 import { ajaxRequest } from "brandup-ui-ajax";
 import { PagesMiddleware } from "brandup-ui-pages";
 import "./styles.less";
+import { LayoutMiddleware } from "./middlewares/layout";
 
 host.start({
     pageTypes: {
@@ -12,6 +13,7 @@ host.start({
         "BB1": () => import("./contents/BB1")
     }
 }, (builder) => {
+        builder.useMiddleware(new LayoutMiddleware());
         builder.useMiddleware(new PagesMiddleware());
     }, (app) => {
         app.registerCommand("signin", () => {
@@ -32,11 +34,5 @@ host.start({
             })
         });
 
-        app.registerCommand("toggle-app-menu", () => {
-            document.body.classList.toggle("website-state-show-appmenu");
-        });
-
-        window.addEventListener("pageNavigated", () => {
-            document.body.classList.remove("website-state-show-appmenu");
-        });
+        
 });

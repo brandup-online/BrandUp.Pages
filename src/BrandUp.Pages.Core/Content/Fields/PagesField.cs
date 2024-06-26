@@ -65,7 +65,7 @@ namespace BrandUp.Pages.Content.Fields
 
         public override object GetFormOptions(IServiceProvider services)
         {
-            var pageMetadataManager = services.GetRequiredService<Metadata.IPageMetadataManager>();
+            var pageMetadataManager = services.GetRequiredService<Metadata.PageMetadataManager>();
 
             var pageMetadata = pageMetadataManager.FindPageMetadataByContentType(PageModelType);
             if (pageMetadata == null)

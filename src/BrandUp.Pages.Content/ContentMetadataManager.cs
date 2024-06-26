@@ -3,7 +3,7 @@ using BrandUp.Pages.Content.Infrastructure;
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentMetadataManager : IContentMetadataManager
+    public class ContentMetadataManager
     {
         readonly List<ContentMetadataProvider> metadataProviders = [];
         readonly Dictionary<Type, int> contentTypes = [];
@@ -49,7 +49,7 @@ namespace BrandUp.Pages.Content
             return true;
         }
 
-        #region IContentMetadataManager members
+        #region Instance
 
         public IEnumerable<ContentMetadataProvider> MetadataProviders => metadataProviders;
 
@@ -110,15 +110,5 @@ namespace BrandUp.Pages.Content
         }
 
         #endregion
-    }
-
-    public interface IContentMetadataManager
-    {
-        IEnumerable<ContentMetadataProvider> MetadataProviders { get; }
-        bool IsRegisterdContentType(Type contentType);
-        ContentMetadataProvider GetMetadata(Type contentType);
-        bool TryGetMetadata(Type contentType, out ContentMetadataProvider metadata);
-        bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata);
-        object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary);
     }
 }

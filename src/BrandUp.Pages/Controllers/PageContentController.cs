@@ -1,15 +1,15 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Identity;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/content"), Filters.Administration]
-    public class PageContentController(IContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
+    public class PageContentController(ContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
     {
         [HttpPost("begin")]
-        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] IContentMetadataManager contentMetadataManager)
+        public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] ContentMetadataManager contentMetadataManager, [FromServices] IAccessProvider accessProvider)
         {
             if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(type))
                 return BadRequest();
@@ -21,7 +21,9 @@ namespace BrandUp.Pages.Controllers
 
             var result = new Models.BeginPageEditResult();
 
-            var currentEdit = await contentEditService.FindEditByUserAsync(websiteId, key, HttpContext.RequestAborted);
+            var userId = await accessProvider.GetUserIdAsync(HttpContext.RequestAborted);
+
+            var currentEdit = await contentEditService.FindEditByUserAsync(websiteId, key, userId, HttpContext.RequestAborted);
             if (currentEdit != null)
             {
                 if (force)
@@ -35,7 +37,7 @@ namespace BrandUp.Pages.Controllers
 
             if (currentEdit == null)
             {
-                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, contentMetadata, HttpContext.RequestAborted);
+                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, userId, contentMetadata, HttpContext.RequestAborted);
                 if (currentEdit == null)
                     return NotFound();
             }
@@ -109,7 +111,7 @@ namespace BrandUp.Pages.Controllers
         }
 
         [HttpGet("changeType")]
-        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] IContentMetadataManager contentMetadataManager, [FromServices] Views.IViewLocator viewLocator)
+        public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] ContentMetadataManager contentMetadataManager, [FromServices] Views.IViewLocator viewLocator)
         {
             if (modelType == null)
                 return BadRequest();
@@ -130,11 +132,6 @@ namespace BrandUp.Pages.Controllers
                 return BadRequest();
 
             contentExplorer.Field.ChangeType(contentExplorer.Model, modelType);
-
-            var newItem = newModelType.CreateModelInstance();
-            var view = viewLocator.FindView(newModelType.ModelType);
-            if (view != null && view.DefaultModelData != null)
-                newItem = newModelType.ConvertDictionaryToContentModel(view.DefaultModelData);
 
             return Ok();
         }

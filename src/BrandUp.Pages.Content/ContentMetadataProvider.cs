@@ -53,7 +53,7 @@ namespace BrandUp.Pages.Content
 
         #region Properties
 
-        public IContentMetadataManager Manager { get; }
+        public ContentMetadataManager Manager { get; }
         public Type ModelType { get; }
         public string Name { get; }
         public string Title { get; }
@@ -80,6 +80,7 @@ namespace BrandUp.Pages.Content
                 injectProperties.Add(propery);
             }
         }
+
         internal void InitializeFields()
         {
             var baseModelMetadata = BaseMetadata;
@@ -123,6 +124,7 @@ namespace BrandUp.Pages.Content
                 }
             }
         }
+
         void InitializeField(FieldProviderAttribute field, MemberInfo fieldMember)
         {
             IModelBinding modelBinding = fieldMember.MemberType switch
@@ -136,6 +138,7 @@ namespace BrandUp.Pages.Content
 
             AddField(field);
         }
+
         void AddField(FieldProviderAttribute field)
         {
             var fieldName = field.Name.ToLower();
@@ -146,6 +149,7 @@ namespace BrandUp.Pages.Content
             fieldNames.Add(fieldName, fieldIndex);
             fields.Add(field);
         }
+
         [System.Diagnostics.DebuggerStepThrough]
         public bool TryGetField(string fieldName, out IFieldProvider field)
         {
@@ -159,6 +163,7 @@ namespace BrandUp.Pages.Content
             field = fields[index];
             return true;
         }
+
         [System.Diagnostics.DebuggerStepThrough]
         public object CreateModelInstance()
         {
@@ -167,6 +172,7 @@ namespace BrandUp.Pages.Content
 
             return modelConstructor.Invoke([]);
         }
+
         public void ApplyInjections(object model, IServiceProvider serviceProvider, bool injectInnerModels)
         {
             ArgumentNullException.ThrowIfNull(model);
@@ -273,6 +279,7 @@ namespace BrandUp.Pages.Content
 
             return contentModel;
         }
+
         public object ApplyDataToModel(IDictionary<string, object> data, object contentModel)
         {
             ArgumentNullException.ThrowIfNull(data);
@@ -297,34 +304,41 @@ namespace BrandUp.Pages.Content
 
             return contentModel;
         }
+
         public bool IsInherited(ContentMetadataProvider baseMetadataProvider)
         {
             ArgumentNullException.ThrowIfNull(baseMetadataProvider);
 
             return IsInherited(baseMetadataProvider.ModelType);
         }
+
         public bool IsInherited(Type baseModelType)
         {
             ArgumentNullException.ThrowIfNull(baseModelType);
 
             return ModelType.IsSubclassOf(baseModelType);
         }
+
         public bool IsInheritedOrEqual(ContentMetadataProvider baseMetadataProvider)
         {
             return this == baseMetadataProvider || IsInherited(baseMetadataProvider);
         }
+
         public bool IsInheritedOrEqual(Type baseModelType)
         {
             return this == baseModelType || IsInherited(baseModelType);
         }
+
         public string GetContentTitle(object contentModel)
         {
             ArgumentNullException.ThrowIfNull(contentModel);
 
             if (titleField != null)
                 return (string)titleField.GetModelValue(contentModel);
-            return Title;
+
+            return null;
         }
+
         public void SetContentTitle(object contentModel, string title)
         {
             ArgumentNullException.ThrowIfNull(contentModel);

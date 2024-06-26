@@ -25,12 +25,12 @@ namespace BrandUp.Pages.Builder
 
         private static void AddCoreServices(IServiceCollection services)
         {
-            services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
+            services.AddSingleton<ContentMetadataManager>();
 
-            services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
+            services.AddSingleton<PageMetadataManager, PageMetadataManager>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<IContentEditService, ContentEditService>();
+            services.AddScoped<ContentEditService>();
             services.AddScoped<ContentService>();
 
             services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
@@ -39,6 +39,7 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<Files.FileService>();
 
             services.AddSingleton<Content.Infrastructure.IContentTypeLocator>(new Content.Infrastructure.EmptyContentTypeLocator());
+            services.AddScoped<Content.Infrastructure.IDefaultContentDataProvider, ViewDefaultContentDataProvider>();
 
             services.AddSingleton<IAccessProvider, EmptyAccessProvider>();
         }
