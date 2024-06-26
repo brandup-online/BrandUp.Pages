@@ -1,4 +1,6 @@
-﻿namespace BrandUp.Pages.Content.Fields
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BrandUp.Pages.Content.Fields
 {
     public interface IFieldProvider
     {
@@ -9,6 +11,8 @@
         string Title { get; }
         Type ValueType { get; }
         bool AllowNull { get; }
+        bool HasValidators { get; }
+        bool IsRequired { get; }
         bool HasValue(object value);
         object GetModelValue(object model);
         bool TryGetModelValue(object model, out object value);
@@ -19,5 +23,6 @@
         Task<object> GetFormValueAsync(object modelValue, IServiceProvider services);
         object GetFormOptions(IServiceProvider services);
         object ParseValue(string strValue);
+        List<string> GetErrors(object model, ValidationContext validationContext);
     }
 }

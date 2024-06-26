@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
 {
@@ -9,6 +10,7 @@ namespace BrandUp.Pages.Content.Fields
         static readonly Type IEquatableType = typeof(IEquatable<>);
         readonly MethodInfo equalMethodInfo = null;
         IModelBinding modelBinding;
+        readonly List<ValidationAttribute> validators = [];
 
         #region Properties
 
@@ -46,6 +48,18 @@ namespace BrandUp.Pages.Content.Fields
 
             ValueType = valueType;
 
+            var validationAttributes = modelBinding.Member.GetCustomAttributes<ValidationAttribute>(true);
+            if (validationAttributes != null)
+            {
+                foreach (var validation in validationAttributes)
+                {
+                    validators.Add(validation);
+
+                    if (validation is RequiredAttribute)
+                        IsRequired = true;
+                }
+            }
+
             OnInitialize();
         }
         protected abstract void OnInitialize();
@@ -59,6 +73,8 @@ namespace BrandUp.Pages.Content.Fields
         public string Title { get; set; }
         public Type ValueType { get; private set; }
         public bool AllowNull { get; private set; }
+        public bool HasValidators => validators.Count > 0;
+        public bool IsRequired { get; private set; }
 
         [System.Diagnostics.DebuggerStepThrough]
         public virtual bool HasValue(object value)
@@ -135,6 +151,28 @@ namespace BrandUp.Pages.Content.Fields
             return null;
         }
         public abstract object ParseValue(string strValue);
+        public List<string> GetErrors(object model, ValidationContext validationContext)
+        {
+            ArgumentNullException.ThrowIfNull(model);
+            ArgumentNullException.ThrowIfNull(validationContext);
+
+            if (!HasValidators)
+                return [];
+
+            var errors = new List<string>();
+            var modelValue = GetModelValue(model);
+            foreach (var validator in validators)
+            {
+                var validationResult = validator.GetValidationResult(modelValue, validationContext);
+                if (validationResult != ValidationResult.Success)
+                {
+                    var message = validationResult.ErrorMessage ?? "Field error";
+                    errors.Add(message);
+                }
+            }
+
+            return errors;
+        }
 
         #endregion
 

@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Content;
+﻿using System.ComponentModel.DataAnnotations;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Models.Contents;
 using Microsoft.AspNetCore.Mvc;
@@ -89,10 +90,13 @@ namespace BrandUp.Pages.Controllers
             var modelValue = Field.GetModelValue(contentContext.Content);
             var formValue = await Field.GetFormValueAsync(modelValue, HttpContext.RequestServices);
 
+            var validationContext = new ValidationContext(contentContext.Content, HttpContext.RequestServices, null);
+            var errors = Field.GetErrors(contentContext.Content, validationContext);
+
             return new JsonResult(new FieldValueResult
             {
                 Value = formValue,
-                Errors = []
+                Errors = errors
             });
         }
     }

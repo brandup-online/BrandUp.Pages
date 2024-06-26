@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages.Content.Fakes;
+﻿using System.ComponentModel.DataAnnotations;
+using BrandUp.Pages.Content.Fakes;
 using BrandUp.Pages.ContentModels;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #region IAsyncLifetime members
 
-        Task IAsyncLifetime.InitializeAsync()
+        async Task IAsyncLifetime.InitializeAsync()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator([typeof(TestPageContent).Assembly]);
             var defaultContentDataProvider = new FakeDefaultContentDataProvider();
@@ -31,17 +32,17 @@ namespace BrandUp.Pages.Content.Fields
 
             var metadataProvider = metadataManager.GetMetadata<TestContent>();
             if (!metadataProvider.TryGetField("Text", out field))
-                throw new System.Exception();
+                throw new Exception();
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
-        Task IAsyncLifetime.DisposeAsync()
+        async Task IAsyncLifetime.DisposeAsync()
         {
             serviceScope.Dispose();
             serviceProvider.Dispose();
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         #endregion
@@ -116,6 +117,30 @@ namespace BrandUp.Pages.Content.Fields
             var formValue = (string)await field.GetFormValueAsync(modelValue, serviceScope.ServiceProvider);
 
             Assert.Equal(content.Text, formValue);
+        }
+
+        [Fact]
+        public void Validation_IsValid()
+        {
+            var content = new TestContent { Text = "test" };
+
+            Assert.True(field.IsRequired);
+
+            var validationContext = new ValidationContext(content, serviceScope.ServiceProvider, null);
+            var errors = field.GetErrors(content, validationContext);
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public void Validation_NoValid()
+        {
+            var content = new TestContent { Text = null };
+
+            Assert.True(field.IsRequired);
+
+            var validationContext = new ValidationContext(content, serviceScope.ServiceProvider, null);
+            var errors = field.GetErrors(content, validationContext);
+            Assert.Single(errors);
         }
 
         #endregion

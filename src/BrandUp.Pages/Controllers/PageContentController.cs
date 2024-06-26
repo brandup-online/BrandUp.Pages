@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Identity;
@@ -195,27 +196,29 @@ namespace BrandUp.Pages.Controllers
             };
             output.Add(content);
 
+            var validationContext = new ValidationContext(contentExplorer.Model, HttpContext.RequestServices, null);
+
             foreach (var field in contentExplorer.Metadata.Fields)
             {
-                var value = field.GetModelValue(contentExplorer.Model);
+                var modelValue = field.GetModelValue(contentExplorer.Model);
                 var fieldModel = new Models.Contents.ContentModel.Field
                 {
                     Type = field.Type,
                     Name = field.Name,
                     Options = field.GetFormOptions(serviceProvider),
                     Title = field.Title,
-                    IsRequired = false,
-                    Value = await field.GetFormValueAsync(value, serviceProvider),
-                    Errors = []
+                    IsRequired = field.IsRequired,
+                    Value = await field.GetFormValueAsync(modelValue, serviceProvider),
+                    Errors = field.GetErrors(contentExplorer.Model, validationContext)
                 };
                 content.Fields.Add(fieldModel);
 
-                if (field is IModelField modelField && modelField.HasValue(value))
+                if (field is IModelField modelField && modelField.HasValue(modelValue))
                 {
                     if (modelField.IsListValue)
                     {
                         var i = 0;
-                        foreach (var item in (IList)value)
+                        foreach (var item in (IList)modelValue)
                         {
                             var childContentExplorer = contentExplorer.Navigate($"{modelField.Name}[{i}]");
                             await EnsureContentsAsync(childContentExplorer, output);

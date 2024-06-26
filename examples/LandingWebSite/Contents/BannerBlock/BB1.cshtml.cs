@@ -8,14 +8,14 @@ namespace LandingWebSite.Contents.BannerBlock
     [ContentType(Title = "Слайдер баннеров")]
     public class BB1 : BannerBlockContent
     {
-        [Model]
+        [Model, Required]
         public List<BB1_ItemBase> Banners { get; set; }
     }
 
     [ContentType]
     public abstract class BB1_ItemBase
     {
-        [Image]
+        [Image, Required]
         public ImageValue Image { get; set; }
 
         [Text, Title, Required]
@@ -24,7 +24,7 @@ namespace LandingWebSite.Contents.BannerBlock
         [Text(AllowMultiline = true)]
         public string SubHeader { get; set; }
 
-        [HyperLink]
+        [HyperLink, Required]
         public HyperLinkValue Link { get; set; }
     }
 }

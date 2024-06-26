@@ -18,7 +18,7 @@ namespace LandingWebSite.Contents.PageNav
         {
             [Text, Title, Required]
             public string Text { get; set; }
-            [HyperLink]
+            [HyperLink, Required]
             public HyperLinkValue Url { get; set; }
         }
     }

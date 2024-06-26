@@ -1,4 +1,5 @@
-﻿using BrandUp.Pages;
+﻿using System.ComponentModel.DataAnnotations;
+using BrandUp.Pages;
 using BrandUp.Pages.Content.Fields;
 
 namespace LandingWebSite.Contents.Page
@@ -6,7 +7,7 @@ namespace LandingWebSite.Contents.Page
     [PageContent(Title = "Article page")]
     public class ArticlePageContent : PageContent
     {
-        [Text(Placeholder = "Input page sub header")]
+        [Text(Placeholder = "Input page sub header"), Required]
         public string SubHeader { get; set; }
 
         [Model]
