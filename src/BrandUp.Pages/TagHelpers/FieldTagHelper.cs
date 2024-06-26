@@ -24,15 +24,21 @@ namespace BrandUp.Pages.TagHelpers
         public FieldRenderMode RenderMode { get; set; }
         public bool IsDesigner => ContentContext.IsDesigner;
 
+        #region TagHelper members
+
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             if (ViewContext.ViewData[RazorViewRenderService.ViewData_ContentContextKeyName] is not ContentContext contentContext)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"Not found content context in view {ViewContext.View.Path}.");
             ContentContext = contentContext;
 
-            if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || field is not TField textField)
-                throw new InvalidOperationException();
-            Field = textField;
+            var fieldName = FieldName.Name;
+            if (fieldName.StartsWith("ContentModel."))
+                fieldName = fieldName["ContentModel.".Length..];
+
+            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out IFieldProvider field) || field is not TField typedField)
+                throw new InvalidOperationException($"Not fount field by name {fieldName} in content type {contentContext.Explorer.Metadata.Name}.");
+            Field = typedField;
 
             var accessProvider = contentContext.Services.GetRequiredService<Identity.IAccessProvider>();
             var isAdmin = await accessProvider.CheckAccessAsync();
@@ -47,7 +53,7 @@ namespace BrandUp.Pages.TagHelpers
                 };
 
                 output.Attributes.Add("data-content-field-path", contentContext.Explorer.ModelPath);
-                output.Attributes.Add("data-content-field-name", textField.Name);
+                output.Attributes.Add("data-content-field-name", typedField.Name);
                 //output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
 
                 var designerName = DesignerName;
@@ -68,6 +74,8 @@ namespace BrandUp.Pages.TagHelpers
 
             await RenderContentAsync(output);
         }
+
+        #endregion
 
         protected abstract Task RenderContentAsync(TagHelperOutput output);
     }

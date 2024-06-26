@@ -57,6 +57,4 @@ namespace BrandUp.Pages.Filters
 
         #endregion
     }
-
-
 }

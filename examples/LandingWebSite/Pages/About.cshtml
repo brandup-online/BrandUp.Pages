@@ -4,7 +4,11 @@
 
 <h1>@Model.Title</h1>
 
-<div><a href="#test">hash</a></div>
+<div>
+    <h4 content-text="ContentModel.Title">test</h4>
+
+    <a href="#test">link with hash</a>
+</div>
 
 @await Html.BlockAsync("test", typeof(Contents.TextBlock.TB1))
 

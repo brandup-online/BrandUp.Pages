@@ -63,7 +63,7 @@ namespace BrandUp.Pages.Content
         public ContentMetadataProvider GetMetadata(Type contentType)
         {
             if (!TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata))
-                throw new ArgumentException($"Тип \"{contentType.AssemblyQualifiedName}\" не является контентом.");
+                throw new ArgumentException($"Type \"{contentType.AssemblyQualifiedName}\" is not registered as content.");
             return contentMetadata;
         }
 

@@ -22,6 +22,7 @@ namespace BrandUp.Pages.Builder
 
             services.Configure<MvcOptions>(options =>
             {
+                options.Filters.Add(new ContentPageFilter());
                 options.Filters.Add(new ContentEditFilter());
             });
 
