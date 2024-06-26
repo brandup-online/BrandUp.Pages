@@ -15,7 +15,7 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
 
         this.page = page;
         this.options = options;
-        this.path = elem.getAttribute("content-path");
+        this.path = elem.getAttribute("data-content-path");
         this.name = this.fullPath = elem.getAttribute("content-field");
 
         if (this.path)

@@ -45,7 +45,7 @@ export class PageBlocksDesigner extends ModelDesigner {
         var type = blockElem.getAttribute("content-type");
 
         if (this.options.isListValue) {
-            let index = parseInt(blockElem.getAttribute("content-path-index"));
+            let index = parseInt(blockElem.getAttribute("data-content-path-index"));
             type = '<i>#' + (index + 1) + '</i>' + type;
         }
 
@@ -69,8 +69,8 @@ export class PageBlocksDesigner extends ModelDesigner {
     }
 
     destroy() {
-        DOM.queryElements(this.element, "* > [content-path-index] .page-blocks-designer-item-add").forEach((elem) => { elem.remove(); });
-        DOM.queryElements(this.element, "* > [content-path-index] .page-blocks-designer-item-tools").forEach((elem) => { elem.remove(); });
+        DOM.queryElements(this.element, "* > [data-content-path-index] .page-blocks-designer-item-add").forEach((elem) => { elem.remove(); });
+        DOM.queryElements(this.element, "* > [data-content-path-index] .page-blocks-designer-item-tools").forEach((elem) => { elem.remove(); });
         DOM.queryElements(this.element, "* > .page-blocks-designer-new-item").forEach((elem) => { elem.remove(); });
 
         super.destroy();
