@@ -34,8 +34,8 @@ export class Editor extends UIElement implements IPageDesigner {
 
         this.queue = new AjaxQueue();
 
-        this.render();
         this.__renderToolbar();
+        this.__renderDesigner();
         this.__initLogic();
 
         document.body.classList.add("bp-state-design");
@@ -77,7 +77,7 @@ export class Editor extends UIElement implements IPageDesigner {
         this.setElement(toolbarElem)
     }
 
-    render() {
+    private __renderDesigner() {
         const fieldElements = DOM.queryElements(this.contentElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
             const fieldElem = fieldElements.item(i);
@@ -116,6 +116,10 @@ export class Editor extends UIElement implements IPageDesigner {
         }
 
         this.page.refreshScripts();
+    }
+
+    redraw () { // Временный публичный метод для ModelDesigner
+        this.__renderDesigner();
     }
 
     private __initLogic() {

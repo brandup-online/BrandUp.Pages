@@ -169,7 +169,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                     elem.remove();
 
                     this._renderBlock(newElem);
-                    this.page.render();
+                    this.page.redraw();
                 }
             }
         });
@@ -213,7 +213,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                                         this.getItem(-1).insertAdjacentElement("afterend", newElem);
                                 }
 
-                                this.page.render();
+                                this.page.redraw();
 
                                 this._renderBlock(newElem);
 
