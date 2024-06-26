@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Identity;
+using BrandUp.Pages.Models;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,37 @@ namespace BrandUp.Pages.Controllers
             }
 
             result.EditId = currentEdit.Id;
+
+            var contentModel = await contentEditService.GetContentAsync(currentEdit, HttpContext.RequestAborted);
+
+            var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
+
+            result.Content = [
+                    new ContentModel {
+                        Path = string.Empty,
+                        Index = -1,
+                        TypeName = "PageNav",
+                        TypeTitle = "PageNav",
+                        Fields = [
+                                new ContentModel.TextField { Name = "LogoText", Title = "Logo", Type = "text", Value = "Logo text" },
+                                new ContentModel.ModelField { Name = "Items", Title = "Menu", Type = "model", IsList = true, Value = new List<string> { "Items[0]", "Items[1]" } }
+                            ]
+                    },
+                    new ContentModel {
+                        Path = "Items[0]",
+                        Index = -1,
+                        TypeName = "PageNav.MenuItem",
+                        TypeTitle = "PageNav.MenuItem",
+                        Fields = []
+                    },
+                    new ContentModel {
+                        Path = "Items[1]",
+                        Index = -1,
+                        TypeName = "PageNav.MenuItem",
+                        TypeTitle = "PageNav.MenuItem",
+                        Fields = []
+                    }
+                ];
 
             return Ok(result);
         }

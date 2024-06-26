@@ -46,14 +46,14 @@ namespace BrandUp.Pages.TagHelpers
                     Options = field.GetFormOptions(contentContext.Services)
                 };
 
-                output.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
-                output.Attributes.Add("content-field", textField.Name);
-                output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
+                output.Attributes.Add("data-content-field-path", contentContext.Explorer.ModelPath);
+                output.Attributes.Add("data-content-field-name", textField.Name);
+                //output.Attributes.Add(new TagHelperAttribute("content-field-model", JsonHelper.Serialize(fieldModel).ToString(), HtmlAttributeValueStyle.SingleQuotes));
 
                 var designerName = DesignerName;
                 if (string.IsNullOrEmpty(designerName))
                     designerName = Field.Type;
-                output.Attributes.Add("content-designer", designerName.ToLower());
+                output.Attributes.Add("data-content-designer", designerName.ToLower());
             }
 
             if (!contentContext.IsDesigner && RenderMode == FieldRenderMode.HasValue)
