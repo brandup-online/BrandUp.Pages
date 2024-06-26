@@ -7,7 +7,7 @@ using BrandUp.Website;
 using BrandUp.Website.Pages;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BrandUp.Pages
+namespace BrandUp.Pages.Pages
 {
     public sealed class ContentPageModel : AppPageModel
     {

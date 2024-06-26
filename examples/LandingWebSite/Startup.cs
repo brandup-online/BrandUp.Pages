@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
+using BrandUp.Pages.Pages;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
 using LandingWebSite._migrations;
@@ -28,7 +29,7 @@ namespace LandingWebSite
         {
             #region Web
 
-            services.AddRazorPages().AddApplicationPart(typeof(BrandUp.Pages.ContentPageModel).Assembly);
+            services.AddRazorPages().AddApplicationPart(typeof(ContentPageModel).Assembly);
             services.AddControllers();
 
             services.Configure<WebEncoderOptions>(options =>
@@ -76,6 +77,9 @@ namespace LandingWebSite
                         new GZipCompressorFactory(new GZipCompressionSettings { Level = CompressionLevel.Fastest })
                     ];
                 });
+
+            services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
+            services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
             #endregion
 

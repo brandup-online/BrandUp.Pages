@@ -5,113 +5,148 @@ using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace LandingWebSite.Controllers
 {
-	public class SeoController : ControllerBase
-	{
-		[HttpGet("sitemap.xml")]
-		[Produces("application/xml")]
-		public async Task<IActionResult> SitemapXmlAsync([FromServices] IPageService pageService, [FromServices] IPageLinkGenerator pageLinkGenerator, [FromServices] IWebsiteContext websiteContext)
-		{
-			if (pageService == null)
-				throw new ArgumentNullException(nameof(pageService));
-			if (pageLinkGenerator == null)
-				throw new ArgumentNullException(nameof(pageLinkGenerator));
+    public class SeoController : ControllerBase
+    {
+        [HttpGet("sitemap.xml")]
+        [Produces("application/xml")]
+        public async Task<IActionResult> SitemapXmlAsync([FromServices] IPageService pageService, [FromServices] IPageLinkGenerator pageLinkGenerator, [FromServices] IWebsiteContext websiteContext, [FromServices] ApplicationPartManager applicationPartManager)
+        {
+            if (pageService == null)
+                throw new ArgumentNullException(nameof(pageService));
+            if (pageLinkGenerator == null)
+                throw new ArgumentNullException(nameof(pageLinkGenerator));
 
-			var request = Request;
+            var request = Request;
 
-			var dateNow = DateTime.Now.ToString("s");
-			var model = new SitemapModel { Urls = new List<SitemapUrl>() };
+            var viewsFeature = new Microsoft.AspNetCore.Mvc.Razor.Compilation.ViewsFeature();
+            applicationPartManager.PopulateFeature(viewsFeature);
 
-			var pages = await pageService.GetPublishedPagesAsync(websiteContext.Website.Id, HttpContext.RequestAborted);
+            var dateNow = DateTime.Now.ToString("s");
+            var model = new SitemapModel { Urls = [] };
 
-			foreach (var page in pages)
-			{
-				var url = await pageLinkGenerator.GetUriAsync(page);
+            foreach (var viewDescriptor in viewsFeature.ViewDescriptors)
+            {
+                var path = viewDescriptor.RelativePath;
+                if (!path.StartsWith("/Pages/"))
+                    continue;
 
-				model.Urls.Add(new SitemapUrl
-				{
-					Location = url,
-					LastMod = dateNow,
-					ChangeFreq = "daily",
-					Priority = "1"
-				});
-			}
+                path = path["/Pages".Length..].Replace(".cshtml", "").ToLower();
 
-			model.Urls = model.Urls.OrderBy(it => it.Location).ToList();
-			model.Urls[0].ChangeFreq = "daily";
-			model.Urls[0].Priority = "1";
+                if (path.Contains("/contentpage", StringComparison.InvariantCultureIgnoreCase) || path.Contains("/error", StringComparison.InvariantCultureIgnoreCase))
+                    continue;
 
-			return new XmlResult(model);
-		}
+                var url = Url.Page(path, null, null, request.Scheme, request.Host.ToUriComponent());
+                if (string.IsNullOrEmpty(url))
+                    continue;
 
-		[XmlRoot("urlset")]
-		public class SitemapModel
-		{
-			[XmlElement("url")]
-			public List<SitemapUrl> Urls { get; set; }
-		}
+                model.Urls.Add(new SitemapUrl
+                {
+                    Temp = path,
+                    Location = url,
+                    LastMod = dateNow,
+                    ChangeFreq = "daily",
+                    Priority = "0.6"
+                });
+            }
 
-		public class SitemapUrl
-		{
-			[XmlElement("loc")]
-			public string Location { get; set; }
-			[XmlElement("lastmod")]
-			public string LastMod { get; set; }
-			[XmlElement("changefreq")]
-			public string ChangeFreq { get; set; }
-			[XmlElement("priority")]
-			public string Priority { get; set; }
-		}
+            var pages = await pageService.GetPublishedPagesAsync(websiteContext.Website.Id, HttpContext.RequestAborted);
+            foreach (var page in pages)
+            {
+                var url = await pageLinkGenerator.GetUriAsync(page);
 
-		class XmlResult : ActionResult
-		{
-			readonly SitemapModel model;
+                model.Urls.Add(new SitemapUrl
+                {
+                    Temp = page.Id.ToString(),
+                    Location = url,
+                    LastMod = dateNow,
+                    ChangeFreq = "daily",
+                    Priority = "1"
+                });
+            }
 
-			public XmlResult(SitemapModel model)
-			{
-				this.model = model;
-			}
+            model.Urls = model.Urls.OrderBy(it => it.Location).ToList();
+            model.Urls[0].ChangeFreq = "daily";
+            model.Urls[0].Priority = "1";
 
-			public override void ExecuteResult(ActionContext context)
-			{
-				context.HttpContext.Response.ContentType = "text/xml";
+            return new XmlResult(model);
+        }
 
-				using (var textWriter = new StreamWriter(context.HttpContext.Response.Body, new UTF8Encoding(false)))
-				{
-					var writer = new XmlTextWriter(textWriter);
-					writer.Formatting = Formatting.Indented;
-					writer.WriteStartDocument();
-					writer.WriteStartElement("urlset");
-					writer.WriteAttributeString("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
+        [XmlRoot("urlset")]
+        public class SitemapModel
+        {
+            [XmlElement("url")]
+            public List<SitemapUrl> Urls { get; set; }
+        }
 
-					foreach (var p in model.Urls)
-					{
-						writer.WriteStartElement("url");
+        public class SitemapUrl
+        {
+            [XmlElement("loc")]
+            public string Location { get; set; }
+            [XmlElement("lastmod")]
+            public string LastMod { get; set; }
+            [XmlElement("changefreq")]
+            public string ChangeFreq { get; set; }
+            [XmlElement("priority")]
+            public string Priority { get; set; }
+            [XmlIgnore]
+            public string Temp { get; set; }
+        }
 
-						writer.WriteStartElement("loc");
-						writer.WriteRaw(p.Location);
-						writer.WriteEndElement();
+        class XmlResult : ActionResult
+        {
+            readonly SitemapModel model;
 
-						writer.WriteStartElement("lastmod");
-						writer.WriteRaw(p.LastMod);
-						writer.WriteEndElement();
+            public XmlResult(SitemapModel model)
+            {
+                this.model = model;
+            }
 
-						writer.WriteStartElement("changefreq");
-						writer.WriteRaw(p.ChangeFreq);
-						writer.WriteEndElement();
+            public override async Task ExecuteResultAsync(ActionContext context)
+            {
+                context.HttpContext.Response.ContentType = "text/xml";
 
-						writer.WriteStartElement("priority");
-						writer.WriteRaw(p.Priority.ToString(System.Globalization.CultureInfo.InvariantCulture));
-						writer.WriteEndElement();
+                using (var textWriter = new StreamWriter(context.HttpContext.Response.Body, new UTF8Encoding(false)))
+                {
+                    var writer = new XmlTextWriter(textWriter)
+                    {
+                        Formatting = Formatting.Indented
+                    };
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("urlset");
+                    writer.WriteAttributeString("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-						writer.WriteEndElement();
-					}
+                    foreach (var p in model.Urls)
+                    {
+                        writer.WriteStartElement("url");
 
-					writer.WriteEndElement();
-				}
-			}
-		}
-	}
+                        writer.WriteStartElement("loc");
+                        writer.WriteRaw(p.Location);
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("lastmod");
+                        writer.WriteRaw(p.LastMod);
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("changefreq");
+                        writer.WriteRaw(p.ChangeFreq);
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("priority");
+                        writer.WriteRaw(p.Priority.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+
+                    writer.WriteEndElement();
+                }
+
+                await Task.CompletedTask;
+            }
+        }
+    }
 }

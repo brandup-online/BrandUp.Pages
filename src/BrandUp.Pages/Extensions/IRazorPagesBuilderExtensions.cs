@@ -5,25 +5,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Builder
 {
-    public static class IPagesBuilderExtensions
+    public static class IRazorPagesBuilderExtensions
     {
+        public const string ContentPageName = "/ContentPage";
+
         public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder)
         {
-            return AddRazorContentPage(builder, options => { });
-        }
-
-        public static IPagesBuilder AddRazorContentPage(this IPagesBuilder builder, Action<ContentPageOptions> optionAction)
-        {
-            var contentPageOptions = new ContentPageOptions();
-            optionAction?.Invoke(contentPageOptions);
-
             var services = builder.Services;
 
             services.AddHttpContextAccessor();
 
             services.Configure<RazorPagesOptions>(options =>
             {
-                options.Conventions.AddPageRoute(contentPageOptions.ContentPageName, "{**url}");
+                options.Conventions.AddPageRoute(ContentPageName, "{**url}");
             });
 
             services.Configure<MvcOptions>(options =>
@@ -36,8 +30,6 @@ namespace BrandUp.Pages.Builder
 
             services.AddSingleton<Views.IViewLocator, Views.RazorViewLocator>();
             services.AddScoped<Views.IViewRenderService, Views.RazorViewRenderService>();
-
-            services.Configure(optionAction);
 
             return builder;
         }

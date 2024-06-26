@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Features;
+using BrandUp.Pages.Pages;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Html;

@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages
 {
-    public abstract class ContentPage<TModel> : RazorPage<TModel>
+    public abstract class RazorContent<TModel> : RazorPage<TModel>
     {
         public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext;
 

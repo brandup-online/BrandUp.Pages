@@ -21,7 +21,7 @@ namespace BrandUp.Pages.Views
                     continue;
 
                 var d = viewDescriptor.Type.BaseType.GetGenericTypeDefinition();
-                if (d == typeof(ContentPage<>))
+                if (d == typeof(RazorContent<>))
                 {
                     var contentType = viewDescriptor.Type.BaseType.GenericTypeArguments[0];
                     IDictionary<string, object> defaultModelData = null;
