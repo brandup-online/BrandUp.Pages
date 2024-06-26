@@ -251,9 +251,6 @@ namespace BrandUp.Pages.Controllers
             ArgumentNullException.ThrowIfNull(contentExplorer);
             ArgumentNullException.ThrowIfNull(output);
 
-            if (output.Count == 0 && !contentExplorer.IsRoot)
-                throw new ArgumentException("Начать заполнение моделей контента можно только с рутового контента.");
-
             var validationContext = new ValidationContext(contentExplorer.Model, HttpContext.RequestServices, null);
 
             var content = new Models.Contents.ContentValidationResult
@@ -267,6 +264,8 @@ namespace BrandUp.Pages.Controllers
 
             if (contentExplorer.Metadata.IsValidatable)
                 content.Errors = contentExplorer.Metadata.Validate(validationContext, contentExplorer.Model);
+            else
+                content.Errors = [];
 
             foreach (var field in contentExplorer.Metadata.Fields)
             {
