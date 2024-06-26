@@ -120,7 +120,7 @@ namespace BrandUp.Pages.Controllers
 
             await SaveChangesAsync();
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
 
         [HttpPost("up")]
@@ -143,7 +143,7 @@ namespace BrandUp.Pages.Controllers
                 await SaveChangesAsync();
             }
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
 
         [HttpPost("down")]
@@ -167,7 +167,7 @@ namespace BrandUp.Pages.Controllers
                 await SaveChangesAsync();
             }
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
 
         [HttpPost("move")]
@@ -195,7 +195,7 @@ namespace BrandUp.Pages.Controllers
                 await SaveChangesAsync();
             }
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
 
         [HttpDelete]
@@ -213,7 +213,7 @@ namespace BrandUp.Pages.Controllers
                 }
             }
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using BrandUp.Pages.Content;
+﻿using System.Collections;
+using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Identity;
-using BrandUp.Pages.Models;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,8 @@ namespace BrandUp.Pages.Controllers
     [Route("brandup.pages/page/content"), Filters.Administration]
     public class PageContentController(ContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
     {
+        #region Actions
+
         [HttpPost("begin")]
         public async Task<IActionResult> BeginEditAsync([FromQuery] string key, [FromQuery] string type, [FromQuery] bool force, [FromServices] ContentMetadataManager contentMetadataManager, [FromServices] IAccessProvider accessProvider)
         {
@@ -20,7 +23,7 @@ namespace BrandUp.Pages.Controllers
 
             var websiteId = websiteContext.Website.Id;
 
-            var result = new Models.BeginPageEditResult();
+            var result = new Models.Contents.BeginPageEditResult();
 
             var userId = await accessProvider.GetUserIdAsync(HttpContext.RequestAborted);
 
@@ -46,35 +49,10 @@ namespace BrandUp.Pages.Controllers
             result.EditId = currentEdit.Id;
 
             var contentModel = await contentEditService.GetContentAsync(currentEdit, HttpContext.RequestAborted);
-
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
 
-            result.Content = [
-                    new ContentModel {
-                        Path = string.Empty,
-                        Index = -1,
-                        TypeName = "PageNav",
-                        TypeTitle = "PageNav",
-                        Fields = [
-                                new ContentModel.TextField { Name = "LogoText", Title = "Logo", Type = "text", Value = "Logo text" },
-                                new ContentModel.ModelField { Name = "Items", Title = "Menu", Type = "model", IsList = true, Value = new List<string> { "Items[0]", "Items[1]" } }
-                            ]
-                    },
-                    new ContentModel {
-                        Path = "Items[0]",
-                        Index = -1,
-                        TypeName = "PageNav.MenuItem",
-                        TypeTitle = "PageNav.MenuItem",
-                        Fields = []
-                    },
-                    new ContentModel {
-                        Path = "Items[1]",
-                        Index = -1,
-                        TypeName = "PageNav.MenuItem",
-                        TypeTitle = "PageNav.MenuItem",
-                        Fields = []
-                    }
-                ];
+            result.Content = [];
+            await EnsureContentsAsync(contentExplorer, result.Content);
 
             return Ok(result);
         }
@@ -191,5 +169,68 @@ namespace BrandUp.Pages.Controllers
 
             return Ok();
         }
+
+        #endregion
+
+        #region Helpers
+
+        async Task EnsureContentsAsync(ContentExplorer contentExplorer, List<Models.Contents.ContentModel> output)
+        {
+            ArgumentNullException.ThrowIfNull(contentExplorer);
+            ArgumentNullException.ThrowIfNull(output);
+
+            if (output.Count == 0 && !contentExplorer.IsRoot)
+                throw new ArgumentException("Начать заполнение моделей контента можно только с рутового контента.");
+
+            var serviceProvider = HttpContext.RequestServices;
+
+            var content = new Models.Contents.ContentModel
+            {
+                Parent = contentExplorer.Parent?.ModelPath,
+                Path = contentExplorer.ModelPath,
+                Index = contentExplorer.Index,
+                TypeName = contentExplorer.Metadata.Name,
+                TypeTitle = contentExplorer.Metadata.Title,
+                Fields = []
+            };
+            output.Add(content);
+
+            foreach (var field in contentExplorer.Metadata.Fields)
+            {
+                var value = field.GetModelValue(contentExplorer.Model);
+                var fieldModel = new Models.Contents.ContentModel.Field
+                {
+                    Type = field.Type,
+                    Name = field.Name,
+                    Options = field.GetFormOptions(serviceProvider),
+                    Title = field.Title,
+                    IsRequired = false,
+                    Value = await field.GetFormValueAsync(value, serviceProvider),
+                    Errors = []
+                };
+                content.Fields.Add(fieldModel);
+
+                if (field is IModelField modelField && modelField.HasValue(value))
+                {
+                    if (modelField.IsListValue)
+                    {
+                        var i = 0;
+                        foreach (var item in (IList)value)
+                        {
+                            var childContentExplorer = contentExplorer.Navigate($"{modelField.Name}[{i}]");
+                            await EnsureContentsAsync(childContentExplorer, output);
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        var childContentExplorer = contentExplorer.Navigate(modelField.Name);
+                        await EnsureContentsAsync(childContentExplorer, output);
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }

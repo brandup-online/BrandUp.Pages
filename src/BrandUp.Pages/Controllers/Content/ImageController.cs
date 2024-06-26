@@ -29,7 +29,7 @@ namespace BrandUp.Pages.Controllers
                 return Ok(fielUrl);
             }
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
 
         [HttpPost("url")]
@@ -62,7 +62,7 @@ namespace BrandUp.Pages.Controllers
                 }
             }
 
-            return await FormValueAsync();
+            return await FormValueResultAsync();
         }
     }
 }

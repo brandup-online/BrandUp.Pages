@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Controllers
 			Field.SetModelValue(ContentContext.Content, newValue);
 			await SaveChangesAsync();
 
-			return await FormValueAsync();
+			return await FormValueResultAsync();
 		}
 	}
 }

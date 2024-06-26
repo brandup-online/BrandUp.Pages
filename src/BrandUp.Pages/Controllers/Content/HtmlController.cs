@@ -16,7 +16,7 @@ namespace BrandUp.Pages.Controllers
 				await SaveChangesAsync();
 			}
 
-			return await FormValueAsync();
+			return await FormValueResultAsync();
 		}
 	}
 }

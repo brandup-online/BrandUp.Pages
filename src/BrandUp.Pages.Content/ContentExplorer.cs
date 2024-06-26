@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Content
 
         #endregion
 
-        private ContentExplorer(object model, ContentMetadataProvider contentMetadata)
+        ContentExplorer(object model, ContentMetadataProvider contentMetadata)
         {
             Field = null;
             Model = model;
@@ -41,7 +41,7 @@ namespace BrandUp.Pages.Content
             rootExplorer = null;
             name = contentMetadata.Name;
         }
-        private ContentExplorer(ContentExplorer parent, IModelField field, int index, object model, ContentMetadataProvider contentMetadata)
+        ContentExplorer(ContentExplorer parent, IModelField field, int index, object model, ContentMetadataProvider contentMetadata)
         {
             Field = field;
             Model = model;

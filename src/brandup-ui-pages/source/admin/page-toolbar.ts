@@ -44,7 +44,7 @@ export class PageToolbar extends UIElement {
     }
 
     private __renderUI() {
-        const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[content-root]"));
+        const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[data-content-root]"));
 
         const websiteMenuItems = document.createDocumentFragment();
         websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]));
@@ -60,10 +60,10 @@ export class PageToolbar extends UIElement {
             DOM.tag("div", null, [
                 DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, iconEdit),
                 DOM.tag("menu", { class: "page-toolbar-menu edit-menu" }, contentElements.map(elem => {
-                    const contentKey = elem.getAttribute("content-root");
+                    const contentKey = elem.getAttribute("data-content-root");
                     if (!contentKey) throw "Not set content root value.";
     
-                    const contentType = elem.getAttribute("content-type");
+                    const contentType = elem.getAttribute("data-content-type");
                     if (!contentType) throw "Not set content type value.";
     
                     return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
@@ -256,7 +256,7 @@ export class PageToolbar extends UIElement {
     }
 
     private __navToEdit(editId: string, contentKey: string) {
-        const contentElem = DOM.queryElement(document.body, `[content-root='${contentKey}']`);
+        const contentElem = DOM.queryElement(document.body, `[data-content-root='${contentKey}']`);
 
         contentElem.dataset["contentEditId"] = editId;
 

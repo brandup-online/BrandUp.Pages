@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
+using BrandUp.Pages.Models.Contents;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -73,9 +74,9 @@ namespace BrandUp.Pages.Controllers
         #endregion
 
         [HttpGet]
-        public Task<IActionResult> GetAsync()
+        public async Task<IActionResult> GetAsync()
         {
-            return FormValueAsync();
+            return await FormValueResultAsync();
         }
 
         protected async Task SaveChangesAsync()
@@ -83,11 +84,16 @@ namespace BrandUp.Pages.Controllers
             await contentEditService.SetContentAsync(ContentEdit, rootContentContext.Content);
         }
 
-        protected async Task<IActionResult> FormValueAsync()
+        protected async Task<IActionResult> FormValueResultAsync()
         {
             var modelValue = Field.GetModelValue(contentContext.Content);
             var formValue = await Field.GetFormValueAsync(modelValue, HttpContext.RequestServices);
-            return new JsonResult(formValue);
+
+            return new JsonResult(new FieldValueResult
+            {
+                Value = formValue,
+                Errors = []
+            });
         }
     }
 }

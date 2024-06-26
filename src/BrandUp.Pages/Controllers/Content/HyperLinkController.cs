@@ -16,7 +16,7 @@ namespace BrandUp.Pages.Controllers
 			Field.SetModelValue(ContentContext.Content, value);
 			await SaveChangesAsync();
 
-			return await FormValueAsync();
+			return await FormValueResultAsync();
 		}
 
 		[HttpPost("page")]
@@ -31,7 +31,7 @@ namespace BrandUp.Pages.Controllers
 			Field.SetModelValue(ContentContext.Content, value);
 			await SaveChangesAsync();
 
-			return await FormValueAsync();
+			return await FormValueResultAsync();
 		}
 	}
 }
