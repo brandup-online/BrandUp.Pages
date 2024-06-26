@@ -10,7 +10,6 @@ import { Page } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
-import "./editor.less";
 import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
 

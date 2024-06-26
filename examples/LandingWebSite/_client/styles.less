@@ -49,6 +49,10 @@ a {
 	}
 }
 
+svg {
+	display: block;
+}
+
 .content-width {
 	max-width: @Content-MaxWidth;
 	min-width: @Content-MinWidth;
@@ -93,9 +97,22 @@ nav.app-top {
 
 	& a.logo {
 		color: #fff;
-		font-size: 32px;
+		font-size: 28px;
 		line-height: 40px;
 		text-decoration: none;
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		column-gap: 10px;
+
+		& svg {
+			width: 40px;
+			height: 40px;
+		}
+
+		& span {
+			text-transform: uppercase;
+		}
 	}
 
 	& ul {
@@ -126,8 +143,8 @@ nav.app-top {
 			& svg {
 				display: block;
 				fill: #fff;
-				width: 30px;
-				height: 30px;
+				width: 26px;
+				height: 26px;
 			}
 
 			&:hover {

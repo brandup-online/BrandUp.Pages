@@ -1,4 +1,4 @@
-﻿@import "vars.less";
+﻿@import "./vars.less";
 
 :root {
     --ck-border-radius: 0 !important;
@@ -53,6 +53,7 @@ body:has(.editor-toolbar) {
     }
 
     & svg {
+        display: block;
         fill: @Neutral-Darkest;
         width: 24px;
     }
@@ -150,233 +151,6 @@ body:has(.editor-toolbar) {
     }
 }
 
-.page-toolbar {
-    position: fixed;
-    left:100px;
-    bottom: 77px;
-    background: @Accent-Darkest;
-    border-radius: @Border-Radius;
-    height: 50px;
-    display: flex;
-    flex-flow: row nowrap;
-    z-index: 500;
-    align-items: center;
-    padding: 2px 6px;
-    gap: 5px;
-
-    & .first-button {
-        padding-right: 10px;
-        position: relative;
-
-        &:after {
-            content: "";
-            position: absolute;
-            background-color: @Main-Color;
-            opacity: 0.5;
-            width: 1px;
-            height: 20px;
-            right: 2px;
-            top: 10px;
-            bottom: 10px;
-        }
-    }
-
-    &-button {
-        background: none;
-        padding: 8px;
-        display: flex;
-        align-items: center;
-        border-radius: 3px;
-    
-        & svg {
-            display: block;
-            width: 22px;
-            height: 22px;
-            fill: #fff;
-        }
-
-        &.active ~ menu {
-            display: block;
-        }
-    
-        &:hover,&:focus {
-            background: @Accent-Dark;
-        }
-    
-        &:active {
-            background: @Accent-Medium;
-        }
-    
-        &.page-status {
-            gap: 5px;
-        
-            & span {
-                margin: 2px;
-                border-radius: 50%;
-                width: 18px;
-                height: 18px;
-            }
-    
-            & svg {
-                width: 18px;
-                height: 18px;
-            }
-        
-            &.published > span {
-                background-color: @Succes-Darkest;
-            }
-        
-            &.draft > span {
-                background: @Warning-Darkest;
-            }
-        }
-    }
-    
-    &-menu {
-        display: none;
-        position: absolute;
-        bottom: 70px;
-        left: 0;
-        list-style: none;
-        background: #FFFFFF;
-        box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.12);
-        border-radius: 10px;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-    
-        scrollbar-width: 6px;
-        &::-webkit-scrollbar {
-            width: 6px;
-            height: 5px;
-            background: none;
-        }
-    
-        &::-webkit-scrollbar-track {
-            border-radius: 3px;
-            background-color: transparent;
-            cursor: default;
-        }
-    
-        &::-webkit-scrollbar-thumb {
-            background-color: #8696a0;
-            border-radius: 3px;
-            cursor: default;
-        }
-    
-        & a {
-            align-items: center;
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 12px;
-            padding: 14px 16px;
-            color: @Text-Color;
-            text-decoration: none;
-            text-wrap: nowrap;
-            font-weight: 600;
-            min-width: 270px;
-    
-            &:first-child {
-                padding-top: 18px;
-            }
-    
-            &:last-child {
-                padding-bottom: 18px;
-            }
-    
-            & svg {
-                width: 18px;
-                fill: @Text-Color;
-            }
-            
-            &:hover {
-                background-color: @Accent-Lightest;
-                color: @Text-Color;
-            }
-    
-            &:active {
-                color: #6E7072;
-    
-                & svg {
-                    fill: #6E7072;
-                }
-            }
-        }
-    
-        &.edit-menu {
-            max-height: 400px;
-            overflow: auto;
-    
-            & a {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 3px;
-    
-                & span {
-                    font-size: 10px;
-                    color: @Neutral-Dark;
-                }
-            }
-        }
-    
-        .adaptive-mobile({
-            & a {
-                padding: 15px;
-                font-size: 12px;
-            }
-    
-            & svg {
-                width: 16px;
-            }
-        })
-    }
-    
-    &-popup {
-        position: absolute;
-        left: 0;
-        bottom: 60px;
-        min-width: 250px;
-        padding: 30px 0;
-        background: #FFFFFF;
-        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-    
-        & .text {
-            padding: 0 30px 20px;
-        }
-    
-        & .buttons {
-            display: flex;
-            flex-flow: row nowrap;
-            margin: 0 25px;
-    
-            & button {
-                background: @Accent-Color;
-                color: @Main-Color;
-                border: 0;
-                border-radius: @Border-Radius;
-                outline: none;
-                height: 42px;
-                box-sizing: border-box;
-                padding: 0 20px;
-                white-space: nowrap;
-                margin: 0 5px;
-                cursor: pointer;
-            }
-        }
-    }
-
-    @media all and (max-width: 1280px) {
-        left: 20px;
-        bottom: 20px;
-    }
-
-    @media all and (max-width: 400px) {
-        left: 10px;
-        bottom: 10px;
-    }
-}
-
 .ck.ck-block-toolbar-button {
     z-index: 1100 !important;
 }
@@ -390,3 +164,6 @@ body.bp-state-loading {
 @keyframes bp-spinner {
   to {transform: rotate(360deg);}
 }
+
+@import "./admin/page-toolbar.less";
+@import "./content/editor.less";

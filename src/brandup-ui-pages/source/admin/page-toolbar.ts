@@ -1,4 +1,4 @@
-﻿import { UIElement } from "brandup-ui";
+import { UIElement } from "brandup-ui";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
@@ -16,7 +16,6 @@ import iconPlus from "../svg/new/plus.svg";
 import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
-import "../styles.less";
 
 export class PageToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -54,12 +53,12 @@ export class PageToolbar extends UIElement {
 
         let toolbarButtons = [
             DOM.tag("div", {class: "first-button"}, [
-                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия" }, iconList),
-                websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu" }),
+                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Действия" }, iconList),
+                websiteMenu = DOM.tag("menu", { class: "bp-page-toolbar-menu" }),
             ]),
             DOM.tag("div", null, [
-                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, iconEdit),
-                DOM.tag("menu", { class: "page-toolbar-menu edit-menu" }, contentElements.map(elem => {
+                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, iconEdit),
+                DOM.tag("menu", { class: "bp-page-toolbar-menu edit-menu" }, contentElements.map(elem => {
                     const contentKey = elem.getAttribute("data-content-root");
                     if (!contentKey) throw "Not set content root value.";
     
@@ -95,19 +94,19 @@ export class PageToolbar extends UIElement {
                 pageMenuItems.push(DOM.tag("a", { href: "", command: "bp-pages" }, [iconPublish, "Опубликовать"]));
 
                 toolbarButtons = toolbarButtons.slice(0, 1).concat([
-                    DOM.tag("div", null, DOM.tag ("button", { class: "page-status page-toolbar-button " + status }, [DOM.tag("span"),])),
-                    (published ? null : DOM.tag("div", null, DOM.tag("button", { class: "page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish))),
+                    DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button page-status " + status }, [DOM.tag("span"),])),
+                    (published ? null : DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish))),
                 ],
                 toolbarButtons.slice(1),
                 DOM.tag("div", null, [
-                    DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, iconMore),
-                    DOM.tag("menu", { class: "page-toolbar-menu", title: "" }, pageMenuItems),
+                    DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, iconMore),
+                    DOM.tag("menu", { class: "bp-page-toolbar-menu", title: "" }, pageMenuItems),
                 ]),
             );
         }
         websiteMenu.append(websiteMenuItems);
 
-        const toolbarElem = DOM.tag("div", { class: "bp-elem page-toolbar" }, toolbarButtons);
+        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-page-toolbar" }, toolbarButtons);
 
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
@@ -194,7 +193,7 @@ export class PageToolbar extends UIElement {
                     }
 
                     if (response.data.currentDate) {
-                        const popup = DOM.tag("div", { class: "page-toolbar-popup" }, [
+                        const popup = DOM.tag("div", { class: "bp-page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
                                 DOM.tag("button", { "data-command": "continue-edit", dataset: { editId: response.data.editId, contentKey } }, "Продолжить"),
@@ -246,10 +245,10 @@ export class PageToolbar extends UIElement {
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const target = e.target as Element;
-            if (target.closest(".page-toolbar-menu")) return;
+            if (target.closest(".bp-page-toolbar-menu")) return;
 
-            const button = target.closest(`.page-toolbar-button`);
-            const buttons = DOM.queryElements(this.element, '.page-toolbar-button');
+            const button = target.closest(`.bp-page-toolbar-button`);
+            const buttons = DOM.queryElements(this.element, '.bp-page-toolbar-button');
             buttons.forEach(item => {
                 if (button && item === button) return; 
                 else item.classList.remove("active");

@@ -104,8 +104,7 @@ module.exports = (env) => {
         plugins: [
             new MiniCssExtractPlugin({
                 filename: '[name].css',
-                chunkFilename: isDevBuild ? '[id].css' : '[id].[contenthash].css',
-                ignoreOrder: true
+                chunkFilename: isDevBuild ? '[id].css' : '[id].[contenthash].css'
             })
         ]
     }];
