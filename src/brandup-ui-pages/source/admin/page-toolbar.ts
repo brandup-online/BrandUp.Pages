@@ -54,15 +54,11 @@ export class PageToolbar extends UIElement {
 
         let toolbarButtons = [
             DOM.tag("div", {class: "first-button"}, [
-                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия" }, [
-                    iconList,
-                ]),
+                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия" }, iconList),
                 websiteMenu = DOM.tag("menu", { class: "page-toolbar-menu" }),
             ]),
             DOM.tag("div", null, [
-                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, [
-                    iconEdit,
-                ]),
+                DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, iconEdit),
                 DOM.tag("menu", { class: "page-toolbar-menu edit-menu" }, contentElements.map(elem => {
                     const contentKey = elem.getAttribute("content-root");
                     if (!contentKey) throw "Not set content root value.";
@@ -101,9 +97,7 @@ export class PageToolbar extends UIElement {
                 ],
                 toolbarButtons.slice(1),
                 DOM.tag("div", null, [
-                    DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, [
-                        iconMore,
-                    ]),
+                    DOM.tag("button", { class: "page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, iconMore),
                     DOM.tag("menu", { class: "page-toolbar-menu", title: "" }, pageMenuItems),
                 ]),
             );
@@ -140,7 +134,9 @@ export class PageToolbar extends UIElement {
             }
         });
 
-        if(this.__page.model.status !== "Published")
+        const published = this.__page.model.status?.toLowerCase() === "published";
+
+        if (!published)
             this.registerCommand("bp-publish", () => {
                 publishPage(this.__page.model.id).then(result => {
                     this.__page.website.nav({ url: result.url, replace: true });
@@ -265,15 +261,6 @@ export class PageToolbar extends UIElement {
         contentElem.dataset["contentEditId"] = editId;
 
         this.__page.website.nav({ url: this.__page.buildUrl({ editid: editId }), replace: true });
-    }
-
-    private __closeMenu(menuName?: string) {
-        let className = "";
-        if (menuName) className = `opened-menu-${menuName}`;
-        this.element.classList.forEach((value: string) => {
-            if (value.indexOf('opened-menu-') >= 0 && value !== className)
-                this.element.classList.remove(value);
-        })
     }
 
     private __closePopupFunc (e: MouseEvent): void {

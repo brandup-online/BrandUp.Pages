@@ -178,6 +178,8 @@ export class Editor extends UIElement implements IPageDesigner {
         }
         this.__fields = null;
 
+        this.queue.destroy();
+
         this.contentElem.classList.remove("page-designer");
 
         document.body.classList.remove("bp-state-design");
