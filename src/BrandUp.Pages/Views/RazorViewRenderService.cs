@@ -70,6 +70,7 @@ namespace BrandUp.Pages.Views
                     tag.Attributes.Add("data-content-edit-id", contentContext.EditId.Value.ToString());
             }
             tag.Attributes.Add("data-content-type", contentContext.Explorer.Metadata.Name);
+            tag.Attributes.Add("data-content-title", contentContext.Explorer.Metadata.Title);
             tag.Attributes.Add("data-content-path", contentContext.Explorer.ModelPath);
             //tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
 

@@ -65,12 +65,15 @@ export class PageToolbar extends UIElement {
     
                     const contentType = elem.getAttribute("data-content-type");
                     if (!contentType) throw "Not set content type value.";
-    
+
+                    const contentTitle = elem.getAttribute("data-content-title");
+                    if (!contentType) throw "Not set content type value.";
+
                     return DOM.tag("a", { href: "", command: "bp-edit", dataset: { contentKey, contentType } }, [
-                        contentKey, DOM.tag('span', null, contentKey),
+                        contentTitle, DOM.tag('span', null, contentKey),
                     ])
                 }))
-            ]),
+            ])
         ];
         
         // Если страница динамическая
