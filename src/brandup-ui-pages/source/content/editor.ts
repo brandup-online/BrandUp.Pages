@@ -13,6 +13,12 @@ import cancelIcon from "../svg/new/cancel.svg";
 import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
 import { IContentModel } from "../admin/page-toolbar";
+import { FieldProvider } from "./provider/base";
+import { HtmlFieldProvider } from "./provider/html";
+import { ImageFieldProvider } from "./provider/image";
+import { ModelFieldProvider } from "./provider/model";
+import { PageBlocksFieldProvider } from "./provider/page-blocks";
+import { TextFieldProvider } from "./provider/text";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
@@ -37,21 +43,35 @@ export class Editor extends UIElement implements IPageDesigner {
 
         this.queue = new AjaxQueue();
 
-        const contentPathMap = new Map();
+        const contentPathMap = new Map<string, HTMLElement>();
+        const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
+
         contentPathMap.set("", contentElem);
         
-        DOM.queryElements(contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.getAttribute("data-content-path"), elem));
-        const contentFieldElements = DOM.queryElements(contentElem, "[data-content-field-path][data-content-field-name]");
+        DOM.queryElements(contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.dataset.contentPath, elem));
+        DOM.queryElements(contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
+            const fieldPath = elem.dataset.contentFieldPath;
+            const fieldName = elem.dataset.contentFieldName;
+            if (!contentFieldsMap.has(fieldPath)) {
+                contentFieldsMap.set(fieldPath, new Map());
+            }
+            contentFieldsMap.get(fieldPath).set(fieldName, elem);
+        });
         
-        console.log("🚀 ~ Editor ~ constructor ~ contentPathMap:", contentPathMap)
         for (const contentItem of content) {
-            
+            const fields = new Map<string, FieldProvider<any>>();
+            contentItem.fields.forEach(item => {
+                let type = item.type.toLowerCase();
+                if (type === "model" && item.name === "Blocks") type = "page-blocks";
+                const field = this.__getFieldInstance(type);
+                fields.set(item.name, new field(this, item, contentFieldsMap.get(contentItem.path).get(item.name)));
+            });
+            const content = new Content(this, contentItem, contentPathMap.get(contentItem.path), fields);
+            content.renderDesigners();
         }
 
-
-
         this.__renderToolbar();
-        this.__renderDesigner();
+        // this.__renderDesigner();
         this.__initLogic();
 
         document.body.classList.add("bp-state-design");
@@ -134,6 +154,24 @@ export class Editor extends UIElement implements IPageDesigner {
         this.page.refreshScripts();
     }
 
+    private __getFieldInstance(type: string) {
+        switch (type) {
+            case "text":
+            case "hyperlink":
+                return TextFieldProvider;
+            case "html":
+                return HtmlFieldProvider;
+            case "image":
+                return ImageFieldProvider;
+            case "model":
+                return ModelFieldProvider;
+            case "page-blocks":
+                return PageBlocksFieldProvider;  
+            default:
+                throw new Error("field type not found");
+        }
+    }
+
     redraw () { // Временный публичный метод для ModelDesigner
         this.__renderDesigner();
     }
@@ -157,8 +195,8 @@ export class Editor extends UIElement implements IPageDesigner {
                 success: (response) => {
                     if (response.status !== 200)
                         throw "Error commit content editing."; // TODO получаем список ошибок и рисуем модалку
-
-                    this.__complateEdit();
+                    if (response.data.isSuccess)
+                        this.__complateEdit();
                 }
             }, true);
         });
@@ -211,37 +249,21 @@ export class Editor extends UIElement implements IPageDesigner {
 }
 
 class Content {
-    private __fields: { [key: string]: Field<any> } = {};
+    private __fields: Map<string, FieldProvider<any>>;
     private __container: HTMLElement;
+    private __editor: Editor;
 
-    constructor(editor: Editor, model: any, container: HTMLElement = null) {
-
+    constructor(editor: Editor, model: any, container: HTMLElement = null, fields: Map<string, FieldProvider<any>> = new Map()) {
+        this.__container = container;
+        this.__editor = editor;
+        this.__fields = fields;
     }
 
-    renderDesigner() {
-
+    renderDesigners() {
+        this.__fields.forEach(field => field.renderDesigner())
     }
 
     redraw () {
 
     }
-}
-
-abstract class Field<TModel> {
-    readonly model: TModel;
-    designer: IContentFieldDesigner;
-
-    constructor(editor: Editor, model: TModel, valueElem: HTMLElement = null) {
-        this.model = model;
-    }
-
-    // renderDesigner() {
-    //     this.designer = createDesigner();
-    // }
-
-    // abstract createDesigner(): IContentFieldDesigner;
-}
-
-class TextField extends Field<any> {
-
 }

@@ -74,9 +74,10 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (response: AjaxResponse<string>) => {
+            success: (response: AjaxResponse) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    this.setValue(response.data.value);
+                    this.setValid(response.data.errors.length === 0);
                 }
             }
         });

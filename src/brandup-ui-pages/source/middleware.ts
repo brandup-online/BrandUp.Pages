@@ -1,4 +1,5 @@
-﻿import { Middleware, NavigateContext } from "brandup-ui-app";
+﻿import { IContentModel } from "./admin/page-toolbar";
+import { Middleware, NavigateContext } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
 
 const UI = () => import("./ui");
@@ -20,7 +21,7 @@ export class PagesMiddleware extends Middleware {
             const page = items["page"] as Page<PageModel>;
             if (page) {
                 UI().then(t => {
-                    t.default(page);
+                    t.default(page, content);
                 });
             }
         }

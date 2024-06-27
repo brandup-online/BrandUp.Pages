@@ -44,7 +44,6 @@ export class PageToolbar extends UIElement {
 
     private __renderUI() {
         const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[data-content-root]"));
-        const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[data-content-root]"));
 
         const websiteMenuItems = document.createDocumentFragment();
         websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]));
@@ -259,7 +258,7 @@ export class PageToolbar extends UIElement {
         };
     }
 
-    private __navToEdit(editId: string, contentKey: string) {
+    private __navToEdit(editId: string, contentKey: string, content: IContentModel[]) {
         const contentElem = DOM.queryElement(document.body, `[data-content-root='${contentKey}']`);
 
         contentElem.dataset["contentEditId"] = editId;
