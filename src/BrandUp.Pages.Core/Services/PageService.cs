@@ -11,7 +11,6 @@ namespace BrandUp.Pages.Services
         PageMetadataManager pageMetadataManager,
         Url.IPageUrlHelper pageUrlHelper,
         Views.IViewLocator viewLocator,
-        ContentService contentService,
         IOptions<PagesOptions> options) : IPageService
     {
         readonly PagesOptions options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -39,7 +38,7 @@ namespace BrandUp.Pages.Services
             var pageContentKey = await GetContentKeyAsync(pageId, cancellationToken);
             var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, cancellationToken);
 
-            await contentService.SetContentAsync(collection.WebsiteId, pageContentKey, pageContent, cancellationToken);
+            //await contentService.SetContentAsync(collection.WebsiteId, pageContentKey, pageContent, cancellationToken);
 
             if (collection.CustomSorting)
             {

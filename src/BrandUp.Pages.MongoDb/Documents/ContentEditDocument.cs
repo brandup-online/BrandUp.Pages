@@ -10,16 +10,19 @@ namespace BrandUp.Pages.MongoDb.Documents
         public DateTime CreatedDate { get; set; }
         public string WebsiteId { get; set; }
         public string ContentKey { get; set; }
+        public string ContentVersion { get; set; }
         public string UserId { get; set; }
     }
 
-    [MongoDB.MongoCollection(CollectionName = "BrandUpPages.edits")]
+    [MongoDB.MongoCollection(CollectionName = "BrandUpPages.contents.edit")]
     public class ContentEditDocument : Document
     {
         [BsonRequired]
         public string WebsiteId { get; set; }
         [BsonRequired]
         public string ContentKey { get; set; }
+        [BsonRepresentation(BsonType.String)]
+        public ObjectId? ContentVersion { get; set; }
         [BsonRequired]
         public string UserId { get; set; }
         [BsonRequired]

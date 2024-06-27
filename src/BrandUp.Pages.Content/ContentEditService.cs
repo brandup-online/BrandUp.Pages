@@ -11,19 +11,25 @@ namespace BrandUp.Pages.Content
             ArgumentNullException.ThrowIfNull(userId);
             ArgumentNullException.ThrowIfNull(contentMetadata);
 
-            var contentModel = await contentService.GetContentAsync(websiteId, key, cancellationToken);
-            if (contentModel == null)
+            object contentModel;
+            var contentData = await contentService.GetContentAsync(websiteId, key, cancellationToken);
+            if (contentData == null)
             {
                 contentModel = await contentService.CreateDefaultAsync(contentMetadata, cancellationToken);
                 if (contentModel == null)
                     throw new InvalidOperationException($"Not found default data for content type {contentMetadata.Name}.");
             }
-            else if (!contentMetadata.IsInheritedOrEqual(contentModel.GetType()))
-                throw new InvalidOperationException();
+            else
+            {
+                if (!contentMetadata.IsInheritedOrEqual(contentData.Provider))
+                    throw new InvalidOperationException();
 
-            var contentData = contentMetadata.ConvertContentModelToDictionary(contentModel);
+                contentModel = contentData.Data;
+            }
 
-            return await editSessionRepository.CreateEditAsync(websiteId, key, userId, contentData, cancellationToken);
+            var contentEditData = contentMetadata.ConvertContentModelToDictionary(contentModel);
+
+            return await editSessionRepository.CreateEditAsync(websiteId, key, contentData?.Version, userId, contentEditData, cancellationToken);
         }
 
         public Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -67,21 +73,23 @@ namespace BrandUp.Pages.Content
             await editSessionRepository.SetContentAsync(editSession, contentData, cancellationToken);
         }
 
-        public async Task CommitEditAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
+        public async Task CommitAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(editSession);
+
+            var currentContent = await contentService.FindByKeyAsync(editSession.WebsiteId, editSession.ContentKey, cancellationToken);
 
             var newContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
             var contentMetadata = contentMetadataManager.GetMetadata(newContentData);
 
             var newContentModel = contentMetadata.ConvertDictionaryToContentModel(newContentData);
 
-            await contentService.SetContentAsync(editSession.WebsiteId, editSession.ContentKey, newContentModel, cancellationToken);
+            await contentService.SetContentAsync(editSession, newContentModel, cancellationToken);
 
             await editSessionRepository.DeleteEditAsync(editSession, cancellationToken);
         }
 
-        public Task DiscardEditAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
+        public Task DiscardAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(editSession);
 
@@ -95,6 +103,7 @@ namespace BrandUp.Pages.Content
         DateTime CreatedDate { get; }
         string WebsiteId { get; }
         string ContentKey { get; }
+        string ContentVersion { get; }
         string UserId { get; }
     }
 }

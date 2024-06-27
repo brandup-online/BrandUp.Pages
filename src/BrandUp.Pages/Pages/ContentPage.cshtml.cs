@@ -116,7 +116,7 @@ namespace BrandUp.Pages.Pages
                 contentModel = await contentService.GetContentAsync(PageEntry.WebsiteId, pageContentKey, CancellationToken);
                 if (contentModel == null)
                 {
-                    contentModel = contentService.CreateDefaultAsync(PageMetadata.ContentMetadata, CancellationToken);
+                    contentModel = await contentService.CreateDefaultAsync(PageMetadata.ContentMetadata, CancellationToken);
                     if (contentModel == null)
                         throw new InvalidOperationException($"Not found default data for page type {PageMetadata.Name}.");
 

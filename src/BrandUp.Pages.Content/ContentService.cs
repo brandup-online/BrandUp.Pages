@@ -14,24 +14,36 @@ namespace BrandUp.Pages.Content
             return contentMetadata.ConvertDictionaryToContentModel(contentData);
         }
 
-        public async Task<object> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<IContent> FindByKeyAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
 
-            var contentData = await contentRepository.GetDataAsync(websiteId, key, cancellationToken);
-            if (contentData == null)
-                return null;
-
-            var contentMetadata = contentMetadataManager.GetMetadata(contentData);
-
-            return contentMetadata.ConvertDictionaryToContentModel(contentData);
+            return await contentRepository.FindByKeyAsync(websiteId, key, cancellationToken);
         }
 
-        public async Task SetContentAsync(string websiteId, string key, object contentModel, CancellationToken cancellationToken = default)
+        public async Task<IContentData> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
+
+            var contentDataSource = await contentRepository.GetDataAsync(websiteId, key, cancellationToken);
+            if (contentDataSource == null)
+                return null;
+
+            var contentProvider = contentMetadataManager.GetMetadata(contentDataSource.Type);
+
+            return new ContentData
+            {
+                Provider = contentProvider,
+                Data = contentProvider.ConvertDictionaryToContentModel(contentDataSource.Data),
+                Version = contentDataSource.Version
+            };
+        }
+
+        internal async Task SetContentAsync(IContentEdit contentEdit, object contentModel, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(contentEdit);
             ArgumentNullException.ThrowIfNull(contentModel);
 
             if (!contentMetadataManager.TryGetMetadata(contentModel, out var contentMetadata))
@@ -40,7 +52,37 @@ namespace BrandUp.Pages.Content
             var contentTitle = contentMetadata.GetContentTitle(contentModel);
             var contentData = contentMetadata.ConvertContentModelToDictionary(contentModel);
 
-            await contentRepository.SetDataAsync(websiteId, key, contentMetadata.Name, contentTitle, contentData, cancellationToken);
+            var currentData = await contentRepository.GetDataAsync(contentEdit.WebsiteId, contentEdit.ContentKey, cancellationToken);
+
+            await contentRepository.SetDataAsync(
+                contentEdit.WebsiteId, contentEdit.ContentKey, contentEdit.ContentVersion,
+                contentMetadata.Name,
+                contentTitle, contentData,
+                cancellationToken);
         }
+
+        class ContentData : IContentData
+        {
+            public ContentMetadataProvider Provider { get; init; }
+            public object Data { get; init; }
+            public string Version { get; init; }
+        }
+    }
+
+    public interface IContent
+    {
+        Guid Id { get; }
+        string WebsiteId { get; }
+        string Key { get; }
+        string Type { get; }
+        string Title { get; }
+        string Version { get; }
+    }
+
+    public interface IContentData
+    {
+        ContentMetadataProvider Provider { get; }
+        object Data { get; }
+        string Version { get; }
     }
 }

@@ -74,7 +74,7 @@ namespace BrandUp.Pages.MongoDb._migrations
                         Builders<ContentDocument>.Update
                             .Set(it => it.Type, contentMetadata.Name)
                             .Set(it => it.Title, contentTitle)
-                            .Set(it => it.Version, Guid.NewGuid()),
+                            .Set(it => it.Version, ObjectId.GenerateNewId()),
                         new UpdateOptions { IsUpsert = false }, cancellationToken
                     );
                 if (updateResult.ModifiedCount != 1)

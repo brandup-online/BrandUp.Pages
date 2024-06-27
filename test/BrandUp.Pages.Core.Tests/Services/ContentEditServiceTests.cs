@@ -168,7 +168,7 @@ namespace BrandUp.Pages.Services
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
-            await contentEditService.CommitEditAsync(edit);
+            await contentEditService.CommitAsync(edit);
 
             Assert.Null(await contentEditService.FindEditByIdAsync(edit.Id));
 
@@ -188,7 +188,7 @@ namespace BrandUp.Pages.Services
 
             var newContent = new TestPageContent() { Title = "test2" };
             await contentEditService.SetContentAsync(edit, newContent);
-            await contentEditService.DiscardEditAsync(edit);
+            await contentEditService.DiscardAsync(edit);
 
             Assert.Null(await contentEditService.FindEditByIdAsync(edit.Id));
 

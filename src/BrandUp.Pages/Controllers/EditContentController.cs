@@ -33,7 +33,7 @@ namespace BrandUp.Pages.Controllers
             {
                 if (force)
                 {
-                    await contentEditService.DiscardEditAsync(currentEdit, HttpContext.RequestAborted);
+                    await contentEditService.DiscardAsync(currentEdit, HttpContext.RequestAborted);
                     currentEdit = null;
                 }
                 else
@@ -163,7 +163,7 @@ namespace BrandUp.Pages.Controllers
             if (result.Validation.Count > 0)
                 return Ok(result);
 
-            await contentEditService.CommitEditAsync(contentEdit, HttpContext.RequestAborted);
+            await contentEditService.CommitAsync(contentEdit, HttpContext.RequestAborted);
 
             result.IsSuccess = true;
             result.Validation = null;
@@ -178,7 +178,7 @@ namespace BrandUp.Pages.Controllers
             if (editSession == null)
                 return BadRequest();
 
-            await contentEditService.DiscardEditAsync(editSession, HttpContext.RequestAborted);
+            await contentEditService.DiscardAsync(editSession, HttpContext.RequestAborted);
 
             return Ok();
         }
