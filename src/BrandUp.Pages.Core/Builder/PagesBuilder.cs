@@ -26,12 +26,11 @@ namespace BrandUp.Pages.Builder
         private static void AddCoreServices(IServiceCollection services)
         {
             services.AddSingleton<ContentMetadataManager>();
+            services.AddScoped<ContentService>();
 
             services.AddSingleton<PageMetadataManager, PageMetadataManager>();
             services.AddScoped<IPageCollectionService, PageCollectionService>();
             services.AddScoped<IPageService, PageService>();
-            services.AddScoped<ContentEditService>();
-            services.AddScoped<ContentService>();
 
             services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
             services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();

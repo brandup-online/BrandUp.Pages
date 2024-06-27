@@ -3,11 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentMetadataManagerTests
+    public class ContentMetadataManagerTest
     {
         private readonly ContentMetadataManager metadataManager;
 
-        public ContentMetadataManagerTests()
+        public ContentMetadataManagerTest()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator([typeof(TestPageContent).Assembly]);
 

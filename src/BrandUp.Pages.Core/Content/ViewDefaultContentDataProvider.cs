@@ -5,7 +5,7 @@ namespace BrandUp.Pages.Content
 {
     internal class ViewDefaultContentDataProvider(IViewLocator viewLocator) : IDefaultContentDataProvider
     {
-        public async Task<IDictionary<string, object>> GetDefaultAsync(ContentMetadataProvider contentMetadata)
+        public async Task<IDictionary<string, object>> GetDefaultAsync(ContentMetadataProvider contentMetadata, CancellationToken cancellationToken)
         {
             var view = viewLocator.FindView(contentMetadata.ModelType);
             if (view == null)

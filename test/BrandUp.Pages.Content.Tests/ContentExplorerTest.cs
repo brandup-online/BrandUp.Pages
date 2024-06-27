@@ -2,11 +2,11 @@
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentExplorerTests
+    public class ContentExplorerTest
     {
-        private readonly ContentMetadataManager metadataManager;
+        readonly ContentMetadataManager metadataManager;
 
-        public ContentExplorerTests()
+        public ContentExplorerTest()
         {
             var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator([typeof(TestPageContent).Assembly]);
 

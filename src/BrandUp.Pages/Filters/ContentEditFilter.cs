@@ -21,8 +21,8 @@ namespace BrandUp.Pages.Filters
 
             if (await accessProvider.CheckAccessAsync(cancellationToken) && httpContext.Request.Query.TryGetValue("editid", out string editIdValue) && Guid.TryParse(editIdValue, out var editId))
             {
-                var contentEditService = httpContext.RequestServices.GetRequiredService<ContentEditService>();
-                var editSession = await contentEditService.FindEditByIdAsync(editId, cancellationToken);
+                var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
+                var editSession = await contentService.FindEditByIdAsync(editId, cancellationToken);
                 if (editSession == null)
                 {
                     context.Result = new NotFoundResult();
@@ -36,7 +36,7 @@ namespace BrandUp.Pages.Filters
                     return;
                 }
 
-                var content = await contentEditService.GetContentAsync(editSession, cancellationToken);
+                var content = await contentService.GetEditContentAsync(editSession, cancellationToken);
 
                 httpContext.Features.Set(new ContentEditFeature(editSession, content));
             }

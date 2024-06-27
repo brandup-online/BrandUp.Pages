@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/content"), Filters.Administration]
-    public class EditContentController(ContentEditService contentEditService, IWebsiteContext websiteContext) : Controller
+    public class EditContentController(ContentService contentService, IWebsiteContext websiteContext) : Controller
     {
         #region Actions
 
@@ -22,34 +22,40 @@ namespace BrandUp.Pages.Controllers
             if (!contentMetadataManager.TryGetMetadata(type, out var contentMetadata))
                 return BadRequest();
 
+            var cancellationToken = HttpContext.RequestAborted;
             var websiteId = websiteContext.Website.Id;
 
             var result = new Models.Contents.BeginPageEditResult();
 
-            var userId = await accessProvider.GetUserIdAsync(HttpContext.RequestAborted);
+            var userId = await accessProvider.GetUserIdAsync(cancellationToken);
+            var content = await contentService.FindContentByKeyAsync(websiteId, key, cancellationToken);
 
-            var currentEdit = await contentEditService.FindEditByUserAsync(websiteId, key, userId, HttpContext.RequestAborted);
-            if (currentEdit != null)
+            IContentEdit currentEdit = null;
+            if (content != null)
             {
-                if (force)
+                currentEdit = await contentService.FindEditByUserAsync(content, userId, cancellationToken);
+                if (currentEdit != null)
                 {
-                    await contentEditService.DiscardAsync(currentEdit, HttpContext.RequestAborted);
-                    currentEdit = null;
+                    if (force)
+                    {
+                        await contentService.DiscardEditAsync(currentEdit, HttpContext.RequestAborted);
+                        currentEdit = null;
+                    }
+                    else
+                        result.CurrentDate = currentEdit.CreatedDate;
                 }
-                else
-                    result.CurrentDate = currentEdit.CreatedDate;
             }
 
             if (currentEdit == null)
             {
-                currentEdit = await contentEditService.BeginEditAsync(websiteId, key, userId, contentMetadata, HttpContext.RequestAborted);
+                currentEdit = await contentService.BeginEditAsync(websiteId, key, userId, contentMetadata, cancellationToken);
                 if (currentEdit == null)
                     return NotFound();
             }
 
             result.EditId = currentEdit.Id;
 
-            var contentModel = await contentEditService.GetContentAsync(currentEdit, HttpContext.RequestAborted);
+            var contentModel = await contentService.GetEditContentAsync(currentEdit, cancellationToken);
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
 
             result.Content = [];
@@ -61,13 +67,13 @@ namespace BrandUp.Pages.Controllers
         [HttpGet("form")]
         public async Task<IActionResult> GetFormAsync([FromQuery] Guid editId, [FromQuery] string modelPath)
         {
-            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            var editSession = await contentService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
             modelPath ??= string.Empty;
 
-            var pageContent = await contentEditService.GetContentAsync(editSession);
+            var pageContent = await contentService.GetEditContentAsync(editSession);
             var pageContentContext = new ContentContext(editSession.ContentKey, pageContent, HttpContext.RequestServices, editSession);
 
             var contentContext = pageContentContext.Navigate(modelPath);
@@ -127,7 +133,7 @@ namespace BrandUp.Pages.Controllers
             if (modelType == null)
                 return BadRequest();
 
-            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            var editSession = await contentService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
@@ -135,7 +141,7 @@ namespace BrandUp.Pages.Controllers
 
             var newModelType = contentMetadataManager.GetMetadata(modelType);
 
-            var pageContent = await contentEditService.GetContentAsync(editSession, HttpContext.RequestAborted);
+            var pageContent = await contentService.GetEditContentAsync(editSession, HttpContext.RequestAborted);
             var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContent);
 
             var contentExplorer = pageContentExplorer.Navigate(modelPath);
@@ -150,11 +156,11 @@ namespace BrandUp.Pages.Controllers
         [HttpPost("commit")]
         public async Task<IActionResult> CommitAsync([FromQuery] Guid editId, [FromServices] ContentMetadataManager contentMetadataManager)
         {
-            var contentEdit = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            var contentEdit = await contentService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (contentEdit == null)
                 return BadRequest();
 
-            var contentModel = await contentEditService.GetContentAsync(contentEdit, HttpContext.RequestAborted);
+            var contentModel = await contentService.GetEditContentAsync(contentEdit, HttpContext.RequestAborted);
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
 
             var result = new Models.Contents.CommitResult { IsSuccess = false, Validation = [] };
@@ -163,7 +169,7 @@ namespace BrandUp.Pages.Controllers
             if (result.Validation.Count > 0)
                 return Ok(result);
 
-            await contentEditService.CommitAsync(contentEdit, HttpContext.RequestAborted);
+            await contentService.CommitEditAsync(contentEdit, HttpContext.RequestAborted);
 
             result.IsSuccess = true;
             result.Validation = null;
@@ -174,11 +180,11 @@ namespace BrandUp.Pages.Controllers
         [HttpPost("discard")]
         public async Task<IActionResult> DiscardAsync([FromQuery] Guid editId)
         {
-            var editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            var editSession = await contentService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
                 return BadRequest();
 
-            await contentEditService.DiscardAsync(editSession, HttpContext.RequestAborted);
+            await contentService.DiscardEditAsync(editSession, HttpContext.RequestAborted);
 
             return Ok();
         }

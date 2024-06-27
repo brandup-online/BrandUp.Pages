@@ -24,7 +24,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             };
         }
 
-        public async Task<IContentEdit> CreateEditAsync(string websiteId, string contentKey, string contentVersion, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> CreateEditAsync(string websiteId, string contentKey, string sourceVersion, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
 
@@ -36,7 +36,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Version = 1,
                 WebsiteId = websiteId,
                 ContentKey = contentKey,
-                ContentVersion = contentVersion != null ? ObjectId.Parse(contentVersion) : null,
+                ContentVersion = sourceVersion != null ? ObjectId.Parse(sourceVersion) : null,
                 UserId = userId,
                 Content = contentDataDocument
             };
@@ -49,7 +49,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 CreatedDate = createdDate,
                 WebsiteId = document.WebsiteId,
                 ContentKey = document.ContentKey,
-                ContentVersion = document.ContentVersion != null ? document.ContentVersion.ToString() : null,
+                SourceCommitId = document.ContentVersion != null ? document.ContentVersion.ToString() : null,
                 UserId = document.UserId
             };
         }
@@ -77,7 +77,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return MongoDbHelper.BsonDocumentToDictionary(document.Content);
         }
 
-        public async Task SetContentAsync(IContentEdit pageEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task UpdateContentAsync(IContentEdit pageEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
             var updateDefinition = Builders<ContentEditDocument>.Update.Set(it => it.Content, contentDataDocument);

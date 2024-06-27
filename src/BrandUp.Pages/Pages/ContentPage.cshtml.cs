@@ -107,8 +107,8 @@ namespace BrandUp.Pages.Pages
 
                 contentEdit = contentEditFeature.Edit;
 
-                var contentEditService = httpContext.RequestServices.GetRequiredService<ContentEditService>();
-                contentModel = await contentEditService.GetContentAsync(contentEditFeature.Edit, CancellationToken);
+                var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
+                contentModel = await contentService.GetEditContentAsync(contentEditFeature.Edit, CancellationToken);
             }
             else
             {

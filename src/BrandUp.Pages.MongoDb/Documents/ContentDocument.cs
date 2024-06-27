@@ -12,15 +12,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string WebsiteId { get; set; }
         [BsonRequired]
         public string Key { get; set; }
-        [BsonRequired]
-        public string Type { get; set; }
-        [BsonRequired]
-        public string Title { get; set; }
         [BsonRepresentation(BsonType.String)]
-        public ObjectId? Prev { get; set; }
-        [BsonRepresentation(BsonType.String), BsonRequired]
-        public ObjectId Version { get; set; }
-        [BsonRequired]
-        public BsonDocument Data { get; set; }
+        public ObjectId? CommitId { get; set; }
     }
 }

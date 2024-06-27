@@ -1,23 +1,25 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Repositories;
-using BrandUp.Pages.Interfaces;
 
 namespace BrandUp.Pages.Repositories
 {
     public class FakeContentEditRepository : IContentEditRepository
     {
-        readonly Dictionary<string, PageEdit> edits = [];
+        readonly Dictionary<string, ContentEdit> edits = [];
         readonly Dictionary<Guid, string> ids = [];
 
-        public async Task<IContentEdit> CreateEditAsync(string websiteId, string key, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        #region IContentEditRepository members
+
+        public async Task<IContentEdit> CreateEditAsync(string websiteId, string key, string sourceVersion, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var editId = Guid.NewGuid();
-            var edit = new PageEdit
+            var edit = new ContentEdit
             {
                 Id = editId,
                 CreatedDate = DateTime.UtcNow,
                 WebsiteId = websiteId,
                 ContentKey = key,
+                SourceCommitId = sourceVersion,
                 UserId = userId,
                 Content = contentData
             };
@@ -41,7 +43,7 @@ namespace BrandUp.Pages.Repositories
             if (!ids.TryGetValue(id, out string uniqueId))
                 return null;
 
-            edits.TryGetValue(uniqueId, out PageEdit pageEdit);
+            edits.TryGetValue(uniqueId, out ContentEdit pageEdit);
 
             return await Task.FromResult<IContentEdit>(pageEdit);
         }
@@ -49,42 +51,46 @@ namespace BrandUp.Pages.Repositories
         public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string key, string userId, CancellationToken cancellationToken = default)
         {
             var uniqueId = GetId(websiteId, key, userId);
-            edits.TryGetValue(uniqueId, out PageEdit pageEdit);
+            edits.TryGetValue(uniqueId, out ContentEdit pageEdit);
             return await Task.FromResult<IContentEdit>(pageEdit);
         }
 
-        public async Task<IDictionary<string, object>> GetContentAsync(IContentEdit pageEdit, CancellationToken cancellationToken = default)
+        public async Task<IDictionary<string, object>> GetContentAsync(IContentEdit contentEdit, CancellationToken cancellationToken = default)
         {
-            return await Task.FromResult(((PageEdit)pageEdit).Content);
+            return await Task.FromResult(((ContentEdit)contentEdit).Content);
         }
 
-        public async Task SetContentAsync(IContentEdit pageEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task UpdateContentAsync(IContentEdit contentEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
-            ((PageEdit)pageEdit).Content = contentData;
+            if (!ids.TryGetValue(contentEdit.Id, out var uniqueKey))
+                throw new InvalidOperationException();
+
+            var edit = edits[uniqueKey];
+            edit.Content = contentData;
 
             await Task.CompletedTask;
         }
 
-        private static string GetId(IPage page, string key, string userId)
+        #endregion
+
+        static string GetId(IContentEdit contentEdit)
         {
-            return GetId(page.WebsiteId, key, userId);
-        }
-        private static string GetId(IContentEdit editPage)
-        {
-            return GetId(editPage.WebsiteId, editPage.ContentKey, editPage.UserId);
-        }
-        private static string GetId(string websiteId, string key, string userId)
-        {
-            return $"{websiteId}-{key}-{userId}";
+            return GetId(contentEdit.WebsiteId, contentEdit.ContentKey, contentEdit.UserId);
         }
 
-        class PageEdit : IContentEdit
+        static string GetId(string websiteId, string key, string userId)
         {
-            public Guid Id { get; set; }
-            public DateTime CreatedDate { get; set; }
-            public string WebsiteId { get; set; }
-            public string ContentKey { get; set; }
-            public string UserId { get; set; }
+            return $"{websiteId}-{key}-{userId}".ToLower();
+        }
+
+        class ContentEdit : IContentEdit
+        {
+            public Guid Id { get; init; }
+            public DateTime CreatedDate { get; init; }
+            public string WebsiteId { get; init; }
+            public string ContentKey { get; init; }
+            public string SourceCommitId { get; init; }
+            public string UserId { get; init; }
             public IDictionary<string, object> Content { get; set; }
         }
     }

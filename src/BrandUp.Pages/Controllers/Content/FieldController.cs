@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Controllers
     public abstract class FieldController<TField> : Controller, IAsyncActionFilter
         where TField : class, IFieldProvider
     {
-        ContentEditService contentEditService;
+        ContentService contentService;
         IContentEdit editSession;
         ContentContext contentContext;
         TField field;
@@ -26,7 +26,7 @@ namespace BrandUp.Pages.Controllers
 
         async Task IAsyncActionFilter.OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            contentEditService = HttpContext.RequestServices.GetRequiredService<ContentEditService>();
+            contentService = HttpContext.RequestServices.GetRequiredService<ContentService>();
 
             if (!Request.Query.TryGetValue("editId", out Microsoft.Extensions.Primitives.StringValues editIdValue) || !Guid.TryParse(editIdValue[0], out Guid editId))
             {
@@ -34,14 +34,14 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            editSession = await contentEditService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            editSession = await contentService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (editSession == null)
             {
                 context.Result = BadRequest();
                 return;
             }
 
-            var content = await contentEditService.GetContentAsync(editSession, HttpContext.RequestAborted);
+            var content = await contentService.GetEditContentAsync(editSession, HttpContext.RequestAborted);
 
             rootContentContext = new ContentContext(editSession.ContentKey, content, HttpContext.RequestServices, editSession);
 
@@ -82,7 +82,7 @@ namespace BrandUp.Pages.Controllers
 
         protected async Task SaveChangesAsync()
         {
-            await contentEditService.SetContentAsync(ContentEdit, rootContentContext.Content);
+            await contentService.UpdateEditContentAsync(ContentEdit, rootContentContext.Content);
         }
 
         protected async Task<IActionResult> FormValueResultAsync()

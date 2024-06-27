@@ -10,7 +10,7 @@ namespace BrandUp.Pages.MongoDb.Documents
         public DateTime CreatedDate { get; set; }
         public string WebsiteId { get; set; }
         public string ContentKey { get; set; }
-        public string ContentVersion { get; set; }
+        public string SourceCommitId { get; set; }
         public string UserId { get; set; }
     }
 

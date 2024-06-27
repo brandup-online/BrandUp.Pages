@@ -89,7 +89,7 @@ namespace BrandUp.Pages.Repositories
             pageIds.Remove(page.Id);
             pagePaths.Remove(page.UrlPath.ToLower());
 
-            await contentRepository.SetDataAsync(page.WebsiteId, contentKey, null, null, null, cancellationToken);
+            await contentRepository.SetDataAsync(page.WebsiteId, contentKey, null, null, null, null, cancellationToken);
         }
 
         public Task<bool> HasPagesAsync(Guid ownCollectionId, CancellationToken cancellationToken = default)

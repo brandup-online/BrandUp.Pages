@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Services
         readonly IServiceScope serviceScope;
         readonly IPageService pageService;
         readonly IPageCollectionService pageCollectionService;
-        private PageMetadataManager pageMetadataManager;
+        readonly PageMetadataManager pageMetadataManager;
         readonly IWebsiteContext websiteContext;
 
         public PageServiceTests()
@@ -36,6 +36,7 @@ namespace BrandUp.Pages.Services
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
+            pageMetadataManager = serviceScope.ServiceProvider.GetService<PageMetadataManager>();
             pageService = serviceScope.ServiceProvider.GetService<IPageService>();
             pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
         }
@@ -44,7 +45,6 @@ namespace BrandUp.Pages.Services
 
         async Task IAsyncLifetime.InitializeAsync()
         {
-            pageMetadataManager = serviceScope.ServiceProvider.GetService<PageMetadataManager>();
             var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
             var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
 
@@ -62,12 +62,13 @@ namespace BrandUp.Pages.Services
             await pageRepository.SetUrlPathAsync(testPage, "test");
             await pageRepository.UpdatePageAsync(testPage);
         }
-        Task IAsyncLifetime.DisposeAsync()
+
+        async Task IAsyncLifetime.DisposeAsync()
         {
             serviceScope.Dispose();
             serviceProvider.Dispose();
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         #endregion

@@ -209,8 +209,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 TypeName = page.TypeName,
                 Header = page.Header,
                 UrlPath = page.UrlPath,
-                Status = pageDocument.Status,
-                Content = pageContent.Data
+                Status = pageDocument.Status
             };
             await recyclebinDocuments.InsertOneAsync(mongoDbSession.Current, recycleBinDocument, cancellationToken: cancellationToken);
 
