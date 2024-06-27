@@ -12,6 +12,7 @@ import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
 import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
+import { IContentModel } from "../admin/page-toolbar";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
@@ -24,14 +25,30 @@ export class Editor extends UIElement implements IPageDesigner {
 
     get typeName(): string { return "BrandUpPages.Editor"; }
 
-    constructor(page: Page, contentElem: HTMLElement) {
+    constructor(page: Page, contentElem: HTMLElement, content: IContentModel[]) {
         super();
+        
+        console.log("🚀 ~ Editor ~ constructor ~ content:", content)
+              
         this.page = page;
         this.contentElem = contentElem;
         this.contentElem.classList.add("root-designer");
         this.editId = contentElem.dataset["contentEditId"];
 
         this.queue = new AjaxQueue();
+
+        const contentPathMap = new Map();
+        contentPathMap.set("", contentElem);
+        
+        DOM.queryElements(contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.getAttribute("data-content-path"), elem));
+        const contentFieldElements = DOM.queryElements(contentElem, "[data-content-field-path][data-content-field-name]");
+        
+        console.log("🚀 ~ Editor ~ constructor ~ contentPathMap:", contentPathMap)
+        for (const contentItem of content) {
+            
+        }
+
+
 
         this.__renderToolbar();
         this.__renderDesigner();
@@ -80,10 +97,10 @@ export class Editor extends UIElement implements IPageDesigner {
         const fieldElements = DOM.queryElements(this.contentElem, "[content-field]");
         for (let i = 0; i < fieldElements.length; i++) {
             const fieldElem = fieldElements.item(i);
-            if (!fieldElem.hasAttribute("content-field-model") || !fieldElem.hasAttribute("content-designer") || fieldElem.classList.contains("field-designer"))
+            if (!fieldElem.hasAttribute("content-field-model") || !fieldElem.hasAttribute("data-content-designer") || fieldElem.classList.contains("field-designer"))
                 continue;
 
-            const designerName = fieldElem.getAttribute("content-designer");
+            const designerName = fieldElem.getAttribute("data-content-designer");
             const fieldModel: ContentFieldModel = JSON.parse(fieldElem.getAttribute("content-field-model"));
             let fieldDesigner: IContentFieldDesigner;
             switch (designerName.toLowerCase()) {
@@ -191,4 +208,40 @@ export class Editor extends UIElement implements IPageDesigner {
 
         super.destroy();
     }
+}
+
+class Content {
+    private __fields: { [key: string]: Field<any> } = {};
+    private __container: HTMLElement;
+
+    constructor(editor: Editor, model: any, container: HTMLElement = null) {
+
+    }
+
+    renderDesigner() {
+
+    }
+
+    redraw () {
+
+    }
+}
+
+abstract class Field<TModel> {
+    readonly model: TModel;
+    designer: IContentFieldDesigner;
+
+    constructor(editor: Editor, model: TModel, valueElem: HTMLElement = null) {
+        this.model = model;
+    }
+
+    // renderDesigner() {
+    //     this.designer = createDesigner();
+    // }
+
+    // abstract createDesigner(): IContentFieldDesigner;
+}
+
+class TextField extends Field<any> {
+
 }

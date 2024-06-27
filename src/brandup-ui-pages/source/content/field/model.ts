@@ -30,8 +30,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.element.appendChild(this.__itemsElem);
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
-            const itemIndex = itemElem.getAttribute("content-path-index");
+            const itemElem = elem.closest("[data-content-path-index]");
+            const itemIndex = itemElem.getAttribute("data-content-path-index");
             let modelPath = `${this.name}[${itemIndex}]`;
 
             if (this.form.modelPath)
@@ -44,8 +44,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             //});
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
-            const itemIndex = parseInt(itemElem.getAttribute("content-path-index"));
+            const itemElem = elem.closest("[data-content-path-index]");
+            const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index"));
 
             itemElem.remove();
             this._refreshBlockIndexes();
@@ -70,10 +70,10 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
         this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
             const target = e.target as Element;
-            const itemElem = target.closest("[content-path-index]");
+            const itemElem = target.closest("[data-content-path-index]");
             if (itemElem) {
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData("content-path-index", itemElem.getAttribute('content-path-index'));
+                e.dataTransfer.setData("data-content-path-index", itemElem.getAttribute('data-content-path-index'));
                 e.dataTransfer.setDragImage(itemElem, 0, 0);
                 return true;
             }
@@ -90,14 +90,14 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
             const target = e.target as Element;
-            const sourceIndex = e.dataTransfer.getData("content-path-index");
-            const elem = target.closest("[content-path-index]");
+            const sourceIndex = e.dataTransfer.getData("data-content-path-index");
+            const elem = target.closest("[data-content-path-index]");
             if (elem) {
-                const destIndex = elem.getAttribute("content-path-index");
+                const destIndex = elem.getAttribute("data-content-path-index");
                 if (destIndex !== sourceIndex) {
                     console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
 
-                    const sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
+                    const sourceElem = DOM.queryElement(this.__itemsElem, `[data-content-path-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {
                             elem.insertAdjacentElement("beforebegin", sourceElem);
@@ -152,7 +152,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         ]));
     }
     private __createItemElem(item: ContentModel, index: number) {
-        const itemElem = DOM.tag("div", { class: "item", "content-path-index": index.toString() }, [
+        const itemElem = DOM.tag("div", { class: "item", "data-content-path-index": index.toString() }, [
             DOM.tag("div", { class: "index", draggable: "true", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),
             DOM.tag("div", { class: "type" }, item.type.title),
@@ -167,19 +167,19 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
     private eachItems(f: (elem: Element, index: number) => void) {
         for (let i = 0; i < this.__itemsElem.children.length; i++) {
             const itemElem = this.__itemsElem.children.item(i);
-            if (!itemElem.hasAttribute("content-path-index"))
+            if (!itemElem.hasAttribute("data-content-path-index"))
                 continue;
             f(itemElem, i);
         }
     }
     private _refreshBlockIndexes() {
         this.eachItems((elem, index) => {
-            elem.setAttribute("content-path-index", index.toString());
+            elem.setAttribute("data-content-path-index", index.toString());
             DOM.getElementByClass(elem, "index").innerText = `#${index + 1}`;
         });
     }
     private __refreshItem(elem: Element) {
-        const itemIndex = parseInt(elem.getAttribute("content-path-index"));
+        const itemIndex = parseInt(elem.getAttribute("data-content-path-index"));
 
         this.form.request(this, {
             url: '/brandup.pages/content/model/data',

@@ -17,8 +17,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             let itemIndex = -1;
 
             if (this.options.isListValue) {
-                if (elem.parentElement.hasAttribute("content-path-index"))
-                    itemIndex = parseInt(elem.parentElement.getAttribute("content-path-index")) + 1;
+                if (elem.parentElement.hasAttribute("data-content-path-index"))
+                    itemIndex = parseInt(elem.parentElement.getAttribute("data-content-path-index")) + 1;
                 else
                     itemIndex = this.countItems();
             }
@@ -33,8 +33,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
         });
         this.registerCommand("item-view", () => { return; });
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path]");
-            const contentPath = itemElem.getAttribute("content-path");
+            const itemElem = elem.closest("[data-content-path]");
+            const contentPath = itemElem.getAttribute("data-content-path");
 
             editPage(this.page.editId, contentPath).then(() => {
                 this.__refreshItem(itemElem);
@@ -43,12 +43,12 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             });
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
+            const itemElem = elem.closest("[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");
 
-            const itemIndex = itemElem.getAttribute("content-path-index");
+            const itemIndex = itemElem.getAttribute("data-content-path-index");
 
             itemElem.remove();
             this._refreshBlockIndexes();
@@ -62,8 +62,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             });
         });
         this.registerCommand("item-up", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
-            const itemIndex = itemElem.getAttribute("content-path-index");
+            const itemElem = elem.closest("[data-content-path-index]");
+            const itemIndex = itemElem.getAttribute("data-content-path-index");
             if (parseInt(itemIndex) <= 0)
                 return;
 
@@ -83,10 +83,10 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             });
         });
         this.registerCommand("item-down", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
-            const itemIndex = itemElem.getAttribute("content-path-index");
+            const itemElem = elem.closest("[data-content-path-index]");
+            const itemIndex = itemElem.getAttribute("data-content-path-index");
 
-            if (parseInt(itemIndex) >= DOM.queryElements(this.element, "* > [content-path-index]").length - 1)
+            if (parseInt(itemIndex) >= DOM.queryElements(this.element, "* > [data-content-path-index]").length - 1)
                 return;
 
             if (itemElem.classList.contains("processing"))
@@ -105,7 +105,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             });
         });
         this.registerCommand("item-refresh", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path]");
+            const itemElem = elem.closest("[data-content-path]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");
@@ -118,7 +118,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     protected eachItems(f: (elem: Element, index: number) => void) {
         for (let i = 0; i < this.element.children.length; i++) {
             const itemElem = this.element.children.item(i);
-            if (!itemElem.hasAttribute("content-path-index"))
+            if (!itemElem.hasAttribute("data-content-path-index"))
                 continue;
             f(itemElem, i);
         }
@@ -133,7 +133,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 
         for (let i = 0; i < this.element.children.length; i++) {
             itemElem = this.element.children.item(i);
-            if (!itemElem.hasAttribute("content-path-index"))
+            if (!itemElem.hasAttribute("data-content-path-index"))
                 continue;
 
             if (i === index)
@@ -147,12 +147,12 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     }
     protected _renderBlock(itemElem: Element) { }
     protected _refreshBlockIndexes() {
-        this.eachItems((elem, index) => { elem.setAttribute("content-path-index", index.toString()); });
+        this.eachItems((elem, index) => { elem.setAttribute("data-content-path-index", index.toString()); });
     }
     private __refreshItem(elem: Element) {
         const urlParams = {};
         if (this.options.isListValue)
-            urlParams["itemIndex"] = elem.getAttribute("content-path-index");
+            urlParams["itemIndex"] = elem.getAttribute("data-content-path-index");
 
         this.request({
             url: '/brandup.pages/content/model/view',
@@ -164,7 +164,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                     const container = DOM.tag("div", null, response.data);
                     fragment.appendChild(container);
 
-                    const newElem = DOM.queryElement(container, "[content-path]");
+                    const newElem = DOM.queryElement(container, "[data-content-path]");
                     elem.insertAdjacentElement("afterend", newElem);
                     elem.remove();
 
@@ -178,7 +178,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     hasValue(): boolean {
         for (let i = 0; i < this.element.children.length; i++) {
             const itemElem = this.element.children.item(i);
-            if (itemElem.hasAttribute("content-path-index"))
+            if (itemElem.hasAttribute("data-content-path-index"))
                 return true;
         }
         return false;
@@ -202,7 +202,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                                 const fragment = document.createDocumentFragment();
                                 const container = DOM.tag("div", null, response.data);
                                 fragment.appendChild(container);
-                                const newElem = DOM.queryElement(container, "[content-path]");
+                                const newElem = DOM.queryElement(container, "[data-content-path]");
 
                                 if (this.options.isListValue) {
                                     if (index > 0)

@@ -44,6 +44,7 @@ export class PageToolbar extends UIElement {
 
     private __renderUI() {
         const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[data-content-root]"));
+        const contentElements: HTMLElement[] = Array.from(DOM.queryElements(document.body, "[data-content-root]"));
 
         const websiteMenuItems = document.createDocumentFragment();
         websiteMenuItems.append(DOM.tag("a", { href: "", command: "bp-content-types" }, [iconPlus, "Типы контента"]));
@@ -196,8 +197,8 @@ export class PageToolbar extends UIElement {
                         const popup = DOM.tag("div", { class: "bp-page-toolbar-popup" }, [
                             DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                             DOM.tag("div", { class: "buttons" }, [
-                                DOM.tag("button", { "data-command": "continue-edit", dataset: { editId: response.data.editId, contentKey } }, "Продолжить"),
-                                DOM.tag("button", { "data-command": "restart-edit", dataset: { contentKey, contentType } }, "Начать заново")
+                                DOM.tag("button", { command: "continue-edit", dataset: { editId: response.data.editId, contentKey, content: JSON.stringify(response.data.content) } }, "Продолжить"), // TODO подумать над передачей контента в команду
+                                DOM.tag("button", { command: "restart-edit", dataset: { contentKey, contentType } }, "Начать заново")
                             ])
                         ])
 
@@ -207,7 +208,7 @@ export class PageToolbar extends UIElement {
                     }
                     else {
                         // редирект на страницу редактирования контента
-                        this.__navToEdit(response.data.editId, contentKey);
+                        this.__navToEdit(response.data.editId, contentKey, response.data.content);
                     }
 
                     context.complate();
@@ -220,7 +221,8 @@ export class PageToolbar extends UIElement {
 
             const editId = elem.dataset["editId"];
             const contentKey = elem.dataset["contentKey"];
-            this.__navToEdit(editId, contentKey);
+            const content = JSON.parse(elem.dataset.content);
+            this.__navToEdit(editId, contentKey, content);
         });
 
         this.registerCommand("restart-edit", (elem: HTMLElement) => {
@@ -238,7 +240,7 @@ export class PageToolbar extends UIElement {
                     if (response.status !== 200)
                         throw "Error begin content edit.";
                         
-                    this.__navToEdit(response.data.editId, contentKey);
+                    this.__navToEdit(response.data.editId, contentKey, response.data.content);
                 }
             });
         });
@@ -262,7 +264,7 @@ export class PageToolbar extends UIElement {
 
         contentElem.dataset["contentEditId"] = editId;
 
-        this.__page.website.nav({ url: this.__page.buildUrl({ editid: editId }), replace: true });
+        this.__page.website.nav({ url: this.__page.buildUrl({ editid: editId }), replace: true, context: { content } });
     }
 
     private __closePopupFunc (e: MouseEvent): void {
@@ -303,5 +305,22 @@ export enum PageStatus {
 export interface BeginPageEditResult {
     editId: string;
     currentDate: string;
-    url: string;
+    content: IContentModel[];
+}
+
+export interface IContentModel {
+    parent: string;
+    path: string;
+    index: number;
+    typeName: string;
+    typeTitle: string;
+    fields: IField[];
+}
+
+export interface IField {
+    type: string;
+    name: string;
+    title: string;
+    isRequired: boolean;
+    value: object;
 }
