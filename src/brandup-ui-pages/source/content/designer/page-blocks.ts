@@ -42,10 +42,10 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         super._renderBlock(blockElem);
 
-        var type = blockElem.getAttribute("content-type");
+        var type = blockElem.dataset.contentType;;
 
         if (this.options.isListValue) {
-            let index = parseInt(blockElem.getAttribute("data-content-path-index"));
+            let index = this.getItemIndex(blockElem);
             type = '<i>#' + (index + 1) + '</i>' + type;
         }
 
