@@ -1,10 +1,5 @@
 ﻿import { DOM } from "brandup-ui-dom";
-import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../typings/content";
-import { TextDesigner } from "./designer/text";
-import { HtmlDesigner } from "./designer/html";
-import { ModelDesigner } from "./designer/model";
-import { ImageDesigner } from "./designer/image";
-import { PageBlocksDesigner } from "./designer/page-blocks";
+import { IPageDesigner, IContentFieldDesigner } from "../typings/content";
 import { AjaxQueue } from "brandup-ui-ajax";
 import { Page } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
@@ -23,6 +18,7 @@ import { TextFieldProvider } from "./provider/text";
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
     readonly contentElem: HTMLElement;
+    readonly content: IContentModel[];
     readonly editId: string;
     readonly queue: AjaxQueue;
     private __fields: { [key: string]: IContentFieldDesigner } = {};
@@ -33,45 +29,17 @@ export class Editor extends UIElement implements IPageDesigner {
 
     constructor(page: Page, contentElem: HTMLElement, content: IContentModel[]) {
         super();
-        
-        console.log("🚀 ~ Editor ~ constructor ~ content:", content)
               
         this.page = page;
         this.contentElem = contentElem;
+        this.content = content;
         this.contentElem.classList.add("root-designer");
         this.editId = contentElem.dataset["contentEditId"];
 
         this.queue = new AjaxQueue();
 
-        const contentPathMap = new Map<string, HTMLElement>();
-        const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
-
-        contentPathMap.set("", contentElem);
-        
-        DOM.queryElements(contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.dataset.contentPath, elem));
-        DOM.queryElements(contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
-            const fieldPath = elem.dataset.contentFieldPath;
-            const fieldName = elem.dataset.contentFieldName;
-            if (!contentFieldsMap.has(fieldPath)) {
-                contentFieldsMap.set(fieldPath, new Map());
-            }
-            contentFieldsMap.get(fieldPath).set(fieldName, elem);
-        });
-        
-        for (const contentItem of content) {
-            const fields = new Map<string, FieldProvider<any>>();
-            contentItem.fields.forEach(item => {
-                let type = item.type.toLowerCase();
-                if (type === "model" && item.name === "Blocks") type = "page-blocks";
-                const field = this.__getFieldInstance(type);
-                fields.set(item.name, new field(this, item, contentFieldsMap.get(contentItem.path).get(item.name)));
-            });
-            const content = new Content(this, contentItem, contentPathMap.get(contentItem.path), fields);
-            content.renderDesigners();
-        }
-
         this.__renderToolbar();
-        // this.__renderDesigner();
+        this.__renderDesigner();
         this.__initLogic();
 
         document.body.classList.add("bp-state-design");
@@ -114,41 +82,31 @@ export class Editor extends UIElement implements IPageDesigner {
     }
 
     private __renderDesigner() {
-        const fieldElements = DOM.queryElements(this.contentElem, "[content-field]");
-        for (let i = 0; i < fieldElements.length; i++) {
-            const fieldElem = fieldElements.item(i);
-            if (!fieldElem.hasAttribute("content-field-model") || !fieldElem.hasAttribute("data-content-designer") || fieldElem.classList.contains("field-designer"))
-                continue;
+        const contentPathMap = new Map<string, HTMLElement>();
+        const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
 
-            const designerName = fieldElem.getAttribute("data-content-designer");
-            const fieldModel: ContentFieldModel = JSON.parse(fieldElem.getAttribute("content-field-model"));
-            let fieldDesigner: IContentFieldDesigner;
-            switch (designerName.toLowerCase()) {
-                case "text": {
-                    fieldDesigner = new TextDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "html": {
-                    fieldDesigner = new HtmlDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "image": {
-                    fieldDesigner = new ImageDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "model": {
-                    fieldDesigner = new ModelDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "page-blocks": {
-                    fieldDesigner = new PageBlocksDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                default:
-                    continue;
+        contentPathMap.set("", this.contentElem);
+        
+        DOM.queryElements(this.contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.dataset.contentPath, elem));
+        DOM.queryElements(this.contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
+            const fieldPath = elem.dataset.contentFieldPath;
+            const fieldName = elem.dataset.contentFieldName;
+            if (!contentFieldsMap.has(fieldPath)) {
+                contentFieldsMap.set(fieldPath, new Map());
             }
-
-            this.__fields[fieldDesigner.fullPath] = fieldDesigner;
+            contentFieldsMap.get(fieldPath).set(fieldName, elem);
+        });
+        
+        for (const contentItem of this.content) {
+            const fields = new Map<string, FieldProvider<any>>();
+            contentItem.fields.forEach(item => {
+                let type = item.type.toLowerCase();
+                if (type === "model" && item.name === "Blocks") type = "page-blocks";
+                const field = this.__getFieldInstance(type);
+                fields.set(item.name, new field(this, item, contentFieldsMap.get(contentItem.path).get(item.name)));
+            });
+            const content = new Content(this, contentItem, contentPathMap.get(contentItem.path), fields);
+            content.renderDesigners();
         }
 
         this.page.refreshScripts();
