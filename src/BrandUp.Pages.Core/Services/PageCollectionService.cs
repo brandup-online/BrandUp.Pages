@@ -3,7 +3,7 @@ using BrandUp.Pages.Metadata;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageCollectionService(IPageCollectionRepository repositiry, IPageRepository pageRepositiry, PageMetadataManager pageMetadataManager) : IPageCollectionService
+    public class PageCollectionService(IPageCollectionRepository repositiry, IPageRepository pageRepositiry, PageMetadataManager pageMetadataManager)
     {
         public async Task<Result<IPageCollection>> CreateCollectionAsync(string websiteId, string title, string pageTypeName, PageSortMode sortMode)
         {
@@ -122,5 +122,21 @@ namespace BrandUp.Pages.Services
             }
             return Task.FromResult(result);
         }
+    }
+
+    public interface IPageCollection
+    {
+        Guid Id { get; }
+        DateTime CreatedDate { get; }
+        string WebsiteId { get; }
+        string Title { get; }
+        string PageTypeName { get; }
+        Guid? PageId { get; }
+        PageSortMode SortMode { get; }
+        bool CustomSorting { get; }
+
+        void SetTitle(string newTitle);
+        void SetSortModel(PageSortMode sortMode);
+        void SetCustomSorting(bool enabledCustomSorting);
     }
 }

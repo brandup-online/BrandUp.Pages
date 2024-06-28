@@ -1,4 +1,5 @@
-﻿using BrandUp.MongoDB;
+﻿using System.Linq.Expressions;
+using BrandUp.MongoDB;
 using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Repositories;
 using BrandUp.Pages.MongoDb.Documents;
@@ -12,14 +13,43 @@ namespace BrandUp.Pages.MongoDb.Repositories
         readonly IMongoCollection<ContentDocument> contents = dbContext.Contents;
         readonly IMongoCollection<ContentCommitDocument> commits = dbContext.ContentCommits;
 
-        public async Task<IContent> FindByKeyAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        #region IContentRepository members
+
+        public async Task<IContent> FindByIdAsync(Guid contentId, CancellationToken cancellationToken = default)
         {
-            key = NormalizeAndValidateKey(key);
+            var content = await contents
+                .Find(it => it.Id == contentId)
+                .SingleOrDefaultAsync(cancellationToken);
+
+            return content;
+        }
+
+        public async Task<IContent> FindByKeyAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default)
+        {
+            websiteId = NormalizeAndValidateWebsite(websiteId);
+            contentKey = NormalizeAndValidateKey(contentKey);
 
             var content = await contents
-                .Find(it => it.WebsiteId == websiteId && it.Key == key)
-                .Project(Builders<ContentDocument>.Projection.As<Content>())
+                .Find(it => it.WebsiteId == websiteId && it.Key == contentKey)
                 .SingleOrDefaultAsync(cancellationToken);
+
+            return content;
+        }
+
+        public async Task<IContent> CreateContentAsync(string websiteId, string contentKey, CancellationToken cancellationToken)
+        {
+            websiteId = NormalizeAndValidateWebsite(websiteId);
+            contentKey = NormalizeAndValidateKey(contentKey);
+
+            var content = new ContentDocument
+            {
+                Id = Guid.NewGuid(),
+                WebsiteId = websiteId,
+                Key = contentKey,
+                CommitId = null
+            };
+
+            await contents.InsertOneAsync(content, cancellationToken: cancellationToken);
 
             return content;
         }
@@ -32,7 +62,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var contentData = await commits
                 .Find(it => it.Id == id)
-                .Project(Builders<ContentCommitDocument>.Projection.As<ContentCommitProject>())
+                .Project(ContentCommitProject.Projection)
                 .SingleOrDefaultAsync(cancellationToken);
             if (contentData == null)
                 return null;
@@ -42,26 +72,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Type = contentData.Type,
                 Title = contentData.Title,
                 Data = MongoDbHelper.BsonDocumentToDictionary(contentData.Data),
-                CommitId = contentData.Id
+                CommitId = contentData.Id.ToString()
             };
         }
 
-        public async Task<Guid> CreateContentAsync(string websiteId, string key, CancellationToken cancellationToken)
-        {
-            var content = new ContentDocument
-            {
-                Id = Guid.NewGuid(),
-                WebsiteId = websiteId,
-                Key = key,
-                CommitId = null
-            };
-
-            await contents.InsertOneAsync(content, cancellationToken: cancellationToken);
-
-            return content.Id;
-        }
-
-        public async Task CreateCommitAsync(Guid contentId, string sourceCommitId, string userId, string type, IDictionary<string, object> data, string title, CancellationToken cancellationToken)
+        public async Task<ContentCommitResult> CreateCommitAsync(Guid contentId, string sourceCommitId, string userId, string type, IDictionary<string, object> data, string title, CancellationToken cancellationToken)
         {
             using var transaction = await mongoDbSession.BeginAsync(cancellationToken);
 
@@ -88,55 +103,67 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 throw new InvalidOperationException("Не удалось обновить контент.");
 
             await transaction.CommitAsync(cancellationToken);
-        }
-
-        public async Task<ContentCommitResult> SetDataAsync(string websiteId, string key, string prevVersion, string type, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
-        {
-            key = NormalizeAndValidateKey(key);
-
-            var contentDataDocument = MongoDbHelper.DictionaryToBsonDocument(contentData);
-
-            var updateDef = Builders<ContentDocument>.Update
-                    .Set(it => it.Type, type)
-                    .Set(it => it.Title, title)
-                    .Set(it => it.CommitId, ObjectId.GenerateNewId())
-                    .Set(it => it.Data, contentDataDocument);
-
-            var contentDocument = await contents.FindOneAndUpdateAsync<ContentDocument>(
-                it => it.WebsiteId == websiteId && it.Key == key,
-                updateDef,
-                new FindOneAndUpdateOptions<ContentDocument, ContentDocument> { IsUpsert = true, ReturnDocument = ReturnDocument.After },
-                cancellationToken: cancellationToken);
 
             return new ContentCommitResult
             {
-                Type = contentDocument.Type,
-                Data = MongoDbHelper.BsonDocumentToDictionary(contentDocument.Data),
-                CommitId = contentDocument.CommitId.ToString()
+                Type = commit.Type,
+                Data = MongoDbHelper.BsonDocumentToDictionary(commit.Data),
+                CommitId = commit.Id.ToString()
             };
+        }
+
+        public async Task DeleteAsync(Guid contentId, CancellationToken cancellationToken = default)
+        {
+            using var transaction = await mongoDbSession.BeginAsync(cancellationToken);
+
+            var deleteContentResult = await contents.DeleteOneAsync(mongoDbSession.Current, it => it.Id == contentId, cancellationToken: cancellationToken);
+            if (deleteContentResult.DeletedCount != 1)
+                throw new InvalidOperationException($"Unable to delete content by ID {contentId}.");
+
+            await commits.DeleteManyAsync(mongoDbSession.Current, it => it.ContentId == contentId, cancellationToken: cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+
+        #endregion
+
+        #region Helpers
+
+        static string NormalizeAndValidateWebsite(string websiteId)
+        {
+            if (websiteId == null)
+                ArgumentNullException.ThrowIfNull(websiteId);
+
+            var result = websiteId.Trim().ToLower();
+            if (string.IsNullOrEmpty(result))
+                throw new InvalidOperationException($"Invalid websiteId \"{websiteId}\".");
+            return result;
         }
 
         static string NormalizeAndValidateKey(string key)
         {
+            if (key == null)
+                ArgumentNullException.ThrowIfNull(key);
+
             var result = key.Trim().ToLower();
             if (string.IsNullOrEmpty(result))
                 throw new InvalidOperationException($"Invalid key \"{key}\".");
             return result;
         }
 
-        class Content : IContent
-        {
-            public Guid Id { get; set; }
-            public string WebsiteId { get; set; }
-            public string Key { get; set; }
-            public string CommitId { get; set; }
-            public string Type { get; set; }
-            public string Title { get; set; }
-        }
+        #endregion
 
         class ContentCommitProject
         {
-            public string Id { get; set; }
+            public static readonly Expression<Func<ContentCommitDocument, ContentCommitProject>> Projection = it => new ContentCommitProject
+            {
+                Id = it.Id,
+                Type = it.Type,
+                Title = it.Title,
+                Data = it.Data
+            };
+
+            public ObjectId Id { get; set; }
             public string Type { get; set; }
             public string Title { get; set; }
             public BsonDocument Data { get; set; }

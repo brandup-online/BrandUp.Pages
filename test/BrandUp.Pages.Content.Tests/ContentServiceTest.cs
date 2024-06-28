@@ -37,22 +37,21 @@ namespace BrandUp.Pages.Content
         [Fact]
         public async Task FindContentByKey_Success()
         {
-            var contentModel = new ContentModels.TestPageContent { Title = "title" };
-            var contentProvider = metadataManager.GetMetadata(contentModel);
-            var contentTitle = contentProvider.GetContentTitle(contentModel);
-            var contentData = contentProvider.ConvertContentModelToDictionary(contentModel);
+            //var contentModel = new ContentModels.TestPageContent { Title = "title" };
+            //var contentProvider = metadataManager.GetMetadata(contentModel);
+            //var contentTitle = contentProvider.GetContentTitle(contentModel);
+            //var contentData = contentProvider.ConvertContentModelToDictionary(contentModel);
 
             var websiteId = "website";
             var contentKey = "key";
-            await contentRepository.SetDataAsync(websiteId, contentKey, null, contentProvider.Name, contentTitle, contentData);
+            await contentRepository.CreateContentAsync(websiteId, contentKey);
 
             var content = await contentService.FindContentByKeyAsync(websiteId, contentKey);
             Assert.NotNull(content);
             Assert.NotEqual(Guid.Empty, content.Id);
             Assert.Equal(websiteId, content.WebsiteId);
             Assert.Equal(contentKey, content.Key);
-            Assert.NotNull(content.CommitId);
-            Assert.Equal(contentProvider.Name, content.Type);
+            Assert.Null(content.CommitId);
         }
 
         #endregion

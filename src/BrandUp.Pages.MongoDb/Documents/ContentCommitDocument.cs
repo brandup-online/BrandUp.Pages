@@ -14,7 +14,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         public Guid ContentId { get; set; }
         [BsonRequired, BsonDateTimeOptions(Kind = DateTimeKind.Utc, Representation = BsonType.DateTime)]
         public DateTime Date { get; set; }
-        [BsonRequired]
         public string UserId { get; set; }
         [BsonRequired]
         public string Type { get; set; }

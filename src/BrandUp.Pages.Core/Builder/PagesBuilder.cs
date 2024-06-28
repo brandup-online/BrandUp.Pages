@@ -1,6 +1,5 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Identity;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,14 +22,14 @@ namespace BrandUp.Pages.Builder
 
         public IServiceCollection Services { get; }
 
-        private static void AddCoreServices(IServiceCollection services)
+        static void AddCoreServices(IServiceCollection services)
         {
             services.AddSingleton<ContentMetadataManager>();
             services.AddScoped<ContentService>();
 
-            services.AddSingleton<PageMetadataManager, PageMetadataManager>();
-            services.AddScoped<IPageCollectionService, PageCollectionService>();
-            services.AddScoped<IPageService, PageService>();
+            services.AddSingleton<PageMetadataManager>();
+            services.AddScoped<PageCollectionService>();
+            services.AddScoped<PageService>();
 
             services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
             services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();

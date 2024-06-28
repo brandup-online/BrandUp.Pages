@@ -5,63 +5,103 @@ namespace BrandUp.Pages.Testing.Repositories
 {
     public class FakeContentRepository : IContentRepository
     {
-        readonly Dictionary<string, Content> contents = [];
+        readonly List<Content> contents = [];
+        readonly Dictionary<Guid, int> contentIds = [];
+        readonly Dictionary<string, int> contentKeys = [];
+        readonly Dictionary<string, Commit> commits = [];
 
-        public async Task<IContent> FindByKeyAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        #region IContentRepository members
+
+        public async Task<IContent> FindByIdAsync(Guid contentId, CancellationToken cancellationToken = default)
         {
-            var uniqueKey = UniqueId(websiteId, key);
+            if (!contentIds.TryGetValue(contentId, out var index))
+                return await Task.FromResult<IContent>(null);
 
-            contents.TryGetValue(uniqueKey, out var content);
+            return contents[index];
+        }
+
+        public async Task<IContent> FindByKeyAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default)
+        {
+            var uniqueKey = UniqueId(websiteId, contentKey);
+
+            if (!contentKeys.TryGetValue(uniqueKey, out var index))
+                return await Task.FromResult<IContent>(null);
+
+            return contents[index];
+        }
+
+        public async Task<IContent> CreateContentAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default)
+        {
+            var uniqueKey = UniqueId(websiteId, contentKey);
+            if (contentKeys.ContainsKey(uniqueKey))
+                throw new InvalidOperationException($"Dublicate content by key {uniqueKey}.");
+
+            var content = new Content
+            {
+                Id = Guid.NewGuid(),
+                WebsiteId = websiteId,
+                Key = contentKey,
+                CommitId = null
+            };
+
+            var index = contents.Count;
+            contents.Add(content);
+            contentIds.Add(content.Id, index);
+            contentKeys.Add(uniqueKey, index);
 
             return await Task.FromResult(content);
         }
 
-        public async Task<ContentCommitResult> GetDataAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<ContentCommitResult> FindCommitByIdAsync(string commitId, CancellationToken cancellationToken = default)
         {
-            var uniqueKey = UniqueId(websiteId, key);
+            commits.TryGetValue(commitId, out var commit);
 
-            if (!contents.TryGetValue(uniqueKey, out var content))
-                return null;
-
-            return await Task.FromResult(new ContentCommitResult
-            {
-                Type = content.Type,
-                Data = content.Data,
-                CommitId = content.CommitId
-            });
+            return await Task.FromResult(commit?.CreateResult());
         }
 
-        public async Task<ContentCommitResult> SetDataAsync(string websiteId, string key, string prevVersion, string type, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<ContentCommitResult> CreateCommitAsync(Guid contentId, string sourceCommitId, string userId, string type, IDictionary<string, object> data, string title, CancellationToken cancellationToken = default)
         {
-            var uniqueKey = UniqueId(websiteId, key);
-
-            if (!contents.TryGetValue(uniqueKey, out var content))
+            var commit = new Commit
             {
-                content = contents[uniqueKey] = new Content
-                {
-                    Id = Guid.NewGuid(),
-                    WebsiteId = websiteId,
-                    Key = key
-                };
-            }
+                Id = Guid.NewGuid().ToString(),
+                SourceId = sourceCommitId,
+                ContentId = contentId,
+                Date = DateTime.UtcNow,
+                UserId = userId,
+                Type = type,
+                Data = data,
+                Title = title
+            };
 
-            content.CommitId = Guid.NewGuid().ToString();
-            content.Type = type;
-            content.Title = title;
-            content.Data = contentData;
+            commits.Add(commit.Id, commit);
 
-            return await Task.FromResult(new ContentCommitResult
-            {
-                Type = content.Type,
-                Data = content.Data,
-                CommitId = content.CommitId
-            });
+            return await Task.FromResult(commit.CreateResult());
         }
+
+        public async Task DeleteAsync(Guid contentId, CancellationToken cancellationToken = default)
+        {
+            if (!contentIds.TryGetValue(contentId, out var index))
+                throw new InvalidOperationException();
+
+            var content = contents[index];
+            var uniqueKey = UniqueId(content.WebsiteId, content.Key);
+
+            contents.RemoveAt(index);
+            contentIds.Remove(contentId);
+            contentKeys.Remove(uniqueKey);
+
+            var contentCommits = commits.Values.Where(it => it.ContentId == contentId).ToList();
+            foreach (var commit in contentCommits)
+                commits.Remove(commit.Id);
+
+            await Task.CompletedTask;
+        }
+
+        #endregion
 
         static string UniqueId(string websiteId, string key)
         {
             return $"{websiteId}-{key}".ToLower();
-
         }
 
         class Content : IContent
@@ -70,9 +110,23 @@ namespace BrandUp.Pages.Testing.Repositories
             public string WebsiteId { get; set; }
             public string Key { get; set; }
             public string CommitId { get; set; }
+        }
+
+        class Commit
+        {
+            public string Id { get; set; }
+            public string SourceId { get; set; }
+            public Guid ContentId { get; set; }
+            public DateTime Date { get; set; }
+            public string UserId { get; set; }
             public string Type { get; set; }
             public string Title { get; set; }
             public IDictionary<string, object> Data { get; set; }
+
+            public ContentCommitResult CreateResult()
+            {
+                return new ContentCommitResult { CommitId = Id, Type = Type, Title = Title, Data = Data };
+            }
         }
     }
 }

@@ -2,13 +2,14 @@
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Models;
+using BrandUp.Pages.Services;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/list", Name = "BrandUp.Pages.Page.List"), Filters.Administration]
-    public class PageListController(IPageService pageService, IPageCollectionService pageCollectionService, Url.IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext, ContentService contentService, PageMetadataManager pageMetadataManager) : ListController<PageListModel, PageModel, IPage, Guid>
+    public class PageListController(PageService pageService, PageCollectionService pageCollectionService, Url.IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext, ContentService contentService, PageMetadataManager pageMetadataManager) : ListController<PageListModel, PageModel, IPage, Guid>
     {
         IPage page;
 
@@ -95,10 +96,17 @@ namespace BrandUp.Pages.Controllers
 
         protected override async Task<PageModel> OnGetItemModelAsync(IPage item)
         {
+            string pageHeader = null;
             var pageContentKey = await pageService.GetContentKeyAsync(item.Id, HttpContext.RequestAborted);
-            var pageContent = await contentService.GetContentAsync(websiteContext.Website.Id, pageContentKey, HttpContext.RequestAborted);
-            var pageMetadata = pageMetadataManager.GetMetadata(pageContent.GetType());
-            var pageHeader = pageMetadata.GetPageHeader(pageContent);
+            var content = await contentService.FindContentByKeyAsync(websiteContext.Website.Id, pageContentKey, HttpContext.RequestAborted);
+            if (content != null)
+            {
+                var pageContent = await contentService.GetContentAsync(content.CommitId, HttpContext.RequestAborted);
+                var pageMetadata = pageMetadataManager.GetMetadata(pageContent.GetType());
+                pageHeader = pageMetadata.GetPageHeader(pageContent);
+            }
+            else
+                pageHeader = "New page";
 
             return new PageModel
             {

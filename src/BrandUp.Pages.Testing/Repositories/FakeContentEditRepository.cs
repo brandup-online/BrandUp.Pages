@@ -10,32 +10,25 @@ namespace BrandUp.Pages.Repositories
 
         #region IContentEditRepository members
 
-        public async Task<IContentEdit> CreateEditAsync(string websiteId, string key, string sourceVersion, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> CreateEditAsync(IContent content, string userId, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
             var editId = Guid.NewGuid();
             var edit = new ContentEdit
             {
                 Id = editId,
                 CreatedDate = DateTime.UtcNow,
-                WebsiteId = websiteId,
-                ContentKey = key,
-                SourceCommitId = sourceVersion,
+                WebsiteId = content.WebsiteId,
+                ContentKey = content.Key,
+                BaseCommitId = content.CommitId,
                 UserId = userId,
                 Content = contentData
             };
 
-            var uniqueId = GetId(websiteId, key, userId);
+            var uniqueId = GetId(content.WebsiteId, content.Key, userId);
             edits.Add(uniqueId, edit);
             ids.Add(editId, uniqueId);
 
             return await Task.FromResult(edit);
-        }
-
-        public async Task DeleteEditAsync(IContentEdit pageEdit, CancellationToken cancellationToken = default)
-        {
-            edits.Remove(GetId(pageEdit));
-
-            await Task.CompletedTask;
         }
 
         public async Task<IContentEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -71,6 +64,13 @@ namespace BrandUp.Pages.Repositories
             await Task.CompletedTask;
         }
 
+        public async Task DeleteEditAsync(IContentEdit contentEdit, CancellationToken cancellationToken = default)
+        {
+            edits.Remove(GetId(contentEdit));
+
+            await Task.CompletedTask;
+        }
+
         #endregion
 
         static string GetId(IContentEdit contentEdit)
@@ -87,9 +87,11 @@ namespace BrandUp.Pages.Repositories
         {
             public Guid Id { get; init; }
             public DateTime CreatedDate { get; init; }
+            public int Version { get; init; }
             public string WebsiteId { get; init; }
             public string ContentKey { get; init; }
-            public string SourceCommitId { get; init; }
+            public Guid ContentId { get; init; }
+            public string BaseCommitId { get; init; }
             public string UserId { get; init; }
             public IDictionary<string, object> Content { get; set; }
         }

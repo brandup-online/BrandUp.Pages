@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Services;
 
 namespace BrandUp.Pages.Url
 {

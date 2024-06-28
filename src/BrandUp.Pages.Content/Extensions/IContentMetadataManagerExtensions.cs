@@ -15,10 +15,7 @@
             if (!contentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
                 throw new ArgumentException($"Not found content type name.", nameof(contentData));
 
-            if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
-                throw new InvalidOperationException($"Not found content type by name {contentTypeName}.");
-
-            return metadata;
+            return GetMetadata(contentMetadataManager, (string)contentTypeName);
         }
 
         public static ContentMetadataProvider GetMetadata(this ContentMetadataManager contentMetadataManager, object model)
@@ -26,6 +23,16 @@
             ArgumentNullException.ThrowIfNull(model);
 
             return contentMetadataManager.GetMetadata(model.GetType());
+        }
+
+        public static ContentMetadataProvider GetMetadata(this ContentMetadataManager contentMetadataManager, string typeName)
+        {
+            ArgumentNullException.ThrowIfNull(typeName);
+
+            if (!contentMetadataManager.TryGetMetadata(typeName, out var contentMetadata))
+                throw new InvalidOperationException($"Not found content type by name {typeName}.");
+
+            return contentMetadata;
         }
 
         public static bool TryGetMetadata(this ContentMetadataManager contentMetadataManager, object model, out ContentMetadataProvider contentMetadataProvider)

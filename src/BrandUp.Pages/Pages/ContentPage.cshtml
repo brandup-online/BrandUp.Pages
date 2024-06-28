@@ -3,4 +3,5 @@
 @using BrandUp.Pages
 @{ await Model.RenderPageAsync(this); }
 
-@await Html.RenderPageAsync()
+@* @await Html.RenderPageAsync()*@
+@await Html.RenderContentAsync(Model.ContentKey, Model.PageMetadata.ContentType)

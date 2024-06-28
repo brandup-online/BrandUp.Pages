@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Features;
 using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +24,7 @@ namespace BrandUp.Pages
         {
             ArgumentNullException.ThrowIfNull(pageCollectionReference);
 
-            var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
+            var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<PageService>();
 
             if (pageCollectionReference.CollectionId == Guid.Empty)
                 return [];
@@ -45,7 +46,7 @@ namespace BrandUp.Pages
         {
             ArgumentNullException.ThrowIfNull(page);
 
-            var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<IPageService>();
+            var pageService = ViewContext.HttpContext.RequestServices.GetRequiredService<PageService>();
             var result = new List<IPage>();
 
             if (includeCurrentPage)

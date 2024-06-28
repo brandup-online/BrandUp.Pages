@@ -2,11 +2,12 @@
 {
     public interface IContentRepository
     {
-        Task<IContent> FindByKeyAsync(string websiteId, string key, CancellationToken cancellationToken = default);
+        Task<IContent> FindByIdAsync(Guid contentId, CancellationToken cancellationToken = default);
+        Task<IContent> FindByKeyAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default);
+        Task<IContent> CreateContentAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default);
         Task<ContentCommitResult> FindCommitByIdAsync(string commitId, CancellationToken cancellationToken = default);
-        Task<Guid> CreateContentAsync(string websiteId, string key, CancellationToken cancellationToken = default);
-        Task CreateCommitAsync(Guid contentId, string sourceCommitId, string userId, string type, IDictionary<string, object> data, string title, CancellationToken cancellationToken = default);
-        Task<ContentCommitResult> SetDataAsync(string websiteId, string key, string prevVersion, string type, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default);
+        Task<ContentCommitResult> CreateCommitAsync(Guid contentId, string sourceCommitId, string userId, string type, IDictionary<string, object> data, string title, CancellationToken cancellationToken = default);
+        Task DeleteAsync(Guid contentId, CancellationToken cancellationToken = default);
     }
 
     public class ContentCommitResult
@@ -15,10 +16,5 @@
         public string Type { get; set; }
         public string Title { get; set; }
         public IDictionary<string, object> Data { get; set; }
-    }
-
-    public class CreateCommitData
-    {
-        public Guid CotnentId { get; init; }
     }
 }

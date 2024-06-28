@@ -1,8 +1,8 @@
 ﻿using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Documents;
+using BrandUp.Pages.Services;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -11,7 +11,7 @@ using MongoDB.Driver;
 namespace BrandUp.Pages.MongoDb._migrations
 {
     [Upgrade(typeof(SetupMigration), Description = "New content structure.")]
-    public class Upgrade1(IPagesDbContext dbContext, IPageService pageService, ContentMetadataManager contentMetadataManager, ILogger<Upgrade1> logger) : IMigrationHandler
+    public class Upgrade1(IPagesDbContext dbContext, PageService pageService, ContentMetadataManager contentMetadataManager, ILogger<Upgrade1> logger) : IMigrationHandler
     {
         #region IMigrationHandler members
 
@@ -59,7 +59,7 @@ namespace BrandUp.Pages.MongoDb._migrations
             #region Add properties
 
             var prevContentsCursor2 = await (await dbContext.Contents
-                .Find(Builders<ContentDocument>.Filter.Exists("type", false))
+                .Find(Builders<ContentDocument>.Filter.Exists("data", false))
                 .Project<PrevContent2>(Builders<ContentDocument>.Projection.Include("_id").Include("data"))
                 .ToCursorAsync(cancellationToken)).ToListAsync(cancellationToken);
             foreach (var prev in prevContentsCursor2)
@@ -69,12 +69,26 @@ namespace BrandUp.Pages.MongoDb._migrations
                 var contentModel = contentMetadataManager.ConvertDictionaryToContentModel(contentData);
                 var contentTitle = contentMetadata.GetContentTitle(contentModel);
 
+                var commit = new ContentCommitDocument
+                {
+                    Id = ObjectId.GenerateNewId(),
+                    SourceId = null,
+                    Date = DateTime.UtcNow,
+                    ContentId = prev.Id,
+                    Title = contentTitle,
+                    Type = contentMetadata.Name,
+                    UserId = null,
+                    Data = prev.Data
+                };
+                await dbContext.ContentCommits.InsertOneAsync(commit, cancellationToken: cancellationToken);
+
                 var updateResult = await dbContext.Contents.UpdateOneAsync(
                         it => it.Id == prev.Id,
                         Builders<ContentDocument>.Update
-                            .Set(it => it.Type, contentMetadata.Name)
-                            .Set(it => it.Title, contentTitle)
-                            .Set(it => it.CommitId, ObjectId.GenerateNewId()),
+                            .Set(it => it.CommitId, commit.Id)
+                            .Unset("data")
+                            .Unset("type")
+                            .Unset("title"),
                         new UpdateOptions { IsUpsert = false }, cancellationToken
                     );
                 if (updateResult.ModifiedCount != 1)

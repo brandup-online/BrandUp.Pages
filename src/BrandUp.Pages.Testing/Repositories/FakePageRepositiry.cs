@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content.Repositories;
 using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 
 namespace BrandUp.Pages.Repositories
 {
@@ -30,6 +31,7 @@ namespace BrandUp.Pages.Repositories
 
             return page;
         }
+
         public Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
             if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
@@ -39,6 +41,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
+
         public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(id, out int index))
@@ -48,6 +51,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IPage>(page);
         }
+
         public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
             if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
@@ -57,15 +61,18 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult(new PageUrlResult(page.Id));
         }
+
         public Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
             var pages = pageHierarhy.OnGetPages(options.CollectionId);
             return Task.FromResult(pages);
         }
+
         public Task<IEnumerable<IPage>> GetPublishedPagesAsync(string websiteId, CancellationToken cancellationToken = default)
         {
             return Task.FromResult<IEnumerable<IPage>>(pages.Values.Where(it => it.WebsiteId == websiteId && it.IsPublished));
         }
+
         public Task<IEnumerable<IPage>> SearchPagesAsync(string websiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             var result = pages.Values.AsQueryable().Where(it => it.WebsiteId == websiteId && it.Header.Contains(title));
@@ -78,6 +85,7 @@ namespace BrandUp.Pages.Repositories
 
             return Task.FromResult<IEnumerable<IPage>>(result.OfType<IPage>().ToArray());
         }
+
         public async Task DeletePageAsync(IPage page, string contentKey, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(page.Id, out int index))
@@ -89,7 +97,9 @@ namespace BrandUp.Pages.Repositories
             pageIds.Remove(page.Id);
             pagePaths.Remove(page.UrlPath.ToLower());
 
-            await contentRepository.SetDataAsync(page.WebsiteId, contentKey, null, null, null, null, cancellationToken);
+            var content = await contentRepository.FindByKeyAsync(page.WebsiteId, contentKey, cancellationToken);
+            if (content != null)
+                await contentRepository.DeleteAsync(content.Id, cancellationToken);
         }
 
         public Task<bool> HasPagesAsync(Guid ownCollectionId, CancellationToken cancellationToken = default)

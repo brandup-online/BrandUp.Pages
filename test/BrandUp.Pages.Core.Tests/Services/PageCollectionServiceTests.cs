@@ -12,8 +12,8 @@ namespace BrandUp.Pages.Services
     {
         readonly ServiceProvider serviceProvider;
         readonly IServiceScope serviceScope;
-        readonly IPageService pageService;
-        readonly IPageCollectionService pageCollectionService;
+        readonly PageService pageService;
+        readonly PageCollectionService pageCollectionService;
         readonly PageMetadataManager pageMetadataManager;
         readonly IWebsiteContext websiteContext;
 
@@ -32,8 +32,8 @@ namespace BrandUp.Pages.Services
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
-            pageService = serviceScope.ServiceProvider.GetService<IPageService>();
-            pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
+            pageService = serviceScope.ServiceProvider.GetService<PageService>();
+            pageCollectionService = serviceScope.ServiceProvider.GetService<PageCollectionService>();
             pageMetadataManager = serviceScope.ServiceProvider.GetService<PageMetadataManager>();
         }
 

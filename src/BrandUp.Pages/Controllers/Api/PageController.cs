@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
@@ -7,21 +8,8 @@ using Microsoft.AspNetCore.Routing;
 namespace BrandUp.Pages.Controllers
 {
     [ApiController, Filters.Administration]
-    public class PageController : ControllerBase
+    public class PageController(PageCollectionService pageCollectionService, PageService pageService, IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext) : ControllerBase
     {
-        readonly IPageCollectionService pageCollectionService;
-        readonly IPageService pageService;
-        readonly IPageLinkGenerator pageLinkGenerator;
-        readonly IWebsiteContext websiteContext;
-
-        public PageController(IPageCollectionService pageCollectionService, IPageService pageService, IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext)
-        {
-            this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
-            this.pageService = pageService ?? throw new ArgumentNullException(nameof(pageService));
-            this.pageLinkGenerator = pageLinkGenerator ?? throw new ArgumentNullException(nameof(pageLinkGenerator));
-            this.websiteContext = websiteContext ?? throw new ArgumentNullException(nameof(websiteContext));
-        }
-
         #region Action methods
 
         [HttpGet, Route("brandup.pages/page/{id}", Name = "BrandUp.Pages.Page.Get")]

@@ -1,7 +1,6 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Features;
-using BrandUp.Pages.Interfaces;
+﻿using BrandUp.Pages.Features;
 using BrandUp.Pages.Metadata;
+using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
 using BrandUp.Website.Pages;
@@ -24,20 +23,21 @@ namespace BrandUp.Pages.Pages
         public Models.PageStatus Status { get; private set; }
         [ClientProperty]
         public Guid? ParentPageId { get; private set; }
+        public string ContentKey { get; private set; }
         public ContentContext ContentContext { get; private set; }
 
         #endregion
 
         #region AppPageModel members
 
-        public override string Title => !string.IsNullOrEmpty(pageSeo.Title) ? pageSeo.Title : PageMetadata.GetPageHeader(ContentContext.Content);
+        public override string Title => pageSeo.Title;//!string.IsNullOrEmpty(pageSeo.Title) ? pageSeo.Title : PageMetadata.GetPageHeader(ContentContext.Content);
         public override string Description => pageSeo.Description;
         public override string Keywords => pageSeo.Keywords != null ? string.Join(",", pageSeo.Keywords) : null;
         public override string ScriptName => "content";
         protected override async Task OnPageRequestAsync(PageRequestContext context)
         {
             var httpContext = HttpContext;
-            var pageService = httpContext.RequestServices.GetRequiredService<IPageService>();
+            var pageService = httpContext.RequestServices.GetRequiredService<PageService>();
 
             #region Find page by url
 
@@ -94,40 +94,37 @@ namespace BrandUp.Pages.Pages
 
             #region Create content context
 
-            var pageContentKey = await pageService.GetContentKeyAsync(Id, CancellationToken);
+            ContentKey = await pageService.GetContentKeyAsync(Id, CancellationToken);
+            //var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
+            //var content = await contentService.FindContentByKeyAsync(WebsiteContext.Website.Id, pageContentKey, CancellationToken);
 
-            object contentModel;
-            IContentEdit contentEdit = null;
-            var contentEditFeature = httpContext.Features.Get<ContentEditFeature>();
-            if (contentEditFeature != null && contentEditFeature.IsEdit(pageContentKey))
-            {
-                var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
-                if (!await accessProvider.CheckAccessAsync(CancellationToken) || await accessProvider.GetUserIdAsync(CancellationToken) != contentEditFeature.Edit.UserId)
-                    throw new InvalidOperationException();
+            //object contentModel;
+            //IContentEdit contentEdit;
+            //if (content != null && HttpContext.IsEditContent(content, out var editContext))
+            //{
+            //    contentModel = await contentService.GetEditContentAsync(editContext.Edit, CancellationToken);
+            //    contentEdit = editContext.Edit;
+            //}
+            //else
+            //{
+            //    if (content != null && content.CommitId != null)
+            //    {
+            //        var contentData = await contentService.GetContentAsync(content.CommitId, CancellationToken);
+            //        contentModel = contentData.Data;
+            //    }
+            //    else
+            //    {
+            //        contentModel = await contentService.CreateDefaultAsync(PageMetadata.ContentMetadata, CancellationToken);
+            //        contentModel ??= PageMetadata.ContentMetadata.CreateModelInstance();
+            //    }
 
-                contentEdit = contentEditFeature.Edit;
+            //    contentEdit = null;
+            //}
 
-                var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                contentModel = await contentService.GetEditContentAsync(contentEditFeature.Edit, CancellationToken);
-            }
-            else
-            {
-                var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                contentModel = await contentService.GetContentAsync(PageEntry.WebsiteId, pageContentKey, CancellationToken);
-                if (contentModel == null)
-                {
-                    contentModel = await contentService.CreateDefaultAsync(PageMetadata.ContentMetadata, CancellationToken);
-                    if (contentModel == null)
-                        throw new InvalidOperationException($"Not found default data for page type {PageMetadata.Name}.");
+            //if (contentModel == null)
+            //    throw new InvalidOperationException($"Not set page content.");
 
-                    PageMetadata.SetPageHeader(contentModel, page.Header);
-                }
-            }
-
-            if (contentModel == null)
-                throw new InvalidOperationException($"Not set page content.");
-
-            ContentContext = new ContentContext(pageContentKey, contentModel, httpContext.RequestServices, contentEdit);
+            //ContentContext = new ContentContext(pageContentKey, contentModel, httpContext.RequestServices, contentEdit);
 
             #endregion
         }

@@ -1,28 +1,27 @@
 ﻿using System.Text.RegularExpressions;
-using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 
 namespace BrandUp.Pages.Url
 {
     public interface IPageUrlPathGenerator
     {
-        Task<string> GenerateAsync(IPage page);
+        Task<string> GenerateAsync(IPage page, CancellationToken cancellationToken = default);
     }
 
     public class PageUrlPathGenerator : IPageUrlPathGenerator
     {
-        private static readonly string[] TranslitChars = ["yo", "a", "b", "v", "g", "d", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "c", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya"];
-        private static readonly char[] TrimChars = ['-'];
-        private static readonly Regex TranslitRegex = new Regex(@"(?<1>[а-яё])|(?<2>[\s_-])|(?<3>[^\w])", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex NormalizeRegex = new Regex(@"(?<1>[-]{2,})", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
+        static readonly string[] TranslitChars = ["yo", "a", "b", "v", "g", "d", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "c", "ch", "sh", "shch", "", "y", "", "e", "yu", "ya"];
+        static readonly char[] TrimChars = ['-'];
+        static readonly Regex TranslitRegex = new Regex(@"(?<1>[а-яё])|(?<2>[\s_-])|(?<3>[^\w])", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
+        static readonly Regex NormalizeRegex = new Regex(@"(?<1>[-]{2,})", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
 
-        public Task<string> GenerateAsync(IPage page)
+        public async Task<string> GenerateAsync(IPage page, CancellationToken cancellationToken)
         {
-            if (page == null)
-                throw new System.ArgumentNullException(nameof(page));
+            ArgumentNullException.ThrowIfNull(page);
 
             var input = page.Header;
             if (input == null)
-                return Task.FromResult<string>(null);
+                return null;
 
             var result = TranslitRegex.Replace(input, match =>
             {
@@ -64,7 +63,7 @@ namespace BrandUp.Pages.Url
                     return match.Value;
             });
 
-            return Task.FromResult(result);
+            return await Task.FromResult(result);
         }
     }
 }

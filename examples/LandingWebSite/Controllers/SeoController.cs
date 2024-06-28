@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,7 @@ namespace LandingWebSite.Controllers
     {
         [HttpGet("sitemap.xml")]
         [Produces("application/xml")]
-        public async Task<IActionResult> SitemapXmlAsync([FromServices] IPageService pageService, [FromServices] IPageLinkGenerator pageLinkGenerator, [FromServices] IWebsiteContext websiteContext, [FromServices] ApplicationPartManager applicationPartManager)
+        public async Task<IActionResult> SitemapXmlAsync([FromServices] PageService pageService, [FromServices] IPageLinkGenerator pageLinkGenerator, [FromServices] IWebsiteContext websiteContext, [FromServices] ApplicationPartManager applicationPartManager)
         {
             if (pageService == null)
                 throw new ArgumentNullException(nameof(pageService));

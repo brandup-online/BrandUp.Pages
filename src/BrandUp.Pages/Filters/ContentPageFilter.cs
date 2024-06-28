@@ -1,5 +1,4 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Features;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,6 +19,7 @@ namespace BrandUp.Pages.Filters
             }
 
             var httpContext = context.HttpContext;
+            var cancellationToken = httpContext.RequestAborted;
             var contentMetadataManager = httpContext.RequestServices.GetRequiredService<ContentMetadataManager>();
             var websiteContext = httpContext.RequestServices.GetRequiredService<IWebsiteContext>();
             var pageModelType = pageModel.GetType();
@@ -36,24 +36,30 @@ namespace BrandUp.Pages.Filters
 
                     var keyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
                     var contentKey = (string)keyProperty.GetValue(pageModel);
+                    var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
+                    var content = await contentService.FindContentByKeyAsync(websiteContext.Website.Id, contentKey, cancellationToken);
 
                     object contentModel;
-                    IContentEdit contentEdit = null;
-                    var contentEditFeature = httpContext.Features.Get<ContentEditFeature>();
-                    if (contentEditFeature != null && contentEditFeature.IsEdit(contentKey))
+                    IContentEdit contentEdit;
+                    if (content != null && httpContext.IsEditContent(content, out var editContext))
                     {
-                        contentModel = contentEditFeature.Content;
-                        contentEdit = contentEditFeature.Edit;
+                        contentModel = await contentService.GetEditContentAsync(editContext.Edit, cancellationToken);
+                        contentEdit = editContext.Edit;
                     }
                     else
                     {
-                        var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                        contentModel = await contentService.GetContentAsync(websiteContext.Website.Id, contentKey, httpContext.RequestAborted);
-                        if (contentModel == null)
+                        if (content != null && content.CommitId != null)
                         {
-                            contentModel = await contentService.CreateDefaultAsync(contentProvider, httpContext.RequestAborted);
+                            var contentData = await contentService.GetContentAsync(content.CommitId, cancellationToken);
+                            contentModel = contentData.Data;
+                        }
+                        else
+                        {
+                            contentModel = await contentService.CreateDefaultAsync(contentProvider, cancellationToken);
                             contentModel ??= contentProvider.CreateModelInstance();
                         }
+
+                        contentEdit = null;
                     }
 
                     var contentProperty = @interface.GetProperty("ContentModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);

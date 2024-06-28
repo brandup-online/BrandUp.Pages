@@ -1,24 +1,16 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
-using Microsoft.Extensions.Options;
 
 namespace BrandUp.Pages.Services
 {
-    public class PageService(
-        IPageRepository pageRepository,
-        IPageCollectionRepository pageCollectionRepository,
-        PageMetadataManager pageMetadataManager,
-        Url.IPageUrlHelper pageUrlHelper,
-        Views.IViewLocator viewLocator,
-        IOptions<PagesOptions> options) : IPageService
+    public class PageService(IPageRepository pageRepository, IPageCollectionRepository pageCollectionRepository, PageMetadataManager pageMetadataManager, Url.IPageUrlHelper pageUrlHelper)
     {
-        readonly PagesOptions options = options?.Value ?? throw new ArgumentNullException(nameof(options));
-
         public async Task<string> GetContentKeyAsync(Guid pageId, CancellationToken cancellationToken = default)
         {
             return await Task.FromResult($"page-{pageId}");
         }
+
         public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(collection);
@@ -35,10 +27,7 @@ namespace BrandUp.Pages.Services
             var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
             var pageId = Guid.NewGuid();
-            var pageContentKey = await GetContentKeyAsync(pageId, cancellationToken);
             var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, cancellationToken);
-
-            //await contentService.SetContentAsync(collection.WebsiteId, pageContentKey, pageContent, cancellationToken);
 
             if (collection.CustomSorting)
             {
@@ -61,6 +50,7 @@ namespace BrandUp.Pages.Services
 
             return page;
         }
+
         public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(collection);
@@ -74,13 +64,6 @@ namespace BrandUp.Pages.Services
                 throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
             if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
                 throw new ArgumentException($"Тип страницы {pageType} не подходит для коллекции {collection.Title} ({collection.Id}).");
-
-            //var pageContent = pageMetadata.CreatePageModel();
-
-            //ApplyDefaultDataToContentModel(pageMetadata, pageContent, pageHeader);
-
-            //var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
-            //pageHeader = pageMetadata.GetPageHeader(pageContent);
 
             var pageId = Guid.NewGuid();
             var page = await pageRepository.CreatePageAsync(collection.WebsiteId, collection.Id, pageId, pageMetadata.Name, pageHeader, cancellationToken);
@@ -106,10 +89,12 @@ namespace BrandUp.Pages.Services
 
             return page;
         }
+
         public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             return pageRepository.FindPageByIdAsync(id, cancellationToken);
         }
+
         public Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(webSiteId);
@@ -121,6 +106,7 @@ namespace BrandUp.Pages.Services
 
             return pageRepository.FindPageByPathAsync(webSiteId, path, cancellationToken);
         }
+
         public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(webSiteId);
@@ -132,12 +118,14 @@ namespace BrandUp.Pages.Services
 
             return pageRepository.FindUrlByPathAsync(webSiteId, path, cancellationToken);
         }
+
         public Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(webSiteId);
 
             return pageRepository.FindPageByPathAsync(webSiteId, pageUrlHelper.GetDefaultPagePath(), cancellationToken);
         }
+
         public async Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(options);
@@ -154,12 +142,14 @@ namespace BrandUp.Pages.Services
 
             return await pageRepository.GetPagesAsync(options, cancellationToken);
         }
+
         public Task<IEnumerable<IPage>> GetPublishedPagesAsync(string webSiteId, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(webSiteId);
 
             return pageRepository.GetPublishedPagesAsync(webSiteId, cancellationToken);
         }
+
         public Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(webSiteId);
@@ -171,6 +161,7 @@ namespace BrandUp.Pages.Services
 
             return pageRepository.SearchPagesAsync(webSiteId, title, pagination, cancellationToken);
         }
+
         public Task<PageMetadataProvider> GetPageTypeAsync(IPage page, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -180,6 +171,7 @@ namespace BrandUp.Pages.Services
                 throw new InvalidOperationException($"Тип страницы {page.TypeName} не зарегистрирован.");
             return Task.FromResult(pageType);
         }
+
         public async Task<Result> PublishPageAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -211,6 +203,7 @@ namespace BrandUp.Pages.Services
 
             return Result.Success;
         }
+
         public async Task<Result> DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -221,6 +214,7 @@ namespace BrandUp.Pages.Services
 
             return Result.Success;
         }
+
         public async Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -228,6 +222,7 @@ namespace BrandUp.Pages.Services
             var pageCollection = await pageCollectionRepository.FindCollectiondByIdAsync(page.OwnCollectionId);
             return pageCollection.PageId;
         }
+
         public async Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -241,6 +236,7 @@ namespace BrandUp.Pages.Services
 
             return result;
         }
+
         public async Task UpdatePageSeoOptionsAsync(IPage page, PageSeoOptions seoOptions, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -252,6 +248,7 @@ namespace BrandUp.Pages.Services
 
             await pageRepository.UpdatePageAsync(page, cancellationToken);
         }
+
         public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -259,6 +256,7 @@ namespace BrandUp.Pages.Services
 
             return pageRepository.UpPagePositionAsync(page, beforePage, cancellationToken);
         }
+
         public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);
@@ -266,26 +264,39 @@ namespace BrandUp.Pages.Services
 
             return pageRepository.DownPagePositionAsync(page, afterPage, cancellationToken);
         }
+    }
 
-        void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
-        {
-            ArgumentNullException.ThrowIfNull(pageMetadataProvider);
-            ArgumentNullException.ThrowIfNull(contentModel);
+    public interface IPage
+    {
+        Guid Id { get; }
+        DateTime CreatedDate { get; }
+        string WebsiteId { get; }
+        string TypeName { get; }
+        Guid OwnCollectionId { get; }
+        string Header { get; set; }
+        string UrlPath { get; }
+        bool IsPublished { get; }
+    }
 
-            if (string.IsNullOrEmpty(header) && !string.IsNullOrEmpty(options.DefaultPageHeader))
-                pageMetadataProvider.SetPageHeader(contentModel, options.DefaultPageHeader);
+    public class PageSeoOptions
+    {
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string[] Keywords { get; set; }
+    }
 
-            var view = viewLocator.FindView(pageMetadataProvider.ContentType);
-            if (view == null)
-                throw new InvalidOperationException();
+    public enum PageSortMode
+    {
+        FirstOld = 0,
+        FirstNew = 1
+    }
 
-            if (view.DefaultModelData != null)
-                pageMetadataProvider.ContentMetadata.ApplyDataToModel(view.DefaultModelData, contentModel);
-
-            if (string.IsNullOrEmpty(header))
-                header = pageMetadataProvider.Title;
-
-            pageMetadataProvider.SetPageHeader(contentModel, header);
-        }
+    public class GetPagesOptions(Guid collectionId)
+    {
+        public Guid CollectionId { get; set; } = collectionId;
+        public PageSortMode? SortDirection { get; set; }
+        public bool? CustomSorting { get; set; }
+        public bool IncludeDrafts { get; set; }
+        public PagePaginationOptions Pagination { get; set; }
     }
 }

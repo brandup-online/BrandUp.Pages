@@ -1,19 +1,8 @@
-﻿using BrandUp.Pages.Content;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace BrandUp.Pages.MongoDb.Documents
 {
-    public class ContentEdit : IContentEdit
-    {
-        public Guid Id { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string WebsiteId { get; set; }
-        public string ContentKey { get; set; }
-        public string SourceCommitId { get; set; }
-        public string UserId { get; set; }
-    }
-
     [MongoDB.MongoCollection(CollectionName = "BrandUpPages.contents.edit")]
     public class ContentEditDocument : Document
     {
@@ -21,8 +10,10 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string WebsiteId { get; set; }
         [BsonRequired]
         public string ContentKey { get; set; }
+        [BsonRequired, BsonRepresentation(BsonType.String)]
+        public Guid ContentId { get; set; }
         [BsonRepresentation(BsonType.String)]
-        public ObjectId? ContentVersion { get; set; }
+        public ObjectId? BaseCommitId { get; set; }
         [BsonRequired]
         public string UserId { get; set; }
         [BsonRequired]

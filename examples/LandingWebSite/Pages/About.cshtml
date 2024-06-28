@@ -10,6 +10,6 @@
     <a href="#test">link with hash</a>
 </div>
 
-@await Html.BlockAsync("test", typeof(Contents.TextBlock.TB1))
+@await Html.RenderContentAsync("test", typeof(Contents.TextBlock.TB1))
 
-@await Html.BlockAsync("test2", typeof(Contents.BannerBlock.BB1))
+@await Html.RenderContentAsync("test2", typeof(Contents.BannerBlock.BB1))

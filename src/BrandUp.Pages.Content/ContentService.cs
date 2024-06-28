@@ -14,6 +14,11 @@ namespace BrandUp.Pages.Content
             return contentMetadata.ConvertDictionaryToContentModel(contentData);
         }
 
+        public async Task<IContent> FindContentByIdAsync(Guid contentId, CancellationToken cancellationToken = default)
+        {
+            return await contentRepository.FindByIdAsync(contentId, cancellationToken);
+        }
+
         public async Task<IContent> FindContentByKeyAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
@@ -22,22 +27,21 @@ namespace BrandUp.Pages.Content
             return await contentRepository.FindByKeyAsync(websiteId, key, cancellationToken);
         }
 
-        public async Task<IContentData> GetContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<IContentData> GetContentAsync(string commitId, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(websiteId);
-            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(commitId);
 
-            var contentDataSource = await contentRepository.GetDataAsync(websiteId, key, cancellationToken);
-            if (contentDataSource == null)
+            var commitResult = await contentRepository.FindCommitByIdAsync(commitId, cancellationToken);
+            if (commitResult == null)
                 return null;
 
-            var contentProvider = contentMetadataManager.GetMetadata(contentDataSource.Type);
+            var contentProvider = contentMetadataManager.GetMetadata(commitResult.Type);
 
             return new ContentData
             {
                 Provider = contentProvider,
-                Data = contentProvider.ConvertDictionaryToContentModel(contentDataSource.Data),
-                CommitId = contentDataSource.Version
+                Data = contentProvider.ConvertDictionaryToContentModel(commitResult.Data),
+                CommitId = commitResult.CommitId
             };
         }
 
@@ -54,17 +58,18 @@ namespace BrandUp.Pages.Content
             return await contentEditRepository.FindEditByUserAsync(content.WebsiteId, content.Key, userId, cancellationToken);
         }
 
-        public async Task<IContentEdit> BeginEditAsync(string websiteId, string key, string userId, ContentMetadataProvider contentProvider, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> BeginEditAsync(string websiteId, string contentKey, string userId, ContentMetadataProvider contentProvider, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
-            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(contentKey);
             ArgumentNullException.ThrowIfNull(userId);
             ArgumentNullException.ThrowIfNull(contentProvider);
 
-            var content = await FindContentByKeyAsync(websiteId, key, cancellationToken);
+            var content = await FindContentByKeyAsync(websiteId, contentKey, cancellationToken);
+            content ??= await contentRepository.CreateContentAsync(websiteId, contentKey, cancellationToken);
 
             object contentModel;
-            if (content == null || content.CommitId == null)
+            if (content.CommitId == null)
             {
                 contentModel = await CreateDefaultAsync(contentProvider, cancellationToken);
                 if (contentModel == null)
@@ -74,15 +79,17 @@ namespace BrandUp.Pages.Content
             {
                 var commitResult = await contentRepository.FindCommitByIdAsync(content.CommitId, cancellationToken);
 
-                if (!contentProvider.IsInheritedOrEqual(contentData.Provider))
+                var commitContentProvider = contentMetadataManager.GetMetadata(commitResult.Type);
+                if (!commitContentProvider.IsInheritedOrEqual(contentProvider))
                     throw new InvalidOperationException();
+                contentProvider = commitContentProvider;
 
-                contentModel = contentData.Data;
+                contentModel = commitContentProvider.ConvertDictionaryToContentModel(commitResult.Data);
             }
 
             var contentEditData = contentProvider.ConvertContentModelToDictionary(contentModel);
 
-            return await contentEditRepository.CreateEditAsync(websiteId, key, contentData?.CommitId, userId, contentEditData, cancellationToken);
+            return await contentEditRepository.CreateEditAsync(content, userId, contentEditData, cancellationToken);
         }
 
         public async Task<object> GetEditContentAsync(IContentEdit editSession, CancellationToken cancellationToken = default)
@@ -116,14 +123,12 @@ namespace BrandUp.Pages.Content
         {
             ArgumentNullException.ThrowIfNull(editSession);
 
-            var currentContent = await FindContentByKeyAsync(editSession.WebsiteId, editSession.ContentKey, cancellationToken);
-
             var newContentData = await contentEditRepository.GetContentAsync(editSession, cancellationToken);
             var contentMetadata = contentMetadataManager.GetMetadata(newContentData);
             var newContentModel = contentMetadata.ConvertDictionaryToContentModel(newContentData);
             var contentTitle = contentMetadata.GetContentTitle(newContentModel);
 
-            await contentRepository.CreateCommitAsync(editSession.ContentId, editSession.SourceCommitId, editSession.UserId, contentMetadata.Name, newContentData, contentTitle, cancellationToken);
+            await contentRepository.CreateCommitAsync(editSession.ContentId, editSession.BaseCommitId, editSession.UserId, contentMetadata.Name, newContentData, contentTitle, cancellationToken);
 
             await contentEditRepository.DeleteEditAsync(editSession, cancellationToken);
         }
@@ -149,8 +154,6 @@ namespace BrandUp.Pages.Content
         string WebsiteId { get; }
         string Key { get; }
         string CommitId { get; }
-        string Type { get; }
-        string Title { get; }
     }
 
     public interface IContentData
@@ -164,10 +167,11 @@ namespace BrandUp.Pages.Content
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }
+        int Version { get; }
         string WebsiteId { get; }
         string ContentKey { get; }
         Guid ContentId { get; }
-        string SourceCommitId { get; }
+        string BaseCommitId { get; }
         string UserId { get; }
     }
 }

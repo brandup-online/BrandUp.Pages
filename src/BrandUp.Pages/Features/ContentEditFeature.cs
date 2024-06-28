@@ -2,22 +2,28 @@
 
 namespace BrandUp.Pages.Features
 {
-    public class ContentEditFeature
+    internal class ContentEditFeature : IContentEditContext
     {
         public IContentEdit Edit { get; }
         public object Content { get; }
 
-        internal ContentEditFeature(IContentEdit contentEdit, object content)
+        public ContentEditFeature(IContentEdit contentEdit, object content)
         {
             Edit = contentEdit;
             Content = content;
         }
 
-        public bool IsEdit(string contentKey)
+        public bool IsCurrentEdit(IContent content)
         {
-            ArgumentNullException.ThrowIfNull(contentKey);
+            ArgumentNullException.ThrowIfNull(content);
 
-            return contentKey.Equals(Edit.ContentKey, StringComparison.InvariantCultureIgnoreCase);
+            return content.Id == Edit.ContentId;
         }
+    }
+
+    public interface IContentEditContext
+    {
+        IContentEdit Edit { get; }
+        object Content { get; }
     }
 }

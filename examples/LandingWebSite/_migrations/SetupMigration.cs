@@ -1,12 +1,12 @@
 ﻿using BrandUp.Extensions.Migrations;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
+using BrandUp.Pages.Services;
 using BrandUp.Website;
 
 namespace LandingWebSite._migrations
 {
     [Setup]
-    public class SetupMigration(IPageCollectionService pageCollectionService, PageMetadataManager pageMetadataManager, IPageService pageService, IWebsiteStore websiteStore) : IMigrationHandler
+    public class SetupMigration(PageCollectionService pageCollectionService, PageMetadataManager pageMetadataManager, PageService pageService, IWebsiteStore websiteStore) : IMigrationHandler
     {
         public async Task UpAsync(CancellationToken cancellationToken = default)
         {

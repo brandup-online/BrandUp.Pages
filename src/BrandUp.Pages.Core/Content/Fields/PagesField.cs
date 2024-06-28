@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Content.Fields
@@ -28,7 +28,7 @@ namespace BrandUp.Pages.Content.Fields
             if (!valueType.IsGenericType || valueType.GetGenericTypeDefinition() != typeof(PageCollectionReference<>))
                 throw new InvalidOperationException();
 
-            valueConstructor = valueType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(Guid) }, null);
+            valueConstructor = valueType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, [typeof(Guid)], null);
             if (valueConstructor == null)
                 throw new InvalidOperationException();
 
@@ -60,7 +60,7 @@ namespace BrandUp.Pages.Content.Fields
         public override object ConvetValueFromData(object value)
         {
             var collectionId = Guid.Parse((string)value);
-            return valueConstructor.Invoke(new object[] { collectionId });
+            return valueConstructor.Invoke([collectionId]);
         }
 
         public override object GetFormOptions(IServiceProvider services)
@@ -83,7 +83,7 @@ namespace BrandUp.Pages.Content.Fields
             if (!HasValue(modelValue))
                 return null;
 
-            var pageCollectionService = services.GetRequiredService<IPageCollectionService>();
+            var pageCollectionService = services.GetRequiredService<PageCollectionService>();
 
             var value = (IPageCollectionReference)modelValue;
             var pageCollection = await pageCollectionService.FindCollectiondByIdAsync(value.CollectionId);
@@ -93,7 +93,7 @@ namespace BrandUp.Pages.Content.Fields
             string pageUrl = "/";
             if (pageCollection.PageId.HasValue)
             {
-                var pageService = services.GetRequiredService<IPageService>();
+                var pageService = services.GetRequiredService<PageService>();
                 var page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
                 pageUrl = page.UrlPath;
             }

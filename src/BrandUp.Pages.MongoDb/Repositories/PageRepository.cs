@@ -1,6 +1,7 @@
 ﻿using BrandUp.MongoDB;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.MongoDb.Documents;
+using BrandUp.Pages.Services;
 using MongoDB.Driver;
 
 namespace BrandUp.Pages.MongoDb.Repositories

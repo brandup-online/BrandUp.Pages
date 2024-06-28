@@ -1,6 +1,6 @@
 ﻿using System.Text.Encodings.Web;
 using BrandUp.Pages.Content.Fields;
-using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Services;
 using BrandUp.Pages.Url;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace BrandUp.Pages.TagHelpers
 {
     [HtmlTargetElement(Attributes = "content-link")]
-    public class HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, IPageService pageService, HtmlEncoder htmlEncoder) : FieldTagHelper<IHyperLinkField>
+    public class HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, PageService pageService, HtmlEncoder htmlEncoder) : FieldTagHelper<IHyperLinkField>
     {
         [HtmlAttributeName("content-link")]
         public override ModelExpression FieldName { get; set; }
