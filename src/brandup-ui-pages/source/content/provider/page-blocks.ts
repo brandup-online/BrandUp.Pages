@@ -83,7 +83,7 @@ export class PageBlocksFieldProvider extends ModelFieldProvider {
             options.urlParams = {};
 
         options.urlParams["editId"] = this.__editor.editId;
-        options.urlParams["path"] = this.__valueElem.dataset.contentFieldPath;
+        options.urlParams["path"] = this.designer.path;
         options.urlParams["field"] = this.model.name;
 
         this.__editor.queue.push(options);

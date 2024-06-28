@@ -1,9 +1,10 @@
 import { Editor } from "../editor";
-import { IContentFieldDesigner } from "../../typings/content";
+import { IContentField, IContentFieldDesigner } from "../../typings/content";
 
 export abstract class FieldProvider<TModel> {
     readonly model: TModel;
     designer: IContentFieldDesigner;
+    field: IContentField;
     protected __valueElem: HTMLElement;
     protected __editor: Editor;
 
@@ -18,4 +19,10 @@ export abstract class FieldProvider<TModel> {
     }
 
     abstract createDesigner(): IContentFieldDesigner;
+    // abstract createField(): IContentField;
+
+    destroy() {
+        this.designer?.destroy();
+        this.field?.destroy();
+    }
 }

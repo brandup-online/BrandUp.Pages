@@ -63,7 +63,6 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
 
     destroy() {
         this.element.classList.remove("field-designer");
-
         super.destroy();
     }
 }

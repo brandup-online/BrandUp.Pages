@@ -201,9 +201,9 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             url: '/brandup.pages/content/model',
             urlParams: { itemType: itemType },
             method: "PUT",
-            success: (response: AjaxResponse<ModelFieldFormValue>) => {
+            success: (response: AjaxResponse) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    this.setValue(response.data.value);
                 }
             }
         });

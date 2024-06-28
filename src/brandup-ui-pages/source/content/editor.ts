@@ -14,6 +14,7 @@ import { ImageFieldProvider } from "./provider/image";
 import { ModelFieldProvider } from "./provider/model";
 import { PageBlocksFieldProvider } from "./provider/page-blocks";
 import { TextFieldProvider } from "./provider/text";
+import { HyperlinkFieldProvider } from "./provider/hyperlink";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
@@ -22,6 +23,7 @@ export class Editor extends UIElement implements IPageDesigner {
     readonly editId: string;
     readonly queue: AjaxQueue;
     private __fields: { [key: string]: IContentFieldDesigner } = {};
+    private __contentItems: Content[] = [];
     private __accentedField: IContentFieldDesigner = null;
     private __isLoading = false;
 
@@ -39,7 +41,7 @@ export class Editor extends UIElement implements IPageDesigner {
         this.queue = new AjaxQueue();
 
         this.__renderToolbar();
-        this.__renderDesigner();
+        this.__renderContent();
         this.__initLogic();
 
         document.body.classList.add("bp-state-design");
@@ -81,7 +83,12 @@ export class Editor extends UIElement implements IPageDesigner {
         this.setElement(toolbarElem)
     }
 
-    private __renderDesigner() {
+    private __renderContent() {
+        this.__contentItems.forEach(item => item.destroy());
+
+        this.__fields = {};
+        this.__contentItems = [];
+
         const contentPathMap = new Map<string, HTMLElement>();
         const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
 
@@ -107,6 +114,8 @@ export class Editor extends UIElement implements IPageDesigner {
             });
             const content = new Content(this, contentItem, contentPathMap.get(contentItem.path), fields);
             content.renderDesigners();
+            this.__fields = { ...this.__fields, ...content.getDesigers() };
+            this.__contentItems.push(content);
         }
 
         this.page.refreshScripts();
@@ -115,8 +124,9 @@ export class Editor extends UIElement implements IPageDesigner {
     private __getFieldInstance(type: string) {
         switch (type) {
             case "text":
-            case "hyperlink":
                 return TextFieldProvider;
+            case "hyperlink":
+                return HyperlinkFieldProvider;
             case "html":
                 return HtmlFieldProvider;
             case "image":
@@ -131,7 +141,7 @@ export class Editor extends UIElement implements IPageDesigner {
     }
 
     redraw () { // Временный публичный метод для ModelDesigner
-        this.__renderDesigner();
+        this.__renderContent();
     }
 
     private __initLogic() {
@@ -217,11 +227,21 @@ class Content {
         this.__fields = fields;
     }
 
+    getDesigers() {
+        const result = {};
+        this.__fields.forEach(field => result[field.designer.fullPath] = field.designer);
+        return result;
+    }
+
     renderDesigners() {
-        this.__fields.forEach(field => field.renderDesigner())
+        this.__fields.forEach(field => field.renderDesigner());
     }
 
     redraw () {
+        this.renderDesigners();
+    }
 
+    destroy() {
+        this.__fields.forEach(field => field.destroy());
     }
 }
