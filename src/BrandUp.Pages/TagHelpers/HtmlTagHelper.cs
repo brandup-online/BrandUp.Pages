@@ -4,21 +4,21 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace BrandUp.Pages.TagHelpers
 {
-	[HtmlTargetElement(Attributes = "content-html")]
-	public class HtmlTagHelper : FieldTagHelper<IHtmlField>
-	{
-		[HtmlAttributeName("content-html")]
-		public override ModelExpression FieldName { get; set; }
+    [HtmlTargetElement(Attributes = "content-html")]
+    public class HtmlTagHelper : FieldTagHelper<IHtmlField>
+    {
+        [HtmlAttributeName("content-html")]
+        public override ModelExpression FieldName { get; set; }
 
-		protected override Task RenderContentAsync(TagHelperOutput output)
-		{
-			var value = Field.GetModelValue(Content) as string;
+        protected override async Task RenderContentAsync(TagHelperOutput output)
+        {
+            var value = Field.GetModelValue(Content) as string;
 
-			output.Content.SetHtmlContent(value ?? string.Empty);
+            output.Content.SetHtmlContent(value ?? string.Empty);
 
-			output.TagMode = TagMode.StartTagAndEndTag;
+            output.TagMode = TagMode.StartTagAndEndTag;
 
-			return Task.CompletedTask;
-		}
-	}
+            await Task.CompletedTask;
+        }
+    }
 }

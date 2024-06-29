@@ -32,6 +32,9 @@ namespace BrandUp.Pages.TagHelpers
                 throw new InvalidOperationException($"Not found content context in view {ViewContext.View.Path}.");
             ContentContext = contentContext;
 
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ContentRenderingContext contentRenderingContext)
+                throw new InvalidOperationException($"Not found content rendering in view {ViewContext.View.Path}.");
+
             var fieldName = FieldName.Name;
             if (fieldName.StartsWith("ContentModel."))
                 fieldName = fieldName["ContentModel.".Length..];
@@ -44,13 +47,13 @@ namespace BrandUp.Pages.TagHelpers
             var isAdmin = await accessProvider.CheckAccessAsync();
             if (isAdmin)
             {
-                var fieldModel = new Models.ContentFieldModel
-                {
-                    Type = field.Type,
-                    Name = field.Name,
-                    Title = field.Title,
-                    Options = field.GetFormOptions(contentContext.Services)
-                };
+                //var fieldModel = new Models.ContentFieldModel
+                //{
+                //    Type = field.Type,
+                //    Name = field.Name,
+                //    Title = field.Title,
+                //    Options = field.GetFormOptions(contentContext.Services)
+                //};
 
                 output.Attributes.Add("data-content-field-path", contentContext.Explorer.ModelPath);
                 output.Attributes.Add("data-content-field-name", typedField.Name);

@@ -22,7 +22,7 @@ namespace BrandUp.Pages.TagHelpers
             if (pageLinkGenerator == null)
                 return;
 
-            var pagePath = await pageLinkGenerator.GetPathAsync(PagePath);
+            var pagePath = await pageLinkGenerator.GetPathAsync(PagePath, ViewContext.HttpContext.RequestAborted);
 
             output.Attributes.SetAttribute("href", pagePath);
             output.AddClass("applink", htmlEncoder);

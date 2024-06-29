@@ -11,12 +11,7 @@ namespace BrandUp.Pages.Views
     public class RazorViewRenderService(ICompositeViewEngine viewEngine, IHttpContextAccessor httpContextAccessor, IViewLocator viewLocator, HtmlEncoder htmlEncoder) : IViewRenderService
     {
         public const string ViewData_ContentContextKeyName = "_ContentContext_";
-        public const string ViewData_ViewRenderingContextKeyName = "_ViewRenderingContext_";
-
-        readonly ICompositeViewEngine viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
-        readonly IHttpContextAccessor httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        readonly IViewLocator viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
-        readonly HtmlEncoder htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
+        public const string ViewData_ViewRenderingContextKeyName = "_ContentRenderingContext_";
 
         #region IViewRenderService members
 
@@ -37,8 +32,8 @@ namespace BrandUp.Pages.Views
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { Model = contentContext.Content };
             viewData.Add(ViewData_ContentContextKeyName, contentContext);
 
-            var itemRenderingContext = new ViewRenderingContext();
-            viewData.Add(ViewData_ViewRenderingContextKeyName, itemRenderingContext);
+            var contentRenderingContext = new ContentRenderingContext();
+            viewData.Add(ViewData_ViewRenderingContextKeyName, contentRenderingContext);
 
             using var contentOutput = new StringWriter();
 
@@ -53,15 +48,15 @@ namespace BrandUp.Pages.Views
             await view.RenderAsync(viewContext);
 
             string tagName = "div";
-            if (!string.IsNullOrEmpty(itemRenderingContext.HtmlTag))
-                tagName = itemRenderingContext.HtmlTag;
+            if (!string.IsNullOrEmpty(contentRenderingContext.HtmlTag))
+                tagName = contentRenderingContext.HtmlTag;
 
             var tag = new TagBuilder(tagName);
-            if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
-                tag.AddCssClass(itemRenderingContext.CssClass);
+            if (!string.IsNullOrEmpty(contentRenderingContext.CssClass))
+                tag.AddCssClass(contentRenderingContext.CssClass);
 
-            if (!string.IsNullOrEmpty(itemRenderingContext.ScriptName))
-                tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
+            if (!string.IsNullOrEmpty(contentRenderingContext.ScriptName))
+                tag.Attributes.Add("data-content-script", contentRenderingContext.ScriptName);
 
             if (contentContext.Explorer.IsRoot)
             {

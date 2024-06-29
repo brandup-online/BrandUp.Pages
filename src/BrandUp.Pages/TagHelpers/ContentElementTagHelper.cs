@@ -22,7 +22,7 @@ namespace BrandUp.Pages.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ViewRenderingContext contentRenderingContext)
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ContentRenderingContext contentRenderingContext)
                 throw new InvalidOperationException("Not found content view rendering context.");
 
             output.SuppressOutput();

@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Views;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -15,6 +16,9 @@ namespace BrandUp.Pages.TagHelpers
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             if (ViewContext.ViewData.Model is not PageModel pageModel)
+                return;
+
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ContentRenderingContext contentRenderingContext)
                 return;
 
             var pageModelType = pageModel.GetType();

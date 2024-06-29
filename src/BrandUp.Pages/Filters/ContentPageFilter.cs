@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Views;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -66,13 +67,16 @@ namespace BrandUp.Pages.Filters
                     contentProperty.SetValue(pageModel, contentModel);
 
                     var contentContext = new ContentContext(contentKey, contentModel, httpContext.RequestServices, contentEdit);
-                    pageModel.ViewData.Add(Views.RazorViewRenderService.ViewData_ContentContextKeyName, contentContext);
+                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentContextKeyName, contentContext);
+
+                    var contentRenderingContext = new ContentRenderingContext();
+                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ViewRenderingContextKeyName, contentRenderingContext);
 
                     break;
                 }
             }
 
-            await next();
+            var c = await next();
         }
 
         public async Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
