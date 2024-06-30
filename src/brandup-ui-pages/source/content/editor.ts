@@ -55,7 +55,7 @@ export class Editor extends UIElement implements IPageDesigner {
             const f = this.__fields[key];
             if (f === field)
                 continue;
-            f.element.classList.add("hide-ui");
+            f?.element?.classList.add("hide-ui");
         }
 
         this.__accentedField = field;
@@ -65,7 +65,7 @@ export class Editor extends UIElement implements IPageDesigner {
 
             for (const key in this.__fields) {
                 const f = this.__fields[key];
-                f.element.classList.remove("hide-ui");
+                f?.element.classList.remove("hide-ui");
             }
 
             this.__accentedField = null;
@@ -190,10 +190,10 @@ export class Editor extends UIElement implements IPageDesigner {
 
     private __complateEdit() {
         delete this.contentElem.dataset["contentEditId"];
-
+        
         const url = new URL(location.href);
         url.searchParams.delete("editid");
-
+        
         this.page.website.nav({ url: url.toString(), replace: true });
         this.__isLoading = false;
     }
@@ -229,7 +229,7 @@ class Content {
 
     getDesigers() {
         const result = {};
-        this.__fields.forEach(field => result[field.designer.fullPath] = field.designer);
+        this.__fields.forEach(field => result[field.designer?.fullPath] = field.designer);
         return result;
     }
 
