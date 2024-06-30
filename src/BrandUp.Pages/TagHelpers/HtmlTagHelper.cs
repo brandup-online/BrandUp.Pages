@@ -13,8 +13,10 @@ namespace BrandUp.Pages.TagHelpers
         protected override async Task RenderContentAsync(TagHelperOutput output)
         {
             var value = Field.GetModelValue(Content) as string;
-
-            output.Content.SetHtmlContent(value ?? string.Empty);
+            if (Field.HasValue(value))
+            {
+                output.Content.SetHtmlContent(value);
+            }
 
             output.TagMode = TagMode.StartTagAndEndTag;
 

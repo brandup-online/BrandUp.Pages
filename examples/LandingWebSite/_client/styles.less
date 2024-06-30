@@ -35,7 +35,7 @@ body {
 
 h1, h2, h3, h4, h5 {
 	font-family: @Header-Font-Family;
-	font-weight: normal;
+	font-weight: 500;
 	padding: 0;
 	margin: 0;
 	line-height: normal;
@@ -258,6 +258,10 @@ main.app-content {
 .page-header {
 	padding-bottom: 20px;
 
+	& h1 {
+		font-weight: 400;
+	}
+
 	& p {
 		padding: 10px 0 0;
 		margin: 0;
@@ -278,8 +282,13 @@ main.app-content {
 	}
 }
 
+.page-blocks {
+	display: flex;
+	flex-flow: column nowrap;
+	row-gap: @Content-Padding;
+}
+
 .block-text {
-	margin: 0 0 @Content-Padding 0;
 	line-height: 150%;
 	position: relative;
 
@@ -361,8 +370,6 @@ main.app-content {
 
 .banner-block {
 	&.BB1 {
-		margin: 0 0 @Content-Padding 0;
-
 		& .items {
 			display: flex;
 			flex-flow: row wrap;

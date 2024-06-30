@@ -30,7 +30,7 @@ namespace BrandUp.Pages
             EditId = contentEdit?.Id;
         }
 
-        private ContentContext(ContentContext parent, ContentExplorer contentExplorer)
+        ContentContext(ContentContext parent, ContentExplorer contentExplorer)
         {
             Key = parent.Key;
             Services = parent.Services;

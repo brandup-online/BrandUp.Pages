@@ -143,6 +143,7 @@ stages:
         Contents: |
          source/**
          package.json
+         tsconfig.json
          README.md
         TargetFolder: '$(Build.ArtifactStagingDirectory)/brandup-ui-pages/'
 
@@ -182,6 +183,13 @@ stages:
         deploy:
           steps:
           
+          - task: Npm@1
+            displayName: 'publish npm'
+            inputs:
+              command: publish
+              workingDir: '$(Pipeline.Workspace)/npm/brandup-ui-pages/'
+              publishEndpoint: '$(publish-npm-credentials)'
+
           - task: DotNetCoreCLI@2
             displayName: 'publish nuget'
             inputs:
@@ -191,10 +199,3 @@ stages:
                 push $(Pipeline.Workspace)/net/*.nupkg
                 -s $(nuget-api-url)
                 -k $(nuget-api-key)
-
-          - task: Npm@1
-            displayName: 'publish npm'
-            inputs:
-              command: publish
-              workingDir: '$(Pipeline.Workspace)/npm/brandup-ui-pages/'
-              publishEndpoint: '$(publish-npm-credentials)'

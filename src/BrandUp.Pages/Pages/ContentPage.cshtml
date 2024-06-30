@@ -1,7 +1,7 @@
 ﻿@page
 @model BrandUp.Pages.Pages.ContentPageModel
 @using BrandUp.Pages
-@{ await Model.RenderPageAsync(this); }
 
-@* @await Html.RenderPageAsync()*@
-@await Html.RenderContentAsync(Model.ContentKey, Model.PageMetadata.ContentType)
+<page>
+    @await Html.RenderContentAsync(Model.ContentKey, Model.PageMetadata.ContentType)
+</page>

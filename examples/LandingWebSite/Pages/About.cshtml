@@ -1,15 +1,22 @@
 ﻿@page
 @model LandingWebSite.Pages.AbountModel
-@{ await Model.RenderPageAsync(this); }
 
-<h1>@Model.Title</h1>
+<page>
 
-<div>
-    <h4 content-text="ContentModel.Title">test</h4>
+    <header class="page-header">
+        <h1>@Model.Title</h1>
+    </header>
 
-    <a href="#test">link with hash</a>
-</div>
+    <div>
+        <h4 content-text="ContentModel.Title">header</h4>
 
-@await Html.RenderContentAsync("test", typeof(Contents.TextBlock.TB1))
+        <a href="#test">link with hash</a>
+    </div>
 
-@await Html.RenderContentAsync("test2", typeof(Contents.BannerBlock.BB1))
+    <div class="page-blocks">
+        @await Html.RenderContentAsync("test", typeof(Contents.TextBlock.TB1))
+
+        @await Html.RenderContentAsync("test2", typeof(Contents.BannerBlock.BB1))
+    </div>
+
+</page>

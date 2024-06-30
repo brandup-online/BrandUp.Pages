@@ -6,28 +6,29 @@
     "css-loader": "^6.10.0",
     "less": "^4.2.0",
     "less-loader": "^12.2.0",
-    "less-plugin-clean-css": "1.5.1",
+    "less-plugin-clean-css": "^1.5.1",
     "mini-css-extract-plugin": "^2.8.1",
     "raw-loader": "^4.0.2",
     "style-loader": "^3.3.4",
     "svgo-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.4.2",
+    "typescript": "^5.5.2",
     "url-loader": "^4.1.1",
     "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "cross-env": "^7.0.3"
   },
   "dependencies": {
     "brandup-ui": "^2.0.9",
     "brandup-ui-dom": "^2.0.9",
     "brandup-ui-ajax": "^2.0.9",
-    "brandup-ui-website": "^7.1.6",
+    "brandup-ui-website": "^8.0.5",
     "brandup-ui-pages": "../../src/brandup-ui-pages"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
-    "dev-build": "webpack --config webpack.config.js",
-    "watch": "webpack --config webpack.config.js --watch"
+    "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
+    "dev-build": "cross-env NODE_ENV=development webpack --config webpack.config.js",
+    "watch": "cross-env NODE_ENV=development webpack --config webpack.config.js --watch"
   }
 }

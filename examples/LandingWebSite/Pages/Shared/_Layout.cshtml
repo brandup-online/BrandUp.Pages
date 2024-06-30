@@ -11,9 +11,7 @@
 
     <div class="app">
         @await Html.RenderContentAsync("page-nav", typeof(Contents.PageNav.PageNavContent))
-        <main role="main" class="content-width app-content" page-content>
-            @RenderBody()
-        </main>
+        @RenderBody()
     </div>
 
     @await Html.RenderContentAsync("mobile-menu", typeof(Contents.MobileMenu.MobileMenuContent))

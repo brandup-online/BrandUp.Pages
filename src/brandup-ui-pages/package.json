@@ -6,7 +6,9 @@
     "javascript",
     "typescript",
     "pages",
-    "content"
+    "content",
+    "headcms",
+    "cms"
   ],
   "author": {
     "name": "Dmitry Kovyazin",
@@ -26,10 +28,12 @@
   "main": "./source/index.ts",
   "types": "./source/index.ts",
   "files": [
-    "source"
+    "source",
+    "tsconfig.json",
+    "README.md"
   ],
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   },
   "dependencies": {
     "brandup-ui": "^2.0.9",
@@ -37,7 +41,7 @@
     "brandup-ui-ajax": "^2.0.9",
     "brandup-ui-helpers": "^2.0.9",
     "brandup-ui-app": "^2.1.8",
-    "brandup-ui-website": "^7.1.6",
+    "brandup-ui-website": "^8.0.5",
     "brandup-pages-ckeditor": "^1.0.15"
   },
   "scripts": {

@@ -1,24 +1,25 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Views;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using BrandUp.Website.Pages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace BrandUp.Pages.TagHelpers
 {
-    [HtmlTargetElement(Attributes = "page-content", TagStructure = TagStructure.NormalOrSelfClosing)]
+    [HtmlTargetElement("page", TagStructure = TagStructure.NormalOrSelfClosing)]
     public class PageContentTagHelper(ContentMetadataManager contentMetadataManager) : TagHelper
     {
         [ViewContext]
         public ViewContext ViewContext { get; set; }
+        public override int Order => int.MaxValue;
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (ViewContext.ViewData.Model is not PageModel pageModel)
+            if (ViewContext.ViewData.Model is not AppPageModel pageModel)
                 return;
 
-            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ContentRenderingContext contentRenderingContext)
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ContentRenderingContext)
                 return;
 
             var pageModelType = pageModel.GetType();
