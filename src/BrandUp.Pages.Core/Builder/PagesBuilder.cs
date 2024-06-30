@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.Identity;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Services;
@@ -30,6 +31,8 @@ namespace BrandUp.Pages.Builder
             services.AddSingleton<PageMetadataManager>();
             services.AddScoped<PageCollectionService>();
             services.AddScoped<PageService>();
+
+            services.AddScoped<IItemContentProvider<IPage>, PageContentProvider>();
 
             services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
             services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();

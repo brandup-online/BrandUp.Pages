@@ -11,7 +11,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
         readonly IMongoCollection<PageDocument> pageDocuments = dbContext.Pages;
         readonly IMongoCollection<ContentDocument> contentDocuments = dbContext.Contents;
         readonly IMongoCollection<PageRecyclebinDocument> recyclebinDocuments = dbContext.PageRecyclebin;
-        readonly IMongoCollection<ContentEditDocument> editDocuments = dbContext.ContentEdits;
         readonly IMongoCollection<PageUrlDocument> urlDocuments = dbContext.PageUrls;
 
         public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, Guid pageId, string typeName, string pageHeader, CancellationToken cancellationToken = default)
@@ -189,17 +188,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             await transaction.CommitAsync(cancellationToken);
         }
-        public async Task DeletePageAsync(IPage page, string contentKey, CancellationToken cancellationToken = default)
+        public async Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             var curVersion = pageDocument.Version;
             pageDocument.Version++;
 
             using var transaction = await mongoDbSession.BeginAsync(cancellationToken);
-
-            var pageContent = await contentDocuments.FindOneAndDeleteAsync(mongoDbSession.Current, it => it.WebsiteId == page.WebsiteId && it.Key == contentKey, cancellationToken: cancellationToken);
-            if (pageContent == null)
-                throw new InvalidOperationException("Не найден контент страницы.");
 
             var recycleBinDocument = new PageRecyclebinDocument
             {
@@ -221,8 +216,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var urlDeleteResult = await urlDocuments.DeleteOneAsync(mongoDbSession.Current, it => it.PageId == page.Id, cancellationToken: cancellationToken);
             if (urlDeleteResult.DeletedCount != 1)
                 throw new InvalidOperationException("Не удалось удалить url страницы.");
-
-            await editDocuments.DeleteManyAsync(mongoDbSession.Current, it => it.WebsiteId == page.WebsiteId && it.ContentKey == contentKey, cancellationToken: cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
         }

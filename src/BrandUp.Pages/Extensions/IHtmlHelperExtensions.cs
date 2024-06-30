@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Html;
@@ -10,16 +11,16 @@ namespace BrandUp.Pages
     public static class IHtmlHelperExtensions
     {
         /// <summary>
-        /// Ренреринг статического блока.
+        /// Render content by key.
         /// </summary>
-        /// <param name="htmlHelper">HTML хелпер представления.</param>
-        /// <param name="key">Ключ блока.</param>
-        /// <param name="contentType">Тип контента блока.</param>
-        /// <returns>HTML контент блока.</returns>
-        public static async Task<IHtmlContent> RenderContentAsync(this IHtmlHelper htmlHelper, string key, Type contentType)
+        /// <param name="htmlHelper">Current html helper.</param>
+        /// <param name="contentKey">Content key.</param>
+        /// <param name="contentType">Content type.</param>
+        /// <returns>Rendered html content.</returns>
+        public static async Task<IHtmlContent> RenderContentAsync(this IHtmlHelper htmlHelper, string contentKey, Type contentType)
         {
             ArgumentNullException.ThrowIfNull(nameof(htmlHelper));
-            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(key));
+            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentKey));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
 
             var httpContext = htmlHelper.ViewContext.HttpContext;
@@ -34,7 +35,7 @@ namespace BrandUp.Pages
             var websiteContext = services.GetRequiredService<IWebsiteContext>();
             var contentService = services.GetRequiredService<ContentService>();
 
-            var content = await contentService.FindContentByKeyAsync(websiteContext.Website.Id, key, cancellationToken);
+            var content = await contentService.FindContentAsync(websiteContext.Website.Id, contentKey, cancellationToken);
 
             object contentModel;
             IContentEdit contentEdit;
@@ -59,12 +60,30 @@ namespace BrandUp.Pages
                 contentEdit = null;
             }
 
-            var contentContext = new ContentContext(key, contentModel, services, contentEdit);
+            var contentContext = new ContentContext(contentKey, contentModel, services, contentEdit);
 
             var builder = new HtmlContentBuilder();
             var pageHtml = await viewRenderService.RenderToStringAsync(contentContext);
             builder.AppendHtml(pageHtml);
             return builder;
+        }
+
+        /// <summary>
+        /// Render content by item.
+        /// </summary>
+        /// <typeparam name="TItem">Item type.</typeparam>
+        /// <param name="htmlHelper">Current html helper.</param>
+        /// <param name="item">Item instance.</param>
+        /// <returns>Rendered html content.</returns>
+        public static async Task<IHtmlContent> RenderContentAsync<TItem>(this IHtmlHelper htmlHelper, TItem item)
+            where TItem : IItemContent
+        {
+            var httpContext = htmlHelper.ViewContext.HttpContext;
+            var itemContentProvider = httpContext.RequestServices.GetRequiredService<IItemContentProvider<TItem>>();
+            var itemContentKey = await itemContentProvider.GetContentKeyAsync(item, httpContext.RequestAborted);
+            var itemContentType = await itemContentProvider.GetContentTypeAsync(item, httpContext.RequestAborted);
+
+            return await RenderContentAsync(htmlHelper, itemContentKey, itemContentType);
         }
     }
 }

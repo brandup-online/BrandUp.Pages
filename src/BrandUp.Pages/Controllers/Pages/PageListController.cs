@@ -97,8 +97,7 @@ namespace BrandUp.Pages.Controllers
         protected override async Task<PageModel> OnGetItemModelAsync(IPage item)
         {
             string pageHeader = null;
-            var pageContentKey = await pageService.GetContentKeyAsync(item.Id, HttpContext.RequestAborted);
-            var content = await contentService.FindContentByKeyAsync(websiteContext.Website.Id, pageContentKey, HttpContext.RequestAborted);
+            var content = await contentService.FindContentAsync(websiteContext.Website.Id, item, HttpContext.RequestAborted);
             if (content != null)
             {
                 var pageContent = await contentService.GetContentAsync(content.CommitId, HttpContext.RequestAborted);

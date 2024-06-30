@@ -1,8 +1,10 @@
 ﻿using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.MongoDb.Documents;
 using BrandUp.Pages.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -11,12 +13,21 @@ using MongoDB.Driver;
 namespace BrandUp.Pages.MongoDb._migrations
 {
     [Upgrade(typeof(SetupMigration), Description = "New content structure.")]
-    public class Upgrade1(IPagesDbContext dbContext, PageService pageService, ContentMetadataManager contentMetadataManager, ILogger<Upgrade1> logger) : IMigrationHandler
+    public class Upgrade1(
+        IServiceProvider serviceProvider,
+        IPagesDbContext dbContext,
+        ContentMetadataManager contentMetadataManager,
+        ILogger<Upgrade1> logger) : IMigrationHandler
     {
         #region IMigrationHandler members
 
         async Task IMigrationHandler.UpAsync(CancellationToken cancellationToken)
         {
+            await using var scope = serviceProvider.CreateAsyncScope();
+
+            var pageService = scope.ServiceProvider.GetRequiredService<PageService>();
+            var pageContentProvider = scope.ServiceProvider.GetRequiredService<IItemContentProvider<IPage>>();
+
             #region Contents
 
             // Delete old index
@@ -40,7 +51,7 @@ namespace BrandUp.Pages.MongoDb._migrations
                     continue;
                 }
 
-                var contentKey = await pageService.GetContentKeyAsync(page.Id, cancellationToken);
+                var contentKey = await pageContentProvider.GetContentKeyAsync(page, cancellationToken);
 
                 var updateResult = await dbContext.Contents.UpdateOneAsync(
                         it => it.Id == prev.Id,

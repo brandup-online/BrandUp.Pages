@@ -1,9 +1,11 @@
 ﻿using BrandUp.Pages.Content.Infrastructure;
+using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.Content.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentService(ContentMetadataManager contentMetadataManager, IContentRepository contentRepository, IContentEditRepository contentEditRepository, IDefaultContentDataProvider defaultContentDataProvider)
+    public class ContentService(ContentMetadataManager contentMetadataManager, IContentRepository contentRepository, IContentEditRepository contentEditRepository, IDefaultContentDataProvider defaultContentDataProvider, IServiceProvider serviceProvider)
     {
         public async Task<object> CreateDefaultAsync(ContentMetadataProvider contentMetadata, CancellationToken cancellationToken = default)
         {
@@ -14,17 +16,29 @@ namespace BrandUp.Pages.Content
             return contentMetadata.ConvertDictionaryToContentModel(contentData);
         }
 
-        public async Task<IContent> FindContentByIdAsync(Guid contentId, CancellationToken cancellationToken = default)
+        public async Task<IContent> FindContentAsync(Guid contentId, CancellationToken cancellationToken = default)
         {
             return await contentRepository.FindByIdAsync(contentId, cancellationToken);
         }
 
-        public async Task<IContent> FindContentByKeyAsync(string websiteId, string key, CancellationToken cancellationToken = default)
+        public async Task<IContent> FindContentAsync(string websiteId, string key, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(key);
 
             return await contentRepository.FindByKeyAsync(websiteId, key, cancellationToken);
+        }
+
+        public async Task<IContent> FindContentAsync<TItem>(string websiteId, TItem item, CancellationToken cancellationToken = default)
+            where TItem : IItemContent
+        {
+            ArgumentNullException.ThrowIfNull(websiteId);
+            ArgumentNullException.ThrowIfNull(item);
+
+            var itemContentProvider = serviceProvider.GetService<IItemContentProvider<TItem>>();
+            var contentKey = await itemContentProvider.GetContentKeyAsync(item, cancellationToken);
+
+            return await contentRepository.FindByKeyAsync(websiteId, contentKey, cancellationToken);
         }
 
         public async Task<IContentData> GetContentAsync(string commitId, CancellationToken cancellationToken = default)
@@ -65,7 +79,7 @@ namespace BrandUp.Pages.Content
             ArgumentNullException.ThrowIfNull(userId);
             ArgumentNullException.ThrowIfNull(contentProvider);
 
-            var content = await FindContentByKeyAsync(websiteId, contentKey, cancellationToken);
+            var content = await FindContentAsync(websiteId, contentKey, cancellationToken);
             content ??= await contentRepository.CreateContentAsync(websiteId, contentKey, cancellationToken);
 
             object contentModel;

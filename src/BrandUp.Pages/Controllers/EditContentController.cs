@@ -28,7 +28,7 @@ namespace BrandUp.Pages.Controllers
             var result = new Models.Contents.BeginPageEditResult();
 
             var userId = await accessProvider.GetUserIdAsync(cancellationToken);
-            var content = await contentService.FindContentByKeyAsync(websiteId, key, cancellationToken);
+            var content = await contentService.FindContentAsync(websiteId, key, cancellationToken);
 
             IContentEdit currentEdit = null;
             if (content != null)

@@ -1,10 +1,10 @@
-﻿using BrandUp.Pages.Content.Repositories;
+﻿using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Services;
 
 namespace BrandUp.Pages.Repositories
 {
-    public class FakePageRepositiry(FakePageHierarhyRepository pageHierarhy, IContentRepository contentRepository) : IPageRepository
+    public class FakePageRepositiry(FakePageHierarhyRepository pageHierarhy) : IPageRepository
     {
         int pageIndex = 0;
         readonly Dictionary<int, Page> pages = [];
@@ -83,10 +83,10 @@ namespace BrandUp.Pages.Repositories
                 result = result.Take(pagination.Limit);
             }
 
-            return Task.FromResult<IEnumerable<IPage>>(result.OfType<IPage>().ToArray());
+            return Task.FromResult<IEnumerable<IPage>>([.. result.OfType<IPage>()]);
         }
 
-        public async Task DeletePageAsync(IPage page, string contentKey, CancellationToken cancellationToken = default)
+        public async Task DeletePageAsync(IPage page, CancellationToken cancellationToken = default)
         {
             if (!pageIds.TryGetValue(page.Id, out int index))
                 throw new InvalidOperationException();
@@ -97,9 +97,7 @@ namespace BrandUp.Pages.Repositories
             pageIds.Remove(page.Id);
             pagePaths.Remove(page.UrlPath.ToLower());
 
-            var content = await contentRepository.FindByKeyAsync(page.WebsiteId, contentKey, cancellationToken);
-            if (content != null)
-                await contentRepository.DeleteAsync(content.Id, cancellationToken);
+            await Task.CompletedTask;
         }
 
         public Task<bool> HasPagesAsync(Guid ownCollectionId, CancellationToken cancellationToken = default)
@@ -192,6 +190,8 @@ namespace BrandUp.Pages.Repositories
             public string SeoTitle { get; set; }
             public string SeoDescription { get; set; }
             public string[] SeoKeywords { get; set; }
+
+            string IItemContent.ItemId => Id.ToString();
 
             public Page(Guid id, string webSiteId, string typeName, Guid collectionId)
             {

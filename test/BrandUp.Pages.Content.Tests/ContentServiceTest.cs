@@ -46,7 +46,7 @@ namespace BrandUp.Pages.Content
             var contentKey = "key";
             await contentRepository.CreateContentAsync(websiteId, contentKey);
 
-            var content = await contentService.FindContentByKeyAsync(websiteId, contentKey);
+            var content = await contentService.FindContentAsync(websiteId, contentKey);
             Assert.NotNull(content);
             Assert.NotEqual(Guid.Empty, content.Id);
             Assert.Equal(websiteId, content.WebsiteId);

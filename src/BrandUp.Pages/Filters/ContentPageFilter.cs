@@ -38,7 +38,7 @@ namespace BrandUp.Pages.Filters
                     var keyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
                     var contentKey = (string)keyProperty.GetValue(pageModel);
                     var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                    var content = await contentService.FindContentByKeyAsync(websiteContext.Website.Id, contentKey, cancellationToken);
+                    var content = await contentService.FindContentAsync(websiteContext.Website.Id, contentKey, cancellationToken);
 
                     object contentModel;
                     IContentEdit contentEdit;
@@ -76,7 +76,7 @@ namespace BrandUp.Pages.Filters
                 }
             }
 
-            var c = await next();
+            await next();
         }
 
         public async Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)
