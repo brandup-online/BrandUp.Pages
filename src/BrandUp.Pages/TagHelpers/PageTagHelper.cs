@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace BrandUp.Pages.TagHelpers
 {
     [HtmlTargetElement("page", TagStructure = TagStructure.NormalOrSelfClosing)]
-    public class PageContentTagHelper(ContentMetadataManager contentMetadataManager) : TagHelper
+    public class PageTagHelper(ContentMetadataManager contentMetadataManager) : TagHelper
     {
         [ViewContext]
         public ViewContext ViewContext { get; set; }
