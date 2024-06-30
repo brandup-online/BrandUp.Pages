@@ -95,36 +95,6 @@ namespace BrandUp.Pages.Pages
             #region Create content context
 
             ContentKey = await pageService.GetContentKeyAsync(Id, CancellationToken);
-            //var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-            //var content = await contentService.FindContentByKeyAsync(WebsiteContext.Website.Id, pageContentKey, CancellationToken);
-
-            //object contentModel;
-            //IContentEdit contentEdit;
-            //if (content != null && HttpContext.IsEditContent(content, out var editContext))
-            //{
-            //    contentModel = await contentService.GetEditContentAsync(editContext.Edit, CancellationToken);
-            //    contentEdit = editContext.Edit;
-            //}
-            //else
-            //{
-            //    if (content != null && content.CommitId != null)
-            //    {
-            //        var contentData = await contentService.GetContentAsync(content.CommitId, CancellationToken);
-            //        contentModel = contentData.Data;
-            //    }
-            //    else
-            //    {
-            //        contentModel = await contentService.CreateDefaultAsync(PageMetadata.ContentMetadata, CancellationToken);
-            //        contentModel ??= PageMetadata.ContentMetadata.CreateModelInstance();
-            //    }
-
-            //    contentEdit = null;
-            //}
-
-            //if (contentModel == null)
-            //    throw new InvalidOperationException($"Not set page content.");
-
-            //ContentContext = new ContentContext(pageContentKey, contentModel, httpContext.RequestServices, contentEdit);
 
             #endregion
         }
