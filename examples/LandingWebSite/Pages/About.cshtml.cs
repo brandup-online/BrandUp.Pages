@@ -7,26 +7,19 @@ namespace LandingWebSite.Pages
 {
     public class AbountModel : AppPageModel, IContentPage<AbountPageContent>
     {
+        #region AppPageModel members
+
         public override string Title => "About";
         public override string Description => "About page description";
         public override string Keywords => "about, company";
         public override string ScriptName => "about";
         public override string CssClass => "about-page";
 
-        #region AppPageModel members
-
-        protected override Task OnPageRequestAsync(PageRequestContext context)
-        {
-            //SetOpenGraph(Url.ContentLink("~/images/banner.jpg"), Title, Description);
-
-            return base.OnPageRequestAsync(context);
-        }
-
         #endregion
 
         #region IContentPage members
 
-        public string ContentKey => "about-page";
+        public string ContentKey => $"{WebsiteContext.Website.Id}-about-page";
         public AbountPageContent ContentModel { get; set; }
 
         #endregion

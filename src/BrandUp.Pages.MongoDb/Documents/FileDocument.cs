@@ -13,11 +13,10 @@ namespace BrandUp.Pages.MongoDb.Documents
         public string WebsiteId { get => (string)Data["websiteId"]; private set => Data["websiteId"] = value; }
         public string ContentKey { get => (string)Data["contentKey"]; private set => Data["contentKey"] = value; }
 
-        public FileDocument(string websiteId, string contentKey, string fileName, string contentType)
+        public FileDocument(string contentKey, string fileName, string contentType)
         {
             Data = new Dictionary<string, object>();
             Id = Guid.NewGuid();
-            WebsiteId = websiteId ?? throw new ArgumentNullException(nameof(websiteId));
             ContentKey = contentKey ?? throw new ArgumentNullException(nameof(contentKey));
             ContentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             Name = fileName ?? throw new ArgumentNullException(nameof(fileName));

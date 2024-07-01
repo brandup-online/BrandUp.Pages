@@ -5,6 +5,7 @@
     {
         Task<string> GetContentKeyAsync(TItem item, CancellationToken cancellationToken);
         Task<Type> GetContentTypeAsync(TItem item, CancellationToken cancellationToken);
+        Task DefaultFactoryAsync(TItem item, object content, CancellationToken cancellationToken);
         Task OnUpdatedContentAsync(string itemId, object content, CancellationToken cancellationToken);
     }
 

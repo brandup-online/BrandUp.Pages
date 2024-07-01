@@ -10,6 +10,16 @@ namespace BrandUp.Pages
 {
     public static class IHtmlHelperExtensions
     {
+        public static async Task<IHtmlContent> RenderContentAsync<TContent>(this IHtmlHelper htmlHelper, ContentScope scope, string contentKey, Func<TContent, Task> defaultFactory = null)
+            where TContent : class
+        {
+            return await RenderContentAsync(htmlHelper, scope, contentKey, typeof(TContent), async content =>
+            {
+                if (defaultFactory != null)
+                    await defaultFactory.Invoke((TContent)content);
+            });
+        }
+
         /// <summary>
         /// Render content by key.
         /// </summary>
@@ -17,7 +27,7 @@ namespace BrandUp.Pages
         /// <param name="contentKey">Content key.</param>
         /// <param name="contentType">Content type.</param>
         /// <returns>Rendered html content.</returns>
-        public static async Task<IHtmlContent> RenderContentAsync(this IHtmlHelper htmlHelper, string contentKey, Type contentType)
+        public static async Task<IHtmlContent> RenderContentAsync(this IHtmlHelper htmlHelper, ContentScope scope, string contentKey, Type contentType, Func<object, Task> defaultFactory = null)
         {
             ArgumentNullException.ThrowIfNull(nameof(htmlHelper));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentKey));
@@ -31,11 +41,21 @@ namespace BrandUp.Pages
             if (!contentMetadataManager.TryGetMetadata(contentType, out var contentProvider))
                 throw new InvalidOperationException($"Type {contentType.AssemblyQualifiedName} is not registered as content.");
 
-            var viewRenderService = services.GetRequiredService<IViewRenderService>();
-            var websiteContext = services.GetRequiredService<IWebsiteContext>();
-            var contentService = services.GetRequiredService<ContentService>();
+            switch (scope)
+            {
+                case ContentScope.Website:
+                    var websiteContext = services.GetRequiredService<IWebsiteContext>();
+                    contentKey = $"{websiteContext.Website.Id}-{contentKey}";
+                    break;
+                case ContentScope.Global:
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
 
-            var content = await contentService.FindContentAsync(websiteContext.Website.Id, contentKey, cancellationToken);
+            var viewRenderService = services.GetRequiredService<IViewRenderService>();
+            var contentService = services.GetRequiredService<ContentService>();
+            var content = await contentService.FindContentAsync(contentKey, cancellationToken);
 
             object contentModel;
             IContentEdit contentEdit;
@@ -55,6 +75,9 @@ namespace BrandUp.Pages
                 {
                     contentModel = await contentService.CreateDefaultAsync(contentProvider, cancellationToken);
                     contentModel ??= contentProvider.CreateModelInstance();
+
+                    if (defaultFactory != null)
+                        await defaultFactory.Invoke(contentModel);
                 }
 
                 contentEdit = null;
@@ -79,11 +102,20 @@ namespace BrandUp.Pages
             where TItem : IItemContent
         {
             var httpContext = htmlHelper.ViewContext.HttpContext;
-            var itemContentProvider = httpContext.RequestServices.GetRequiredService<IItemContentProvider<TItem>>();
+            var itemContentProvider = httpContext.RequestServices.GetContentMappingProvider<TItem>();
             var itemContentKey = await itemContentProvider.GetContentKeyAsync(item, httpContext.RequestAborted);
             var itemContentType = await itemContentProvider.GetContentTypeAsync(item, httpContext.RequestAborted);
 
-            return await RenderContentAsync(htmlHelper, itemContentKey, itemContentType);
+            return await RenderContentAsync(htmlHelper, ContentScope.Global, itemContentKey, itemContentType, async content =>
+            {
+                await itemContentProvider.DefaultFactoryAsync(item, content, httpContext.RequestAborted);
+            });
         }
+    }
+
+    public enum ContentScope
+    {
+        Global,
+        Website
     }
 }

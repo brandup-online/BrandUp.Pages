@@ -7,6 +7,11 @@
     },
     {
       "_type": "MobileMenu.MenuItem",
+      "Text": "Blog",
+      "Url": "url(/blog)"
+    },
+    {
+      "_type": "MobileMenu.MenuItem",
       "Text": "About",
       "Url": "url(/about)"
     }

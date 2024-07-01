@@ -20,9 +20,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         #region IFileRepository members
 
-        public async Task<IFile> UploadFileAsync(string websiteId, string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public async Task<IFile> UploadFileAsync(string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
-            var fileDoc = new FileDocument(websiteId, contentKey, fileName, contentType);
+            var fileDoc = new FileDocument(contentKey, fileName, contentType);
 
             var uploadOptions = new GridFSUploadOptions
             {

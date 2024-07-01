@@ -219,6 +219,13 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             await transaction.CommitAsync(cancellationToken);
         }
+        public async Task SetPageHeaderAsync(IPage page, string header, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (PageDocument)page;
+            pageDocument.Header = header;
+
+            await Task.CompletedTask;
+        }
         public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;

@@ -15,10 +15,8 @@ namespace LandingWebSite.Controllers
         [Produces("application/xml")]
         public async Task<IActionResult> SitemapXmlAsync([FromServices] PageService pageService, [FromServices] IPageLinkGenerator pageLinkGenerator, [FromServices] IWebsiteContext websiteContext, [FromServices] ApplicationPartManager applicationPartManager)
         {
-            if (pageService == null)
-                throw new ArgumentNullException(nameof(pageService));
-            if (pageLinkGenerator == null)
-                throw new ArgumentNullException(nameof(pageLinkGenerator));
+            ArgumentNullException.ThrowIfNull(pageService);
+            ArgumentNullException.ThrowIfNull(pageLinkGenerator);
 
             var request = Request;
 

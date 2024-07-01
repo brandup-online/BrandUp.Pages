@@ -10,8 +10,6 @@ namespace BrandUp.Pages.MongoDb.Documents
         [BsonId, BsonRepresentation(BsonType.String)]
         public Guid Id { get; set; }
         [BsonRequired]
-        public string WebsiteId { get; set; }
-        [BsonRequired]
         public string Key { get; set; }
         /// <summary>
         /// ID последнего коммита контента.

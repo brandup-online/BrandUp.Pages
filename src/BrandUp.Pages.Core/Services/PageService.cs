@@ -209,6 +209,17 @@ namespace BrandUp.Pages.Services
             return Result.Success;
         }
 
+        public async Task<Result> UpdateHeaderAsync(IPage page, string header, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+
+            await pageRepository.SetPageHeaderAsync(page, header, cancellationToken);
+
+            await pageRepository.UpdatePageAsync(page, cancellationToken);
+
+            return Result.Success;
+        }
+
         public async Task<Guid?> GetParentPageIdAsync(IPage page, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(page);

@@ -1,10 +1,12 @@
-@inherits RazorContent<Page.NewsPageContent>
+@model Page.NewsPageContent
 
 <content-element tag="div" class="page-article" />
 
 <header class="page-header">
-    <h1 content-text="Header" />
-    <p><strong content-text="SubHeader" /></p>
+    <div class="content">
+        <h1 content-text="Header" />
+        <p><strong content-text="SubHeader" /></p>
+    </div>
 </header>
 
-<div content-object="Blocks" content-designer="page-blocks"></div>
+<div content-object="Blocks" content-designer="page-blocks" class="page-blocks"></div>

@@ -1,7 +1,6 @@
 ﻿using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Content;
-using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.MongoDb.Documents;
 using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +25,7 @@ namespace BrandUp.Pages.MongoDb._migrations
             await using var scope = serviceProvider.CreateAsyncScope();
 
             var pageService = scope.ServiceProvider.GetRequiredService<PageService>();
-            var pageContentProvider = scope.ServiceProvider.GetRequiredService<IItemContentProvider<IPage>>();
+            var pageContentProvider = scope.ServiceProvider.GetContentMappingProvider<IPage>();
 
             #region Contents
 
@@ -52,12 +51,12 @@ namespace BrandUp.Pages.MongoDb._migrations
                 }
 
                 var contentKey = await pageContentProvider.GetContentKeyAsync(page, cancellationToken);
+                contentKey = $"{page.WebsiteId}-{contentKey}";
 
                 var updateResult = await dbContext.Contents.UpdateOneAsync(
                         it => it.Id == prev.Id,
                         Builders<ContentDocument>.Update
                             .Unset("pageId")
-                            .Set(it => it.WebsiteId, page.WebsiteId)
                             .Set(it => it.Key, contentKey),
                         new UpdateOptions { IsUpsert = false }, cancellationToken
                     );
@@ -107,7 +106,7 @@ namespace BrandUp.Pages.MongoDb._migrations
             }
 
             // Create new index
-            var keyIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.Key);
+            var keyIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.Key);
             await dbContext.Contents.Indexes.ApplyIndexes([
                 new CreateIndexModel<ContentDocument>(keyIndex, new CreateIndexOptions { Name = "Key", Unique = true })
             ], true, cancellationToken);
@@ -124,7 +123,7 @@ namespace BrandUp.Pages.MongoDb._migrations
             await dbContext.ContentEdits.Indexes.DropIfExistAsync("Website", cancellationToken: cancellationToken);
 
             // Recreate edit index
-            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.ContentKey).Ascending(it => it.UserId);
+            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.ContentId).Ascending(it => it.UserId);
             await dbContext.ContentEdits.Indexes.ApplyIndexes([
                 new CreateIndexModel<ContentEditDocument>(userIndex, new CreateIndexOptions { Name = "User", Unique = true })
             ], true, cancellationToken);

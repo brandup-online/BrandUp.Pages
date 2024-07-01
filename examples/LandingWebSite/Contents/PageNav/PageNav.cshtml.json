@@ -8,6 +8,11 @@
     },
     {
       "_type": "PageNav.MenuItem",
+      "Text": "Blog",
+      "Url": "url(/blog)"
+    },
+    {
+      "_type": "PageNav.MenuItem",
       "Text": "About",
       "Url": "url(/about)"
     }

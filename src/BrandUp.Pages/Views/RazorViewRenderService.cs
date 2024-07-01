@@ -12,6 +12,7 @@ namespace BrandUp.Pages.Views
     {
         public const string ViewData_ContentContextKeyName = "_ContentContext_";
         public const string ViewData_ViewRenderingContextKeyName = "_ContentRenderingContext_";
+        public const string DefaultContentTagName = "div";
 
         #region IViewRenderService members
 
@@ -47,7 +48,7 @@ namespace BrandUp.Pages.Views
 
             await view.RenderAsync(viewContext);
 
-            string tagName = "div";
+            var tagName = DefaultContentTagName;
             if (!string.IsNullOrEmpty(contentRenderingContext.HtmlTag))
                 tagName = contentRenderingContext.HtmlTag;
 

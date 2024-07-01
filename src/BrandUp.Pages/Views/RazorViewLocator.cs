@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using BrandUp.Pages.Content;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace BrandUp.Pages.Views
 {
@@ -7,7 +9,7 @@ namespace BrandUp.Pages.Views
     {
         readonly Dictionary<Type, ContentView> views = [];
 
-        public RazorViewLocator(ApplicationPartManager applicationPartManager, IWebHostEnvironment hostingEnvironment)
+        public RazorViewLocator(ApplicationPartManager applicationPartManager, IWebHostEnvironment hostingEnvironment, ContentMetadataManager contentMetadataManager)
         {
             ArgumentNullException.ThrowIfNull(applicationPartManager);
             ArgumentNullException.ThrowIfNull(hostingEnvironment);
@@ -21,9 +23,12 @@ namespace BrandUp.Pages.Views
                     continue;
 
                 var d = viewDescriptor.Type.BaseType.GetGenericTypeDefinition();
-                if (d == typeof(RazorContent<>))
+                if (d == typeof(RazorPage<>))
                 {
                     var contentType = viewDescriptor.Type.BaseType.GenericTypeArguments[0];
+                    if (!contentMetadataManager.TryGetMetadata(contentType, out var contentProvider))
+                        continue;
+
                     IDictionary<string, object> defaultModelData = null;
 
                     var fileInfo = hostingEnvironment.ContentRootFileProvider.GetFileInfo(viewDescriptor.RelativePath + ".json");
