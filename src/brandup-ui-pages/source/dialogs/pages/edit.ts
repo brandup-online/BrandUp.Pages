@@ -94,10 +94,15 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         let path = model.path;
         while (path) {
             let title = path.title;
-            if (path.index >= 0)
-                title = `#${path.index + 1} ${title}`;
-
-            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path.modelPath }, title)));
+            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === model.path ? { class: "current" } : null, [
+                DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path.modelPath }, [
+                    DOM.tag("bolt", null, path.modelPath || "root"),
+                    DOM.tag("div", null, [
+                        DOM.tag("span", null, title),
+                        DOM.tag("span", null, path.name),
+                    ]),
+                ]),
+            ]));
 
             path = path.parent;
         }
@@ -107,27 +112,27 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
             switch (fieldModel.type.toLowerCase()) {
                 case "text": {
-                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, [], fieldModel.options)); //TODO заменить пустой массив на список ошибок с сервера
                     break;
                 }
                 case "html": {
-                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "image": {
-                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "model": {
-                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "hyperlink": {
-                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 case "pages": {
-                    this.addField(fieldModel.title, new PagesContent(this, fieldModel.name, fieldModel.options));
+                    this.addField(fieldModel.title, new PagesContent(this, fieldModel.name, [], fieldModel.options));
                     break;
                 }
                 default: {

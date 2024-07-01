@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
+using BrandUp.Pages.Pages;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
 using LandingWebSite._migrations;
@@ -15,156 +16,156 @@ using WebMarkupMin.AspNetCore8;
 
 namespace LandingWebSite
 {
-	public class Startup
-	{
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
-		public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
-		public void ConfigureServices(IServiceCollection services)
-		{
-			#region Web
+        public void ConfigureServices(IServiceCollection services)
+        {
+            #region Web
 
-			services.AddRazorPages().AddApplicationPart(typeof(BrandUp.Pages.ContentPageModel).Assembly);
-			services.AddControllers();
+            services.AddRazorPages().AddApplicationPart(typeof(ContentPageModel).Assembly);
+            services.AddControllers();
 
-			services.Configure<WebEncoderOptions>(options =>
-			{
-				options.TextEncoderSettings = new TextEncoderSettings(System.Text.Unicode.UnicodeRanges.All);
-			});
+            services.Configure<WebEncoderOptions>(options =>
+            {
+                options.TextEncoderSettings = new TextEncoderSettings(System.Text.Unicode.UnicodeRanges.All);
+            });
 
-			services.Configure<RouteOptions>(options =>
-			{
-				options.LowercaseUrls = true;
-				options.AppendTrailingSlash = false;
-				options.LowercaseQueryStrings = true;
-			});
+            services.Configure<RouteOptions>(options =>
+            {
+                options.LowercaseUrls = true;
+                options.AppendTrailingSlash = false;
+                options.LowercaseQueryStrings = true;
+            });
 
-			services.AddRequestLocalization(options =>
-			{
-				var defaultCulture = new CultureInfo("en");
-				var supportedCultures = new[] { defaultCulture };
+            services.AddRequestLocalization(options =>
+            {
+                var defaultCulture = new CultureInfo("en");
+                var supportedCultures = new[] { defaultCulture };
 
-				options.DefaultRequestCulture = new RequestCulture(defaultCulture);
-				options.SupportedCultures = supportedCultures;
-				options.SupportedUICultures = supportedCultures;
-			});
+                options.DefaultRequestCulture = new RequestCulture(defaultCulture);
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
 
-			services
-				.AddWebMarkupMin(options =>
-				{
-					options.AllowMinificationInDevelopmentEnvironment = true;
-					options.AllowCompressionInDevelopmentEnvironment = true;
-					options.DefaultEncoding = System.Text.Encoding.UTF8;
-				})
-				.AddHtmlMinification(options =>
-				{
-					var settings = options.MinificationSettings;
-					settings.RemoveRedundantAttributes = true;
-					settings.RemoveHttpProtocolFromAttributes = true;
-					settings.RemoveHttpsProtocolFromAttributes = true;
-				})
-				.AddHttpCompression(options =>
-				{
-					options.CompressorFactories =
-					[
-						new BuiltInBrotliCompressorFactory(new BuiltInBrotliCompressionSettings { Level = CompressionLevel.Fastest }),
-						new DeflateCompressorFactory(new DeflateCompressionSettings { Level = CompressionLevel.Fastest }),
-						new GZipCompressorFactory(new GZipCompressionSettings { Level = CompressionLevel.Fastest })
-					];
-				});
+            services
+                .AddWebMarkupMin(options =>
+                {
+                    options.AllowMinificationInDevelopmentEnvironment = true;
+                    options.AllowCompressionInDevelopmentEnvironment = true;
+                    options.DefaultEncoding = System.Text.Encoding.UTF8;
+                })
+                .AddHtmlMinification(options =>
+                {
+                    var settings = options.MinificationSettings;
+                    settings.RemoveRedundantAttributes = true;
+                    settings.RemoveHttpProtocolFromAttributes = true;
+                    settings.RemoveHttpsProtocolFromAttributes = true;
+                })
+                .AddHttpCompression(options =>
+                {
+                    options.CompressorFactories =
+                    [
+                        new BuiltInBrotliCompressorFactory(new BuiltInBrotliCompressionSettings { Level = CompressionLevel.Fastest }),
+                        new DeflateCompressorFactory(new DeflateCompressionSettings { Level = CompressionLevel.Fastest }),
+                        new GZipCompressorFactory(new GZipCompressionSettings { Level = CompressionLevel.Fastest })
+                    ];
+                });
 
-			#endregion
+            services.Configure<IISServerOptions>(options => options.AllowSynchronousIO = true);
+            services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options => options.AllowSynchronousIO = true);
 
-			services.AddMongoDb();
+            #endregion
 
-			services
-				.AddMongoDbContext<Models.AppDbContext>(options => options.DatabaseName = "landing-website")
-				.UseCamelCaseElementName();
+            services.AddMongoDb();
 
-			services
-				.AddWebsite(options =>
-				{
-					options.MapConfiguration(Configuration);
-				})
-				.AddSingleWebsite("brandup.pages")
-				.AddUrlMapProvider<SubdomainUrlMapProvider>()
-				.AddPageEvents<Pages.PageEvents>();
+            services
+                .AddMongoDbContext<Models.AppDbContext>(options => options.DatabaseName = "landing-website")
+                .UseCamelCaseElementName();
 
-			services.AddPages()
-				.AddRazorContentPage()
-				.AddContentTypesFromAssemblies(typeof(Startup).Assembly)
-				.AddImageResizer<Infrastructure.ImageResizer>()
-				.AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped)
-				.AddMongoDb<Models.AppDbContext>();
+            services
+                .AddWebsite(options => options.MapConfiguration(Configuration))
+                .AddSingleWebsite("brandup.pages")
+                .AddUrlMapProvider<SubdomainUrlMapProvider>()
+                .AddPageEvents<Pages.PageEvents>();
 
-			#region Identity
+            services.AddPages()
+                .AddRazorContentPage()
+                .AddContentTypesFromAssemblies(typeof(Startup).Assembly)
+                .AddImageResizer<Infrastructure.ImageResizer>()
+                .AddUserAccessProvider<Identity.RoleBasedAccessProvider>(ServiceLifetime.Scoped)
+                .AddMongoDb<Models.AppDbContext>();
 
-			services.AddIdentity<Identity.IdentityUser, Identity.IdentityRole>((options) =>
-			{
-				options.SignIn.RequireConfirmedEmail = false;
-				options.User.RequireUniqueEmail = true;
-			})
-				.AddDefaultTokenProviders()
-				.AddClaimsPrincipalFactory<Identity.UserClaimsPrincipalFactory>()
-				.AddUserStore<Identity.UserStore<Identity.IdentityUser>>()
-				.AddRoleStore<Identity.RoleStore<Identity.IdentityRole>>();
+            #region Identity
 
-			#endregion
+            services.AddIdentity<Identity.IdentityUser, Identity.IdentityRole>((options) =>
+            {
+                options.SignIn.RequireConfirmedEmail = false;
+                options.User.RequireUniqueEmail = true;
+            })
+                .AddDefaultTokenProviders()
+                .AddClaimsPrincipalFactory<Identity.UserClaimsPrincipalFactory>()
+                .AddUserStore<Identity.UserStore<Identity.IdentityUser>>()
+                .AddRoleStore<Identity.RoleStore<Identity.IdentityRole>>();
 
-			#region Authentication
+            #endregion
 
-			services
-				.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie(options =>
-				{
-					options.Cookie.Name = "LandingWebSite.Identity";
-					options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/signin");
-					options.SlidingExpiration = true;
-					options.ReturnUrlParameter = "returnUrl";
-				});
+            #region Authentication
 
-			#endregion
+            services
+                .AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = "LandingWebSite.Identity";
+                    options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/signin");
+                    options.SlidingExpiration = true;
+                    options.ReturnUrlParameter = "returnUrl";
+                });
 
-			#region Migrations
+            #endregion
 
-			services.AddMigrations<MigrationState>(options =>
-			{
-				options.AddAssembly(typeof(SetupMigration).Assembly);
-			});
-			services.AddHostedService<MigrationService>();
+            #region Migrations
 
-			#endregion
-		}
+            services.AddMigrations<MigrationState>(options =>
+            {
+                options.AddAssembly(typeof(SetupMigration).Assembly);
+            });
+            services.AddHostedService<MigrationService>();
 
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-		{
-			if (env.IsDevelopment())
-				app.UseDeveloperExceptionPage();
-			else
-			{
-				app.UseExceptionHandler("/error");
-				app.UseHsts();
-			}
+            #endregion
+        }
 
-			app.UseWebsite();
-			app.UseStaticFiles();
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+                app.UseDeveloperExceptionPage();
+            else
+            {
+                app.UseExceptionHandler("/error");
+                app.UseHsts();
+            }
 
-			app.UseRouting();
-			app.UseRequestLocalization();
+            app.UseWebsite();
+            app.UseStaticFiles();
 
-			app.UseAuthentication();
+            app.UseRouting();
+            app.UseRequestLocalization();
 
-			app.UseWebMarkupMin();
+            app.UseAuthentication();
 
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapRazorPages();
-				endpoints.MapControllers();
-			});
-		}
-	}
+            app.UseWebMarkupMin();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapControllers();
+            });
+        }
+    }
 }

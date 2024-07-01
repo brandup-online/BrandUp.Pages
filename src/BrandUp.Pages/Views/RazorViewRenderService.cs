@@ -5,92 +5,75 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Views
 {
-	public class RazorViewRenderService : IViewRenderService
-	{
-		public const string ViewData_ContentContextKeyName = "_ContentContext_";
-		public const string ViewData_ViewRenderingContextKeyName = "_ViewRenderingContext_";
+    public class RazorViewRenderService(ICompositeViewEngine viewEngine, IHttpContextAccessor httpContextAccessor, IViewLocator viewLocator, HtmlEncoder htmlEncoder) : IViewRenderService
+    {
+        public const string ViewData_ContentContextKeyName = "_ContentContext_";
+        public const string ViewData_ViewRenderingContextKeyName = "_ContentRenderingContext_";
 
-		private readonly ICompositeViewEngine viewEngine;
-		private readonly IHttpContextAccessor httpContextAccessor;
-		private readonly IViewLocator viewLocator;
-		private readonly HtmlEncoder htmlEncoder;
+        #region IViewRenderService members
 
-		public RazorViewRenderService(ICompositeViewEngine viewEngine, IHttpContextAccessor httpContextAccessor, IViewLocator viewLocator, HtmlEncoder htmlEncoder)
-		{
-			this.viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
-			this.httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-			this.viewLocator = viewLocator ?? throw new ArgumentNullException(nameof(viewLocator));
-			this.htmlEncoder = htmlEncoder ?? throw new ArgumentNullException(nameof(htmlEncoder));
-		}
+        public async Task RenderAsync(ContentContext contentContext, TextWriter output)
+        {
+            ArgumentNullException.ThrowIfNull(contentContext);
+            ArgumentNullException.ThrowIfNull(output);
 
-		#region IViewRenderService members
+            var contentView = viewLocator.FindView(contentContext.Explorer.Metadata.ModelType);
+            if (contentView == null)
+                throw new InvalidOperationException($"Couldn't find content view {contentContext.Explorer.Metadata.Name}");
 
-		public async Task RenderAsync(ContentContext contentContext, TextWriter output)
-		{
-			if (contentContext == null)
-				throw new ArgumentNullException(nameof(contentContext));
-			if (output == null)
-				throw new ArgumentNullException(nameof(output));
+            var viewEngineResult = viewEngine.GetView("~/", contentView.Name, false);
+            if (!viewEngineResult.Success)
+                throw new InvalidOperationException($"Couldn't find view {contentView.Name}");
+            var view = viewEngineResult.View;
 
-			var contentView = viewLocator.FindView(contentContext.Explorer.Metadata.ModelType);
-			if (contentView == null)
-				throw new InvalidOperationException($"Couldn't find content view {contentView.Name}");
+            var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary()) { Model = contentContext.Content };
+            viewData.Add(ViewData_ContentContextKeyName, contentContext);
 
-			var viewEngineResult = viewEngine.GetView("~/", contentView.Name, false);
-			if (!viewEngineResult.Success)
-				throw new InvalidOperationException($"Couldn't find view {contentView.Name}");
-			var view = viewEngineResult.View;
+            var contentRenderingContext = new ContentRenderingContext();
+            viewData.Add(ViewData_ViewRenderingContextKeyName, contentRenderingContext);
 
-			var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-			{
-				Model = contentContext.Content
-			};
-			viewData.Add(ViewData_ContentContextKeyName, contentContext);
+            using var contentOutput = new StringWriter();
 
-			var itemRenderingContext = new ViewRenderingContext();
-			viewData.Add(ViewData_ViewRenderingContextKeyName, itemRenderingContext);
+            var viewContext = new ViewContext
+            {
+                HttpContext = httpContextAccessor.HttpContext,
+                ViewData = viewData,
+                Writer = contentOutput,
+                RouteData = new RouteData()
+            };
 
-			using (var contentOutput = new StringWriter())
-			{
-				var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
+            await view.RenderAsync(viewContext);
 
-				var viewContext = new ViewContext
-				{
-					HttpContext = httpContextAccessor.HttpContext,
-					ViewData = viewData,
-					Writer = contentOutput,
-					RouteData = new RouteData()
-				};
+            string tagName = "div";
+            if (!string.IsNullOrEmpty(contentRenderingContext.HtmlTag))
+                tagName = contentRenderingContext.HtmlTag;
 
-				await view.RenderAsync(viewContext);
+            var tag = new TagBuilder(tagName);
+            if (!string.IsNullOrEmpty(contentRenderingContext.CssClass))
+                tag.AddCssClass(contentRenderingContext.CssClass);
 
-				string tagName = "div";
-				if (!string.IsNullOrEmpty(itemRenderingContext.HtmlTag))
-					tagName = itemRenderingContext.HtmlTag;
+            if (!string.IsNullOrEmpty(contentRenderingContext.ScriptName))
+                tag.Attributes.Add("data-content-script", contentRenderingContext.ScriptName);
 
-				var tag = new TagBuilder(tagName);
-				if (!string.IsNullOrEmpty(itemRenderingContext.CssClass))
-					tag.AddCssClass(itemRenderingContext.CssClass);
+            if (contentContext.Explorer.IsRoot)
+            {
+                tag.Attributes.Add("data-content-root", contentContext.Key);
+                if (contentContext.IsDesigner)
+                    tag.Attributes.Add("data-content-edit-id", contentContext.EditId.Value.ToString());
+            }
+            tag.Attributes.Add("data-content-type", contentContext.Explorer.Metadata.Name);
+            tag.Attributes.Add("data-content-title", contentContext.Explorer.Metadata.Title);
+            tag.Attributes.Add("data-content-path", contentContext.Explorer.ModelPath);
+            //tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
 
-				if (!string.IsNullOrEmpty(itemRenderingContext.ScriptName))
-					tag.Attributes.Add("data-content-script", itemRenderingContext.ScriptName);
+            tag.InnerHtml.AppendHtml(contentOutput.ToString());
 
-				if (contentContext.Explorer.IsRoot)
-					tag.Attributes.Add("content-root", string.Empty);
-				tag.Attributes.Add("content-type", contentContext.Explorer.Metadata.Name);
-				tag.Attributes.Add("content-path", contentContext.Explorer.ModelPath);
-				tag.Attributes.Add("content-path-index", contentContext.Explorer.Index.ToString());
+            tag.WriteTo(output, htmlEncoder);
+        }
 
-				tag.InnerHtml.AppendHtml(contentOutput.ToString());
-
-				tag.WriteTo(output, htmlEncoder);
-			}
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }

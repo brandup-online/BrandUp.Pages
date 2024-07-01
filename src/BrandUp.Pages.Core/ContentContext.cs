@@ -1,36 +1,41 @@
 ﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages
 {
     public class ContentContext
     {
-        public IPage Page { get; }
+        /// <summary>
+        /// Ключ контента.
+        /// </summary>
+        public string Key { get; }
         public ContentExplorer Explorer { get; }
         public IServiceProvider Services { get; }
         public object Content => Explorer.Model;
-        public bool IsDesigner { get; }
+        public Guid? EditId { get; }
+        public bool IsDesigner => EditId.HasValue;
 
-        public ContentContext(IPage page, object contentModel, IServiceProvider services, bool isDesigner)
+        public ContentContext(string key, object contentModel, IServiceProvider services, IContentEdit contentEdit)
         {
+            ArgumentNullException.ThrowIfNull(key);
             ArgumentNullException.ThrowIfNull(contentModel);
+            ArgumentNullException.ThrowIfNull(services);
 
-            Page = page;
-            Services = services ?? throw new ArgumentNullException(nameof(services));
+            Key = key;
+            Services = services;
 
-            var contentMetadataManager = services.GetRequiredService<IContentMetadataManager>();
+            var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();
 
             Explorer = ContentExplorer.Create(contentMetadataManager, contentModel);
-            IsDesigner = isDesigner;
+            EditId = contentEdit?.Id;
         }
 
-        private ContentContext(ContentContext parent, ContentExplorer contentExplorer)
+        ContentContext(ContentContext parent, ContentExplorer contentExplorer)
         {
-            Page = parent.Page;
+            Key = parent.Key;
             Services = parent.Services;
             Explorer = contentExplorer;
-            IsDesigner = parent.IsDesigner;
+            EditId = parent.EditId;
         }
 
         public ContentContext Navigate(string path)

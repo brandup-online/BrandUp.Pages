@@ -21,8 +21,8 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
     private __searchTimeout: number;
     private __searchRequest: XMLHttpRequest;
 
-    constructor(form: IContentForm, name: string, options: HyperLinkFieldFormOptions) {
-        super(name, options);
+    constructor (form: IContentForm, name: string, errors: string[], options: HyperLinkFieldFormOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }

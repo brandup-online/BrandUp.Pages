@@ -24,7 +24,7 @@ export interface IContentField {
 export interface IPageDesigner {
     editId: string;
     queue: AjaxQueue;
-    render();
+    redraw();
     accentField(field: IContentFieldDesigner);
     clearAccent();
     destroy();
@@ -61,4 +61,6 @@ export interface ContentFieldModel {
     title: string;
     options: any;
     value: any;
+    errors: string[];
+    isRequired: boolean;
 }

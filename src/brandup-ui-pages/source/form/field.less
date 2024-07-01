@@ -1,5 +1,13 @@
 ﻿@import "../vars.less";
 
 .website-form-field {
+    & ~ .field-errors {
+        display: none;
+    }
 
+    &.has-errors {
+        & ~ .field-errors {
+            display: block;
+        }
+    }
 }

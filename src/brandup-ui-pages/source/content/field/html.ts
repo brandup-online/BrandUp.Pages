@@ -9,9 +9,10 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
     private __isChanged: boolean;
     private __value: HTMLElement;
     private __editor: ContentEditor;
+    private __editorPromise: Promise<any>;
 
-    constructor(form: IContentForm, name: string, options: HtmlFieldFormOptions) {
-        super(name, options);
+    constructor(form: IContentForm, name: string, errors: string[], options: HtmlFieldFormOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }
@@ -28,7 +29,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         if (this.options.placeholder)
             this.__value.setAttribute("data-placeholder", this.options.placeholder);
 
-        ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
+        this.__editorPromise = ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
             .then(editor => {
                 this.__editor = editor;
 
@@ -59,13 +60,16 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         const data = this.__editor.data.get();
         return data ? data : null;
     }
+
     setValue(value: string) {
-        if (this.__editor) {
-            this.__editor.data.set(value ? value : "");
-            this.__refreshUI();
-        }
-        else
-            this.__value.innerHTML = value ? value : "";
+        this.__editorPromise.then (()=> { // если editor еще не создался - ждем
+            if (this.__editor) {
+                this.__editor.data.set(value ? value : "");
+                this.__refreshUI();
+            }
+            else
+                this.__value.innerHTML = value ? value : "";
+        });
     }
     hasValue(): boolean {
         const value = this.normalizeValue(this.__value.innerText);
@@ -88,10 +92,11 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
             data: value ? value : "",
             success: (response) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    this.setValue(response.data.value);
+                    this.setErrors(response.data.errors);
                 }
                 else {
-                    this.setErrors(["error"]);
+                    this.setErrors([]);
                 }
             }
         });

@@ -14,8 +14,8 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
     private __searchRequest: XMLHttpRequest;
     private __closeMenuFunc: (e: MouseEvent) => void;
 
-    constructor(form: IContentForm, name: string, options: PagesFieldFormOptions) {
-        super(name, options);
+    constructor (form: IContentForm, name: string, errors: string[], options: PagesFieldFormOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }

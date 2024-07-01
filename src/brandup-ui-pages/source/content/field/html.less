@@ -6,20 +6,32 @@
     min-height: 20px;
     position: relative;
 
+    &.has-errors {
+        & .value {
+            &.ck.ck-editor__editable_inline {
+                border-bottom-color:@Error-Darkest;
+
+                &:hover {
+                    border-bottom-color: @Error-Darkest;
+                }
+            }
+        }
+    }
+
     & .value {
         &.ck.ck-editor__editable_inline {
-            border: 0 !important;
-            border-bottom: solid 1px #eee !important;
+            border: 0 ;
+            border-bottom: solid 1px #eee;
             outline: none;
             padding: 7px 0 5px;
-            box-shadow: none !important;
+            box-shadow: none;
 
             &:hover {
-                border-bottom-color: #ddd !important;
+                border-bottom-color: #ddd;
             }
 
             &:focus {
-                border-bottom-color: #ddd !important;
+                border-bottom-color: #ddd;
             }
 
             & p {

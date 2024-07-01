@@ -1,45 +1,45 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Identity;
-using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Builder
 {
-	public interface IPagesBuilder
-	{
-		IServiceCollection Services { get; }
-	}
+    public interface IPagesBuilder
+    {
+        IServiceCollection Services { get; }
+    }
 
-	public class PagesBuilder : IPagesBuilder
-	{
-		public PagesBuilder(IServiceCollection services)
-		{
-			Services = services ?? throw new ArgumentNullException(nameof(services));
+    public class PagesBuilder : IPagesBuilder
+    {
+        public PagesBuilder(IServiceCollection services)
+        {
+            Services = services ?? throw new ArgumentNullException(nameof(services));
 
-			AddCoreServices(services);
-		}
+            AddCoreServices(services);
+        }
 
-		public IServiceCollection Services { get; }
+        public IServiceCollection Services { get; }
 
-		private static void AddCoreServices(IServiceCollection services)
-		{
-			services.AddSingleton<IContentMetadataManager, ContentMetadataManager>();
+        static void AddCoreServices(IServiceCollection services)
+        {
+            services.AddSingleton<ContentMetadataManager>();
+            services.AddScoped<ContentService>();
 
-			services.AddSingleton<IPageMetadataManager, PageMetadataManager>();
-			services.AddScoped<IPageCollectionService, PageCollectionService>();
-			services.AddScoped<IPageService, PageService>();
-			services.AddScoped<IPageContentService, PageContentService>();
+            services.AddSingleton<PageMetadataManager>();
+            services.AddScoped<PageCollectionService>();
+            services.AddScoped<PageService>();
 
-			services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
-			services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
+            services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();
+            services.AddTransient<Url.IPageUrlPathGenerator, Url.PageUrlPathGenerator>();
 
-			services.AddScoped<Files.FileService>();
+            services.AddScoped<Files.FileService>();
 
-			services.AddSingleton<Content.Infrastructure.IContentTypeLocator>(new Content.Infrastructure.EmptyContentTypeLocator());
+            services.AddSingleton<Content.Infrastructure.IContentTypeLocator>(new Content.Infrastructure.EmptyContentTypeLocator());
+            services.AddScoped<Content.Infrastructure.IDefaultContentDataProvider, ViewDefaultContentDataProvider>();
 
-			services.AddSingleton<IAccessProvider, EmptyAccessProvider>();
-		}
-	}
+            services.AddSingleton<IAccessProvider, EmptyAccessProvider>();
+        }
+    }
 }

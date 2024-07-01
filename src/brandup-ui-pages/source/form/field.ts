@@ -6,10 +6,13 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     readonly name: string;
     private __errorsElem: HTMLElement;
 
-    constructor(name: string, options: TOptions) {
+    constructor(name: string, errors: string[], options: TOptions) {
         super(options);
 
+        this.__errorsElem = DOM.tag("ul", { class: "field-errors" });
+        this.element.insertAdjacentElement("afterend", this.__errorsElem);
         this.name = name;
+        this.setErrors(errors);
     }
 
     protected _onRender() {
@@ -30,20 +33,14 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     abstract hasValue(): boolean;
 
     setErrors(errors: Array<string>) {
-        this.element.classList.remove("has-errors");
-        if (this.__errorsElem) {
-            this.__errorsElem.remove();
-            this.__errorsElem = null;
-        }
-
+        this.__errorsElem.innerHTML = '';
         if (!errors || errors.length === 0) {
+            this.element.classList.remove("has-errors");
             return;
         }
 
         this.element.classList.add("has-errors");
-        this.__errorsElem = DOM.tag("ul", { class: "field-errors" });
         for (let i = 0; i < errors.length; i++)
             this.__errorsElem.appendChild(DOM.tag("li", null, errors[i]));
-        this.element.insertAdjacentElement("afterend", this.__errorsElem);
     }
 }

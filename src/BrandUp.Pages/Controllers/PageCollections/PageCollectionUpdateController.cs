@@ -1,93 +1,83 @@
-﻿using BrandUp.Pages.Interfaces;
-using BrandUp.Pages.Models;
+﻿using BrandUp.Pages.Models;
+using BrandUp.Pages.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrandUp.Pages.Controllers
 {
-	[Route("brandup.pages/collection/{id}/update", Name = "BrandUp.Pages.Collection.Update"), Filters.Administration]
-	public class PageCollectionUpdateController : FormController<PageCollectionUpdateForm, PageCollectionUpdateValues, PageCollectionModel>
-	{
-		#region Fields
+    [Route("brandup.pages/collection/{id}/update", Name = "BrandUp.Pages.Collection.Update"), Filters.Administration]
+    public class PageCollectionUpdateController(PageCollectionService pageCollectionService) : FormController<PageCollectionUpdateForm, PageCollectionUpdateValues, PageCollectionModel>
+    {
+        IPageCollection pageCollection;
 
-		private readonly IPageCollectionService pageCollectionService;
-		private IPageCollection pageCollection;
+        #region FormController members
 
-		#endregion
+        protected override async Task OnInitializeAsync()
+        {
+            if (!RouteData.Values.TryGetValue("id", out object pageCollectionIdValue))
+            {
+                AddErrors("Not valid id.");
+                return;
+            }
 
-		public PageCollectionUpdateController(IPageCollectionService pageCollectionService)
-		{
-			this.pageCollectionService = pageCollectionService ?? throw new ArgumentNullException(nameof(pageCollectionService));
-		}
+            if (!Guid.TryParse(pageCollectionIdValue.ToString(), out Guid pageCollectionId))
+            {
+                AddErrors("Not valid id.");
+                return;
+            }
 
-		#region FormController members
+            pageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollectionId);
+            if (pageCollection == null)
+            {
+                AddErrors("Not found page collection.");
+                return;
+            }
+        }
+        protected override Task OnBuildFormAsync(PageCollectionUpdateForm formModel)
+        {
+            formModel.PageCollection = GetPageCollectionModel(pageCollection);
 
-		protected override async Task OnInitializeAsync()
-		{
-			if (!RouteData.Values.TryGetValue("id", out object pageCollectionIdValue))
-			{
-				AddErrors("Not valid id.");
-				return;
-			}
+            formModel.Values.Title = pageCollection.Title;
+            formModel.Values.Sort = pageCollection.SortMode;
 
-			if (!Guid.TryParse(pageCollectionIdValue.ToString(), out Guid pageCollectionId))
-			{
-				AddErrors("Not valid id.");
-				return;
-			}
+            formModel.Sorts = new List<ComboBoxItem>
+            {
+                new ComboBoxItem(PageSortMode.FirstOld.ToString(), "Сначало старые"),
+                new ComboBoxItem(PageSortMode.FirstNew.ToString(), "Сначало новые")
+            };
 
-			pageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollectionId);
-			if (pageCollection == null)
-			{
-				AddErrors("Not found page collection.");
-				return;
-			}
-		}
-		protected override Task OnBuildFormAsync(PageCollectionUpdateForm formModel)
-		{
-			formModel.PageCollection = GetPageCollectionModel(pageCollection);
+            return Task.CompletedTask;
+        }
+        protected override Task OnChangeValueAsync(string field, PageCollectionUpdateValues values)
+        {
+            return Task.CompletedTask;
+        }
+        protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionUpdateValues values)
+        {
+            pageCollection.SetTitle(values.Title);
+            pageCollection.SetSortModel(values.Sort);
 
-			formModel.Values.Title = pageCollection.Title;
-			formModel.Values.Sort = pageCollection.SortMode;
+            await pageCollectionService.UpdateCollectionAsync(pageCollection, HttpContext.RequestAborted);
 
-			formModel.Sorts = new List<ComboBoxItem>
-			{
-				new ComboBoxItem(PageSortMode.FirstOld.ToString(), "Сначало старые"),
-				new ComboBoxItem(PageSortMode.FirstNew.ToString(), "Сначало новые")
-			};
+            return GetPageCollectionModel(pageCollection);
+        }
 
-			return Task.CompletedTask;
-		}
-		protected override Task OnChangeValueAsync(string field, PageCollectionUpdateValues values)
-		{
-			return Task.CompletedTask;
-		}
-		protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionUpdateValues values)
-		{
-			pageCollection.SetTitle(values.Title);
-			pageCollection.SetSortModel(values.Sort);
+        #endregion
 
-			await pageCollectionService.UpdateCollectionAsync(pageCollection, HttpContext.RequestAborted);
+        #region Helper methods
 
-			return GetPageCollectionModel(pageCollection);
-		}
+        private PageCollectionModel GetPageCollectionModel(IPageCollection pageCollection)
+        {
+            return new PageCollectionModel
+            {
+                Id = pageCollection.Id,
+                CreatedDate = pageCollection.CreatedDate,
+                PageId = pageCollection.PageId,
+                Title = pageCollection.Title,
+                PageType = pageCollection.PageTypeName,
+                Sort = pageCollection.SortMode
+            };
+        }
 
-		#endregion
-
-		#region Helper methods
-
-		private PageCollectionModel GetPageCollectionModel(IPageCollection pageCollection)
-		{
-			return new PageCollectionModel
-			{
-				Id = pageCollection.Id,
-				CreatedDate = pageCollection.CreatedDate,
-				PageId = pageCollection.PageId,
-				Title = pageCollection.Title,
-				PageType = pageCollection.PageTypeName,
-				Sort = pageCollection.SortMode
-			};
-		}
-
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -5,24 +5,21 @@ using SixLabors.ImageSharp.Processing;
 
 namespace LandingWebSite.Infrastructure
 {
-	public class ImageResizer : IImageResizer
-	{
-		public Task Resize(Stream imageStream, int width, int height, Stream output)
-		{
-			using (Image<Rgba32> image = Image.Load<Rgba32>(imageStream))
-			{
-				var resizeOptions = new ResizeOptions
-				{
-					Mode = ResizeMode.Crop,
-					Size = new Size(width, height),
-					//CenterCoordinates = new List<float> { 5000, 5000 }
-				};
+    public class ImageResizer : IImageResizer
+    {
+        public async Task ResizeAsync(Stream imageStream, int width, int height, Stream output, CancellationToken cancellationToken)
+        {
+            using Image<Rgba32> image = Image.Load<Rgba32>(imageStream);
 
-				image.Mutate(x => x.Resize(resizeOptions));
-				image.SaveAsJpeg(output, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder() { Quality = 65 });
-			}
+            var resizeOptions = new ResizeOptions
+            {
+                Mode = ResizeMode.Crop,
+                Size = new Size(width, height),
+                //CenterCoordinates = new List<float> { 5000, 5000 }
+            };
 
-			return Task.CompletedTask;
-		}
-	}
+            image.Mutate(x => x.Resize(resizeOptions));
+            await image.SaveAsJpegAsync(output, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder() { Quality = 65 }, cancellationToken);
+        }
+    }
 }

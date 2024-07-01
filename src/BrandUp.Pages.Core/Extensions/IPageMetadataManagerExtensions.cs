@@ -2,7 +2,7 @@
 {
 	public static class IPageMetadataManagerExtensions
 	{
-		public static PageMetadataProvider GetMetadata(this IPageMetadataManager pageMetadataManager, string name)
+		public static PageMetadataProvider GetMetadata(this PageMetadataManager pageMetadataManager, string name)
 		{
 			var pageMetadataProvider = pageMetadataManager.FindPageMetadataByName(name);
 			if (pageMetadataProvider == null)
@@ -10,7 +10,7 @@
 			return pageMetadataProvider;
 		}
 
-		public static PageMetadataProvider GetMetadata(this IPageMetadataManager pageMetadataManager, Type modelType)
+		public static PageMetadataProvider GetMetadata(this PageMetadataManager pageMetadataManager, Type modelType)
 		{
 			var pageMetadataProvider = pageMetadataManager.FindPageMetadataByContentType(modelType);
 			if (pageMetadataProvider == null)
@@ -18,7 +18,7 @@
 			return pageMetadataProvider;
 		}
 
-		public static PageMetadataProvider GetMetadata<TModel>(this IPageMetadataManager pageMetadataManager)
+		public static PageMetadataProvider GetMetadata<TModel>(this PageMetadataManager pageMetadataManager)
 		{
 			return GetMetadata(pageMetadataManager, typeof(TModel));
 		}

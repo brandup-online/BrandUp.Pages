@@ -1,0 +1,15 @@
+{
+  "LogoText": "PAGES",
+  "Items": [
+    {
+      "_type": "PageNav.MenuItem",
+      "Text": "News",
+      "Url": "url(/news)"
+    },
+    {
+      "_type": "PageNav.MenuItem",
+      "Text": "About",
+      "Url": "url(/about)"
+    }
+  ]
+}

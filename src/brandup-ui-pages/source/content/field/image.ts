@@ -11,8 +11,8 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
 
-    constructor(form: IContentForm, name: string, options: ImageFieldOptions) {
-        super(name, options);
+    constructor (form: IContentForm, name: string, errors: string[], options: ImageFieldOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }
@@ -102,10 +102,11 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
                 urlParams: { fileName: file.name },
                 method: "POST",
                 data: file,
-                success: (response: AjaxResponse<ImageFieldValue>) => {
+                success: (response: AjaxResponse) => {
                     switch (response.status) {
                         case 200:
-                            this.setValue(response.data);
+                            this.setValue(response.data.value);
+                            this.setErrors(response.data.errors);
 
                             this.valueElem.classList.remove("uploading");
 
@@ -123,10 +124,11 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
                 url: `/brandup.pages/content/image/url`,
                 urlParams: { url: file },
                 method: "POST",
-                success: (response: AjaxResponse<ImageFieldValue>) => {
+                success: (response: AjaxResponse) => {
                     switch (response.status) {
                         case 200:
-                            this.setValue(response.data);
+                            this.setValue(response.data.value);
+                            this.setErrors(response.data.errors);
 
                             this.valueElem.classList.remove("uploading");
 

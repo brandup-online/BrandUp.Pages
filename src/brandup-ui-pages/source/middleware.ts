@@ -1,7 +1,8 @@
-﻿import { Middleware } from "brandup-ui-app";
+﻿import { IContentModel } from "./admin/page-toolbar";
+import { Middleware, NavigateContext } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
-import ContentPage from "./pages/content";
-import "./styles.less";
+
+const UI = () => import("./ui");
 
 export class PagesMiddleware extends Middleware {
     start(context, next) {
@@ -10,24 +11,17 @@ export class PagesMiddleware extends Middleware {
         this._showUI(context.items);
     }
 
-    navigate(context, next) {
+    navigate(context: NavigateContext, next) {
         next();
-
-        this._showUI(context.items);
+        this._showUI(context.items, context.context.content || []);
     }
 
-    private _showUI(items: { [key: string]: any }) {
+    private _showUI(items: { [key: string]: any }, content: IContentModel[] = []) {
         if (items["nav"].enableAdministration) {
             const page = items["page"] as Page<PageModel>;
-            if (!page.model.editId) {
-                import("./admin/website").then(d => {
-                    page.attachDestroyElement(new d.WebSiteToolbar(page));
-                });
-            }
-
-            if (page instanceof ContentPage) {
-                import("./admin/page").then(d => {
-                    page.attachDestroyElement(new d.PageToolbar(page as ContentPage));
+            if (page) {
+                UI().then(t => {
+                    t.default(page, content);
                 });
             }
         }

@@ -44,7 +44,7 @@ module.exports = (env) => {
             chunkFilename: isDevBuild ? '[name].js' : '[name].[contenthash].js',
             iife: true,
             clean: true,
-            publicPath: 'dist/'
+            publicPath: '/dist/'
         },
         module: {
             rules: [
@@ -104,8 +104,7 @@ module.exports = (env) => {
         plugins: [
             new MiniCssExtractPlugin({
                 filename: '[name].css',
-                chunkFilename: isDevBuild ? '[id].css' : '[id].[contenthash].css',
-                ignoreOrder: true
+                chunkFilename: isDevBuild ? '[id].css' : '[id].[contenthash].css'
             })
         ]
     }];

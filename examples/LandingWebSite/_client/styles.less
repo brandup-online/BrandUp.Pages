@@ -35,7 +35,7 @@ body {
 
 h1, h2, h3, h4, h5 {
 	font-family: @Header-Font-Family;
-	font-weight: normal;
+	font-weight: 500;
 	padding: 0;
 	margin: 0;
 	line-height: normal;
@@ -47,6 +47,10 @@ a {
 	&:hover {
 		color: @Link-Color-Hover;
 	}
+}
+
+svg {
+	display: block;
 }
 
 .content-width {
@@ -93,9 +97,22 @@ nav.app-top {
 
 	& a.logo {
 		color: #fff;
-		font-size: 32px;
+		font-size: 28px;
 		line-height: 40px;
 		text-decoration: none;
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
+		column-gap: 10px;
+
+		& svg {
+			width: 40px;
+			height: 40px;
+		}
+
+		& span {
+			text-transform: uppercase;
+		}
 	}
 
 	& ul {
@@ -126,9 +143,17 @@ nav.app-top {
 			& svg {
 				display: block;
 				fill: #fff;
-				width: 30px;
-				height: 30px;
+				width: 26px;
+				height: 26px;
 			}
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+
+		&.user {
+			flex: 0 0 auto;
 		}
 	}
 
@@ -189,11 +214,15 @@ main.app-content {
 		transform: translate3d(0px, 0px, 0px);
 		transition: transform ease 250ms;
 		display: flex;
-		align-items: stretch;
+		flex-flow: column nowrap;
+		justify-content: flex-end;
+		box-sizing: border-box;
+		padding: @Content-Padding 0;
+		row-gap: @Content-Padding;
 
-		& ul.menu {
+		& ul {
 			list-style: none;
-			padding: @Content-Padding 25px;
+			padding: 0 25px;
 			margin: 0;
 			width: 100%;
 			box-sizing: border-box;
@@ -203,17 +232,23 @@ main.app-content {
 				padding: 8px 0;
 				margin: 0;
 
-				& a {
-					text-decoration: none;
-					display: block;
-					color: @Text-Color;
-					font-size: 18px;
-					line-height: 24px;
-				}
-
 				&.separator {
 					height: @Content-Padding / 4;
 					overflow: hidden;
+				}
+			}
+
+			& a {
+				text-decoration: none;
+				display: block;
+				color: @Text-Color;
+				font-size: 18px;
+				line-height: 24px;
+			}
+
+			&.site {
+				& a {
+					font-weight: 500;
 				}
 			}
 		}
@@ -222,6 +257,10 @@ main.app-content {
 
 .page-header {
 	padding-bottom: 20px;
+
+	& h1 {
+		font-weight: 400;
+	}
 
 	& p {
 		padding: 10px 0 0;
@@ -243,8 +282,13 @@ main.app-content {
 	}
 }
 
+.page-blocks {
+	display: flex;
+	flex-flow: column nowrap;
+	row-gap: @Content-Padding;
+}
+
 .block-text {
-	margin: 0 0 @Content-Padding 0;
 	line-height: 150%;
 	position: relative;
 
@@ -326,8 +370,6 @@ main.app-content {
 
 .banner-block {
 	&.BB1 {
-		margin: 0 0 @Content-Padding 0;
-
 		& .items {
 			display: flex;
 			flex-flow: row wrap;

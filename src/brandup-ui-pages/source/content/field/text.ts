@@ -5,8 +5,8 @@ import { AjaxResponse } from "brandup-ui-ajax";
 export class TextContent extends Textbox implements IContentField {
     readonly form: IContentForm;
 
-    constructor(form: IContentForm, name: string, options: TextboxOptions) {
-        super(name, options);
+    constructor(form: IContentForm, name: string, errors: string[], options: TextboxOptions) {
+        super(name, errors, options);
 
         this.form = form;
     }
@@ -21,12 +21,13 @@ export class TextContent extends Textbox implements IContentField {
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (response: AjaxResponse<string>) => {
+            success: (response: AjaxResponse<{errors: string[], value: string}>) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    this.setValue(response.data.value);
+                    this.setErrors(response.data.errors);
                 }
                 else {
-                    this.setErrors([ "error" ]);
+                    this.setErrors([]);
                 }
             }
         });

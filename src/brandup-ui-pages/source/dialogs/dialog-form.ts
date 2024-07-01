@@ -206,17 +206,17 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         this.__fields[field.name.toLowerCase()] = field;
     }
     protected addTextBox(name: string, title: string, options: TextboxOptions) {
-        const field = new Textbox(name, options);
+        const field = new Textbox(name, [], options);
         this.addField(title, field);
     }
     protected addComboBox(name: string, title: string, options: ComboBoxFieldOptions, items: Array<ComboBoxItem>) {
-        const field = new ComboBoxField(name, options);
+        const field = new ComboBoxField(name, [], options);
         this.addField(title, field);
 
         field.addItems(items);
     }
     protected addStringArray(name: string, title: string, options: StringArrayFieldOptions) {
-        const field = new StringArrayField(name, options);
+        const field = new StringArrayField(name, [], options);
         this.addField(title, field);
     }
 
