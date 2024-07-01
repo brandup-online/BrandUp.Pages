@@ -74,9 +74,10 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (response: AjaxResponse<string>) => {
+            success: (response: AjaxResponse) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    this.setValue(response.data.value);
+                    this.setValid(response.data.errors.length === 0);
                 }
             }
         });
@@ -100,10 +101,8 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     destroy() {
         this.element.classList.remove("html-designer");
         this.element.removeAttribute("data-placeholder");
-
-        this.__editor.destroy().then(() => {
-            super.destroy();
-        });
+        this.__editor.destroy();
+        super.destroy();
     }
 }
 
