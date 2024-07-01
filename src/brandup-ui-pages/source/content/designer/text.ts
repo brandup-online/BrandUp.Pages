@@ -103,7 +103,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
             data: value ? value : "",
             success: (response) => {
                 if (response.status === 200) {
-                    this.setValue(response.data);
+                    this.setValue(response.data.value);
+                    this.setValid(response.data.errors.length === 0);
                 }
             }
         });

@@ -9,14 +9,15 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
     readonly path: string;
     readonly name: string;
     readonly fullPath: string;
+    protected eventCallbacks: { [keys: string]: ((e: DesignerEvent<any>) => void)[] } = {};
 
     constructor(page: IPageDesigner, elem: HTMLElement, options: TOptions) {
         super();
 
         this.page = page;
         this.options = options;
-        this.path = elem.getAttribute("content-path");
-        this.name = this.fullPath = elem.getAttribute("content-field");
+        this.path = elem.getAttribute("data-content-field-path");
+        this.name = this.fullPath = elem.getAttribute("data-content-field-name");
 
         if (this.path)
             this.fullPath = this.path + "." + this.fullPath;
@@ -26,6 +27,20 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         elem.classList.add("field-designer");
 
         this.onRender(elem);
+    }
+
+    setCallback(name: string, handler: (e: DesignerEvent<any>) => void) {
+        if (!this.eventCallbacks[name]) this.eventCallbacks[name] = [];
+        this.eventCallbacks[name].push(handler);
+    }
+
+    protected triggerCallback(name: string, e: DesignerEvent<any>) {
+        if (this.eventCallbacks[name])
+            this.eventCallbacks[name].forEach(hook => hook(e));
+    }
+
+    removeCallback(name:string) {
+        delete this.eventCallbacks[name];
     }
 
     protected abstract onRender(elem: HTMLElement);
@@ -48,7 +63,11 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
 
     destroy() {
         this.element.classList.remove("field-designer");
-
         super.destroy();
     }
+}
+
+export interface DesignerEvent<TValue> {
+    value: TValue;
+    target: HTMLElement;
 }

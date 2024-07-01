@@ -54,7 +54,7 @@
 
             hyperLink = default;
 
-            var temp = value.Split(['(', ')'], StringSplitOptions.RemoveEmptyEntries);
+            var temp = value.Split(new char[] {'(', ')'}, StringSplitOptions.RemoveEmptyEntries);
             if (temp.Length != 2)
                 return false;
 
