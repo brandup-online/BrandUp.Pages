@@ -123,18 +123,18 @@ export class Editor extends UIElement implements IPageDesigner {
                 for (const contentItem of this.content) {
                     const fields = new Map<string, FieldProvider>();
                     contentItem.fields.forEach((item: ContentFieldModel) => {
-                        const contentPathElem = contentFieldsMap.get(contentItem.path)?.get(item.name);
-                        let type = contentPathElem.getAttribute("data-content-designer");
+                        const fieldElem = contentFieldsMap.get(contentItem.path)?.get(item.name);
+                        if (!fieldElem) return;
+                        let type = fieldElem.getAttribute("data-content-designer");
                         const field = this.__getFieldInstance(type);
-                        if (!contentPathElem) return;
                         
                         if (field === ModelFieldProvider) {
-                            const fieldProvider = new field(this, item, contentPathElem, type === "page-blocks" ? PageBlocksDesigner : ModelDesigner)
+                            const fieldProvider = new field(this, item, fieldElem, type === "page-blocks" ? PageBlocksDesigner : ModelDesigner)
                             fields.set(item.name, fieldProvider);
                             modelFields.set((contentItem.path + item.name).replace(".", ""), fieldProvider as ModelFieldProvider);
                         }
                         else
-                            fields.set(item.name, new field(this, item, contentPathElem));
+                            fields.set(item.name, new field(this, item, fieldElem));
                     });
                     const contentPathElem = contentPathMap.get(contentItem.path);
                     if (!contentPathElem) continue;
@@ -151,8 +151,6 @@ export class Editor extends UIElement implements IPageDesigner {
                 this.page.refreshScripts();
             },
         });
-
-
     }
 
     private __getFieldInstance(type: string) {
@@ -171,6 +169,11 @@ export class Editor extends UIElement implements IPageDesigner {
             default:
                 throw new Error("field type not found");
         }
+    }
+
+    createContentFromHtml(container: HTMLElement) {
+        const content = new Content(this, null, container, ); // TODO Подумать над созданием контента без обращения к бэкенду
+        return content;
     }
 
     redraw () { // Временный публичный метод для ModelDesigner

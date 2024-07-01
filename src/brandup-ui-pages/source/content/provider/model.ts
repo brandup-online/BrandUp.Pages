@@ -27,7 +27,7 @@ export class ModelFieldProvider extends FieldProvider {
         designer.setCallback("add-item", (e) => {
             const elem = e.target;
             const itemType = elem.getAttribute("data-item-type");
-            let itemIndex = e.value + 1;
+            let itemIndex = e.value;
 
             if (!itemType) {
                 selectContentType(this.model.options.itemTypes).then((type) => {
@@ -116,7 +116,11 @@ export class ModelFieldProvider extends FieldProvider {
                         method: "GET",
                         success: (response: AjaxResponse<string>) => {
                             if (response.status === 200) {
-                                (this.designer as PageBlocksDesigner).addItem(response.data, index);
+                                const container = (this.designer as PageBlocksDesigner).addItem(response.data, index);
+                                const content = this.__editor.createContentFromHtml(container);
+                                content.parent = this;
+                                this.__items.splice(index, 0, content);
+                                content.renderDesigners();
                             }
                         }
                     });
