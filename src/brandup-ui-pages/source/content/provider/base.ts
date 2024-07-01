@@ -1,14 +1,14 @@
 import { Editor } from "../editor";
-import { IContentField, IContentFieldDesigner } from "../../typings/content";
+import { ContentFieldModel, IContentField, IContentFieldDesigner } from "../../typings/content";
 
-export abstract class FieldProvider<TModel> {
-    readonly model: TModel;
+export abstract class FieldProvider {
+    readonly model: ContentFieldModel;
     designer: IContentFieldDesigner;
     field: IContentField;
     protected __valueElem: HTMLElement;
     protected __editor: Editor;
 
-    constructor(editor: Editor, model: TModel, valueElem: HTMLElement = null) {
+    constructor(editor: Editor, model: ContentFieldModel, valueElem: HTMLElement = null) {
         this.model = model;
         this.__valueElem = valueElem;
         this.__editor = editor;

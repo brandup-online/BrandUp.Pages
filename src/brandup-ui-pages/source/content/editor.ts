@@ -1,25 +1,26 @@
 ﻿import { DOM } from "brandup-ui-dom";
-import { IPageDesigner, IContentFieldDesigner } from "../typings/content";
-import { AjaxQueue } from "brandup-ui-ajax";
+import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../typings/content";
+import { AjaxQueue, AjaxResponse } from "brandup-ui-ajax";
 import { Page } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
 import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
-import { IContentModel } from "../admin/page-toolbar";
+import { BeginPageEditResult, IContentModel } from "../admin/page-toolbar";
 import { FieldProvider } from "./provider/base";
 import { HtmlFieldProvider } from "./provider/html";
 import { ImageFieldProvider } from "./provider/image";
 import { ModelFieldProvider } from "./provider/model";
-import { PageBlocksFieldProvider } from "./provider/page-blocks";
 import { TextFieldProvider } from "./provider/text";
 import { HyperlinkFieldProvider } from "./provider/hyperlink";
+import { ModelDesigner } from "./designer/model";
+import { PageBlocksDesigner } from "./designer/page-blocks";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
     readonly contentElem: HTMLElement;
-    readonly content: IContentModel[];
+    private content: IContentModel[];
     readonly editId: string;
     readonly queue: AjaxQueue;
     private __fields: { [key: string]: IContentFieldDesigner } = {};
@@ -84,41 +85,74 @@ export class Editor extends UIElement implements IPageDesigner {
     }
 
     private __renderContent() {
-        this.__contentItems.forEach(item => item.destroy());
+        this.page.website.request({
+            url: "/brandup.pages/page/content/content",
+            urlParams: { editId: this.editId },
+            method: "GET",
+            success: (response: AjaxResponse) => {
+                this.__isLoading = false;
 
-        this.__fields = {};
-        this.__contentItems = [];
+                if (response.status !== 200) {
+                    throw "Error get content.";
+                }
 
-        const contentPathMap = new Map<string, HTMLElement>();
-        const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
+                this.content = response.data.content;
 
-        contentPathMap.set("", this.contentElem);
+                // this.__contentItems.forEach(item => item.destroy());
         
-        DOM.queryElements(this.contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.dataset.contentPath, elem));
-        DOM.queryElements(this.contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
-            const fieldPath = elem.dataset.contentFieldPath;
-            const fieldName = elem.dataset.contentFieldName;
-            if (!contentFieldsMap.has(fieldPath)) {
-                contentFieldsMap.set(fieldPath, new Map());
-            }
-            contentFieldsMap.get(fieldPath).set(fieldName, elem);
+                this.__fields = {};
+                this.__contentItems = [];
+        
+                const contentPathMap = new Map<string, HTMLElement>();
+                const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
+                
+                contentPathMap.set("", this.contentElem);
+                
+                DOM.queryElements(this.contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.dataset.contentPath, elem));
+                DOM.queryElements(this.contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
+                    const fieldPath = elem.dataset.contentFieldPath;
+                    const fieldName = elem.dataset.contentFieldName;
+                    if (!contentFieldsMap.has(fieldPath)) {
+                        contentFieldsMap.set(fieldPath, new Map());
+                    }
+                    contentFieldsMap.get(fieldPath).set(fieldName, elem);
+                });
+
+                const modelFields = new Map<string, ModelFieldProvider>();
+                
+                for (const contentItem of this.content) {
+                    const fields = new Map<string, FieldProvider>();
+                    contentItem.fields.forEach((item: ContentFieldModel) => {
+                        const contentPathElem = contentFieldsMap.get(contentItem.path)?.get(item.name);
+                        let type = contentPathElem.getAttribute("data-content-designer");
+                        const field = this.__getFieldInstance(type);
+                        if (!contentPathElem) return;
+                        
+                        if (field === ModelFieldProvider) {
+                            const fieldProvider = new field(this, item, contentPathElem, type === "page-blocks" ? PageBlocksDesigner : ModelDesigner)
+                            fields.set(item.name, fieldProvider);
+                            modelFields.set((contentItem.path + item.name).replace(".", ""), fieldProvider as ModelFieldProvider);
+                        }
+                        else
+                            fields.set(item.name, new field(this, item, contentPathElem));
+                    });
+                    const contentPathElem = contentPathMap.get(contentItem.path);
+                    if (!contentPathElem) continue;
+                    const content = new Content(this, contentItem, contentPathElem, fields);
+                    const path = contentItem.path.split(".");
+                    path[path.length-1] = path[path.length-1].replace(/\W|\d/g, "");
+                    content.parent = modelFields.get(path.reduce((acc, value) => acc += value));
+                    
+                    content.renderDesigners();
+                    this.__fields = { ...this.__fields, ...content.getDesigers() };
+                    this.__contentItems.push(content);
+                }
+                modelFields.forEach(model => model.items = this.__contentItems.filter(content => content.parent === model));
+                this.page.refreshScripts();
+            },
         });
-        
-        for (const contentItem of this.content) {
-            const fields = new Map<string, FieldProvider<any>>();
-            contentItem.fields.forEach(item => {
-                let type = item.type.toLowerCase();
-                if (type === "model" && item.name === "Blocks") type = "page-blocks";
-                const field = this.__getFieldInstance(type);
-                fields.set(item.name, new field(this, item, contentFieldsMap.get(contentItem.path).get(item.name)));
-            });
-            const content = new Content(this, contentItem, contentPathMap.get(contentItem.path), fields);
-            content.renderDesigners();
-            this.__fields = { ...this.__fields, ...content.getDesigers() };
-            this.__contentItems.push(content);
-        }
 
-        this.page.refreshScripts();
+
     }
 
     private __getFieldInstance(type: string) {
@@ -132,16 +166,15 @@ export class Editor extends UIElement implements IPageDesigner {
             case "image":
                 return ImageFieldProvider;
             case "model":
-                return ModelFieldProvider;
             case "page-blocks":
-                return PageBlocksFieldProvider;  
+                return ModelFieldProvider;
             default:
                 throw new Error("field type not found");
         }
     }
 
     redraw () { // Временный публичный метод для ModelDesigner
-        this.__renderContent();
+        // this.page.website.nav({ url: this.page.buildUrl({ editid: this.editId }), replace: true });
     }
 
     private __initLogic() {
@@ -216,12 +249,16 @@ export class Editor extends UIElement implements IPageDesigner {
     }
 }
 
-class Content {
-    private __fields: Map<string, FieldProvider<any>>;
+export class Content {
+    private __fields: Map<string, FieldProvider>;
     private __container: HTMLElement;
     private __editor: Editor;
+    private __parent: ModelFieldProvider | null;
+    set parent(field: ModelFieldProvider) {this.__parent = field}
+    get parent() { return this.__parent }
+    get containerDataset() { return this.__container.dataset };
 
-    constructor(editor: Editor, model: any, container: HTMLElement = null, fields: Map<string, FieldProvider<any>> = new Map()) {
+    constructor(editor: Editor, model: any, container: HTMLElement = null, fields: Map<string, FieldProvider> = new Map()) {
         this.__container = container;
         this.__editor = editor;
         this.__fields = fields;
@@ -229,7 +266,7 @@ class Content {
 
     getDesigers() {
         const result = {};
-        this.__fields.forEach(field => result[field.designer?.fullPath] = field.designer);
+        this.__fields.forEach(field => { if (field.designer) result[field.designer.fullPath] = field.designer });
         return result;
     }
 

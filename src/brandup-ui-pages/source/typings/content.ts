@@ -61,4 +61,6 @@ export interface ContentFieldModel {
     title: string;
     options: any;
     value: any;
+    errors: string[];
+    isRequired: boolean;
 }

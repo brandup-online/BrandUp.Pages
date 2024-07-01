@@ -45,7 +45,7 @@ export class PageBlocksDesigner extends ModelDesigner {
             itemElem.classList.add("processing");
             const index = this.getItemIndex(itemElem);
             itemElem.remove();
-            // this._refreshBlockIndexes();
+            this._refreshBlockIndexes();
             this.renderBlocks();
             this.triggerCallback("item-delete", {value: { index, itemElem }, target: elem});
         });
@@ -60,8 +60,8 @@ export class PageBlocksDesigner extends ModelDesigner {
             itemElem.classList.add("processing");
 
             itemElem.previousElementSibling.insertAdjacentElement("beforebegin", itemElem);
-            this._refreshBlockIndexes();
             this.renderBlocks();
+            this._refreshBlockIndexes();
 
             this.triggerCallback("item-up", { target: itemElem as HTMLElement, value: itemIndex});
         });
@@ -77,8 +77,8 @@ export class PageBlocksDesigner extends ModelDesigner {
             itemElem.classList.add("processing");
 
             itemElem.nextElementSibling.insertAdjacentElement("afterend", itemElem);
-            this._refreshBlockIndexes();
             this.renderBlocks();
+            this._refreshBlockIndexes();
 
             this.triggerCallback("item-down", { target: itemElem as HTMLElement, value: itemIndex});
         });
@@ -97,15 +97,11 @@ export class PageBlocksDesigner extends ModelDesigner {
             f(elements.item(i), i);
     }
     protected countItems(): number {
-        let i = 0;
-        this.eachItems(() => i++);
-        return i;
+        return this.getItems().length;
     }
     protected getItemIndex(item: Element) {
-        const items = this.getItems();
-        for (let i = 0; i < items.length; i++) {
-            if (items.item(i) === item) return i;
-        }
+        const index = +item.getAttribute("data-content-path-index");
+        if (index >=0) return index;
         return -1;
     }
     protected getItems () {
@@ -122,7 +118,12 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         return itemElem;
     }
-    addItem (data, index) {
+
+    protected _refreshBlockIndexes() {
+        this.eachItems((elem, index) => elem.setAttribute("data-content-path-index", index.toString()));
+    }
+
+    addItem (data: string, index: number) {
         const fragment = document.createDocumentFragment();
         const container = DOM.tag("div", null, data);
         fragment.appendChild(container);
@@ -138,17 +139,11 @@ export class PageBlocksDesigner extends ModelDesigner {
         }
 
         this.page.redraw();
-
-        this._renderBlock(newElem);
-
-        this._refreshBlockIndexes();
+        return newElem;
     }
 
     renderBlocks() {
         this.eachItems((elem) => { this._renderBlock(elem as HTMLElement); });
-    }
-    protected _refreshBlockIndexes() {
-        this.eachItems((elem, index) => { elem.setAttribute("data-content-path-index", index.toString()); });
     }
 
     refreshItem(elem: Element, content: any) {
@@ -162,6 +157,7 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         this._renderBlock(newElem);
         this.page.redraw();
+        this._refreshBlockIndexes();
     }
 
     protected _renderBlock(blockElem: HTMLElement) {

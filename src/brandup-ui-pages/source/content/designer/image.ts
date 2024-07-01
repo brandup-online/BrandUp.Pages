@@ -176,11 +176,11 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     }
 
     destroy() {
-        this.element.classList.remove("image-designer");
+        // this.element.classList.remove("image-designer");
 
-        this.__menuElem.remove();
-        this.__fileInputElem.remove();
-        this.__progressElem.remove();
+        // this.__menuElem?.remove();
+        // this.__fileInputElem?.remove();
+        // this.__progressElem?.remove();
 
         super.destroy();
     }
