@@ -2,7 +2,7 @@
 import { DOM } from "brandup-ui-dom";
 import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
-import { ImageFieldOptions } from "../field/image";
+import { ImageFieldOptions, ImageFieldValue } from "../field/image";
 import { AjaxResponse } from "brandup-ui-ajax";
 import { ImageFieldProvider } from "../../content/provider/image";
 
@@ -120,8 +120,8 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldPr
         return this.element.style.backgroundImage.substring(4).substring(-1);
     };
 
-    setValue(value: string) {
-        this.element.style.backgroundImage = `url(${value})`;
+    setValue(value: ImageFieldValue) {
+        this.element.style.backgroundImage = `url(${value.previewUrl})`;
         this.element.classList.remove("uploading");
     };
 
@@ -133,7 +133,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldPr
         this.element.classList.add("uploading");
         const width = this.element.getAttribute("content-image-width");
         const height = this.element.getAttribute("content-image-height");
-        this.provider.setValue(file);
+        this.provider.changeValue(file);
     }
 
     destroy() {

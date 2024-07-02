@@ -1,11 +1,9 @@
 ﻿import { AjaxQueue, AjaxRequest } from "brandup-ui-ajax";
 
 export interface IContentForm {
-    editId: string;
     modelPath: string;
     queue: AjaxQueue;
 
-    request(field: IContentField, options: AjaxRequest);
     navigate(modelPath: string);
     getField(name: string): IContentField;
 }
@@ -19,7 +17,6 @@ export interface IContentFieldProvider {
 }
 
 export interface IContentField {
-    form: IContentForm;
     name: string;
     
     setValue(value: any);

@@ -1,4 +1,4 @@
-import { ImageFieldValue, ImageFieldOptions } from "../../content/field/image";
+import { ImageFieldValue, ImageFieldOptions, ImageContent } from "../../content/field/image";
 import { ImageDesigner } from "../designer/image";
 import { FieldProvider } from "./base";
 import { AjaxResponse } from "brandup-ui-ajax";
@@ -8,7 +8,13 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         return new ImageDesigner(this.__valueElem, this.__model.options, this);
     }
 
-    setValue(value: File | string): void {
+    createField() {
+        const { name, errors, options } = this.__model;
+        this.field = new ImageContent(name, errors, options, this);
+        return this.field;
+    }
+
+    changeValue(value: File | string): void {
         let requestOptions: {[key: string]: any} = {};
         if (value instanceof File) {
             requestOptions = {
@@ -39,11 +45,16 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
             success: (response: AjaxResponse) => {
                 switch (response.status) {
                     case 200:
+                        console.log("🚀 ~ ImageFieldProvider ~ changeValue ~ response.dat:", response.data)
                         super.setValue(response.data.value);
                         this.setErrors(response.data.errors);
                         break;
                 }
             }
         });
+    }
+
+    setValue(value: ImageFieldValue) {
+        super.setValue(value);
     }
 }

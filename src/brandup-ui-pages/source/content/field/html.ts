@@ -1,21 +1,15 @@
-﻿import { IContentField, IContentForm } from "../../typings/content";
-import { Field } from "../../form/field";
+﻿import { IContentField } from "../../typings/content";
 import { DOM } from "brandup-ui-dom";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
+import { FormField } from "./base";
+import { HtmlFieldProvider } from "../../content/provider/html";
 
-export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements IContentField {
-    readonly form: IContentForm;
+export class HtmlContent extends FormField<string, HtmlFieldFormOptions, HtmlFieldProvider>  implements IContentField {
     private __isChanged: boolean;
     private __value: HTMLElement;
     private __editor: ContentEditor;
     private __editorPromise: Promise<any>;
-
-    constructor(form: IContentForm, name: string, errors: string[], options: HtmlFieldFormOptions) {
-        super(name, errors, options);
-
-        this.form = form;
-    }
 
     get typeName(): string { return "BrandUpPages.Form.Field.Html"; }
 
@@ -82,24 +76,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
 
     protected _onChanged() {
         this.__refreshUI();
-
-        const value = this.getValue();
-
-        this.form.request(this, {
-            url: '/brandup.pages/content/html',
-            method: "POST",
-            type: "JSON",
-            data: value ? value : "",
-            success: (response) => {
-                if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.setErrors(response.data.errors);
-                }
-                else {
-                    this.setErrors([]);
-                }
-            }
-        });
+        super._onChanged();
     }
     private __refreshUI() {
         if (this.hasValue())

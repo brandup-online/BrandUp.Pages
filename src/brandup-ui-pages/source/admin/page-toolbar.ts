@@ -322,4 +322,6 @@ export interface IField {
     title: string;
     isRequired: boolean;
     value: object;
+    errors: string[];
+    options: any;
 }

@@ -5,7 +5,7 @@ import { ContentFieldModel, IContentFieldDesigner } from "../../typings/content"
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
-import { ModelFieldFormValue } from "../../content/field/model";
+import { ModelField, ModelFieldFormValue } from "../../content/field/model";
 import { Content } from "../../content/content";
 
 export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, ModelDesignerOptions> {
@@ -20,6 +20,12 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
     createDesigner() {
         const designer = new this.__designerType(this.__valueElem, this.__model.options, this);
         return designer;
+    }
+
+    createField() {
+        const { name, errors, options } = this.__model;
+        this.field = new ModelField(name, errors, options, this);
+        return this.field;
     }
 
     itemUp(index: number, elem: Element) {
@@ -46,13 +52,28 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
             urlParams: { itemIndex: index.toString() },
             method: "DELETE",
             success: (() => {
+                (this.designer as ModelDesigner)?.deleteItem(index);
+                (this.field as ModelField)?.deleteItem(index);
                 this.content.__editor.removeContentItem(path);
             })
         });
     }
 
+    moveItem(itemIndex: number, newIndex: number) {
+        this.request({
+            url: '/brandup.pages/content/model/move',
+            urlParams: { itemIndex: itemIndex.toString(), newIndex: newIndex.toString() },
+            method: "POST",
+            success: (response: AjaxResponse) => {
+                if (response.status === 200) {
+                    this.setValue(response.data.value);
+                }
+            }
+        });
+    }
+
     settingItem(contentPath: string) {
-        editPage(this.content.__editor.editId, contentPath).then(() => {
+        editPage(this.content.__editor, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {
             // this.__refreshItem(e.target, e.value.index);
@@ -67,7 +88,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
             urlParams: urlParams,
             method: "GET",
             success: (response: AjaxResponse<string>) => {
-                (this.designer as ModelDesigner).refreshItem(elem, response.data);
+                (this.designer as ModelDesigner)?.refreshItem(elem, response.data);
                 this.content.__editor.redraw();
             }
         });
@@ -90,7 +111,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
                             method: "GET",
                             success: (response: AjaxResponse<string>) => {
                                 if (response.status === 200) {
-                                    (this.designer as ModelDesigner).addItem(response.data, index);
+                                    (this.designer as ModelDesigner)?.addItem(response.data, index);
                                     this.content.__editor.redraw();
                                 }
                             }

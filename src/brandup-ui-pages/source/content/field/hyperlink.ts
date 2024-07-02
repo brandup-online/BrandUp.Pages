@@ -5,8 +5,10 @@ import iconArrow from "../../svg/combobox-arrow.svg";
 import { PageModel } from "../../typings/models";
 import "./hyperlink.less";
 import { DOM } from "brandup-ui-dom";
+import { FormField } from "./base";
+import { HyperlinkFieldProvider } from "../../content/provider/hyperlink";
 
-export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> implements IContentField {
+export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLinkFieldFormOptions, HyperlinkFieldProvider> implements IContentField {
     readonly form: IContentForm;
     private __typeElem: HTMLElement;
     private __valueElem: HTMLElement;
@@ -20,12 +22,6 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
     private __type: HyperLinkType = "Page";
     private __searchTimeout: number;
     private __searchRequest: XMLHttpRequest;
-
-    constructor (form: IContentForm, name: string, errors: string[], options: HyperLinkFieldFormOptions) {
-        super(name, errors, options);
-
-        this.form = form;
-    }
 
     get typeName(): string { return "BrandUpPages.Form.Field.HyperLink"; }
 
@@ -45,23 +41,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.__urlValueInput.addEventListener("change", () => {
             this.__refreshUI();
 
-            this.form.request(this, {
-                url: `/brandup.pages/content/hyperlink/url`,
-                urlParams: {
-                    url: this.__urlValueInput.value
-                },
-                method: "POST",
-                success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.setValue(response.data);
-
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
+            this.provider.changeValue(this.__urlValueInput.value);
         });
         this.__urlValueInput.addEventListener("blur", () => {
             this.element.classList.remove("inputing");
@@ -200,23 +180,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
             this.__refreshUI();
 
-            this.form.request(this, {
-                url: `/brandup.pages/content/hyperlink/page`,
-                urlParams: {
-                    pageId: pageId
-                },
-                method: "POST",
-                success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.setValue(response.data);
-
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
+            this.provider.selectPage(pageId);
         });
 
         this.__refreshUI();

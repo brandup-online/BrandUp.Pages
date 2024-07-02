@@ -61,7 +61,7 @@ export class Editor extends UIElement implements IPageDesigner {
                     throw "Error get content.";
                 }
 
-                const content = response.data;
+                const content: IContentModel[] = response.data;
                 this.__contentItems = new Map();
         
                 const contentPathMap = new Map<string, HTMLElement>();
@@ -106,7 +106,7 @@ export class Editor extends UIElement implements IPageDesigner {
 
     private __initLogic() {
         this.registerCommand("bp-content", () => {
-            editPage(this.editId).then(() => {
+            editPage(this, "").then(() => {
                 this.page.website.app.reload();
             });
         });

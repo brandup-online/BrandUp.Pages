@@ -35,9 +35,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions, ModelFiel
             const path = itemElem.getAttribute("data-content-path");
             itemElem.classList.add("processing");
             const index = this.getItemIndex(itemElem);
-            itemElem.remove();
-            this._refreshBlockIndexes();
-            this.renderBlocks();
+            
             this.provider.deleteItem(index, path);
         });
 
@@ -84,6 +82,13 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions, ModelFiel
 
             this.provider.refreshItem(itemElem, this.getItemIndex(itemElem));
         });
+    }
+
+    deleteItem(index: number) {
+        const itemElem = this.getItem(index);
+        itemElem.remove();
+        this._refreshBlockIndexes();
+        this.renderBlocks();
     }
 
     hasValue(): boolean {
@@ -168,11 +173,11 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions, ModelFiel
     }
 
     getValue() {
-        throw "method getValue not implemented";
+        
     };
 
     setValue(value) {
-        throw "method getValue not implemented";
+        
     };
 }
 export interface ModelDesignerOptions {

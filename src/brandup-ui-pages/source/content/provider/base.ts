@@ -19,6 +19,12 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
         this.designer = this.createDesigner();
     }
 
+    abstract createField();
+
+    destroyField() {
+        this.field?.destroy();
+    }
+
     getValue() {
         return this.__model.value;
     }
@@ -50,6 +56,6 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
 
     destroy() {
         this.designer?.destroy();
-        this.field?.destroy();
+        this.destroyField();
     }
 }

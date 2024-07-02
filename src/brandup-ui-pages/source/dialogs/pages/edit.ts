@@ -1,15 +1,12 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
 import { AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import { IContentForm, IContentField, PageContentForm } from "../../typings/content";
-import { TextContent } from "../../content/field/text";
-import { HtmlContent } from "../../content/field/html";
-import { ImageContent } from "../../content/field/image";
-import { ModelField } from "../../content/field/model";
-import { HyperLinkContent } from "../../content/field/hyperlink";
-import { PagesContent } from "../../content/field/pages";
 import { ValidationProblemDetails } from "../../typings/models";
 import "../dialog-form.less";
 import { DOM } from "brandup-ui-dom";
+import { Editor } from "../../content/editor";
+import { Content } from "../../content/content";
+import { IContentModel } from "../../admin/page-toolbar";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -18,12 +15,12 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __fields: { [key: string]: IContentField } = {};
     private __modelPath: string;
     private __queue: AjaxQueue;
-    readonly editId: string;
+    private __content: Content;
 
-    constructor(editId: string, modelPath?: string, options?: DialogOptions) {
+    constructor(editor: Editor, modelPath?: string, options?: DialogOptions) {
         super(options);
 
-        this.editId = editId;
+        this.__content = editor.getContentItem(modelPath);
         this.__modelPath = modelPath ? modelPath : "";
     }
 
@@ -44,45 +41,16 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         this.setHeader("Контент страницы");
 
-        this.__loadForm();
+        this.__renderForm();
 
         this.registerCommand("navigate", (elem: HTMLElement) => {
             const path = elem.getAttribute("data-path");
             this.navigate(path);
         });
     }
-    private __loadForm() {
-        if (this.__queue)
-            this.__queue.destroy();
-        this.__queue = new AjaxQueue();
 
-        for (const fieldName in this.__fields) {
-            const field = this.__fields[fieldName];
-            field.destroy();
-        }
-
-        DOM.empty(this.__fieldsElem);
-        this.__fields = {};
-
-        this.setLoading(true);
-
-        this.__queue.push({
-            url: "/brandup.pages/page/content/form",
-            urlParams: { editId: this.editId, modelPath: this.__modelPath },
-            method: "GET",
-            success: (response: AjaxResponse<PageContentForm>) => {
-                if (response.status !== 200) {
-                    this.setError("Не удалось загрузить форму.");
-                    return;
-                }
-
-                this.__renderForm(response.data);
-
-                this.setLoading(false);
-            }
-        });
-    }
-    private __renderForm(model: PageContentForm) {
+    private __renderForm() {
+        const model = this.__content.model;
         if (!this.navElem) {
             this.navElem = DOM.tag("ol", { class: "nav" });
             this.content.insertAdjacentElement("afterbegin", this.navElem);
@@ -92,93 +60,37 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         }
 
         let path = model.path;
-        while (path) {
-            let title = path.title;
+        while (path || path === "") {
+            const model = this.__content.__editor.getContentItem(path).model;
+            let title = model.typeTitle;
             this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === model.path ? { class: "current" } : null, [
-                DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path.modelPath }, [
-                    DOM.tag("bolt", null, path.modelPath || "root"),
+                DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
+                    DOM.tag("bolt", null, path || "root"),
                     DOM.tag("div", null, [
                         DOM.tag("span", null, title),
-                        DOM.tag("span", null, path.name),
+                        DOM.tag("span", null, model.typeTitle),
                     ]),
                 ]),
             ]));
 
-            path = path.parent;
+            path = model.parent;
         }
+
+        const providers = this.__content.getFields();
 
         for (let i = 0; i < model.fields.length; i++) {
             const fieldModel = model.fields[i];
-
-            switch (fieldModel.type.toLowerCase()) {
-                case "text": {
-                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, [], fieldModel.options)); //TODO заменить пустой массив на список ошибок с сервера
-                    break;
-                }
-                case "html": {
-                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, [], fieldModel.options));
-                    break;
-                }
-                case "image": {
-                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, [], fieldModel.options));
-                    break;
-                }
-                case "model": {
-                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, [], fieldModel.options));
-                    break;
-                }
-                case "hyperlink": {
-                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, [], fieldModel.options));
-                    break;
-                }
-                case "pages": {
-                    this.addField(fieldModel.title, new PagesContent(this, fieldModel.name, [], fieldModel.options));
-                    break;
-                }
-                default: {
-                    throw "";
-                }
-            }
-        }
-
-        this.setValues(model.values);
-    }
-
-    private __applyModelState(state: ValidationProblemDetails) {
-        for (const key in this.__fields) {
-            const field = this.__fields[key];
-            field.setErrors(null);
-        }
-
-        if (state && state.errors) {
-            for (const key in state.errors) {
-                if (key === "")
-                    continue;
-
-                const field = this.getField(key);
-                field.setErrors(state.errors[key]);
-            }
-        }
-
-        if (state && state.errors && state.errors.hasOwnProperty("")) {
-            alert(state.errors[""]);
+            const provider = providers.get(fieldModel.name);
+            this.addField(fieldModel.title, provider.createField());
+            provider.setValue(fieldModel.value)
         }
     }
 
     navigate(modelPath: string) {
         this.__modelPath = modelPath ? modelPath : "";
-
-        this.__loadForm();
-    }
-    request(field: IContentField, options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
-
-        options.urlParams["editId"] = this.editId;
-        options.urlParams["path"] = this.modelPath;
-        options.urlParams["field"] = field.name;
-
-        this.__queue.push(options);
+        this.__content.getFields().forEach(provider => provider.destroyField());
+        this.__content = this.__content.__editor.getContentItem(modelPath);
+        this.__renderForm();
     }
 
     validate(): boolean {
@@ -227,7 +139,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 }
 
-export const editPage = (editId: string, modelPath?: string) => {
-    const dialog = new PageEditDialog(editId, modelPath);
+export const editPage = (editor: Editor, modelPath?: string) => {
+    const dialog = new PageEditDialog(editor, modelPath);
     return dialog.open();
 };
