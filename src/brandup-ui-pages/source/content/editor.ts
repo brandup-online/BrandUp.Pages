@@ -121,8 +121,8 @@ export class Editor extends UIElement implements IPageDesigner {
                 const modelFields = new Map<string, ModelFieldProvider>();
                 
                 for (const contentItem of this.content) {
-                    const fields = new Map<string, FieldProvider>();
-                    contentItem.fields.forEach((item: ContentFieldModel) => {
+                    const fields = new Map<string, FieldProvider<any, any>>();
+                    contentItem.fields.forEach((item: ContentFieldModel<any, any>) => {
                         const fieldElem = contentFieldsMap.get(contentItem.path)?.get(item.name);
                         if (!fieldElem) return;
                         let type = fieldElem.getAttribute("data-content-designer");
@@ -253,7 +253,7 @@ export class Editor extends UIElement implements IPageDesigner {
 }
 
 export class Content {
-    private __fields: Map<string, FieldProvider>;
+    private __fields: Map<string, FieldProvider<any, any>>;
     private __container: HTMLElement;
     private __editor: Editor;
     private __parent: ModelFieldProvider | null;
@@ -261,7 +261,7 @@ export class Content {
     get parent() { return this.__parent }
     get containerDataset() { return this.__container.dataset };
 
-    constructor(editor: Editor, model: any, container: HTMLElement = null, fields: Map<string, FieldProvider> = new Map()) {
+    constructor(editor: Editor, model: any, container: HTMLElement = null, fields: Map<string, FieldProvider<any, any>> = new Map()) {
         this.__container = container;
         this.__editor = editor;
         this.__fields = fields;

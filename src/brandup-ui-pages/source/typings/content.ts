@@ -1,4 +1,5 @@
 ﻿import { AjaxQueue, AjaxRequest } from "brandup-ui-ajax";
+import { DesignerEvent } from "../content/designer/base";
 
 export interface IContentForm {
     editId: string;
@@ -38,12 +39,16 @@ export interface IContentFieldDesigner {
     fullPath: string;
     
     hasValue(): boolean;
+    getValue(): any;
+    setValue(val: any);
+    setValid(val: boolean);
+    setCallback(name: string, handler: (e: DesignerEvent<any>) => void);
     destroy();
 }
 
 export interface PageContentForm {
     path: PageContentPath;
-    fields: Array<ContentFieldModel>;
+    fields: Array<ContentFieldModel<any, any>>;
     values: { [key: string]: any };
 }
 
@@ -55,12 +60,12 @@ export interface PageContentPath {
     modelPath: string;
 }
 
-export interface ContentFieldModel {
+export interface ContentFieldModel<TValue, TOptions> {
     type: string;
     name: string;
     title: string;
-    options: any;
-    value: any;
+    options: TOptions;
+    value: TValue;
     errors: string[];
     isRequired: boolean;
 }

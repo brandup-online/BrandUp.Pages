@@ -43,17 +43,15 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         delete this.eventCallbacks[name];
     }
 
-    protected abstract onRender(elem: HTMLElement);
-    request(options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
+    abstract getValue();
 
-        options.urlParams["editId"] = this.page.editId;
-        options.urlParams["path"] = this.path;
-        options.urlParams["field"] = this.name;
+    abstract setValue(value);
 
-        this.page.queue.push(options);
+    protected _onChanged() {
+        this.triggerCallback("change", {target: this.element, value: this.getValue()});
     }
+
+    protected abstract onRender(elem: HTMLElement);
 
     setValid(val: boolean) {
         val ? this.element.classList.remove("invalid") : this.element.classList.add("invalid");

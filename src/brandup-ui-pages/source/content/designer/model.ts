@@ -9,6 +9,14 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
         
     }
 
+    getValue() {
+        throw "method getValue not implemented";
+    };
+
+    setValue(value) {
+        throw "method getValue not implemented";
+    };
+
     hasValue() {
         return false;
     }

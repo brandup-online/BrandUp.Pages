@@ -93,21 +93,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     }
 
     protected _onChanged() {
+        super._onChanged();
         this.__refreshUI();
-        const value = this.getValue();
-
-        this.request({
-            url: '/brandup.pages/content/text',
-            method: "POST",
-            type: "JSON",
-            data: value ? value : "",
-            success: (response) => {
-                if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.setValid(response.data.errors.length === 0);
-                }
-            }
-        });
     }
     
     private __refreshUI() {

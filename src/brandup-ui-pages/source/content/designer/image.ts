@@ -115,64 +115,20 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         };
     }
 
+    getValue() {
+        this.element.style.backgroundImage.substring(4).substring(-1);
+    };
+
+    setValue(value: string) {
+        this.element.style.backgroundImage = `url(${value})`;
+    };
+
     hasValue(): boolean {
         return false;
     }
 
     private __uploadFile(file: File | string) {
-        this.element.classList.add("uploading");
-
-        const width = this.element.getAttribute("content-image-width");
-        const height = this.element.getAttribute("content-image-height");
-
-        if (file instanceof File) {
-            this.request({
-                url: `/brandup.pages/content/image`,
-                urlParams: {
-                    fileName: file.name,
-                    width: width,
-                    height: height
-                },
-                method: "POST",
-                data: file,
-                success: (response: AjaxResponse<string>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.element.style.backgroundImage = `url(${response.data})`;
-                            this.element.classList.remove("uploading");
-
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
-
-            return;
-        }
-        else if (typeof file === "string") {
-            this.request({
-                url: `/brandup.pages/content/image/url`,
-                urlParams: {
-                    url: file,
-                    width: width,
-                    height: height
-                },
-                method: "POST",
-                success: (response: AjaxResponse<string>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.element.style.backgroundImage = `url(${response.data})`;
-                            break;
-                    }
-
-                    this.element.classList.remove("uploading");
-                }
-            });
-        }
-        else {
-            this.element.classList.remove("uploading");
-        }
+        this._onChanged();
     }
 
     destroy() {

@@ -1,13 +1,14 @@
 import { AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { ModelDesigner } from "../designer/model";
+import { ModelDesigner, ModelDesignerOptions } from "../designer/model";
 import { FieldProvider } from "./base";
 import { ContentFieldModel, IContentFieldDesigner } from "../../typings/content";
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { Content, Editor } from "../../content/editor";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
+import { ModelFieldFormValue } from "../../content/field/model";
 
-export class ModelFieldProvider extends FieldProvider {
+export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, ModelDesignerOptions> {
     protected __designerType;
     protected __items: Content[];
     set items(contents: Content[]) {
@@ -17,20 +18,20 @@ export class ModelFieldProvider extends FieldProvider {
         })
     }
 
-    constructor(editor: Editor, model: ContentFieldModel, valueElem: HTMLElement, designerType: typeof ModelDesigner = ModelDesigner) {
+    constructor(editor: Editor, model: ContentFieldModel<ModelFieldFormValue, ModelDesignerOptions>, valueElem: HTMLElement, designerType: typeof ModelDesigner = ModelDesigner) {
         super(editor, model, valueElem);
         this.__designerType = designerType;
     }
 
     createDesigner() {
-        const designer = new this.__designerType(this.__editor, this.__valueElem, this.model.options);
+        const designer = new this.__designerType(this.__editor, this.__valueElem, this.__model.options);
         designer.setCallback("add-item", (e) => {
             const elem = e.target;
             const itemType = elem.getAttribute("data-item-type");
             let itemIndex = e.value;
 
             if (!itemType) {
-                selectContentType(this.model.options.itemTypes).then((type) => {
+                selectContentType(this.__model.options.itemTypes).then((type) => {
                     this.addItem(type.name, itemIndex);  
                 });
             }
@@ -87,17 +88,6 @@ export class ModelFieldProvider extends FieldProvider {
                 (this.designer as PageBlocksDesigner).refreshItem(elem, response.data);
             }
         });
-    }
-
-    request(options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
-
-        options.urlParams["editId"] = this.__editor.editId;
-        options.urlParams["path"] = this.designer.path;
-        options.urlParams["field"] = this.model.name;
-
-        this.__editor.queue.push(options);
     }
 
     addItem(itemType: string, index: number) {

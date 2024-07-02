@@ -60,27 +60,8 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     protected _onChanged() {
-        this.__refreshUI();
-
-        const value = this.getValue();
-
-        this.page.queue.push({
-            url: '/brandup.pages/content/html',
-            urlParams: {
-                editId: this.page.editId,
-                path: this.path,
-                field: this.name
-            },
-            method: "POST",
-            type: "JSON",
-            data: value ? value : "",
-            success: (response: AjaxResponse) => {
-                if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.setValid(response.data.errors.length === 0);
-                }
-            }
-        });
+        super._onChanged();
+        this.__refreshUI();       
     }
     private __refreshUI() {
         if (this.hasValue())
