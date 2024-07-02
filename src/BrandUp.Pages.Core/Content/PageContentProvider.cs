@@ -20,11 +20,20 @@ namespace BrandUp.Pages.Content
             return await Task.FromResult(pageProvider.ContentType);
         }
 
-        public async Task DefaultFactoryAsync(IPage item, object content, CancellationToken cancellationToken)
-        {
-            var pageProvider = pageMetadataManager.GetMetadata(item.TypeName);
+        #endregion
 
-            pageProvider.SetPageHeader(content, item.Header);
+        #region IItemContentEvents members
+
+        public async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
+        {
+            if (!Guid.TryParse(itemId, out var pageId))
+                throw new ArgumentException();
+
+            var page = await pageService.FindPageByIdAsync(pageId, cancellationToken);
+
+            var pageProvider = pageMetadataManager.GetMetadata(page.TypeName);
+
+            pageProvider.SetPageHeader(content, page.Header);
 
             await Task.CompletedTask;
         }
@@ -61,7 +70,7 @@ namespace BrandUp.Pages.Content
             return await Task.FromResult(item.Type);
         }
 
-        public async Task DefaultFactoryAsync(StaticContent item, object content, CancellationToken cancellationToken)
+        public async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
         {
             await Task.CompletedTask;
         }
@@ -72,6 +81,7 @@ namespace BrandUp.Pages.Content
         }
     }
 
+    [ContentItem("brandup.content-static")]
     public readonly struct StaticContent(string key, Type type) : IItemContent
     {
         public string Key { get; } = key ?? throw new ArgumentNullException(nameof(key));

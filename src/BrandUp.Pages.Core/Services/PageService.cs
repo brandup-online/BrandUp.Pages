@@ -271,6 +271,8 @@ namespace BrandUp.Pages.Services
         }
     }
 
+
+    [ContentItem("brandup.content-page")]
     public interface IPage : IItemContent
     {
         Guid Id { get; }

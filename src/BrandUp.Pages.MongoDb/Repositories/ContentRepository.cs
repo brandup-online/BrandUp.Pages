@@ -35,13 +35,15 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return content;
         }
 
-        public async Task<IContent> CreateContentAsync(string contentKey, CancellationToken cancellationToken)
+        public async Task<IContent> CreateContentAsync(string itemType, string itemId, string contentKey, CancellationToken cancellationToken)
         {
             contentKey = NormalizeAndValidateKey(contentKey);
 
             var content = new ContentDocument
             {
                 Id = Guid.NewGuid(),
+                ItemType = itemType,
+                ItemId = itemId,
                 Key = contentKey,
                 CommitId = null
             };

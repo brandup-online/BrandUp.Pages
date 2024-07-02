@@ -26,5 +26,21 @@ namespace BrandUp.Pages.Content
 
             return serviceProvider.GetRequiredKeyedService<IItemContentProvider<TItem>>(serviceKey);
         }
+
+        internal static IItemContentEvents GetContentEvents(this IServiceProvider serviceProvider, string itemType)
+        {
+            ArgumentNullException.ThrowIfNull(serviceProvider);
+            ArgumentNullException.ThrowIfNull(itemType);
+
+            var type = MappingHelper.GetItemType(itemType);
+
+            var defType = typeof(IItemContentProvider<>);
+            var itemProviderType = defType.MakeGenericType(type);
+
+            var itemContentEvents = serviceProvider.GetRequiredKeyedService(itemProviderType, itemType);
+            if (itemContentEvents == null)
+                throw new InvalidOperationException();
+            return (IItemContentEvents)itemContentEvents;
+        }
     }
 }
