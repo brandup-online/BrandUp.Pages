@@ -1,28 +1,22 @@
-import { Editor } from "../editor";
-import { ContentFieldModel, IContentField, IContentFieldDesigner } from "../../typings/content";
-import { DesignerEvent } from "../../content/designer/base";
+import { ContentFieldModel, IContentField, IContentFieldDesigner, IContentFieldProvider } from "../../typings/content";
 import { AjaxRequest } from "brandup-ui-ajax";
+import { Content } from "../../content/content";
 
-export abstract class FieldProvider<TValue, TOptions> {
+export abstract class FieldProvider<TValue, TOptions> implements IContentFieldProvider {
     protected __model: ContentFieldModel<TValue, TOptions>;
     designer: IContentFieldDesigner;
     field: IContentField;
     protected __valueElem: HTMLElement;
-    protected __editor: Editor;
+    readonly content: Content;
 
-    constructor(editor: Editor, model: ContentFieldModel<TValue, TOptions>, valueElem: HTMLElement = null) {
+    constructor(content: Content, model: ContentFieldModel<TValue, TOptions>, valueElem: HTMLElement = null) {
         this.__model = model;
         this.__valueElem = valueElem;
-        this.__editor = editor;
-    }
-    
-    protected _onChange(e: DesignerEvent<any>) {
-        this.setValue(e.value);
+        this.content = content;
     }
     
     renderDesigner() {
         this.designer = this.createDesigner();
-        this.designer?.setCallback("change", (e) => this._onChange(e));
     }
 
     getValue() {
@@ -35,15 +29,20 @@ export abstract class FieldProvider<TValue, TOptions> {
         this.field?.setValue(value);
     }
 
+    setErrors(errors: Array<string>) {
+        this.designer?.setValid(errors.length === 0);
+        this.field?.setErrors(errors);
+    }
+
     protected request(options: AjaxRequest) {
         if (!options.urlParams)
             options.urlParams = {};
 
-        options.urlParams["editId"] = this.__editor.editId;
+        options.urlParams["editId"] = this.content.__editor.editId;
         options.urlParams["path"] = this.__valueElem.dataset.contentFieldPath;
         options.urlParams["field"] = this.__model.name;
 
-        this.__editor.queue.push(options);
+        this.content.__editor.queue.push(options);
     }
 
     abstract createDesigner(): IContentFieldDesigner;

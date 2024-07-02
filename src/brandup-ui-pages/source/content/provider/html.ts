@@ -1,24 +1,22 @@
 import { FieldProvider } from "./base";
 import { HtmlDesigner, HtmlFieldFormOptions } from "../designer/html";
-import { DesignerEvent } from "../../content/designer/base";
 import { AjaxResponse } from "brandup-ui-ajax";
 
 export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldFormOptions> {
     createDesigner() {
-        return new HtmlDesigner(this.__editor, this.__valueElem, this.__model.options);
+        return new HtmlDesigner(this.__valueElem, this.__model.options, this);
     }
 
-    protected _onChange(e: DesignerEvent<string>): void {
+    setValue(value: string): void {
         this.request({
             url: '/brandup.pages/content/html',
             method: "POST",
             type: "JSON",
-            data: e.value ? e.value : "",
+            data: value ? value : "",
             success: (response: AjaxResponse) => {
                 if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.designer?.setValid(response.data.errors.length === 0);
-                    this.field?.setErrors(response.data.errors);
+                    super.setValue(response.data.value);
+                    this.setErrors(response.data.errors);
                 }
             }
         });

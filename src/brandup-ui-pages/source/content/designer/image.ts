@@ -4,8 +4,9 @@ import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
 import { ImageFieldOptions } from "../field/image";
 import { AjaxResponse } from "brandup-ui-ajax";
+import { ImageFieldProvider } from "../../content/provider/image";
 
-export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
+export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldProvider> {
     private __fileInputElem: HTMLInputElement;
     private __menuElem: HTMLElement;
     private __progressElem: HTMLElement;
@@ -116,11 +117,12 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     }
 
     getValue() {
-        this.element.style.backgroundImage.substring(4).substring(-1);
+        return this.element.style.backgroundImage.substring(4).substring(-1);
     };
 
     setValue(value: string) {
         this.element.style.backgroundImage = `url(${value})`;
+        this.element.classList.remove("uploading");
     };
 
     hasValue(): boolean {
@@ -128,7 +130,10 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     }
 
     private __uploadFile(file: File | string) {
-        this._onChanged();
+        this.element.classList.add("uploading");
+        const width = this.element.getAttribute("content-image-width");
+        const height = this.element.getAttribute("content-image-height");
+        this.provider.setValue(file);
     }
 
     destroy() {

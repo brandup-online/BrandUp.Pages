@@ -1,5 +1,4 @@
 ﻿import { AjaxQueue, AjaxRequest } from "brandup-ui-ajax";
-import { DesignerEvent } from "../content/designer/base";
 
 export interface IContentForm {
     editId: string;
@@ -9,6 +8,14 @@ export interface IContentForm {
     request(field: IContentField, options: AjaxRequest);
     navigate(modelPath: string);
     getField(name: string): IContentField;
+}
+
+export interface IContentFieldProvider {  
+    setValue(value: any);
+    setErrors(errors: Array<string>);
+    renderDesigner();
+    getValue();
+    destroy();
 }
 
 export interface IContentField {
@@ -26,13 +33,10 @@ export interface IPageDesigner {
     editId: string;
     queue: AjaxQueue;
     redraw();
-    accentField(field: IContentFieldDesigner);
-    clearAccent();
     destroy();
 }
 
 export interface IContentFieldDesigner {
-    page: IPageDesigner;
     element: HTMLElement;
     path: string;
     name: string;
@@ -42,7 +46,6 @@ export interface IContentFieldDesigner {
     getValue(): any;
     setValue(val: any);
     setValid(val: boolean);
-    setCallback(name: string, handler: (e: DesignerEvent<any>) => void);
     destroy();
 }
 

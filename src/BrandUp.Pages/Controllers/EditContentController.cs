@@ -20,10 +20,8 @@ namespace BrandUp.Pages.Controllers
             IContentEdit currentEdit = await contentService.FindEditByIdAsync(editId, cancellationToken);
             var contentModel = await contentService.GetEditContentAsync(currentEdit, cancellationToken);
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
-
-            var result = new Models.Contents.BeginPageEditResult();
-            result.Content = [];
-            await EnsureContentsAsync(contentExplorer, result.Content);
+            List<Models.Contents.ContentModel> result = [];
+            await EnsureContentsAsync(contentExplorer, result);
 
             return Ok(result);
         }

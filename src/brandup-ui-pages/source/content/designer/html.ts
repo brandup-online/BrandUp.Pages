@@ -1,11 +1,12 @@
 ﻿import { FieldDesigner } from "./base";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { HtmlFieldProvider } from "../../content/provider/html";
 
-export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
+export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions, HtmlFieldProvider> {
     private __isChanged: boolean;
     private __editor: ContentEditor;
+    private __editorPromise: Promise<any>;
 
     get typeName(): string { return "BrandUpPages.HtmlDesigner"; }
 
@@ -14,7 +15,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
         if (this.options.placeholder)
             elem.setAttribute("data-placeholder", this.options.placeholder);
 
-        ContentEditor.create(elem, { placeholder: this.options.placeholder })
+        this.__editorPromise = ContentEditor.create(elem, { placeholder: this.options.placeholder })
             .then(editor => {
                 this.__editor = editor;
 
@@ -46,9 +47,12 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
         return data ? data : null;
     }
     setValue(value: string) {
-        this.__editor.data.set(value ? value : "");
-
-        this.__refreshUI();
+        this.__editorPromise.then (()=> { // если editor еще не создался - ждем
+            if (this.__editor) {
+                this.__editor.data.set(value ? value : "");
+                this.__refreshUI();
+            }
+        });
     }
     hasValue(): boolean {
         const value = this.normalizeValue(this.element.innerText);
@@ -82,8 +86,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     destroy() {
         this.element.classList.remove("html-designer");
         this.element.removeAttribute("data-placeholder");
-        this.__editor.destroy();
-        super.destroy();
+        this.__editor.destroy().then(() => super.destroy());
     }
 }
 

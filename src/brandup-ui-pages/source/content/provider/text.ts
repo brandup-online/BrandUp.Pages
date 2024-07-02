@@ -1,24 +1,22 @@
-import { DesignerEvent } from "../../content/designer/base";
 import { TextboxOptions } from "../../form/textbox";
 import { TextDesigner } from "../designer/text";
 import { FieldProvider } from "./base";
 
 export class TextFieldProvider extends FieldProvider<string, TextboxOptions> {
     createDesigner() {
-        return new TextDesigner(this.__editor, this.__valueElem, this.__model.options || {});
+        return new TextDesigner(this.__valueElem, this.__model.options || {}, this);
     }
 
-    protected _onChange(e: DesignerEvent<string>): void {
+    setValue(value: string): void {
         this.request({
             url: '/brandup.pages/content/text',
             method: "POST",
             type: "JSON",
-            data: e.value ? e.value : "",
+            data: value ? value : "",
             success: (response) => {
                 if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.designer?.setValid(response.data.errors.length === 0);
-                    this.field?.setErrors(response.data.errors);
+                    super.setValue(response.data.value);
+                    this.setErrors(response.data.errors);
                 }
             }
         });
