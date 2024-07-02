@@ -1,8 +1,6 @@
-﻿import { IContentField, IContentForm } from "../../typings/content";
-import { Field } from "../../form/field";
+﻿import { IContentField } from "../../typings/content";
 import { DOM } from "brandup-ui-dom";
 import "./image.less";
-import { AjaxResponse } from "brandup-ui-ajax";
 import { FormField } from "./base";
 import { ImageFieldProvider } from "../../content/provider/image";
 
@@ -89,7 +87,7 @@ export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, 
         });
     }
     private __uploadFile(file: File | string) {
-        this.provider.changeValue(file);
+        this.provider.changeImage(file);
     }
 
     private __refreshValueUI() {

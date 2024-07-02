@@ -1,4 +1,4 @@
-﻿import { ModelDesigner, ModelDesignerOptions } from "./model";
+﻿import { ModelDesigner } from "./model";
 import { DOM } from "brandup-ui-dom";
 import "./page-blocks.less";
 import iconRefresh from "../../svg/new/update.svg";
@@ -7,20 +7,20 @@ import iconDelete from "../../svg/new/trash.svg";
 import iconSort from "../../svg/new/sort.svg";
 import iconSortDown from "../../svg/new/sort-down.svg";
 import iconAdd from "../../svg/page-blocks-add.svg";
-import { IPageDesigner } from "../../typings/content";
 import { ModelFieldProvider } from "../../content/provider/model";
 
 export class PageBlocksDesigner extends ModelDesigner {
     get typeName(): string { return "BrandUpPages.PageBlocksDesigner"; }
 
-    constructor(elem: HTMLElement, options: ModelDesignerOptions, provider: ModelFieldProvider) {
-        super(elem, options, provider);
+    constructor(provider: ModelFieldProvider) {
+        super(provider);
+
         this.renderBlocks();
     }
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("page-blocks-designer");
-        if (this.options.isListValue) {
+        if (this.provider.options.isListValue) {
             elem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "page-blocks-designer-new-item bp-elem" }, '<div><ol><li><a href="#" data-command="item-add" class="accent">Добавить блок</a></li></ol></div>'));
         }
         super.onRender(elem);
@@ -48,14 +48,14 @@ export class PageBlocksDesigner extends ModelDesigner {
 
         var type = blockElem.dataset.contentType;;
 
-        if (this.options.isListValue) {
+        if (this.provider.options.isListValue) {
             let index = this.getItemIndex(blockElem);
             type = '<i>#' + (index + 1) + '</i>' + type;
         }
 
         blockElem.classList.add("page-blocks-designer-item");
 
-        blockElem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "bp-elem page-blocks-designer-item-add", href: "#", "data-command": "item-add", title: this.options.addText ? this.options.addText : "Добавить" }, iconAdd));
+        blockElem.insertAdjacentElement("beforeend", DOM.tag("a", { class: "bp-elem page-blocks-designer-item-add", href: "#", "data-command": "item-add", title: this.provider.options.addText ? this.provider.options.addText : "Добавить" }, iconAdd));
 
         blockElem.insertAdjacentElement("beforeend", DOM.tag("div", { class: "bp-elem page-blocks-designer-item-tools" }, '<ul class="pad">' +
             '   <li data-command="item-view" class="no-icon"><span><b>' + type + '</b></span></li>' +

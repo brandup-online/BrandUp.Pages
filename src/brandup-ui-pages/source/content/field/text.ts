@@ -13,6 +13,6 @@ export class TextContent extends Textbox implements IContentField {
     protected _onChanged() {
         super._onChanged();
         const value = this.getValue();
-        this.provider.setValue(value);
+        //this.provider.setValue(value);
     }
 }

@@ -1,9 +1,8 @@
 ﻿import { FieldDesigner } from "./base";
-import { TextboxOptions } from "../../form/textbox";
-import "./text.less";
 import { TextFieldProvider } from "../../content/provider/text";
+import "./text.less";
 
-export class TextDesigner extends FieldDesigner<TextboxOptions, TextFieldProvider> {
+export class TextDesigner extends FieldDesigner<TextFieldProvider> {
     private __isChanged: boolean;
     private __onPaste: (e: ClipboardEvent) => void;
     private __onCut: () => void;
@@ -19,8 +18,9 @@ export class TextDesigner extends FieldDesigner<TextboxOptions, TextFieldProvide
         elem.classList.add("text-designer");
         elem.setAttribute("tabindex", "0");
         elem.contentEditable = "true";
-        if (this.options.placeholder)
-            elem.setAttribute("data-placeholder", this.options.placeholder);
+
+        if (this.provider.options.placeholder)
+            elem.setAttribute("data-placeholder", this.provider.options.placeholder);
 
         this.__onPaste = (e: ClipboardEvent) => {
             this.__isChanged = true;
@@ -28,13 +28,13 @@ export class TextDesigner extends FieldDesigner<TextboxOptions, TextFieldProvide
             e.preventDefault();
 
             const text = e.clipboardData.getData("text/plain");
-            document.execCommand("insertText", false, this.normalizeValue(text));
+            document.execCommand("insertText", false, this.provider.normalizeValue(text));
         };
 
-        this.__onCut = () => { this.__isChanged = true; };
+        this.__onCut = () => this.__isChanged = true;
 
         this.__onKeyDown = (e: KeyboardEvent) => {
-            if (!this.options.allowMultiline && e.keyCode === 13) {
+            if (!this.provider.options.allowMultiline && e.keyCode === 13) {
                 e.preventDefault();
                 return false;
             }
@@ -42,17 +42,15 @@ export class TextDesigner extends FieldDesigner<TextboxOptions, TextFieldProvide
             this.__refreshUI();
         };
 
-        this.__onKeyUp = (e: KeyboardEvent) => {
-            this.__isChanged = true;
-        };
+        this.__onKeyUp = (e: KeyboardEvent) => this.__isChanged = true;
 
-        this.__onFocus = () => {
-            this.__isChanged = false;
-        };
+        this.__onFocus = () => this.__isChanged = false;
 
         this.__onBlur = () => {
-            if (this.__isChanged)
-                this._onChanged();
+            if (this.__isChanged) {
+                this.provider.saveValue(this.element.innerText);
+                this.__refreshUI();
+            }
         };
 
         this.__onClick = (e: MouseEvent) => {
@@ -70,50 +68,15 @@ export class TextDesigner extends FieldDesigner<TextboxOptions, TextFieldProvide
 
         this.__refreshUI();
     }
-
-    getValue(): string {
-        const val = this.normalizeValue(this.element.innerText);
-        return val ? val : null;
-    }
-    setValue(value: string) {
-        value = this.normalizeValue(value);
-        if (value && this.options.allowMultiline)
-            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
-
-        this.element.innerHTML = value ? value : "";
-
-        this.__refreshUI();
-    }
-    hasValue(): boolean {
-        const val = this.normalizeValue(this.element.innerText);
-        return val ? true : false;
-    }
-
-    protected _onChanged() {
-        super._onChanged();
-        this.__refreshUI();
-    }
     
     private __refreshUI() {
-        if (this.hasValue())
+        if (this.provider.hasValue())
             this.element.classList.remove("empty-value");
         else {
             this.element.classList.add("empty-value");
         }
     }
-
-    normalizeValue(value: string): string {
-        if (!value)
-            return "";
-
-        value = value.trim();
-
-        if (!this.options.allowMultiline)
-            value = value.replace("\n\r", " ");
-
-        return value;
-    }
-
+    
     destroy() {
         this.element.classList.remove("text-designer");
         this.element.removeAttribute("tabindex");

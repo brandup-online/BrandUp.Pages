@@ -1,12 +1,10 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { IContentForm, IContentField, PageContentForm } from "../../typings/content";
-import { ValidationProblemDetails } from "../../typings/models";
+import { AjaxQueue } from "brandup-ui-ajax";
+import { IContentForm, IContentField } from "../../typings/content";
 import "../dialog-form.less";
 import { DOM } from "brandup-ui-dom";
 import { Editor } from "../../content/editor";
 import { Content } from "../../content/content";
-import { IContentModel } from "../../admin/page-toolbar";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -82,7 +80,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             const fieldModel = model.fields[i];
             const provider = providers.get(fieldModel.name);
             this.addField(fieldModel.title, provider.createField());
-            provider.setValue(fieldModel.value)
+            //provider.setValue(fieldModel.value)
         }
     }
 

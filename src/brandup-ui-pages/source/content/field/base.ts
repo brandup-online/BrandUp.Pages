@@ -12,6 +12,6 @@ export abstract class FormField <TValue, TOptions, TProvider extends IContentFie
     protected _onChanged() {
         this.raiseChanged();
         const value = this.getValue();
-        this.provider.setValue(value);
+        //this.provider.setValue(value);
     }
 }

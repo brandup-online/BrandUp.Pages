@@ -51,3 +51,33 @@ export interface ValidationProblemDetails {
     instance: string;
     errors: { [key: string]: Array<string> };
 }
+
+export interface BeginPageEditResult {
+    editId: string;
+    currentDate: string;
+    content: ContentModel[];
+}
+
+export interface ContentModel {
+    parent: string;
+    path: string;
+    index: number;
+    typeName: string;
+    typeTitle: string;
+    fields: ContentFieldModel[];
+}
+
+export interface ContentFieldModel {
+    type: string;
+    name: string;
+    title: string;
+    options: any;
+    isRequired: boolean;
+    value: any;
+    errors: string[];
+}
+
+export interface FieldValueResult {
+    value: any;
+    errors: Array<string>;
+}
