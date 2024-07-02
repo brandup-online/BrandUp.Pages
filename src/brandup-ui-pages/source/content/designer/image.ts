@@ -2,10 +2,11 @@
 import { DOM } from "brandup-ui-dom";
 import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
-import { ImageFieldOptions } from "../field/image";
+import { ImageFieldOptions, ImageFieldValue } from "../field/image";
 import { AjaxResponse } from "brandup-ui-ajax";
+import { ImageFieldProvider } from "../../content/provider/image";
 
-export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
+export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldProvider> {
     private __fileInputElem: HTMLInputElement;
     private __menuElem: HTMLElement;
     private __progressElem: HTMLElement;
@@ -115,64 +116,24 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         };
     }
 
+    getValue() {
+        return this.element.style.backgroundImage.substring(4).substring(-1);
+    };
+
+    setValue(value: ImageFieldValue) {
+        this.element.style.backgroundImage = `url(${value.previewUrl})`;
+        this.element.classList.remove("uploading");
+    };
+
     hasValue(): boolean {
         return false;
     }
 
     private __uploadFile(file: File | string) {
         this.element.classList.add("uploading");
-
         const width = this.element.getAttribute("content-image-width");
         const height = this.element.getAttribute("content-image-height");
-
-        if (file instanceof File) {
-            this.request({
-                url: `/brandup.pages/content/image`,
-                urlParams: {
-                    fileName: file.name,
-                    width: width,
-                    height: height
-                },
-                method: "POST",
-                data: file,
-                success: (response: AjaxResponse<string>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.element.style.backgroundImage = `url(${response.data})`;
-                            this.element.classList.remove("uploading");
-
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
-
-            return;
-        }
-        else if (typeof file === "string") {
-            this.request({
-                url: `/brandup.pages/content/image/url`,
-                urlParams: {
-                    url: file,
-                    width: width,
-                    height: height
-                },
-                method: "POST",
-                success: (response: AjaxResponse<string>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.element.style.backgroundImage = `url(${response.data})`;
-                            break;
-                    }
-
-                    this.element.classList.remove("uploading");
-                }
-            });
-        }
-        else {
-            this.element.classList.remove("uploading");
-        }
+        this.provider.changeValue(file);
     }
 
     destroy() {

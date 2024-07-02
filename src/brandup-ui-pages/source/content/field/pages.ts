@@ -114,21 +114,21 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                 pageUrl: pageUrl
             });
 
-            this.form.request(this, {
-                url: `/brandup.pages/content/pages`,
-                urlParams: { pageCollectionId: pageCollectionId },
-                method: "POST",
-                success: (response: AjaxResponse<PagesFieldFormValue>) => {
-                    switch (response.status) {
-                        case 200:
-                            this.setValue(response.data);
+            // this.form.request(this, {
+            //     url: `/brandup.pages/content/pages`,
+            //     urlParams: { pageCollectionId: pageCollectionId },
+            //     method: "POST",
+            //     success: (response: AjaxResponse<PagesFieldFormValue>) => {
+            //         switch (response.status) {
+            //             case 200:
+            //                 this.setValue(response.data);
 
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
+            //                 break;
+            //             default:
+            //                 throw "";
+            //         }
+            //     }
+            // });
         });
 
         this.__refreshUI();

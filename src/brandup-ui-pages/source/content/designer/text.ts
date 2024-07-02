@@ -1,8 +1,9 @@
 ﻿import { FieldDesigner } from "./base";
 import { TextboxOptions } from "../../form/textbox";
 import "./text.less";
+import { TextFieldProvider } from "../../content/provider/text";
 
-export class TextDesigner extends FieldDesigner<TextboxOptions> {
+export class TextDesigner extends FieldDesigner<TextboxOptions, TextFieldProvider> {
     private __isChanged: boolean;
     private __onPaste: (e: ClipboardEvent) => void;
     private __onCut: () => void;
@@ -47,15 +48,11 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
 
         this.__onFocus = () => {
             this.__isChanged = false;
-
-            this.page.accentField(this);
         };
 
         this.__onBlur = () => {
             if (this.__isChanged)
                 this._onChanged();
-
-            this.page.clearAccent();
         };
 
         this.__onClick = (e: MouseEvent) => {
@@ -93,21 +90,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     }
 
     protected _onChanged() {
+        super._onChanged();
         this.__refreshUI();
-        const value = this.getValue();
-
-        this.request({
-            url: '/brandup.pages/content/text',
-            method: "POST",
-            type: "JSON",
-            data: value ? value : "",
-            success: (response) => {
-                if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.setValid(response.data.errors.length === 0);
-                }
-            }
-        });
     }
     
     private __refreshUI() {

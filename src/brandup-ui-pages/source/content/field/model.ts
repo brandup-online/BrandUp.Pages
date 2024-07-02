@@ -7,17 +7,13 @@ import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import "./model.less";
 import { AjaxResponse } from "brandup-ui-ajax";
+import { FormField } from "./base";
+import { ModelFieldProvider } from "../../content/provider/model";
 
-export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions> implements IContentField {
+export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOptions, ModelFieldProvider> implements IContentField {
     readonly form: IContentForm;
     private __value: ModelFieldFormValue;
     private __itemsElem: HTMLElement;
-
-    constructor (form: IContentForm, name: string, errors: string[], options: ModelDesignerOptions) {
-        super(name, errors, options);
-
-        this.form = form;
-    }
 
     get typeName(): string { return "BrandUpPages.Form.Field.Content"; }
 
@@ -46,17 +42,10 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index"));
-
-            itemElem.remove();
-            this._refreshBlockIndexes();
-
-            this.form.request(this, {
-                url: '/brandup.pages/content/model',
-                urlParams: { itemIndex: itemIndex.toString() },
-                method: "DELETE",
-                success: () => { return; }
-            });
+            const path = itemElem.getAttribute("data-content-path")
+            this.provider.deleteItem(itemIndex, path);
         });
+
         this.registerCommand("item-add", () => {
             if (this.options.itemTypes.length === 1) {
                 this.__addItem(this.options.itemTypes[0].name);
@@ -105,17 +94,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                         else {
                             elem.insertAdjacentElement("afterend", sourceElem);
                         }
-
-                        this.form.request(this, {
-                            url: '/brandup.pages/content/model/move',
-                            urlParams: { itemIndex: sourceIndex, newIndex: destIndex },
-                            method: "POST",
-                            success: (response: AjaxResponse<ModelFieldFormValue>) => {
-                                if (response.status === 200) {
-                                    this.setValue(response.data);
-                                }
-                            }
-                        });
+                        this.provider.moveItem(+sourceIndex, +destIndex)
                     }
                 }
             }
@@ -123,6 +102,12 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             e.stopPropagation();
             return false;
         });
+    }
+
+    deleteItem(index: number) {
+        const itemElem = DOM.queryElement(this.__itemsElem, `[data-content-path-index="${index}"]`);
+        itemElem.remove();
+        this._refreshBlockIndexes();
     }
 
     getValue(): ModelFieldFormValue {
@@ -178,46 +163,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             DOM.getElementByClass(elem, "index").innerText = `#${index + 1}`;
         });
     }
-    private __refreshItem(elem: Element) {
-        const itemIndex = parseInt(elem.getAttribute("data-content-path-index"));
-
-        this.form.request(this, {
-            url: '/brandup.pages/content/model/data',
-            urlParams: { itemIndex: itemIndex.toString() },
-            method: "GET",
-            success: (response: AjaxResponse<ContentModel>) => {
-                if (response.status === 200) {
-                    this.__value.items[itemIndex] = response.data;
-
-                    const newElem = this.__createItemElem(response.data, itemIndex);
-                    elem.insertAdjacentElement("afterend", newElem);
-                    elem.remove();
-                }
-            }
-        });
-    }
     private __addItem(itemType: string) {
-        this.form.request(this, {
-            url: '/brandup.pages/content/model',
-            urlParams: { itemType: itemType },
-            method: "PUT",
-            success: (response: AjaxResponse) => {
-                if (response.status === 200) {
-                    this.setValue(response.data.value);
-                }
-            }
-        });
-    }
-    private __refreshItems() {
-        this.form.request(this, {
-            url: '/brandup.pages/content/model',
-            method: "GET",
-            success: (response: AjaxResponse<ModelFieldFormValue>) => {
-                if (response.status === 200) {
-                    this.setValue(response.data);
-                }
-            }
-        });
+        this.provider.addItem(itemType, 0);
     }
 }
 

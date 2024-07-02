@@ -1,21 +1,18 @@
 ﻿import { UIElement } from "brandup-ui";
-import { AjaxRequest } from "brandup-ui-ajax";
-import { IContentFieldDesigner, IPageDesigner } from "../../typings/content";
+import { IContentFieldDesigner, IContentFieldProvider, IPageDesigner } from "../../typings/content";
 import "./base.less";
 
-export abstract class FieldDesigner<TOptions> extends UIElement implements IContentFieldDesigner {
-    readonly page: IPageDesigner;
+export abstract class FieldDesigner<TOptions, TProvider extends IContentFieldProvider> extends UIElement implements IContentFieldDesigner {
     readonly options: TOptions;
+    readonly provider: TProvider;
     readonly path: string;
     readonly name: string;
     readonly fullPath: string;
-    protected eventCallbacks: { [keys: string]: ((e: DesignerEvent<any>) => void)[] } = {};
 
-    constructor(page: IPageDesigner, elem: HTMLElement, options: TOptions) {
+    constructor(elem: HTMLElement, options: TOptions, provider: TProvider) {
         super();
-
-        this.page = page;
         this.options = options;
+        this.provider = provider;
         this.path = elem.getAttribute("data-content-field-path");
         this.name = this.fullPath = elem.getAttribute("data-content-field-name");
 
@@ -29,31 +26,15 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         this.onRender(elem);
     }
 
-    setCallback(name: string, handler: (e: DesignerEvent<any>) => void) {
-        if (!this.eventCallbacks[name]) this.eventCallbacks[name] = [];
-        this.eventCallbacks[name].push(handler);
-    }
+    abstract getValue();
 
-    protected triggerCallback(name: string, e: DesignerEvent<any>) {
-        if (this.eventCallbacks[name])
-            this.eventCallbacks[name].forEach(hook => hook(e));
-    }
+    abstract setValue(value);
 
-    removeCallback(name:string) {
-        delete this.eventCallbacks[name];
+    protected _onChanged() {
+        this.provider.setValue(this.getValue());
     }
 
     protected abstract onRender(elem: HTMLElement);
-    request(options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
-
-        options.urlParams["editId"] = this.page.editId;
-        options.urlParams["path"] = this.path;
-        options.urlParams["field"] = this.name;
-
-        this.page.queue.push(options);
-    }
 
     setValid(val: boolean) {
         val ? this.element.classList.remove("invalid") : this.element.classList.add("invalid");
@@ -65,9 +46,4 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         this.element.classList.remove("field-designer");
         super.destroy();
     }
-}
-
-export interface DesignerEvent<TValue> {
-    value: TValue;
-    target: HTMLElement;
 }

@@ -1,9 +1,9 @@
 ﻿import { FieldDesigner } from "./base";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { HtmlFieldProvider } from "../../content/provider/html";
 
-export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
+export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions, HtmlFieldProvider> {
     private __isChanged: boolean;
     private __editor: ContentEditor;
 
@@ -60,27 +60,8 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     protected _onChanged() {
-        this.__refreshUI();
-
-        const value = this.getValue();
-
-        this.page.queue.push({
-            url: '/brandup.pages/content/html',
-            urlParams: {
-                editId: this.page.editId,
-                path: this.path,
-                field: this.name
-            },
-            method: "POST",
-            type: "JSON",
-            data: value ? value : "",
-            success: (response: AjaxResponse) => {
-                if (response.status === 200) {
-                    this.setValue(response.data.value);
-                    this.setValid(response.data.errors.length === 0);
-                }
-            }
-        });
+        super._onChanged();
+        this.__refreshUI();       
     }
     private __refreshUI() {
         if (this.hasValue())
@@ -101,8 +82,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     destroy() {
         this.element.classList.remove("html-designer");
         this.element.removeAttribute("data-placeholder");
-        this.__editor.destroy();
-        super.destroy();
+        this.__editor.destroy().then(() => super.destroy());
     }
 }
 

@@ -3,19 +3,14 @@ import { Field } from "../../form/field";
 import { DOM } from "brandup-ui-dom";
 import "./image.less";
 import { AjaxResponse } from "brandup-ui-ajax";
+import { FormField } from "./base";
+import { ImageFieldProvider } from "../../content/provider/image";
 
-export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> implements IContentField {
-    readonly form: IContentForm;
+export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, ImageFieldProvider> implements IContentField {
     private valueElem: HTMLElement;
     private __isChanged = false;
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
-
-    constructor (form: IContentForm, name: string, errors: string[], options: ImageFieldOptions) {
-        super(name, errors, options);
-
-        this.form = form;
-    }
 
     get typeName(): string { return "BrandUpPages.Form.Field.Image"; }
 
@@ -94,54 +89,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         });
     }
     private __uploadFile(file: File | string) {
-        this.valueElem.classList.add("uploading");
-
-        if (file instanceof File) {
-            this.form.request(this, {
-                url: `/brandup.pages/content/image`,
-                urlParams: { fileName: file.name },
-                method: "POST",
-                data: file,
-                success: (response: AjaxResponse) => {
-                    switch (response.status) {
-                        case 200:
-                            this.setValue(response.data.value);
-                            this.setErrors(response.data.errors);
-
-                            this.valueElem.classList.remove("uploading");
-
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
-
-            return;
-        }
-        else if (typeof file === "string") {
-            this.form.request(this, {
-                url: `/brandup.pages/content/image/url`,
-                urlParams: { url: file },
-                method: "POST",
-                success: (response: AjaxResponse) => {
-                    switch (response.status) {
-                        case 200:
-                            this.setValue(response.data.value);
-                            this.setErrors(response.data.errors);
-
-                            this.valueElem.classList.remove("uploading");
-
-                            break;
-                        default:
-                            throw "";
-                    }
-                }
-            });
-        }
-        else {
-            this.valueElem.classList.remove("uploading");
-        }
+        this.provider.changeValue(file);
     }
 
     private __refreshValueUI() {
