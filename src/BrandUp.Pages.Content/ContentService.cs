@@ -15,6 +15,11 @@ namespace BrandUp.Pages.Content
             return contentMetadata.ConvertDictionaryToContentModel(contentData);
         }
 
+        public async Task<IContent> CreateAsync(string contentKey, CancellationToken cancellationToken = default)
+        {
+            return await contentRepository.CreateContentAsync(contentKey, cancellationToken);
+        }
+
         public async Task<IContent> FindContentAsync(Guid contentId, CancellationToken cancellationToken = default)
         {
             return await contentRepository.FindByIdAsync(contentId, cancellationToken);

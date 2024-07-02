@@ -31,6 +31,7 @@ namespace BrandUp.Pages.Builder
             services.AddScoped<PageCollectionService>();
             services.AddScoped<PageService>();
 
+            services.AddContentMappingProvider<StaticContent, StaticContentProvider>();
             services.AddContentMappingProvider<IPage, PageContentProvider>();
 
             services.AddSingleton<Url.IPageUrlHelper, Url.PageUrlHelper>();

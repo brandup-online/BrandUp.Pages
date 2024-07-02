@@ -56,6 +56,8 @@ namespace BrandUp.Pages
             var viewRenderService = services.GetRequiredService<IViewRenderService>();
             var contentService = services.GetRequiredService<ContentService>();
             var content = await contentService.FindContentAsync(contentKey, cancellationToken);
+            if (content == null)
+                content = await contentService.CreateAsync(contentKey, cancellationToken);
 
             object contentModel;
             IContentEdit contentEdit;
