@@ -92,7 +92,7 @@ namespace BrandUp.Pages.Controllers
             if (itemType == null)
                 return BadRequest();
 
-            if (!Field.ValueContentMetadata.Manager.TryGetMetadata(itemType, out ContentMetadataProvider contentMetadataProvider))
+            if (!Field.ValueContentMetadata.Manager.TryGetMetadata(itemType, out ContentMetadata contentMetadataProvider))
                 return BadRequest();
 
             if (!contentMetadataProvider.IsInheritedOrEqual(Field.ValueContentMetadata))

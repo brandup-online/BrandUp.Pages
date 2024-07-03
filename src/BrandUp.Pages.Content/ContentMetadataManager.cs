@@ -5,7 +5,7 @@ namespace BrandUp.Pages.Content
 {
     public class ContentMetadataManager
     {
-        readonly List<ContentMetadataProvider> metadataProviders = [];
+        readonly List<ContentMetadata> contents = [];
         readonly Dictionary<Type, int> contentTypes = [];
         readonly Dictionary<string, int> contentNames = [];
 
@@ -14,13 +14,13 @@ namespace BrandUp.Pages.Content
             ArgumentNullException.ThrowIfNull(contentLocator);
 
             foreach (var contentModelType in contentLocator.ContentTypes)
-                TryRegisterContentType(contentModelType, out ContentMetadataProvider typeMetadata);
+                TryRegisterContentType(contentModelType, out ContentMetadata typeMetadata);
 
-            foreach (var metadata in metadataProviders)
+            foreach (var metadata in contents)
                 metadata.InitializeFields();
         }
 
-        bool TryRegisterContentType(Type modelType, out ContentMetadataProvider contentMetadata)
+        bool TryRegisterContentType(Type modelType, out ContentMetadata contentMetadata)
         {
             if (TryGetMetadata(modelType, out contentMetadata))
                 return true;
@@ -28,14 +28,14 @@ namespace BrandUp.Pages.Content
             if (!TypeIsContent(modelType.GetTypeInfo()))
                 return false;
 
-            ContentMetadataProvider baseMetadata = null;
+            ContentMetadata baseMetadata = null;
             if (modelType.BaseType != null)
                 TryRegisterContentType(modelType.BaseType, out baseMetadata);
 
-            contentMetadata = new ContentMetadataProvider(this, modelType, baseMetadata);
+            contentMetadata = new ContentMetadata(this, modelType, baseMetadata);
 
-            var index = metadataProviders.Count;
-            metadataProviders.Add(contentMetadata);
+            var index = contents.Count;
+            contents.Add(contentMetadata);
             contentTypes.Add(modelType, index);
             contentNames.Add(contentMetadata.Name.ToLower(), index);
 
@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Content
 
         #region Instance
 
-        public IEnumerable<ContentMetadataProvider> MetadataProviders => metadataProviders;
+        public IEnumerable<ContentMetadata> Contents => contents;
 
         public bool IsRegisterdContentType(Type contentType)
         {
@@ -60,14 +60,14 @@ namespace BrandUp.Pages.Content
             return contentTypes.ContainsKey(contentType);
         }
 
-        public ContentMetadataProvider GetMetadata(Type contentType)
+        public ContentMetadata GetMetadata(Type contentType)
         {
-            if (!TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata))
+            if (!TryGetMetadata(contentType, out ContentMetadata contentMetadata))
                 throw new ArgumentException($"Type \"{contentType.AssemblyQualifiedName}\" is not registered as content.");
             return contentMetadata;
         }
 
-        public bool TryGetMetadata(Type contentType, out ContentMetadataProvider metadata)
+        public bool TryGetMetadata(Type contentType, out ContentMetadata metadata)
         {
             ArgumentNullException.ThrowIfNull(contentType);
 
@@ -77,11 +77,11 @@ namespace BrandUp.Pages.Content
                 return false;
             }
 
-            metadata = metadataProviders[index];
+            metadata = contents[index];
             return true;
         }
 
-        public bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata)
+        public bool TryGetMetadata(string contentTypeName, out ContentMetadata metadata)
         {
             ArgumentNullException.ThrowIfNull(contentTypeName);
 
@@ -91,7 +91,7 @@ namespace BrandUp.Pages.Content
                 return false;
             }
 
-            metadata = metadataProviders[index];
+            metadata = contents[index];
             return true;
         }
 
@@ -99,11 +99,11 @@ namespace BrandUp.Pages.Content
         {
             ArgumentNullException.ThrowIfNull(dictionary);
 
-            if (!dictionary.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object contentTypeNameValue))
+            if (!dictionary.TryGetValue(ContentMetadata.ContentTypeNameDataKey, out object contentTypeNameValue))
                 throw new InvalidOperationException();
 
             var contentTypeName = (string)contentTypeNameValue;
-            if (!TryGetMetadata(contentTypeName, out ContentMetadataProvider contentMetadataProvider))
+            if (!TryGetMetadata(contentTypeName, out ContentMetadata contentMetadataProvider))
                 throw new InvalidOperationException();
 
             return contentMetadataProvider.ConvertDictionaryToContentModel(dictionary);

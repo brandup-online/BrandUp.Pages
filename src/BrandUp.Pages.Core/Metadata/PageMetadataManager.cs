@@ -13,7 +13,7 @@ namespace BrandUp.Pages.Metadata
         {
             ArgumentNullException.ThrowIfNull(contentManager);
 
-            foreach (var contentMetadataProvider in contentManager.MetadataProviders)
+            foreach (var contentMetadataProvider in contentManager.Contents)
                 TryRegisterPageType(contentMetadataProvider, out _);
         }
 
@@ -45,7 +45,7 @@ namespace BrandUp.Pages.Metadata
 
         #region Helpers
 
-        bool TryRegisterPageType(ContentMetadataProvider contentMetadata, out PageMetadataProvider pageMetadataProvider)
+        bool TryRegisterPageType(ContentMetadata contentMetadata, out PageMetadataProvider pageMetadataProvider)
         {
             if (TryGetPageMetadataByContentType(contentMetadata.ModelType, out pageMetadataProvider))
                 return true;
@@ -71,7 +71,7 @@ namespace BrandUp.Pages.Metadata
             return true;
         }
 
-        PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
+        PageMetadataProvider AddPageType(ContentMetadata contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
         {
             if (!contentMetadataProvider.IsDefinedTitleField)
                 throw new InvalidOperationException("Тип контента не может быть контентом страницы, так как для него не определено поле заголовка.");

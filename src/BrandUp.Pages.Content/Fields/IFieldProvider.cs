@@ -4,7 +4,7 @@ namespace BrandUp.Pages.Content.Fields
 {
     public interface IFieldProvider
     {
-        ContentMetadataProvider ContentMetadata { get; }
+        ContentMetadata ContentMetadata { get; }
         IModelBinding Binding { get; }
         string Type { get; }
         string Name { get; }
@@ -22,7 +22,7 @@ namespace BrandUp.Pages.Content.Fields
         object ConvetValueFromData(object value);
         Task<object> GetFormValueAsync(object modelValue, IServiceProvider services);
         object GetFormOptions(IServiceProvider services);
-        object ParseValue(string strValue);
+        object ParseValue(string strValue, IFormatProvider formatProvider);
         List<string> GetErrors(object model, ValidationContext validationContext);
     }
 }

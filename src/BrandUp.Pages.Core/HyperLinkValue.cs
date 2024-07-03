@@ -1,7 +1,9 @@
 ﻿namespace BrandUp.Pages
 {
-    public readonly struct HyperLinkValue
+    public readonly struct HyperLinkValue : IEquatable<HyperLinkValue>, IComparable<HyperLinkValue>, IParsable<HyperLinkValue>
     {
+        static readonly char[] ValueSeparator = ['(', ')'];
+
         public HyperLinkType ValueType { get; }
         public string Value { get; }
         public bool HasValue => Value != null;
@@ -27,7 +29,7 @@
         public HyperLinkValue(Guid pageId)
         {
             if (pageId == Guid.Empty)
-                throw new ArgumentException();
+                throw new ArgumentException("Page ID value require not equal Guid.Empty.");
 
             ValueType = HyperLinkType.Page;
             Value = pageId.ToString();
@@ -47,14 +49,30 @@
             Value = url.ToString();
         }
 
+        #region IParsable members
+
+        public static HyperLinkValue Parse(string value, IFormatProvider formatProvider)
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            if (!TryParse(value, formatProvider, out var result))
+                throw new FormatException($"Unable parse value {value} as {typeof(HyperLinkValue).FullName}.");
+
+            return result;
+        }
+
         public static bool TryParse(string value, out HyperLinkValue hyperLink)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            return TryParse(value, null, out hyperLink);
+        }
+
+        public static bool TryParse(string value, IFormatProvider formatProvider, out HyperLinkValue hyperLink)
+        {
+            ArgumentNullException.ThrowIfNull(value);
 
             hyperLink = default;
 
-            var temp = value.Split(new char[] {'(', ')'}, StringSplitOptions.RemoveEmptyEntries);
+            var temp = value.Split(ValueSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (temp.Length != 2)
                 return false;
 
@@ -65,17 +83,17 @@
             {
                 case HyperLinkType.Page:
                     {
-                        if (!Guid.TryParse(temp[1], out Guid pageId))
+                        if (!Guid.TryParse(temp[1], formatProvider, out Guid pageId))
                             return false;
                         hyperLink = new HyperLinkValue(pageId);
                         break;
                     }
                 case HyperLinkType.Url:
                     {
-                        if (!Uri.TryCreate(temp[1], UriKind.RelativeOrAbsolute, out Uri uri))
+                        if (!Uri.TryCreate(temp[1], UriKind.RelativeOrAbsolute, out Uri url))
                             return false;
 
-                        hyperLink = new HyperLinkValue(uri);
+                        hyperLink = new HyperLinkValue(url);
                         break;
                     }
                 default:
@@ -85,11 +103,23 @@
             return true;
         }
 
+        #endregion
+
         #region IEquatable members
 
         public bool Equals(HyperLinkValue other)
         {
             return ValueType == other.ValueType && string.Compare(Value, other.Value, true) == 0;
+        }
+
+        #endregion
+
+        #region IComparable members
+
+        int IComparable<HyperLinkValue>.CompareTo(HyperLinkValue other)
+        {
+            var value = Value ?? string.Empty;
+            return value.CompareTo(other.Value ?? string.Empty);
         }
 
         #endregion

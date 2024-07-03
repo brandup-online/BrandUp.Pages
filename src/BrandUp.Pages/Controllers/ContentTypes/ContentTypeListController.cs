@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace BrandUp.Pages.Controllers
 {
 	[Route("brandup.pages/content-type/list", Name = "BrandUp.Pages.ContentType.List"), Filters.Administration]
-	public class ContentTypeListController : ListController<ContentTypeListModel, ContentTypeItemModel, ContentMetadataProvider, string>
+	public class ContentTypeListController : ListController<ContentTypeListModel, ContentTypeItemModel, ContentMetadata, string>
 	{
 		readonly ContentMetadataManager contentMetadataManager;
-		private ContentMetadataProvider contentMetadataProvider;
+		private ContentMetadata contentMetadataProvider;
 
 		public ContentTypeListController(ContentMetadataManager contentMetadataManager)
 		{
@@ -56,22 +56,22 @@ namespace BrandUp.Pages.Controllers
 			return value;
 		}
 
-		protected override Task<IEnumerable<ContentMetadataProvider>> OnGetItemsAsync(int offset, int limit)
+		protected override Task<IEnumerable<ContentMetadata>> OnGetItemsAsync(int offset, int limit)
 		{
 			if (contentMetadataProvider == null)
-				return Task.FromResult(contentMetadataManager.MetadataProviders.Where(it => it.BaseMetadata == null));
+				return Task.FromResult(contentMetadataManager.Contents.Where(it => it.BaseMetadata == null));
 			else
 				return Task.FromResult(contentMetadataProvider.DerivedContents);
 		}
 
-		protected override Task<ContentMetadataProvider> OnGetItemAsync(string id)
+		protected override Task<ContentMetadata> OnGetItemAsync(string id)
 		{
-			contentMetadataManager.TryGetMetadata(id, out ContentMetadataProvider contentMetadataProvider);
+			contentMetadataManager.TryGetMetadata(id, out ContentMetadata contentMetadataProvider);
 
 			return Task.FromResult(contentMetadataProvider);
 		}
 
-		protected override Task<ContentTypeItemModel> OnGetItemModelAsync(ContentMetadataProvider item)
+		protected override Task<ContentTypeItemModel> OnGetItemModelAsync(ContentMetadata item)
 		{
 			return Task.FromResult(new ContentTypeItemModel
 			{

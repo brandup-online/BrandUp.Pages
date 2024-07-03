@@ -20,7 +20,7 @@ namespace BrandUp.Pages.Content.Fields
 
         protected internal FieldProviderAttribute() { }
 
-        internal virtual void Initialize(ContentMetadataProvider contentMetadata, IModelBinding modelBinding)
+        internal virtual void Initialize(ContentMetadata contentMetadata, IModelBinding modelBinding)
         {
             ContentMetadata = contentMetadata;
             this.modelBinding = modelBinding;
@@ -66,7 +66,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #region IFieldProvider members
 
-        public ContentMetadataProvider ContentMetadata { get; private set; }
+        public ContentMetadata ContentMetadata { get; private set; }
         public IModelBinding Binding => modelBinding;
         public string Type { get; private set; }
         public string Name { get; private set; }
@@ -81,6 +81,7 @@ namespace BrandUp.Pages.Content.Fields
         {
             return value != null;
         }
+
         [System.Diagnostics.DebuggerStepThrough]
         public object GetModelValue(object model)
         {
@@ -88,6 +89,7 @@ namespace BrandUp.Pages.Content.Fields
 
             return modelBinding.GetValue(model);
         }
+
         public bool TryGetModelValue(object model, out object value)
         {
             var val = GetModelValue(model);
@@ -100,6 +102,7 @@ namespace BrandUp.Pages.Content.Fields
             value = val;
             return true;
         }
+
         [System.Diagnostics.DebuggerStepThrough]
         public void SetModelValue(object model, object value)
         {
@@ -107,6 +110,7 @@ namespace BrandUp.Pages.Content.Fields
 
             modelBinding.SetValue(model, value);
         }
+
         [System.Diagnostics.DebuggerStepThrough]
         public virtual bool CompareValues(object left, object right)
         {
@@ -134,23 +138,29 @@ namespace BrandUp.Pages.Content.Fields
 
             return left.Equals(right);
         }
+
         public virtual object ConvetValueToData(object value)
         {
             return value;
         }
+
         public virtual object ConvetValueFromData(object value)
         {
             return value;
         }
+
         public virtual Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
             return Task.FromResult(modelValue);
         }
+
         public virtual object GetFormOptions(IServiceProvider services)
         {
             return null;
         }
-        public abstract object ParseValue(string strValue);
+
+        public abstract object ParseValue(string strValue, IFormatProvider formatProvider);
+
         public List<string> GetErrors(object model, ValidationContext validationContext)
         {
             ArgumentNullException.ThrowIfNull(model);

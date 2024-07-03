@@ -5,14 +5,14 @@ using BrandUp.Pages.Content.Fields;
 
 namespace BrandUp.Pages.Content
 {
-    public class ContentMetadataProvider : IEquatable<ContentMetadataProvider>
+    public class ContentMetadata : IEquatable<ContentMetadata>
     {
         #region Fields
 
         public const string ContentTypeNameDataKey = "_type";
         public static readonly string[] ContentTypePrefixes = ["Content", "Model"];
         readonly ConstructorInfo modelConstructor = null;
-        readonly List<ContentMetadataProvider> derivedContents = [];
+        readonly List<ContentMetadata> derivedContents = [];
         readonly List<FieldProviderAttribute> fields = [];
         readonly Dictionary<string, int> fieldNames = [];
         ITextField titleField;
@@ -21,7 +21,7 @@ namespace BrandUp.Pages.Content
 
         #endregion
 
-        internal ContentMetadataProvider(ContentMetadataManager metadataManager, Type modelType, ContentMetadataProvider baseMetadata)
+        internal ContentMetadata(ContentMetadataManager metadataManager, Type modelType, ContentMetadata baseMetadata)
         {
             Manager = metadataManager;
             ModelType = modelType;
@@ -58,8 +58,8 @@ namespace BrandUp.Pages.Content
         public string Name { get; }
         public string Title { get; }
         public string Description { get; }
-        public ContentMetadataProvider BaseMetadata { get; }
-        public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
+        public ContentMetadata BaseMetadata { get; }
+        public IEnumerable<ContentMetadata> DerivedContents => derivedContents;
         public IEnumerable<FieldProviderAttribute> Fields => fields;
         public bool IsAbstract => ModelType.IsAbstract;
         public bool IsValidatable => isValidatable;
@@ -254,7 +254,7 @@ namespace BrandUp.Pages.Content
                 var contentTypeName = (string)contentTypeNameValue;
                 if (string.Compare(contentTypeName, Name, true) != 0)
                 {
-                    if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider deriverMetadata))
+                    if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadata deriverMetadata))
                         throw new InvalidOperationException($"Не найден тип контента с именем {contentTypeName}.");
                     if (!deriverMetadata.ModelType.IsSubclassOf(ModelType))
                         throw new InvalidOperationException();
@@ -305,7 +305,7 @@ namespace BrandUp.Pages.Content
             return contentModel;
         }
 
-        public bool IsInherited(ContentMetadataProvider baseMetadataProvider)
+        public bool IsInherited(ContentMetadata baseMetadataProvider)
         {
             ArgumentNullException.ThrowIfNull(baseMetadataProvider);
 
@@ -319,7 +319,7 @@ namespace BrandUp.Pages.Content
             return ModelType.IsSubclassOf(baseModelType);
         }
 
-        public bool IsInheritedOrEqual(ContentMetadataProvider baseMetadataProvider)
+        public bool IsInheritedOrEqual(ContentMetadata baseMetadataProvider)
         {
             return this == baseMetadataProvider || IsInherited(baseMetadataProvider);
         }
@@ -401,9 +401,9 @@ namespace BrandUp.Pages.Content
 
         #region IEquatable members
 
-        public bool Equals(ContentMetadataProvider other)
+        public bool Equals(ContentMetadata other)
         {
-            if (other == null || !(other is ContentMetadataProvider))
+            if (other == null || !(other is ContentMetadata))
                 return false;
 
             return ModelType == other.ModelType;
@@ -419,7 +419,7 @@ namespace BrandUp.Pages.Content
         }
         public override bool Equals(object obj)
         {
-            return Equals(obj as ContentMetadataProvider);
+            return Equals(obj as ContentMetadata);
         }
         public override string ToString()
         {
@@ -430,7 +430,7 @@ namespace BrandUp.Pages.Content
 
         #region Operators
 
-        public static bool operator ==(ContentMetadataProvider x, ContentMetadataProvider y)
+        public static bool operator ==(ContentMetadata x, ContentMetadata y)
         {
             var xIsNull = Equals(x, null);
             var yIsNull = Equals(y, null);
@@ -444,12 +444,12 @@ namespace BrandUp.Pages.Content
             return x.Equals(y);
         }
 
-        public static bool operator !=(ContentMetadataProvider x, ContentMetadataProvider y)
+        public static bool operator !=(ContentMetadata x, ContentMetadata y)
         {
             return !(x == y);
         }
 
-        public static implicit operator Type(ContentMetadataProvider metadataProvider)
+        public static implicit operator Type(ContentMetadata metadataProvider)
         {
             if (metadataProvider == null)
                 return null;

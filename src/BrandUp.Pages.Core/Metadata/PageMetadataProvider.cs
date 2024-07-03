@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Metadata
 
         #region Properties
 
-        public ContentMetadataProvider ContentMetadata { get; }
+        public ContentMetadata ContentMetadata { get; }
         public string Name => ContentMetadata.Name;
         public string Title => ContentMetadata.Title;
         public string Description => ContentMetadata.Description;
@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Metadata
 
         #endregion
 
-        internal PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
+        internal PageMetadataProvider(ContentMetadata contentMetadata, PageMetadataProvider parentPageMetadata)
         {
             ContentMetadata = contentMetadata;
             ParentMetadata = parentPageMetadata;

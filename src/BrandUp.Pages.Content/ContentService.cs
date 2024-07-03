@@ -6,7 +6,7 @@ namespace BrandUp.Pages.Content
 {
     public class ContentService(ContentMetadataManager contentMetadataManager, IContentRepository contentRepository, IContentEditRepository contentEditRepository, IDefaultContentDataProvider defaultContentDataProvider, IServiceProvider serviceProvider)
     {
-        public async Task<object> CreateDefaultAsync(ContentMetadataProvider contentMetadata, CancellationToken cancellationToken = default)
+        public async Task<object> CreateDefaultAsync(ContentMetadata contentMetadata, CancellationToken cancellationToken = default)
         {
             var contentData = await defaultContentDataProvider.GetDefaultAsync(contentMetadata, cancellationToken);
             if (contentData == null)
@@ -78,7 +78,7 @@ namespace BrandUp.Pages.Content
             return await contentEditRepository.FindEditByUserAsync(content.Id, userId, cancellationToken);
         }
 
-        public async Task<IContentEdit> BeginEditAsync(string contentKey, string userId, ContentMetadataProvider contentProvider, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> BeginEditAsync(string contentKey, string userId, ContentMetadata contentProvider, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(contentKey);
             ArgumentNullException.ThrowIfNull(userId);
@@ -122,7 +122,7 @@ namespace BrandUp.Pages.Content
             ArgumentNullException.ThrowIfNull(editSession);
 
             var contentData = await contentEditRepository.GetContentAsync(editSession, cancellationToken);
-            if (!contentData.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out var contentTypeName))
+            if (!contentData.TryGetValue(ContentMetadata.ContentTypeNameDataKey, out var contentTypeName))
                 throw new InvalidOperationException($"Not found content type name.");
 
             if (!contentMetadataManager.TryGetMetadata((string)contentTypeName, out var metadata))
@@ -175,7 +175,7 @@ namespace BrandUp.Pages.Content
 
         class ContentData : IContentData
         {
-            public ContentMetadataProvider Provider { get; init; }
+            public ContentMetadata Provider { get; init; }
             public object Data { get; init; }
             public string CommitId { get; init; }
         }
@@ -193,7 +193,7 @@ namespace BrandUp.Pages.Content
     public interface IContentData
     {
         string CommitId { get; }
-        ContentMetadataProvider Provider { get; }
+        ContentMetadata Provider { get; }
         object Data { get; }
     }
 

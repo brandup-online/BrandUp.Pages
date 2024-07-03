@@ -4,7 +4,7 @@ namespace BrandUp.Pages.Content.Fakes
 {
     public class FakeDefaultContentDataProvider : IDefaultContentDataProvider
     {
-        public async Task<IDictionary<string, object>> GetDefaultAsync(ContentMetadataProvider contentMetadata, CancellationToken cancellationToken)
+        public async Task<IDictionary<string, object>> GetDefaultAsync(ContentMetadata contentMetadata, CancellationToken cancellationToken)
         {
             if (contentMetadata.ModelType == typeof(TestContent))
             {

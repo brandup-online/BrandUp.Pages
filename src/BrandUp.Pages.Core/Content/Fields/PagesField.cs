@@ -46,9 +46,14 @@ namespace BrandUp.Pages.Content.Fields
             return true;
         }
 
-        public override object ParseValue(string strValue)
+        public override object ParseValue(string strValue, IFormatProvider formatProvider)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(strValue))
+                return null;
+
+            var collectionId = Guid.Parse(strValue, formatProvider);
+
+            return valueConstructor.Invoke([collectionId]);
         }
 
         public override object ConvetValueToData(object value)

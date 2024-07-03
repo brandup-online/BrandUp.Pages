@@ -24,9 +24,12 @@ namespace BrandUp.Pages.Content.Fields
             return hyperLinkValue.HasValue;
         }
 
-        public override object ParseValue(string strValue)
+        public override object ParseValue(string strValue, IFormatProvider formatProvider)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(strValue))
+                return null;
+
+            return HyperLinkValue.Parse(strValue, formatProvider);
         }
 
         public override object ConvetValueToData(object value)

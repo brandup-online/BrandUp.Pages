@@ -1,53 +1,56 @@
 ﻿namespace BrandUp.Pages.Content.Fields
 {
-	public class HtmlAttribute : FieldProviderAttribute, IHtmlField
-	{
-		#region IHtmlField members
+    public class HtmlAttribute : FieldProviderAttribute, IHtmlField
+    {
+        #region IHtmlField members
 
-		public string Placeholder { get; set; }
+        public string Placeholder { get; set; }
 
-		#endregion
+        #endregion
 
-		#region FieldProviderAttribute members
+        #region FieldProviderAttribute members
 
-		protected override void OnInitialize()
-		{
-			var valueType = ValueType;
-			if (valueType != typeof(string))
-				throw new InvalidOperationException();
-		}
+        protected override void OnInitialize()
+        {
+            var valueType = ValueType;
+            if (valueType != typeof(string))
+                throw new InvalidOperationException();
+        }
 
-		public override object ParseValue(string strValue)
-		{
-			if (string.IsNullOrEmpty(strValue))
-				return null;
-			return strValue;
-		}
-		public override object GetFormOptions(IServiceProvider services)
-		{
-			return new HtmlFieldFormOptions
-			{
-				Placeholder = Placeholder
-			};
-		}
-		public override bool HasValue(object value)
-		{
-			if (!base.HasValue(value))
-				return false;
+        public override object ParseValue(string strValue, IFormatProvider formatProvider)
+        {
+            if (string.IsNullOrEmpty(strValue))
+                return null;
 
-			return !string.IsNullOrEmpty((string)value);
-		}
+            return strValue;
+        }
 
-		#endregion
-	}
+        public override object GetFormOptions(IServiceProvider services)
+        {
+            return new HtmlFieldFormOptions
+            {
+                Placeholder = Placeholder
+            };
+        }
 
-	public class HtmlFieldFormOptions
-	{
-		public string Placeholder { get; set; }
-	}
+        public override bool HasValue(object value)
+        {
+            if (!base.HasValue(value))
+                return false;
 
-	public interface IHtmlField : IFieldProvider
-	{
-		string Placeholder { get; }
-	}
+            return !string.IsNullOrEmpty((string)value);
+        }
+
+        #endregion
+    }
+
+    public class HtmlFieldFormOptions
+    {
+        public string Placeholder { get; set; }
+    }
+
+    public interface IHtmlField : IFieldProvider
+    {
+        string Placeholder { get; }
+    }
 }

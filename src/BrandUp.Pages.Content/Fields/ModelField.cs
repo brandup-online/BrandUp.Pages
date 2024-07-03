@@ -13,7 +13,7 @@ namespace BrandUp.Pages.Content.Fields
 
         #region  IModelField members
 
-        public ContentMetadataProvider ValueContentMetadata { get; private set; }
+        public ContentMetadata ValueContentMetadata { get; private set; }
         public bool IsListValue { get; private set; }
         public object Navigate(object value, int index)
         {
@@ -62,10 +62,11 @@ namespace BrandUp.Pages.Content.Fields
             if (!ContentMetadataManager.TypeIsContent(contentType.GetTypeInfo()))
                 throw new InvalidOperationException();
 
-            if (!ContentMetadata.Manager.TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata))
+            if (!ContentMetadata.Manager.TryGetMetadata(contentType, out ContentMetadata contentMetadata))
                 throw new InvalidOperationException();
             ValueContentMetadata = contentMetadata;
         }
+
         public override bool HasValue(object value)
         {
             if (!base.HasValue(value))
@@ -79,6 +80,7 @@ namespace BrandUp.Pages.Content.Fields
 
             return true;
         }
+
         public override object ConvetValueToData(object value)
         {
             if (IsListValue)
@@ -92,6 +94,7 @@ namespace BrandUp.Pages.Content.Fields
             else
                 return ValueContentMetadata.ConvertContentModelToDictionary(value);
         }
+
         public override object ConvetValueFromData(object value)
         {
             if (IsListValue)
@@ -108,10 +111,12 @@ namespace BrandUp.Pages.Content.Fields
             else
                 return ValueContentMetadata.ConvertDictionaryToContentModel((IDictionary<string, object>)value);
         }
-        public override object ParseValue(string strValue)
+
+        public override object ParseValue(string strValue, IFormatProvider formatProvider)
         {
             throw new NotImplementedException();
         }
+
         public override object GetFormOptions(IServiceProvider services)
         {
             var options = new ModelFieldFormOptions
@@ -135,6 +140,7 @@ namespace BrandUp.Pages.Content.Fields
 
             return options;
         }
+
         public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
         {
             var formValue = new ModelFieldFormValue
@@ -198,7 +204,7 @@ namespace BrandUp.Pages.Content.Fields
     {
         bool IsListValue { get; }
         object Navigate(object value, int index);
-        ContentMetadataProvider ValueContentMetadata { get; }
+        ContentMetadata ValueContentMetadata { get; }
         object ChangeType(object value, string newTypeName);
     }
 

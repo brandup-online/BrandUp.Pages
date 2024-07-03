@@ -4,82 +4,84 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Content.Fields
 {
-	public class ImageAttribute : FieldProviderAttribute, IImageField
-	{
-		private static readonly Type ImageValueType = typeof(ImageValue);
+    public class ImageAttribute : FieldProviderAttribute, IImageField
+    {
+        private static readonly Type ImageValueType = typeof(ImageValue);
 
-		#region ModelField members
+        #region ModelField members
 
-		protected override void OnInitialize()
-		{
-			var valueType = ValueType;
-			if (valueType != ImageValueType)
-				throw new InvalidOperationException();
-		}
-		public override bool HasValue(object value)
-		{
-			if (!base.HasValue(value))
-				return false;
+        protected override void OnInitialize()
+        {
+            var valueType = ValueType;
+            if (valueType != ImageValueType)
+                throw new InvalidOperationException();
+        }
 
-			var img = (ImageValue)value;
-			return img.HasValue;
-		}
-		public override object ParseValue(string strValue)
-		{
-			if (string.IsNullOrEmpty(strValue))
-				return null;
+        public override bool HasValue(object value)
+        {
+            if (!base.HasValue(value))
+                return false;
 
-			if (!ImageValue.TryParse(strValue, out ImageValue value))
-				throw new InvalidOperationException();
+            var img = (ImageValue)value;
+            return img.HasValue;
+        }
 
-			return value;
-		}
-		public override object ConvetValueToData(object value)
-		{
-			var img = (ImageValue)value;
-			return img.ToString();
-		}
-		public override object ConvetValueFromData(object value)
-		{
-			if (!ImageValue.TryParse((string)value, out ImageValue imageValue))
-				throw new InvalidOperationException();
-			return imageValue;
-		}
-		public override async Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
-		{
-			ImageFieldFormValue formValue = null;
+        public override object ParseValue(string strValue, IFormatProvider formatProvider)
+        {
+            if (string.IsNullOrEmpty(strValue))
+                return null;
 
-			if (HasValue(modelValue))
-			{
-				var imageValue = (ImageValue)modelValue;
+            return ImageValue.Parse(strValue, formatProvider);
+        }
 
-				var fileUrlGenerator = services.GetRequiredService<IFileUrlGenerator>();
-				var previewUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue, 600, 500);
+        public override object ConvetValueToData(object value)
+        {
+            var img = (ImageValue)value;
+            return img.ToString();
+        }
 
-				formValue = new ImageFieldFormValue
-				{
-					ValueType = imageValue.ValueType,
-					Value = imageValue.Value,
-					PreviewUrl = previewUrl
-				};
-			}
+        public override object ConvetValueFromData(object value)
+        {
+            if (!ImageValue.TryParse((string)value, out ImageValue imageValue))
+                throw new InvalidOperationException();
+            return imageValue;
+        }
 
-			return formValue;
-		}
+        public override async Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+        {
+            ImageFieldFormValue formValue = null;
 
-		#endregion
-	}
+            if (HasValue(modelValue))
+            {
+                var imageValue = (ImageValue)modelValue;
 
-	public class ImageFieldFormValue
-	{
-		[JsonConverter(typeof(JsonStringEnumConverter))]
-		public ImageValueType ValueType { get; set; }
-		public string Value { get; set; }
-		public string PreviewUrl { get; set; }
-	}
+                var fileUrlGenerator = services.GetRequiredService<IFileUrlGenerator>();
+                var previewUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue, 600, 500);
 
-	public interface IImageField : IFieldProvider
-	{
+                formValue = new ImageFieldFormValue
+                {
+                    ValueType = imageValue.ValueType,
+                    Value = imageValue.Value,
+                    PreviewUrl = previewUrl
+                };
+            }
 
-	}
+            return formValue;
+        }
+
+        #endregion
+    }
+
+    public class ImageFieldFormValue
+    {
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ImageValueType ValueType { get; set; }
+        public string Value { get; set; }
+        public string PreviewUrl { get; set; }
+    }
+
+    public interface IImageField : IFieldProvider
+    {
+
+    }
 }

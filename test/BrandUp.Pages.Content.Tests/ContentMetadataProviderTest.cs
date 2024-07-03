@@ -101,7 +101,7 @@ namespace BrandUp.Pages.Content
 
             Assert.NotNull(data);
             Assert.True(data.Count > 0);
-            Assert.True(data.ContainsKey(ContentMetadataProvider.ContentTypeNameDataKey));
+            Assert.True(data.ContainsKey(ContentMetadata.ContentTypeNameDataKey));
             Assert.True(data.ContainsKey("title"));
         }
 
@@ -209,7 +209,7 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void Implicit_Null_Type()
         {
-            ContentMetadataProvider contentMetadata = null;
+            ContentMetadata contentMetadata = null;
             var type = (Type)contentMetadata;
 
             Assert.Null(type);

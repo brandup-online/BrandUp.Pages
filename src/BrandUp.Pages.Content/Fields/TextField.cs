@@ -18,10 +18,11 @@
                 throw new InvalidOperationException();
         }
 
-        public override object ParseValue(string strValue)
+        public override object ParseValue(string strValue, IFormatProvider formatProvider)
         {
             if (string.IsNullOrEmpty(strValue))
                 return null;
+
             return strValue;
         }
 

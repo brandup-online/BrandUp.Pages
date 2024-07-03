@@ -1,7 +1,9 @@
 ﻿namespace BrandUp.Pages
 {
-    public readonly struct ImageValue : IEquatable<ImageValue>
+    public readonly struct ImageValue : IEquatable<ImageValue>, IComparable<ImageValue>, IParsable<ImageValue>
     {
+        static readonly char[] ValueSeparator = ['(', ')'];
+
         public ImageValueType ValueType { get; }
         public string Value { get; }
         public bool HasValue => Value != null;
@@ -9,7 +11,7 @@
         public ImageValue(Guid fileId)
         {
             if (fileId == Guid.Empty)
-                throw new ArgumentException();
+                throw new ArgumentException("File ID value require not equal Guid.Empty.");
 
             ValueType = ImageValueType.Id;
             Value = fileId.ToString();
@@ -22,13 +24,30 @@
             Value = url.ToString();
         }
 
+        #region IParsable members
+
+        public static ImageValue Parse(string value, IFormatProvider formatProvider)
+        {
+            ArgumentNullException.ThrowIfNull(value);
+
+            if (!TryParse(value, formatProvider, out var result))
+                throw new FormatException($"Unable parse value {value} as {typeof(ImageValue).FullName}.");
+
+            return result;
+        }
+
         public static bool TryParse(string value, out ImageValue imageValue)
+        {
+            return TryParse(value, null, out imageValue);
+        }
+
+        public static bool TryParse(string value, IFormatProvider formatProvider, out ImageValue imageValue)
         {
             ArgumentNullException.ThrowIfNull(value);
 
             imageValue = default;
 
-            var temp = value.Split(new char[] { '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
+            var temp = value.Split(ValueSeparator, StringSplitOptions.RemoveEmptyEntries);
             if (temp.Length != 2)
                 return false;
 
@@ -41,12 +60,15 @@
                     {
                         if (!Guid.TryParse(temp[1], out Guid fileId))
                             return false;
+
                         imageValue = new ImageValue(fileId);
                         break;
                     }
                 case ImageValueType.Url:
                     {
-                        var url = new Uri(temp[1], UriKind.RelativeOrAbsolute);
+                        if (!Uri.TryCreate(temp[1], UriKind.RelativeOrAbsolute, out Uri url))
+                            return false;
+
                         imageValue = new ImageValue(url);
                         break;
                     }
@@ -57,11 +79,23 @@
             return true;
         }
 
+        #endregion
+
         #region IEquatable members
 
         public bool Equals(ImageValue other)
         {
             return ValueType == other.ValueType && string.Compare(Value, other.Value, true) == 0;
+        }
+
+        #endregion
+
+        #region IComparable members
+
+        int IComparable<ImageValue>.CompareTo(ImageValue other)
+        {
+            var value = Value ?? string.Empty;
+            return value.CompareTo(other.Value ?? string.Empty);
         }
 
         #endregion

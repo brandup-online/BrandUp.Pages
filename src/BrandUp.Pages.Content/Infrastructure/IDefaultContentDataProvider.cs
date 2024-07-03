@@ -2,6 +2,6 @@
 {
     public interface IDefaultContentDataProvider
     {
-        Task<IDictionary<string, object>> GetDefaultAsync(ContentMetadataProvider contentMetadata, CancellationToken cancellationToken);
+        Task<IDictionary<string, object>> GetDefaultAsync(ContentMetadata contentMetadata, CancellationToken cancellationToken);
     }
 }

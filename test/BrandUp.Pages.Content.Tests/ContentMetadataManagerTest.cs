@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Content
             var contentType = typeof(TestPageContent);
             var contentMetadata = metadataManager.GetMetadata(contentType);
 
-            Assert.True(metadataManager.TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata2));
+            Assert.True(metadataManager.TryGetMetadata(contentType, out ContentMetadata contentMetadata2));
             Assert.Equal(contentMetadata, contentMetadata2);
         }
 
@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Content
             var contentType = typeof(TestPageContent);
             var contentMetadata = metadataManager.GetMetadata(contentType);
 
-            var metadatas = metadataManager.MetadataProviders;
+            var metadatas = metadataManager.Contents;
 
             Assert.NotNull(metadatas);
             Assert.True(metadatas.Any());
