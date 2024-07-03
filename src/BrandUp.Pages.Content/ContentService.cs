@@ -87,7 +87,6 @@ namespace BrandUp.Pages.Content
             var content = await FindContentAsync(contentKey, cancellationToken);
             if (content == null)
                 throw new ArgumentException($"Not found content by key \"{contentKey}\".", nameof(contentKey));
-            //content ??= await contentRepository.CreateContentAsync(contentKey, cancellationToken);
 
             var contentEvents = serviceProvider.GetContentEvents(content.ItemType);
 
@@ -95,8 +94,7 @@ namespace BrandUp.Pages.Content
             if (content.CommitId == null)
             {
                 contentModel = await CreateDefaultAsync(contentProvider, cancellationToken);
-                if (contentModel == null)
-                    throw new InvalidOperationException($"Not found default data for content type {contentProvider.Name}.");
+                contentModel ??= contentProvider.CreateModelInstance();
 
                 await contentEvents.OnDefaultFactoryAsync(content.ItemId, contentModel, cancellationToken);
             }

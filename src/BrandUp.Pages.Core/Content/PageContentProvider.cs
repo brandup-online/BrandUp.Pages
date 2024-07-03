@@ -4,27 +4,23 @@ using BrandUp.Pages.Services;
 
 namespace BrandUp.Pages.Content
 {
-    public class PageContentProvider(PageMetadataManager pageMetadataManager, PageService pageService) : IItemContentProvider<IPage>
+    public class PageContentProvider(PageMetadataManager pageMetadataManager, PageService pageService) : ItemContentProvider<IPage>
     {
-        #region IItemMappingProvider members
+        #region ItemContentProvider members
 
-        public async Task<string> GetContentKeyAsync(IPage item, CancellationToken cancellationToken)
+        public override async Task<string> GetContentKeyAsync(IPage item, CancellationToken cancellationToken)
         {
             return await Task.FromResult($"{item.WebsiteId}-page-{item.ItemId}");
         }
 
-        public async Task<Type> GetContentTypeAsync(IPage item, CancellationToken cancellationToken)
+        public override async Task<Type> GetContentTypeAsync(IPage item, CancellationToken cancellationToken)
         {
             var pageProvider = pageMetadataManager.GetMetadata(item.TypeName);
 
             return await Task.FromResult(pageProvider.ContentType);
         }
 
-        #endregion
-
-        #region IItemContentEvents members
-
-        public async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
+        public override async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
         {
             if (!Guid.TryParse(itemId, out var pageId))
                 throw new ArgumentException();
@@ -38,7 +34,7 @@ namespace BrandUp.Pages.Content
             await Task.CompletedTask;
         }
 
-        public async Task OnUpdatedContentAsync(string itemId, object content, CancellationToken cancellationToken)
+        public override async Task OnUpdatedContentAsync(string itemId, object content, CancellationToken cancellationToken)
         {
             if (!Guid.TryParse(itemId, out var pageId))
                 throw new FormatException("Unable parse page ID as Guid.");

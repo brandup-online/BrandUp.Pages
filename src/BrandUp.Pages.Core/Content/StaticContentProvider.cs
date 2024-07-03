@@ -2,27 +2,21 @@
 
 namespace BrandUp.Pages.Content
 {
-    public class StaticContentProvider : IItemContentProvider<StaticContent>
+    public class StaticContentProvider : ItemContentProvider<StaticContent>
     {
-        public async Task<string> GetContentKeyAsync(StaticContent item, CancellationToken cancellationToken)
+        #region ItemContentProvider members
+
+        public override async Task<string> GetContentKeyAsync(StaticContent item, CancellationToken cancellationToken)
         {
             return await Task.FromResult(item.Key);
         }
 
-        public async Task<Type> GetContentTypeAsync(StaticContent item, CancellationToken cancellationToken)
+        public override async Task<Type> GetContentTypeAsync(StaticContent item, CancellationToken cancellationToken)
         {
             return await Task.FromResult(item.Type);
         }
 
-        public async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-        }
-
-        public async Task OnUpdatedContentAsync(string itemId, object content, CancellationToken cancellationToken)
-        {
-            await Task.CompletedTask;
-        }
+        #endregion
     }
 
     [ContentItem("brandup.content-static")]
@@ -31,6 +25,6 @@ namespace BrandUp.Pages.Content
         public string Key { get; } = key ?? throw new ArgumentNullException(nameof(key));
         public Type Type { get; } = type ?? throw new ArgumentNullException(nameof(type));
 
-        string IItemContent.ItemId => Key;
+        public string ItemId => Key;
     }
 }

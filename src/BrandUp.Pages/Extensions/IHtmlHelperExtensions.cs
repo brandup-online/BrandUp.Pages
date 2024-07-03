@@ -85,7 +85,7 @@ namespace BrandUp.Pages
             }
             else
             {
-                if (content != null && content.CommitId != null)
+                if (content.CommitId != null)
                 {
                     var contentData = await contentService.GetContentAsync(content.CommitId, cancellationToken);
                     contentModel = contentData.Data;

@@ -12,6 +12,7 @@ namespace BrandUp.Pages.Views
     {
         public const string ViewData_ContentContextKeyName = "_ContentContext_";
         public const string ViewData_ViewRenderingContextKeyName = "_ContentRenderingContext_";
+        public const string ViewData_ContentPageContextKeyName = "_ContentPageContext_";
         public const string DefaultContentTagName = "div";
 
         #region IViewRenderService members

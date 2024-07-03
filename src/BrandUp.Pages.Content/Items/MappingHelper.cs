@@ -11,7 +11,17 @@ namespace BrandUp.Pages.Content.Items
         public static string GetServiceKey<TItem>()
             where TItem : IItemContent
         {
-            return keys.GetOrAdd(typeof(TItem), type =>
+            return GetServiceKey(typeof(TItem));
+        }
+
+        public static string GetServiceKey(Type itemType)
+        {
+            ArgumentNullException.ThrowIfNull(itemType);
+
+            if (!typeof(IItemContent).IsAssignableFrom(itemType))
+                throw new ArgumentException($"Type {itemType.AssemblyQualifiedName} is not implement interface {typeof(IItemContent).FullName}.");
+
+            return keys.GetOrAdd(itemType, type =>
             {
                 var attr = type.GetCustomAttribute<ContentItemAttribute>();
                 if (attr == null)

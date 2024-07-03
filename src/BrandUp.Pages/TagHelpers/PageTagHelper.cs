@@ -1,6 +1,5 @@
-﻿using BrandUp.Pages.Content;
-using BrandUp.Pages.Views;
-using BrandUp.Website.Pages;
+﻿using BrandUp.Pages.Views;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace BrandUp.Pages.TagHelpers
 {
     [HtmlTargetElement("page", TagStructure = TagStructure.NormalOrSelfClosing)]
-    public class PageTagHelper(ContentMetadataManager contentMetadataManager) : TagHelper
+    public class PageTagHelper : TagHelper
     {
         [ViewContext]
         public ViewContext ViewContext { get; set; }
@@ -16,35 +15,23 @@ namespace BrandUp.Pages.TagHelpers
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
-            if (ViewContext.ViewData.Model is not AppPageModel pageModel)
+            if (ViewContext.ViewData.Model is not PageModel)
                 return;
 
-            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ViewRenderingContextKeyName] is not ContentRenderingContext)
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ContentContextKeyName] is not ContentContext contentContext)
+                return;
+            if (ViewContext.ViewData[RazorViewRenderService.ViewData_ContentPageContextKeyName] is not ContentPageContext)
                 return;
 
-            var pageModelType = pageModel.GetType();
-            foreach (var @interface in pageModelType.GetInterfaces())
-            {
-                if (!@interface.IsConstructedGenericType)
-                    continue;
+            if (!contentContext.Explorer.IsRoot)
+                throw new InvalidOperationException();
 
-                var gType = @interface.GetGenericTypeDefinition();
-                if (gType == typeof(IContentPage<>))
-                {
-                    var contentType = @interface.GenericTypeArguments[0];
-                    var contentProvider = contentMetadataManager.GetMetadata(contentType);
-
-                    var keyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                    var contentKey = (string)keyProperty.GetValue(pageModel);
-
-                    output.Attributes.Add("data-content-root", contentKey);
-                    output.Attributes.Add("data-content-type", contentProvider.Name);
-                    output.Attributes.Add("data-content-title", contentProvider.Title);
-                    output.Attributes.Add("data-content-path", null);
-
-                    break;
-                }
-            }
+            output.Attributes.Add("data-content-root", contentContext.Key);
+            if (contentContext.IsDesigner)
+                output.Attributes.Add("data-content-edit-id", contentContext.EditId.Value.ToString());
+            output.Attributes.Add("data-content-type", contentContext.Explorer.Metadata.Name);
+            output.Attributes.Add("data-content-title", contentContext.Explorer.Metadata.Title);
+            output.Attributes.Add("data-content-path", contentContext.Explorer.ModelPath);
 
             base.Process(context, output);
         }

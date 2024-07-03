@@ -1,0 +1,24 @@
+﻿@page
+@model CreateModel
+
+<page>
+    <header class="page-header">
+        <div class="content">
+            <h1>@Model.Header</h1>
+        </div>
+    </header>
+
+    <form method="post">
+        @Html.AntiForgeryToken()
+
+        <div>
+            <div><input type="text" asp-for="PostTitle" /></div>
+
+            @Html.ValidationSummary()
+
+            <div>
+                <button type="submit">Create</button>
+            </div>
+        </div>
+    </form>
+</page>

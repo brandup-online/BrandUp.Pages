@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace LandingWebSite.Blog
 {
     [MongoCollection(CollectionName = "Blog.Post")]
+    [ContentItem("blogpost")]
     public class BlogPostDocument : IItemContent
     {
         [BsonId, BsonRepresentation(BsonType.String)]

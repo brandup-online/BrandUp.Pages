@@ -4,6 +4,7 @@ using System.Text.Encodings.Web;
 using BrandUp.Extensions.Migrations;
 using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
+using BrandUp.Pages.Content;
 using BrandUp.Pages.Pages;
 using BrandUp.Website;
 using BrandUp.Website.Infrastructure;
@@ -88,6 +89,10 @@ namespace LandingWebSite
             services
                 .AddMongoDbContext<Models.AppDbContext>(options => options.DatabaseName = "landing-website")
                 .UseCamelCaseElementName();
+
+            services
+                .AddScoped<Blog.BlogPostRepository>()
+                .AddContentMappingProvider<Blog.BlogPostDocument, Blog.BlogPostContentProvider>();
 
             services
                 .AddWebsite(options => options.MapConfiguration(Configuration))
