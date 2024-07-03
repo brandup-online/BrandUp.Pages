@@ -77,11 +77,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
     }
 
-    deleteItem(index: number) {
-        const itemElem = this.getItem(index);
-        itemElem.remove();
-    }
-
     hasValue(): boolean {
         for (let i = 0; i < this.element.children.length; i++) {
             const itemElem = this.element.children.item(i);
@@ -113,25 +108,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         }
 
         return itemElem;
-    }
-
-    addItem (data: string, index: number) {
-        const fragment = document.createDocumentFragment();
-        const container = DOM.tag("div", null, data);
-        fragment.appendChild(container);
-        const newElem = DOM.queryElement(container, "[data-content-path]");
-
-        if (this.provider.options.isListValue) {
-            if (index > 0)
-                this.getItem(index - 1).insertAdjacentElement("afterend", newElem);
-            else if (index === 0)
-                this.element.insertAdjacentElement("afterbegin", newElem);
-            else
-                this.getItem(-1).insertAdjacentElement("afterend", newElem);
-        }
-        return newElem;
-    }
-    
+    }  
 
     protected countItems(): number {
         return this.getItems().length;

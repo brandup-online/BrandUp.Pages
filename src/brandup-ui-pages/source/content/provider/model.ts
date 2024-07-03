@@ -7,6 +7,7 @@ import { editPage } from "../../dialogs/pages/edit";
 import { FieldValueResult } from "../../typings/models";
 import { IModelFieldProvider, IParentContent } from "../../typings/content";
 import { Content } from "../../content/content";
+import { DOM } from "brandup-ui-dom";
 
 export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent, IModelFieldProvider {
     private __contentItems: Content[] = [];
@@ -26,6 +27,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     itemUp(index: number, elem: Element) {
+        [this.__contentItems[index], this.__contentItems[index-1]] = [this.__contentItems[index-1], this.__contentItems[index]]
         this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/up',
@@ -36,6 +38,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     itemDown(index: number, elem: Element) {
+        [this.__contentItems[index], this.__contentItems[index+1]] = [this.__contentItems[index+1], this.__contentItems[index]]
         this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/down',
@@ -51,8 +54,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             urlParams: { itemIndex: index.toString() },
             method: "DELETE",
             success: (() => {
-                (this.designer as ModelDesigner)?.deleteItem(index);
-                //(this.field as ModelField)?.deleteItem(index);
+                this.__contentItems[index].container?.remove();
                 this.__contentItems = this.__contentItems.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
                 this.content.editor.removeContentItem(path);
             })
@@ -116,6 +118,27 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         return index;
     }
 
+    private __addItemDOM(data: string, index: number) {
+        const fragment = document.createDocumentFragment();
+        const container = DOM.tag("div", null, data);
+        fragment.appendChild(container);
+        const newElem = DOM.queryElement(container, "[data-content-path]");
+
+        let elem;
+
+        while (index >= 0 && !elem) {
+            elem = this.__contentItems[index].container;
+            index -= 1;
+        }
+        if (index < 0 && !elem ) {
+            this.designer.element.insertAdjacentElement("afterbegin", newElem);
+        } else {
+            elem.insertAdjacentElement("beforebegin", newElem);
+        }
+
+        return newElem;
+    }
+
     addItem(itemType: string, index: number) {
         const fetchData = () => {
             this.request({
@@ -140,7 +163,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                             method: "GET",
                             success: (response: AjaxResponse<string>) => {
                                 if (response.status === 200) {
-                                    const newElem = (this.designer as ModelDesigner)?.addItem(response.data, index);
+                                    const newElem = this.__addItemDOM(response.data, index);
                                     const modelPath = newElem.dataset.contentPath;
                                     this.content.editor.createContent(modelPath, newElem, () => {
                                         (this.designer as ModelDesigner).renderBlock(newElem);
