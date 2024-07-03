@@ -22,11 +22,6 @@ namespace LandingWebSite.Blog
             return await Task.FromResult($"blogpost-{item.Id}");
         }
 
-        public override async Task<Type> GetContentTypeAsync(BlogPostDocument item, CancellationToken cancellationToken)
-        {
-            return await Task.FromResult(typeof(BlogPostContent));
-        }
-
         public override async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
         {
             var post = await blogPostRepository.FindByIdAsync(itemId, cancellationToken);

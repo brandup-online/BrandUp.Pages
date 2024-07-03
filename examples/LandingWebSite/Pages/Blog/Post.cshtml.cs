@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LandingWebSite.Pages.Blog
 {
-    public class PostModel(BlogPostRepository blogPostRepository) : AppPageModel, IContentPage<BlogPostDocument, BlogPostContent>
+    public class PostModel(BlogPostRepository blogPostRepository) : AppPageModel, IItemContentPage<BlogPostDocument, BlogPostContent>
     {
         BlogPostDocument post;
 

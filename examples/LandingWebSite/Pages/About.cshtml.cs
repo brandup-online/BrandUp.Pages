@@ -5,7 +5,7 @@ using BrandUp.Website.Pages;
 
 namespace LandingWebSite.Pages
 {
-    public class AbountModel : AppPageModel, IContentPage<AbountPageContent>
+    public class AbountModel : AppPageModel, IStaticContentPage<AbountPageContent>
     {
         #region AppPageModel members
 

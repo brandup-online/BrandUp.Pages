@@ -5,16 +5,20 @@ namespace BrandUp.Pages
     public interface IContentPage<TContent>
         where TContent : class
     {
-        string ContentKey { get; }
         TContent ContentModel { get; set; }
     }
 
-    public interface IContentPage<TItem, TContent>
+    public interface IStaticContentPage<TContent> : IContentPage<TContent>
+        where TContent : class
+    {
+        string ContentKey { get; }
+    }
+
+    public interface IItemContentPage<TItem, TContent> : IContentPage<TContent>
         where TItem : IItemContent
         where TContent : class
     {
         TItem ContentItem { get; }
-        TContent ContentModel { get; set; }
     }
 
     internal class ContentPageContext { }

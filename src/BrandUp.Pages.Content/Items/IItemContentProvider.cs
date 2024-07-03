@@ -1,11 +1,5 @@
 ﻿namespace BrandUp.Pages.Content.Items
 {
-    public interface IItemContentProvider : IItemContentEvents
-    {
-        Task<string> GetContentKeyAsync(object item, CancellationToken cancellationToken);
-        Task<Type> GetContentTypeAsync(object item, CancellationToken cancellationToken);
-    }
-
     public abstract class ItemContentProvider<TItem> : IItemContentProvider
         where TItem : IItemContent
     {
@@ -18,15 +12,6 @@
             var typedItem = (TItem)item;
 
             return GetContentKeyAsync(typedItem, cancellationToken);
-        }
-
-        Task<Type> IItemContentProvider.GetContentTypeAsync(object item, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(item);
-
-            var typedItem = (TItem)item;
-
-            return GetContentTypeAsync(typedItem, cancellationToken);
         }
 
         public virtual Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
@@ -42,7 +27,11 @@
         #endregion
 
         public abstract Task<string> GetContentKeyAsync(TItem item, CancellationToken cancellationToken);
-        public abstract Task<Type> GetContentTypeAsync(TItem item, CancellationToken cancellationToken);
+    }
+
+    public interface IItemContentProvider : IItemContentEvents
+    {
+        Task<string> GetContentKeyAsync(object item, CancellationToken cancellationToken);
     }
 
     public interface IItemContentEvents

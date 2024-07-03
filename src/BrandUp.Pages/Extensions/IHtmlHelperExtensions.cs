@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Items;
+using BrandUp.Pages.Pages;
 using BrandUp.Pages.Views;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Html;
@@ -33,7 +34,12 @@ namespace BrandUp.Pages
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentKey));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
 
-            return await RenderContentAsync(htmlHelper, scope, new StaticContent(contentKey, contentType), defaultFactory);
+            return await RenderContentAsync(htmlHelper, scope, new StaticContent(contentKey), contentType, defaultFactory);
+        }
+
+        internal static async Task<IHtmlContent> RenderPageAsync(this IHtmlHelper htmlHelper, ContentPageModel pageModel)
+        {
+            return await RenderContentAsync(htmlHelper, ContentScope.Global, pageModel.PageEntry, pageModel.PageMetadata.ContentType);
         }
 
         /// <summary>
@@ -43,9 +49,12 @@ namespace BrandUp.Pages
         /// <param name="htmlHelper">Current html helper.</param>
         /// <param name="item">Item instance.</param>
         /// <returns>Rendered html content.</returns>
-        public static async Task<IHtmlContent> RenderContentAsync<TItem>(this IHtmlHelper htmlHelper, ContentScope scope, TItem item, Func<object, Task> defaultFactory = null)
+        public static async Task<IHtmlContent> RenderContentAsync<TItem>(this IHtmlHelper htmlHelper, ContentScope scope, TItem item, Type contentType, Func<object, Task> defaultFactory = null)
             where TItem : IItemContent
         {
+            ArgumentNullException.ThrowIfNull(item);
+            ArgumentNullException.ThrowIfNull(contentType);
+
             var httpContext = htmlHelper.ViewContext.HttpContext;
             var cancellationToken = httpContext.RequestAborted;
             var services = httpContext.RequestServices;
@@ -53,7 +62,6 @@ namespace BrandUp.Pages
             var itemType = MappingHelper.GetServiceKey<TItem>();
             var contentProvider = services.GetContentMappingProvider<TItem>();
             var contentKey = await contentProvider.GetContentKeyAsync(item, cancellationToken);
-            var contentType = await contentProvider.GetContentTypeAsync(item, cancellationToken);
             var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();
 
             if (!contentMetadataManager.TryGetMetadata(contentType, out var contentMetadata))

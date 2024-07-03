@@ -13,13 +13,6 @@ namespace BrandUp.Pages.Content
             return await Task.FromResult($"{item.WebsiteId}-page-{item.ItemId}");
         }
 
-        public override async Task<Type> GetContentTypeAsync(IPage item, CancellationToken cancellationToken)
-        {
-            var pageProvider = pageMetadataManager.GetMetadata(item.TypeName);
-
-            return await Task.FromResult(pageProvider.ContentType);
-        }
-
         public override async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
         {
             if (!Guid.TryParse(itemId, out var pageId))

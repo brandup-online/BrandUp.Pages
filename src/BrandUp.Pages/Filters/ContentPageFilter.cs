@@ -19,126 +19,14 @@ namespace BrandUp.Pages.Filters
                 return;
             }
 
-            var httpContext = context.HttpContext;
-            var services = httpContext.RequestServices;
-            var cancellationToken = httpContext.RequestAborted;
-            var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();
-            var pageModelType = pageModel.GetType();
-            foreach (var @interface in pageModelType.GetInterfaces())
+            if (TryGetContentPage(pageModel, out var item, out var contentType))
             {
-                if (!@interface.IsConstructedGenericType)
-                    continue;
+                var contentModel = await RenderContentAsync(pageModel, item, contentType, context.HttpContext.RequestAborted);
 
-                var gType = @interface.GetGenericTypeDefinition();
-                if (gType == typeof(IContentPage<>))
-                {
-                    var contentType = @interface.GenericTypeArguments[0];
-                    var contentMetadata = contentMetadataManager.GetMetadata(contentType);
+                var c = typeof(IContentPage<>).MakeGenericType(contentType);
 
-                    var contentKeyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                    var contentKey = (string)contentKeyProperty.GetValue(pageModel);
-
-                    var itemContent = new StaticContent(contentKey, contentType);
-                    var itemTypeKey = MappingHelper.GetServiceKey<StaticContent>();
-                    var contentProvider = services.GetContentMappingProvider<StaticContent>();
-
-                    var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                    var content = await contentService.FindContentAsync(contentKey, cancellationToken);
-                    content ??= await contentService.CreateAsync(itemTypeKey, itemContent.ItemId, contentKey, cancellationToken);
-
-                    object contentModel;
-                    IContentEdit contentEdit;
-                    if (httpContext.IsEditContent(content, out var editContext))
-                    {
-                        contentModel = await contentService.GetEditContentAsync(editContext.Edit, cancellationToken);
-                        contentEdit = editContext.Edit;
-                    }
-                    else
-                    {
-                        if (content.CommitId != null)
-                        {
-                            var contentData = await contentService.GetContentAsync(content.CommitId, cancellationToken);
-                            contentModel = contentData.Data;
-                        }
-                        else
-                        {
-                            contentModel = await contentService.CreateDefaultAsync(contentMetadata, cancellationToken);
-                            contentModel ??= contentMetadata.CreateModelInstance();
-
-                            await contentProvider.OnDefaultFactoryAsync(itemContent.ItemId, contentModel, cancellationToken);
-                        }
-
-                        contentEdit = null;
-                    }
-
-                    var contentProperty = @interface.GetProperty("ContentModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                    contentProperty.SetValue(pageModel, contentModel);
-
-                    var contentContext = new ContentContext(contentKey, contentModel, httpContext.RequestServices, contentEdit);
-                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentContextKeyName, contentContext);
-
-                    var contentRenderingContext = new ContentRenderingContext();
-                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ViewRenderingContextKeyName, contentRenderingContext);
-
-                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentPageContextKeyName, new ContentPageContext());
-
-                    break;
-                }
-                else if (gType == typeof(IContentPage<,>))
-                {
-                    var itemType = @interface.GenericTypeArguments[0];
-                    var itemTypeKey = MappingHelper.GetServiceKey(itemType);
-                    var contentProvider = services.GetContentMappingProvider(itemType);
-
-                    var itemContentProperty = @interface.GetProperty("ContentItem", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                    var itemContent = (IItemContent)itemContentProperty.GetValue(pageModel);
-
-                    var contentKey = await contentProvider.GetContentKeyAsync(itemContent, cancellationToken);
-                    var contentType = await contentProvider.GetContentTypeAsync(itemContent, cancellationToken);
-                    var contentMetadata = contentMetadataManager.GetMetadata(contentType);
-
-                    var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                    var content = await contentService.FindContentAsync(contentKey, cancellationToken);
-                    content ??= await contentService.CreateAsync(itemTypeKey, itemContent.ItemId, contentKey, cancellationToken);
-
-                    object contentModel;
-                    IContentEdit contentEdit;
-                    if (httpContext.IsEditContent(content, out var editContext))
-                    {
-                        contentModel = await contentService.GetEditContentAsync(editContext.Edit, cancellationToken);
-                        contentEdit = editContext.Edit;
-                    }
-                    else
-                    {
-                        if (content.CommitId != null)
-                        {
-                            var contentData = await contentService.GetContentAsync(content.CommitId, cancellationToken);
-                            contentModel = contentData.Data;
-                        }
-                        else
-                        {
-                            contentModel = await contentService.CreateDefaultAsync(contentMetadata, cancellationToken);
-                            contentModel ??= contentMetadata.CreateModelInstance();
-
-                            await contentProvider.OnDefaultFactoryAsync(itemContent.ItemId, contentModel, cancellationToken);
-                        }
-
-                        contentEdit = null;
-                    }
-
-                    var contentProperty = @interface.GetProperty("ContentModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                    contentProperty.SetValue(pageModel, contentModel);
-
-                    var contentContext = new ContentContext(contentKey, contentModel, httpContext.RequestServices, contentEdit);
-                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentContextKeyName, contentContext);
-
-                    var contentRenderingContext = new ContentRenderingContext();
-                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ViewRenderingContextKeyName, contentRenderingContext);
-
-                    pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentPageContextKeyName, new ContentPageContext());
-
-                    break;
-                }
+                var contentProperty = c.GetProperty("ContentModel", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                contentProperty.SetValue(pageModel, contentModel);
             }
 
             await next();
@@ -154,6 +42,97 @@ namespace BrandUp.Pages.Filters
         #region IOrderedFilter members
 
         int IOrderedFilter.Order => int.MinValue + 1;
+
+        #endregion
+
+        #region Helpers
+
+        static bool TryGetContentPage(PageModel pageModel, out IItemContent item, out Type contentType)
+        {
+            var pageModelType = pageModel.GetType();
+            foreach (var @interface in pageModelType.GetInterfaces())
+            {
+                if (!@interface.IsConstructedGenericType)
+                    continue;
+
+                var gType = @interface.GetGenericTypeDefinition();
+                if (gType == typeof(IStaticContentPage<>))
+                {
+                    contentType = @interface.GenericTypeArguments[0];
+
+                    var contentKeyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    var contentKey = (string)contentKeyProperty.GetValue(pageModel);
+
+                    item = new StaticContent(contentKey);
+                    return true;
+                }
+                else if (gType == typeof(IItemContentPage<,>))
+                {
+                    contentType = @interface.GenericTypeArguments[1];
+
+                    var itemContentProperty = @interface.GetProperty("ContentItem", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    item = (IItemContent)itemContentProperty.GetValue(pageModel);
+                    return true;
+                }
+            }
+
+            item = default;
+            contentType = default;
+            return false;
+        }
+
+        static async Task<object> RenderContentAsync(PageModel pageModel, IItemContent item, Type contentType, CancellationToken cancellationToken)
+        {
+            var services = pageModel.HttpContext.RequestServices;
+
+            var itemType = item.GetType();
+            var itemTypeKey = MappingHelper.GetServiceKey(itemType);
+
+            var contentProvider = services.GetContentMappingProvider(itemType);
+
+            var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();
+            var contentMetadata = contentMetadataManager.GetMetadata(contentType);
+            var contentKey = await contentProvider.GetContentKeyAsync(item, cancellationToken);
+
+            var contentService = services.GetRequiredService<ContentService>();
+            var content = await contentService.FindContentAsync(contentKey, cancellationToken);
+            content ??= await contentService.CreateAsync(itemTypeKey, item.ItemId, contentKey, cancellationToken);
+
+            object contentModel;
+            IContentEdit contentEdit;
+            if (pageModel.HttpContext.IsEditContent(content, out var editContext))
+            {
+                contentModel = await contentService.GetEditContentAsync(editContext.Edit, cancellationToken);
+                contentEdit = editContext.Edit;
+            }
+            else
+            {
+                if (content.CommitId != null)
+                {
+                    var contentData = await contentService.GetContentAsync(content.CommitId, cancellationToken);
+                    contentModel = contentData.Data;
+                }
+                else
+                {
+                    contentModel = await contentService.CreateDefaultAsync(contentMetadata, cancellationToken);
+                    contentModel ??= contentMetadata.CreateModelInstance();
+
+                    await contentProvider.OnDefaultFactoryAsync(item.ItemId, contentModel, cancellationToken);
+                }
+
+                contentEdit = null;
+            }
+
+            var contentContext = new ContentContext(contentKey, contentModel, services, contentEdit);
+            pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentContextKeyName, contentContext);
+
+            var contentRenderingContext = new ContentRenderingContext();
+            pageModel.ViewData.Add(RazorViewRenderService.ViewData_ViewRenderingContextKeyName, contentRenderingContext);
+
+            pageModel.ViewData.Add(RazorViewRenderService.ViewData_ContentPageContextKeyName, new ContentPageContext());
+
+            return contentModel;
+        }
 
         #endregion
     }
