@@ -8,7 +8,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("content-designer");
-        this._refreshBlockIndexes();
+        // this._refreshBlockIndexes();
 
         this.registerCommand("item-add", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path]");
@@ -22,7 +22,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path]");
             const contentPath = itemElem.getAttribute("data-content-path");
-            const index = this.getItemIndex(itemElem);
 
             this.provider.settingItem(contentPath);
         });
@@ -49,8 +48,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             itemElem.classList.add("processing");
 
             itemElem.previousElementSibling.insertAdjacentElement("beforebegin", itemElem);
-            this.renderBlocks();
-            this._refreshBlockIndexes();
 
             this.provider.itemUp(itemIndex, itemElem);
         });
@@ -67,9 +64,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             itemElem.classList.add("processing");
 
             itemElem.nextElementSibling.insertAdjacentElement("afterend", itemElem);
-            this.renderBlocks();
-            this._refreshBlockIndexes();
-
             this.provider.itemDown(itemIndex, itemElem);
         });
 
@@ -86,8 +80,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     deleteItem(index: number) {
         const itemElem = this.getItem(index);
         itemElem.remove();
-        this._refreshBlockIndexes();
-        this.renderBlocks();
     }
 
     hasValue(): boolean {
@@ -108,8 +100,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         elem.insertAdjacentElement("afterend", newElem);
         elem.remove();
 
-        this._renderBlock(newElem);
-        this._refreshBlockIndexes();
+        this.renderBlock(newElem);
     }
 
     protected getItem(index: number): Element {
@@ -141,24 +132,21 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         return newElem;
     }
     
-    protected _refreshBlockIndexes() {
-        this.eachItems((elem, index) => elem.setAttribute("data-content-path-index", index.toString()));
-    }
 
     protected countItems(): number {
         return this.getItems().length;
     }
 
     protected getItemIndex(item: Element) {
-        const index = +item.getAttribute("data-content-path-index");
+        const index = +item?.getAttribute("data-content-path-index");
         if (index >=0) return index;
         return -1;
     }
 
-    protected _renderBlock(itemElem: Element) { }
+    renderBlock(itemElem: Element) { }
 
     renderBlocks() {
-        this.eachItems((elem) => { this._renderBlock(elem as HTMLElement); });
+        this.eachItems((elem) => { this.renderBlock(elem as HTMLElement); });
     }
 
     protected eachItems(f: (elem: Element, index: number) => void) {

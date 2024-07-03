@@ -12,14 +12,14 @@ export class Content {
     readonly editor: Editor;
     readonly parent: IParentContent;
     readonly model: ContentModel;
-    private __container: HTMLElement;
+    readonly container: HTMLElement;
     private __fields: Map<string, FieldProvider<any, any>>;
     
     constructor(editor: Editor, parent: IParentContent, model: ContentModel, container: HTMLElement = null, fieldsElements: Map<string, HTMLElement>) {
         this.editor = editor;
         this.parent = parent;
         this.model = model;
-        this.__container = container;
+        this.container = container;
         
         this.__fields = new Map<string, FieldProvider<any, any>>();
 
@@ -55,7 +55,7 @@ export class Content {
     }
 
     renderDesigners() {
-        if (!this.__container)
+        if (!this.container)
             return;
 
         this.__fields.forEach(field => field.renderDesigner());

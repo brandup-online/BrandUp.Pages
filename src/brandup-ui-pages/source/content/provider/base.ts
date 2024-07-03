@@ -12,6 +12,8 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
     readonly valueElem: HTMLElement;
     readonly designerType: string;
 
+    readonly isModelField:boolean = false;
+
     private __value: TValue;
     private __errors: Array<string>;
 
