@@ -20,9 +20,9 @@ namespace BrandUp.Pages.Testing.Repositories
             return contents[index];
         }
 
-        public async Task<IContent> FindByKeyAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default)
+        public async Task<IContent> FindByKeyAsync(string contentKey, CancellationToken cancellationToken = default)
         {
-            var uniqueKey = UniqueId(websiteId, contentKey);
+            var uniqueKey = UniqueId(contentKey);
 
             if (!contentKeys.TryGetValue(uniqueKey, out var index))
                 return await Task.FromResult<IContent>(null);
@@ -30,16 +30,17 @@ namespace BrandUp.Pages.Testing.Repositories
             return contents[index];
         }
 
-        public async Task<IContent> CreateContentAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default)
+        public async Task<IContent> CreateContentAsync(string itemType, string itemId, string contentKey, CancellationToken cancellationToken = default)
         {
-            var uniqueKey = UniqueId(websiteId, contentKey);
+            var uniqueKey = UniqueId(contentKey);
             if (contentKeys.ContainsKey(uniqueKey))
                 throw new InvalidOperationException($"Dublicate content by key {uniqueKey}.");
 
             var content = new Content
             {
                 Id = Guid.NewGuid(),
-                WebsiteId = websiteId,
+                ItemType = itemType,
+                ItemId = itemId,
                 Key = contentKey,
                 CommitId = null
             };
@@ -84,7 +85,7 @@ namespace BrandUp.Pages.Testing.Repositories
                 throw new InvalidOperationException();
 
             var content = contents[index];
-            var uniqueKey = UniqueId(content.WebsiteId, content.Key);
+            var uniqueKey = UniqueId(content.Key);
 
             contents.RemoveAt(index);
             contentIds.Remove(contentId);
@@ -99,15 +100,16 @@ namespace BrandUp.Pages.Testing.Repositories
 
         #endregion
 
-        static string UniqueId(string websiteId, string key)
+        static string UniqueId(string key)
         {
-            return $"{websiteId}-{key}".ToLower();
+            return $"{key}".ToLower();
         }
 
         class Content : IContent
         {
             public Guid Id { get; set; }
-            public string WebsiteId { get; set; }
+            public string ItemType { get; set; }
+            public string ItemId { get; set; }
             public string Key { get; set; }
             public string CommitId { get; set; }
         }

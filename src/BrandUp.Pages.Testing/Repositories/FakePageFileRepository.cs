@@ -20,12 +20,11 @@ namespace BrandUp.Pages.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<IFile> UploadFileAsync(string websiteId, string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public Task<IFile> UploadFileAsync(string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
             var file = new MemoryFile
             {
                 Id = Guid.NewGuid(),
-                WebsiteId = websiteId,
                 ContentKey = contentKey,
                 Name = fileName,
                 ContentType = contentType,
@@ -62,7 +61,6 @@ namespace BrandUp.Pages.Repositories
         private class MemoryFile : IFile
         {
             public Guid Id { get; set; }
-            public string WebsiteId { get; set; }
             public string ContentKey { get; set; }
             public string Name { get; set; }
             public string ContentType { get; set; }

@@ -42,14 +42,14 @@ namespace BrandUp.Pages.Content
             //var contentTitle = contentProvider.GetContentTitle(contentModel);
             //var contentData = contentProvider.ConvertContentModelToDictionary(contentModel);
 
-            var websiteId = "website";
             var contentKey = "key";
-            await contentRepository.CreateContentAsync(websiteId, contentKey);
+            var createdContent = await contentRepository.CreateContentAsync("item", "id", contentKey);
 
-            var content = await contentService.FindContentAsync(websiteId, contentKey);
+            var content = await contentService.FindContentAsync(contentKey);
             Assert.NotNull(content);
             Assert.NotEqual(Guid.Empty, content.Id);
-            Assert.Equal(websiteId, content.WebsiteId);
+            Assert.Equal("item", content.ItemType);
+            Assert.Equal("id", content.ItemId);
             Assert.Equal(contentKey, content.Key);
             Assert.Null(content.CommitId);
         }
