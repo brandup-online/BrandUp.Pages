@@ -44,6 +44,7 @@ export interface IContentFieldDesigner {
     element: HTMLElement;
     
     destroy();
+    setErrors(errors: string[]);
 }
 
 export interface IParentContent {

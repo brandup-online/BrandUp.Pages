@@ -67,6 +67,8 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
     protected onSavedValue(model: FieldValueResult) {
         this.__value = model.value;
         this.__errors = model.errors;
+        this.field?.setErrors(this.__errors);
+        this.designer?.setErrors(this.__errors);
     }
 
     destroy() {
