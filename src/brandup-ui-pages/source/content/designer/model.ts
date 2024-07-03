@@ -11,8 +11,8 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         // this._refreshBlockIndexes();
 
         this.registerCommand("item-add", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
-            const itemType = itemElem.getAttribute("data-item-type");
+            const itemElem = elem.closest("[data-content-path-index]");
+            const itemType = itemElem?.getAttribute("data-item-type");
             const itemIndex = this.getItemIndex(itemElem) + 1;
             this.provider.addItem(itemType, itemIndex);
         });
@@ -20,14 +20,14 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         this.registerCommand("item-view", () => { return; });
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
+            const itemElem = elem.closest("[data-content-path-index]");
             const contentPath = itemElem.getAttribute("data-content-path");
 
             this.provider.settingItem(contentPath);
         });
 
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
+            const itemElem = elem.closest("[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             const path = itemElem.getAttribute("data-content-path");
@@ -38,7 +38,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
 
         this.registerCommand("item-up", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
+            const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = this.getItemIndex(itemElem);
             if (itemIndex <= 0)
                 return;
@@ -68,7 +68,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
 
         this.registerCommand("item-refresh", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
+            const itemElem = elem.closest("[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");

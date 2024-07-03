@@ -11,6 +11,7 @@ import { Content } from "./content";
 import { ContentModel } from "../typings/models";
 import { FieldProvider } from "./provider/base";
 import { ModelFieldProvider } from "./provider/model";
+import { errorPage } from "../dialogs/dialog-error";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
@@ -168,10 +169,14 @@ export class Editor extends UIElement implements IPageDesigner {
                 urlParams: { editId: this.editId },
                 method: "POST",
                 success: (response) => {
+                    this.__isLoading = false;
                     if (response.status !== 200)
-                        throw "Error commit content editing."; // TODO получаем список ошибок и рисуем модалку
+                        throw "Error commit content editing.";
                     if (response.data.isSuccess)
                         this.__complateEdit();
+                    else {
+                        errorPage(this, response.data.validation);
+                    }
                 }
             });
         });
