@@ -16,7 +16,7 @@ namespace BrandUp.Pages.Controllers
             if (!contentType.StartsWith("image"))
                 return BadRequest();
 
-            var file = await fileService.UploadFileAsync(ContentEdit.WebsiteId, ContentEdit.ContentKey, fileName, contentType, Request.Body);
+            var file = await fileService.UploadFileAsync(ContentEdit.ContentKey, fileName, contentType, Request.Body);
 
             var modelValue = new ImageValue(file.Id);
             Field.SetModelValue(ContentContext.Content, modelValue);
@@ -48,7 +48,7 @@ namespace BrandUp.Pages.Controllers
                 if (!contentType.StartsWith("image"))
                     return BadRequest();
 
-                var file = await fileService.UploadFileAsync(ContentEdit.WebsiteId, ContentEdit.ContentKey, url, contentType, await response.Content.ReadAsStreamAsync());
+                var file = await fileService.UploadFileAsync(ContentEdit.ContentKey, url, contentType, await response.Content.ReadAsStreamAsync());
 
                 var modelValue = new ImageValue(file.Id);
                 Field.SetModelValue(ContentContext.Content, modelValue);

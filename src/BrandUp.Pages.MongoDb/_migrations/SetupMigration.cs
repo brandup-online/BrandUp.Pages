@@ -88,7 +88,7 @@ namespace BrandUp.Pages.MongoDb._migrations
 
         async Task CreateIndexes_ContentAsync(CancellationToken cancellationToken)
         {
-            var keyIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.Key);
+            var keyIndex = Builders<ContentDocument>.IndexKeys.Ascending(it => it.Key);
 
             await dbContext.Contents.Indexes.ApplyIndexes([
                 new CreateIndexModel<ContentDocument>(keyIndex, new CreateIndexOptions { Name = "Key", Unique = true })
@@ -98,7 +98,7 @@ namespace BrandUp.Pages.MongoDb._migrations
         async Task CreateIndexes_ContentEditsAsync(CancellationToken cancellationToken)
         {
             var versionIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.Id).Ascending(it => it.Version);
-            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.ContentKey).Ascending(it => it.UserId);
+            var userIndex = Builders<ContentEditDocument>.IndexKeys.Ascending(it => it.ContentId).Ascending(it => it.UserId);
 
             await dbContext.ContentEdits.Indexes.ApplyIndexes([
                 new CreateIndexModel<ContentEditDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),

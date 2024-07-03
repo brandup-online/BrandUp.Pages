@@ -1,16 +1,18 @@
 import { AjaxResponse } from "brandup-ui-ajax";
-import { HyperLinkFieldFormValue, HyperLinkFieldFormOptions, HyperLinkContent } from "../../content/field/hyperlink";
 import { FieldProvider } from "./base";
+import { FieldValueResult } from "../../typings/models";
 
-export class HyperlinkFieldProvider extends FieldProvider<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> {
+export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperLinkFieldOptions> {
     createDesigner() {
         return null;
     }
 
     createField() {
-        const { name, errors, options } = this.__model;
-        this.field = new HyperLinkContent(name, errors, options, this);
-        return this.field;
+        //const { name, errors, options } = this.model;
+        //this.field = new HyperLinkContent(name, errors, options, this);
+        //return this.field;
+
+        throw "";
     }
 
     changeValue(url: string) {
@@ -18,10 +20,13 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkFieldFormValu
             url: `/brandup.pages/content/hyperlink/url`,
             urlParams: { url },
             method: "POST",
-            success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
+            success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {
                     case 200:
-                        this.setValue(response.data);
+                        this.onSavedValue(response.data);
+
+                        const value = this.getValue();
+                        this.valueElem.setAttribute("href", value.value);
 
                         break;
                     default:
@@ -34,14 +39,15 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkFieldFormValu
     selectPage(pageId: string) {
         this.request({
             url: `/brandup.pages/content/hyperlink/page`,
-            urlParams: {
-                pageId: pageId
-            },
+            urlParams: { pageId },
             method: "POST",
-            success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
+            success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {
                     case 200:
-                        this.setValue(response.data);
+                        this.onSavedValue(response.data);
+
+                        const value = this.getValue();
+                        this.valueElem.setAttribute("href", value.value);
 
                         break;
                     default:
@@ -50,4 +56,17 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkFieldFormValu
             }
         });
     }
+}
+
+export type HyperLinkType = "Url" | "Page";
+
+export interface HyperLinkValue {
+    valueType: HyperLinkType;
+    value: string;
+    pageTitle?: string;
+}
+
+export interface HyperLinkFieldOptions {
+    valueType: "Url" | "Page";
+    value: string;
 }

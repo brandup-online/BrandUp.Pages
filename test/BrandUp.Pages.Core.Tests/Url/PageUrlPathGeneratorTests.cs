@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Builder;
+using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.ContentModels;
 using BrandUp.Pages.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -80,6 +81,8 @@ namespace BrandUp.Pages.Url
             public string EntryId => throw new NotImplementedException();
 
             public bool IsPublished => throw new NotImplementedException();
+
+            string IItemContent.ItemId => Id.ToString();
 
             public Page(string header)
             {

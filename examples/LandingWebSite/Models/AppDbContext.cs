@@ -10,6 +10,8 @@ namespace LandingWebSite.Models
         public IMongoCollection<IdentityUser> Users => GetCollection<IdentityUser>();
         public IMongoCollection<IdentityRole> Roles => GetCollection<IdentityRole>();
 
+        public IMongoCollection<Blog.BlogPostDocument> BlogPosts => GetCollection<Blog.BlogPostDocument>();
+
         #region IPagesDbContext members
 
         public IMongoCollection<ContentDocument> Contents => GetCollection<ContentDocument>();

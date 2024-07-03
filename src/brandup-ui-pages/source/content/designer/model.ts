@@ -1,10 +1,9 @@
 ﻿import { FieldDesigner } from "./base";
-import { ContentTypeModel } from "../../typings/models";
-import "./model.less";
-import { ModelFieldProvider } from "../../content/provider/model";
+import { ModelFieldProvider } from "../provider/model";
 import { DOM } from "brandup-ui-dom";
+import "./model.less";
 
-export class ModelDesigner extends FieldDesigner<ModelDesignerOptions, ModelFieldProvider> {
+export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     get typeName(): string { return "BrandUpPages.ModelDesigner"; }
 
     protected onRender(elem: HTMLElement) {
@@ -131,7 +130,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions, ModelFiel
         fragment.appendChild(container);
         const newElem = DOM.queryElement(container, "[data-content-path]");
 
-        if (this.options.isListValue) {
+        if (this.provider.options.isListValue) {
             if (index > 0)
                 this.getItem(index - 1).insertAdjacentElement("afterend", newElem);
             else if (index === 0)
@@ -171,18 +170,4 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions, ModelFiel
     protected getItems () {
         return DOM.queryElements(this.element, `.page-blocks-designer > [data-content-path]`);
     }
-
-    getValue() {
-        
-    };
-
-    setValue(value) {
-        
-    };
-}
-export interface ModelDesignerOptions {
-    addText: string;
-    isListValue: boolean;
-    itemType: ContentTypeModel;
-    itemTypes: Array<ContentTypeModel>;
 }

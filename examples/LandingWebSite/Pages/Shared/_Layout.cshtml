@@ -10,10 +10,10 @@
     <script type="text/javascript" src="~/dist/app.js" asp-append-version="true"></script>
 
     <div class="app">
-        @await Html.RenderContentAsync("page-nav", typeof(Contents.PageNav.PageNavContent))
+        @await Html.RenderContentAsync(ContentScope.Global, "page-nav", typeof(Contents.PageNav.PageNavContent))
         @RenderBody()
     </div>
 
-    @await Html.RenderContentAsync("mobile-menu", typeof(Contents.MobileMenu.MobileMenuContent))
+    @await Html.RenderContentAsync(ContentScope.Global, "mobile-menu", typeof(Contents.MobileMenu.MobileMenuContent))
 </body>
 </html>

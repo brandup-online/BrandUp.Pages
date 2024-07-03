@@ -23,7 +23,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Id = Guid.NewGuid(),
                 CreatedDate = createdDate,
                 Version = 1,
-                WebsiteId = content.WebsiteId,
                 ContentKey = content.Key,
                 ContentId = content.Id,
                 BaseCommitId = content.CommitId != null ? ObjectId.Parse(content.CommitId) : null,
@@ -37,7 +36,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
             {
                 Id = editDocument.Id,
                 CreatedDate = createdDate,
-                WebsiteId = editDocument.WebsiteId,
                 ContentKey = editDocument.ContentKey,
                 BaseCommitId = editDocument.BaseCommitId,
                 UserId = editDocument.UserId
@@ -54,10 +52,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return await cursor.SingleOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string contentKey, string userId, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(Guid contentId, string userId, CancellationToken cancellationToken = default)
         {
             var cursor = await documents
-                .Find(it => it.WebsiteId == websiteId && it.ContentKey == contentKey && it.UserId == userId)
+                .Find(it => it.ContentId == contentId && it.UserId == userId)
                 .Project(ContentEdit.Projection)
                 .ToCursorAsync(cancellationToken);
 
@@ -106,9 +104,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Id = it.Id,
                 CreatedDate = it.CreatedDate,
                 Version = it.Version,
-                WebsiteId = it.WebsiteId,
-                ContentKey = it.ContentKey,
                 ContentId = it.ContentId,
+                ContentKey = it.ContentKey,
                 BaseCommitId = it.BaseCommitId,
                 UserId = it.UserId
             };
@@ -116,7 +113,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
             public Guid Id { get; set; }
             public DateTime CreatedDate { get; set; }
             public int Version { get; set; }
-            public string WebsiteId { get; set; }
             public string ContentKey { get; set; }
             public Guid ContentId { get; set; }
             public ObjectId? BaseCommitId { get; set; }

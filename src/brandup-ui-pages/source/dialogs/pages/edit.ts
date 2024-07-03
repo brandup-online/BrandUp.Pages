@@ -1,12 +1,10 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { IContentForm, IContentField, PageContentForm } from "../../typings/content";
-import { ValidationProblemDetails } from "../../typings/models";
+import { AjaxQueue } from "brandup-ui-ajax";
+import { IContentForm, IContentField } from "../../typings/content";
 import "../dialog-form.less";
 import { DOM } from "brandup-ui-dom";
 import { Editor } from "../../content/editor";
 import { Content } from "../../content/content";
-import { IContentModel } from "../../admin/page-toolbar";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -61,7 +59,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         let path = model.path;
         while (path || path === "") {
-            const model = this.__content.__editor.getContentItem(path).model;
+            const model = this.__content.editor.getContentItem(path).model;
             let title = model.typeTitle;
             this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
                 DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
@@ -82,7 +80,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             const fieldModel = model.fields[i];
             const provider = providers.get(fieldModel.name);
             this.addField(fieldModel.title, provider.createField());
-            provider.setValue(fieldModel.value)
+            //provider.setValue(fieldModel.value)
         }
     }
 
@@ -90,7 +88,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         this.__modelPath = modelPath ? modelPath : "";
         this.__content.getFields().forEach(provider => provider.destroyField());
         DOM.empty(this.__fieldsElem);
-        this.__content = this.__content.__editor.getContentItem(modelPath);
+        this.__content = this.__content.editor.getContentItem(modelPath);
         this.__renderForm();
     }
 

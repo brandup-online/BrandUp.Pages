@@ -1,21 +1,23 @@
-import { ImageFieldValue, ImageFieldOptions, ImageContent } from "../../content/field/image";
-import { ImageDesigner } from "../designer/image";
 import { FieldProvider } from "./base";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { ImageDesigner } from "../designer/image";
+import { AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { FieldValueResult } from "../../typings/models";
 
 export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFieldOptions> {
     createDesigner() {
-        return new ImageDesigner(this.__valueElem, this.__model.options, this);
+        return new ImageDesigner(this);
     }
 
     createField() {
-        const { name, errors, options } = this.__model;
-        this.field = new ImageContent(name, errors, options, this);
-        return this.field;
+        //const { name, errors, options } = this.model;
+        //this.field = new ImageContent(name, errors, options, this);
+        //return this.field;
+
+        throw "";
     }
 
-    changeValue(value: File | string): void {
-        let requestOptions: {[key: string]: any} = {};
+    changeImage(value: File | string): void {
+        let requestOptions: AjaxRequest = {};
         if (value instanceof File) {
             requestOptions = {
                 url: `/brandup.pages/content/image`,
@@ -42,19 +44,25 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         this.request({
             ...requestOptions, 
             method: "POST",
-            success: (response: AjaxResponse) => {
+            success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {
                     case 200:
-                        console.log("🚀 ~ ImageFieldProvider ~ changeValue ~ response.dat:", response.data)
-                        super.setValue(response.data.value);
-                        this.setErrors(response.data.errors);
+                        this.onSavedValue(response.data);
+
+                        let value = this.getValue();
+                        this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
+
                         break;
                 }
             }
         });
     }
+}
 
-    setValue(value: ImageFieldValue) {
-        super.setValue(value);
-    }
+export interface ImageFieldOptions {
+}
+export interface ImageFieldValue {
+    valueType: string;
+    value: string;
+    previewUrl: string;
 }

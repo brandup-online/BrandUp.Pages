@@ -6,12 +6,10 @@ namespace BrandUp.Pages.MongoDb.Documents
     [MongoDB.MongoCollection(CollectionName = "BrandUpPages.contents.edit")]
     public class ContentEditDocument : Document
     {
-        [BsonRequired]
-        public string WebsiteId { get; set; }
-        [BsonRequired]
-        public string ContentKey { get; set; }
         [BsonRequired, BsonRepresentation(BsonType.String)]
         public Guid ContentId { get; set; }
+        [BsonRequired]
+        public string ContentKey { get; set; }
         [BsonRepresentation(BsonType.String)]
         public ObjectId? BaseCommitId { get; set; }
         [BsonRequired]

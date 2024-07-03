@@ -15,13 +15,13 @@ namespace BrandUp.Pages
         public Guid? EditId { get; }
         public bool IsDesigner => EditId.HasValue;
 
-        public ContentContext(string key, object contentModel, IServiceProvider services, IContentEdit contentEdit)
+        public ContentContext(string contentKey, object contentModel, IServiceProvider services, IContentEdit contentEdit)
         {
-            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(contentKey);
             ArgumentNullException.ThrowIfNull(contentModel);
             ArgumentNullException.ThrowIfNull(services);
 
-            Key = key;
+            Key = contentKey;
             Services = services;
 
             var contentMetadataManager = services.GetRequiredService<ContentMetadataManager>();

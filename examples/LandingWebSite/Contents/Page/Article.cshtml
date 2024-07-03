@@ -1,4 +1,4 @@
-@inherits RazorContent<Page.ArticlePageContent>
+@model Page.ArticlePageContent
 
 <content-element tag="div" class="page-article" />
 
@@ -7,4 +7,4 @@
     <p><strong content-text="SubHeader" /></p>
 </header>
 
-<div content-object="Blocks" content-designer="page-blocks"></div>
+<div content-object="Blocks" content-designer="page-blocks" class="page-blocks"></div>

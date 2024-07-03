@@ -20,17 +20,15 @@ namespace BrandUp.Pages.Pages
         [ClientProperty]
         public Guid Id => page.Id;
         [ClientProperty]
-        public Models.PageStatus Status { get; private set; }
+        public Guid? ParentId { get; private set; }
         [ClientProperty]
-        public Guid? ParentPageId { get; private set; }
-        public string ContentKey { get; private set; }
-        public ContentContext ContentContext { get; private set; }
+        public Models.PageStatus Status { get; private set; }
 
         #endregion
 
         #region AppPageModel members
 
-        public override string Title => pageSeo.Title;//!string.IsNullOrEmpty(pageSeo.Title) ? pageSeo.Title : PageMetadata.GetPageHeader(ContentContext.Content);
+        public override string Title => pageSeo.Title;
         public override string Description => pageSeo.Description;
         public override string Keywords => pageSeo.Keywords != null ? string.Join(",", pageSeo.Keywords) : null;
         public override string ScriptName => "content";
@@ -87,14 +85,8 @@ namespace BrandUp.Pages.Pages
 
             PageMetadata = await pageService.GetPageTypeAsync(page, CancellationToken);
             Status = page.IsPublished ? Models.PageStatus.Published : Models.PageStatus.Draft;
-            ParentPageId = await pageService.GetParentPageIdAsync(page, CancellationToken);
+            ParentId = await pageService.GetParentPageIdAsync(page, CancellationToken);
             pageSeo = await pageService.GetPageSeoOptionsAsync(page, CancellationToken);
-
-            #endregion
-
-            #region Create content context
-
-            ContentKey = await pageService.GetContentKeyAsync(Id, CancellationToken);
 
             #endregion
         }

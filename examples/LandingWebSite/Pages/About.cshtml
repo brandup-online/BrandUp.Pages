@@ -14,9 +14,9 @@
     </div>
 
     <div class="page-blocks">
-        @await Html.RenderContentAsync("test", typeof(Contents.TextBlock.TB1))
+        @(await Html.RenderContentAsync<LandingWebSite.Contents.TextBlock.TB1>(ContentScope.Global, "test"))
 
-        @await Html.RenderContentAsync("test2", typeof(Contents.BannerBlock.BB1))
+        @await Html.RenderContentAsync(ContentScope.Website, "test2", typeof(Contents.BannerBlock.BB1))
     </div>
 
 </page>

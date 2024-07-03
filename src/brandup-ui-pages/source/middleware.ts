@@ -1,5 +1,4 @@
-﻿import { IContentModel } from "./admin/page-toolbar";
-import { Middleware, NavigateContext } from "brandup-ui-app";
+﻿import { Middleware, NavigateContext } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
 
 const UI = () => import("./ui");
@@ -13,15 +12,16 @@ export class PagesMiddleware extends Middleware {
 
     navigate(context: NavigateContext, next) {
         next();
-        this._showUI(context.items, context.context.content || []);
+
+        this._showUI(context.items);
     }
 
-    private _showUI(items: { [key: string]: any }, content: IContentModel[] = []) {
+    private _showUI(items: { [key: string]: any }) {
         if (items["nav"].enableAdministration) {
             const page = items["page"] as Page<PageModel>;
             if (page) {
                 UI().then(t => {
-                    t.default(page, content);
+                    t.default(page);
                 });
             }
         }

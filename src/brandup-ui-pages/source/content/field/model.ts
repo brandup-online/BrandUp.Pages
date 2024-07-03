@@ -1,14 +1,12 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
-import { Field } from "../../form/field";
 import { DOM } from "brandup-ui-dom";
 import { ContentModel, ContentTypeModel } from "../../typings/models";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
-import "./model.less";
-import { AjaxResponse } from "brandup-ui-ajax";
 import { FormField } from "./base";
 import { ModelFieldProvider } from "../../content/provider/model";
+import "./model.less";
 
 export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOptions, ModelFieldProvider> implements IContentField {
     private __value: ModelFieldFormValue;

@@ -1,13 +1,15 @@
-﻿@inherits RazorContent<Page.NewsListPageContent>
+﻿@model Page.NewsListPageContent
 
 <content-element tag="div" class="page-news-list" />
 
 <header class="page-header">
-    <h1 content-text="Header" />
+    <div class="content">
+        <h1 content-text="Header" />
+    </div>
 </header>
 
 <div class="items">
-    @foreach (var item in await GetChildPagesAsync(Model.NewsCollection))
+    @foreach (var item in await this.GetChildPagesAsync(Model.NewsCollection))
     {
         <div class="item">
             <a asp-page-path="@item.UrlPath">@item.Header</a>
@@ -15,4 +17,4 @@
     }
 </div>
 
-<div content-object="Blocks" content-designer="page-blocks"></div>
+<div content-object="Blocks" content-designer="page-blocks" class="page-blocks"></div>

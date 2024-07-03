@@ -1,12 +1,10 @@
 ﻿import { FieldDesigner } from "./base";
+import { ImageFieldProvider } from "../provider/image";
 import { DOM } from "brandup-ui-dom";
-import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
-import { ImageFieldOptions, ImageFieldValue } from "../field/image";
-import { AjaxResponse } from "brandup-ui-ajax";
-import { ImageFieldProvider } from "../../content/provider/image";
+import "./image.less";
 
-export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldProvider> {
+export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
     private __fileInputElem: HTMLInputElement;
     private __menuElem: HTMLElement;
     private __progressElem: HTMLElement;
@@ -14,6 +12,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldPr
     private __closeFunc: (e: MouseEvent) => void;
 
     get typeName(): string { return "BrandUpPages.ImageDesigner"; }
+
     protected onRender(elem: HTMLElement) {
         elem.classList.add("image-designer");
 
@@ -115,25 +114,10 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions, ImageFieldPr
             return false;
         };
     }
-
-    getValue() {
-        return this.element.style.backgroundImage.substring(4).substring(-1);
-    };
-
-    setValue(value: ImageFieldValue) {
-        this.element.style.backgroundImage = `url(${value.previewUrl})`;
-        this.element.classList.remove("uploading");
-    };
-
-    hasValue(): boolean {
-        return false;
-    }
-
+    
     private __uploadFile(file: File | string) {
         this.element.classList.add("uploading");
-        const width = this.element.getAttribute("content-image-width");
-        const height = this.element.getAttribute("content-image-height");
-        this.provider.changeValue(file);
+        this.provider.changeImage(file);
     }
 
     destroy() {

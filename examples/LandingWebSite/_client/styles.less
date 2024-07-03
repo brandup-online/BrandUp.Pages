@@ -38,7 +38,12 @@ h1, h2, h3, h4, h5 {
 	font-weight: 500;
 	padding: 0;
 	margin: 0;
-	line-height: normal;
+	line-height: @LineHeight;
+}
+
+h1 {
+	font-size: 30px;
+	line-height: 44px;
 }
 
 a {
@@ -51,6 +56,17 @@ a {
 
 svg {
 	display: block;
+}
+
+ul, ol {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+
+	& li {
+		padding: 0;
+		margin: 0;
+	}
 }
 
 .content-width {
@@ -255,8 +271,48 @@ main.app-content {
 	}
 }
 
+.app-button {
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	column-gap: 5px;
+	background: @Primary-Color;
+	outline: none;
+	min-height: 44px;
+	border-radius: 5px;
+	color: @Text-Color;
+	text-decoration: none;
+	text-transform: uppercase;
+	font-weight: 500;
+	padding: 0 20px;
+
+	&:hover,
+	&:focus {
+		color: @Text-Color;
+		background: darken(@Primary-Color, 4%);
+	}
+
+	&:active {
+		background: darken(@Primary-Color, 7%);
+	}
+}
+
 .page-header {
 	padding-bottom: 20px;
+	display: flex;
+	flex-flow: row nowrap;
+	column-gap: 30px;
+
+	& .content {
+		flex: 1 1 auto;
+	}
+
+	& ul.actions {
+		flex: 0 0 auto;
+
+		& li {
+		}
+	}
 
 	& h1 {
 		font-weight: 400;

@@ -1,0 +1,23 @@
+const fieldProviders: { [type: string]: () => Promise<any> } = {};
+const fieldDesigners: { [type: string]: () => Promise<any> } = {};
+
+export default {
+    registerProvider: (type: string, resolve: () => Promise<any>) => {
+        fieldProviders[type] = resolve;
+    },
+    resolveProvider: (type: string) => {
+        var provderType = fieldProviders[type];
+        if (!provderType)
+            throw `Not found field provider by type "${type}"`;
+        return provderType();
+    },
+    registerDesigner: (type: string, resolve: () => Promise<any>) => {
+        fieldDesigners[type] = resolve;
+    },
+    resolveDesigner: (type: string) => {
+        var designerType = fieldDesigners[type];
+        if (!designerType)
+            throw `Not found field designer by type "${type}"`;
+        return designerType();
+    }
+};

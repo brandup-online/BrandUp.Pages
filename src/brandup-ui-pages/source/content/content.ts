@@ -1,4 +1,3 @@
-import { ContentFieldModel } from "../typings/content";
 import { Editor } from "./editor";
 import { FieldProvider } from "./provider/base";
 import { ModelFieldProvider } from "./provider/model";
@@ -6,36 +5,35 @@ import { HtmlFieldProvider } from "./provider/html";
 import { HyperlinkFieldProvider } from "./provider/hyperlink";
 import { ImageFieldProvider } from "./provider/image";
 import { TextFieldProvider } from "./provider/text";
-import { IContentModel } from "../admin/page-toolbar";
+import { ContentModel } from "../typings/models";
+import { IParentContent } from "../typings/content";
 
 export class Content {
-    private __fields: Map<string, FieldProvider<any, any>>;
+    readonly editor: Editor;
+    readonly parent: IParentContent;
+    readonly model: ContentModel;
     private __container: HTMLElement;
-    readonly __editor: Editor;
-    readonly model: IContentModel;
-    private __parent: ModelFieldProvider | null;
-    set parent(field: ModelFieldProvider) {this.__parent = field}
-    get parent() { return this.__parent }
-    get containerDataset() { return this.__container.dataset };
-
-    constructor(editor: Editor, model: IContentModel, container: HTMLElement = null, fieldsElements: Map<string, Map<string, HTMLElement>>) {
+    private __fields: Map<string, FieldProvider<any, any>>;
+    
+    constructor(editor: Editor, parent: IParentContent, model: ContentModel, container: HTMLElement = null, fieldsElements: Map<string, HTMLElement>) {
+        this.editor = editor;
+        this.parent = parent;
+        this.model = model;
         this.__container = container;
-        this.__editor = editor;
 
         this.__fields = new Map<string, FieldProvider<any, any>>();
 
-        this.model = model;
-        model.fields.forEach((item: ContentFieldModel<any, any>) => {
-            const fieldElem = fieldsElements.get(model.path)?.get(item.name);
-            if (!fieldElem) return;
-            const field = this.__getFieldType(item.type?.toLowerCase());
-            this.__fields.set(item.name, new field(this, item, fieldElem));
+        model.fields.forEach(field => {
+            const fieldElem = fieldsElements.get(field.name);
+
+            const provider = this.__getFieldType(field.type.toLowerCase());
+            this.__fields.set(field.name, new provider(this, field, fieldElem));
         });
 
         this.renderDesigners();
     }
 
-    private __getFieldType(type: string) {
+    private __getFieldType(type: string): any {
         switch (type) {
             case "text":
                 return TextFieldProvider;
@@ -57,6 +55,9 @@ export class Content {
     }
 
     renderDesigners() {
+        if (!this.__container)
+            return;
+
         this.__fields.forEach(field => field.renderDesigner());
     }
 

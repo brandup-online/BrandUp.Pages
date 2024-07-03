@@ -1,5 +1,5 @@
 ﻿import { DOM } from "brandup-ui-dom";
-import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../typings/content";
+import { IPageDesigner, IContentFieldDesigner } from "../typings/content";
 import { AjaxQueue, AjaxResponse } from "brandup-ui-ajax";
 import { Page } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
@@ -7,8 +7,8 @@ import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
 import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
-import { IContentModel } from "../admin/page-toolbar";
 import { Content } from "./content";
+import { ContentModel } from "../typings/models";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
@@ -21,7 +21,7 @@ export class Editor extends UIElement implements IPageDesigner {
 
     get typeName(): string { return "BrandUpPages.Editor"; }
 
-    constructor(page: Page, contentElem: HTMLElement, content: IContentModel[]) {
+    constructor(page: Page, contentElem: HTMLElement) {
         super();
               
         this.page = page;
@@ -50,7 +50,7 @@ export class Editor extends UIElement implements IPageDesigner {
     }
 
     private __renderContent() {
-        this.page.website.request({
+        this.queue.push({
             url: "/brandup.pages/page/content/content",
             urlParams: { editId: this.editId },
             method: "GET",
@@ -61,27 +61,27 @@ export class Editor extends UIElement implements IPageDesigner {
                     throw "Error get content.";
                 }
 
-                const content: IContentModel[] = response.data;
+                const contents: ContentModel[] = response.data;
                 this.__contentItems = new Map();
         
-                const contentPathMap = new Map<string, HTMLElement>();
-                const contentFieldsMap = new Map<string, Map<string, HTMLElement>>();
+                const contentElemMap = new Map<string, HTMLElement>();
+                const contentFieldElemMap = new Map<string, Map<string, HTMLElement>>();
                 
-                contentPathMap.set("", this.contentElem);
-                DOM.queryElements(this.contentElem, "[data-content-path]").forEach(elem => contentPathMap.set(elem.dataset.contentPath, elem));
+                contentElemMap.set("", this.contentElem);
+                DOM.queryElements(this.contentElem, "[data-content-path]").forEach(elem => contentElemMap.set(elem.dataset.contentPath, elem));
                 DOM.queryElements(this.contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
                     const fieldPath = elem.dataset.contentFieldPath;
                     const fieldName = elem.dataset.contentFieldName;
-                    if (!contentFieldsMap.has(fieldPath)) {
-                        contentFieldsMap.set(fieldPath, new Map());
+                    if (!contentFieldElemMap.has(fieldPath)) {
+                        contentFieldElemMap.set(fieldPath, new Map());
                     }
-                    contentFieldsMap.get(fieldPath).set(fieldName, elem);
+                    contentFieldElemMap.get(fieldPath).set(fieldName, elem);
                 });
                 
-                for (const contentItem of content) {
-                    const contentPathElem = contentPathMap.get(contentItem.path);
-                    if (!contentPathElem) continue;
-                    this.__contentItems.set(contentItem.path, new Content(this, contentItem, contentPathElem, contentFieldsMap));                    
+                for (const contentItem of contents) {
+                    const contentElem = contentElemMap.get(contentItem.path);
+                    const fieldElems = contentFieldElemMap.get(contentItem.path);
+                    this.__contentItems.set(contentItem.path, new Content(this, null, contentItem, contentElem, fieldElems));                    
                 }
             },
         });
@@ -99,16 +99,10 @@ export class Editor extends UIElement implements IPageDesigner {
     getContentItem(path: string) {
         return this.__contentItems.get(path);
     }
-
-    redraw () { // Временный публичный метод для ModelDesigner
-        this.page.website.nav({ url: this.page.buildUrl({ editid: this.editId }), replace: true });
-    }
-
+    
     private __initLogic() {
         this.registerCommand("bp-content", () => {
-            editPage(this, "").then(() => {
-                this.page.website.app.reload();
-            });
+            editPage(this, "");
         });
 
         this.registerCommand("bp-commit", () => {
@@ -116,7 +110,7 @@ export class Editor extends UIElement implements IPageDesigner {
                 return;
             this.__isLoading = true;
 
-            this.page.website.request({
+            this.queue.push({
                 url: "/brandup.pages/page/content/commit",
                 urlParams: { editId: this.editId },
                 method: "POST",
@@ -126,7 +120,7 @@ export class Editor extends UIElement implements IPageDesigner {
                     if (response.data.isSuccess)
                         this.__complateEdit();
                 }
-            }, true);
+            });
         });
 
         this.registerCommand("bp-discard", () => {
@@ -134,7 +128,7 @@ export class Editor extends UIElement implements IPageDesigner {
                 return;
             this.__isLoading = true;
 
-            this.page.website.request({
+            this.queue.push({
                 url: "/brandup.pages/page/content/discard",
                 urlParams: { editId: this.editId },
                 method: "POST",

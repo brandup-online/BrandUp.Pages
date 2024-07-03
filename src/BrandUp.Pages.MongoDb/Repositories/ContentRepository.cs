@@ -24,27 +24,26 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return content;
         }
 
-        public async Task<IContent> FindByKeyAsync(string websiteId, string contentKey, CancellationToken cancellationToken = default)
+        public async Task<IContent> FindByKeyAsync(string contentKey, CancellationToken cancellationToken = default)
         {
-            websiteId = NormalizeAndValidateWebsite(websiteId);
             contentKey = NormalizeAndValidateKey(contentKey);
 
             var content = await contents
-                .Find(it => it.WebsiteId == websiteId && it.Key == contentKey)
+                .Find(it => it.Key == contentKey)
                 .SingleOrDefaultAsync(cancellationToken);
 
             return content;
         }
 
-        public async Task<IContent> CreateContentAsync(string websiteId, string contentKey, CancellationToken cancellationToken)
+        public async Task<IContent> CreateContentAsync(string itemType, string itemId, string contentKey, CancellationToken cancellationToken)
         {
-            websiteId = NormalizeAndValidateWebsite(websiteId);
             contentKey = NormalizeAndValidateKey(contentKey);
 
             var content = new ContentDocument
             {
                 Id = Guid.NewGuid(),
-                WebsiteId = websiteId,
+                ItemType = itemType,
+                ItemId = itemId,
                 Key = contentKey,
                 CommitId = null
             };
@@ -128,17 +127,6 @@ namespace BrandUp.Pages.MongoDb.Repositories
         #endregion
 
         #region Helpers
-
-        static string NormalizeAndValidateWebsite(string websiteId)
-        {
-            if (websiteId == null)
-                ArgumentNullException.ThrowIfNull(websiteId);
-
-            var result = websiteId.Trim().ToLower();
-            if (string.IsNullOrEmpty(result))
-                throw new InvalidOperationException($"Invalid websiteId \"{websiteId}\".");
-            return result;
-        }
 
         static string NormalizeAndValidateKey(string key)
         {

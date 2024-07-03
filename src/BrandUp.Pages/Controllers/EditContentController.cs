@@ -3,13 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Identity;
-using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrandUp.Pages.Controllers
 {
     [Route("brandup.pages/page/content"), Filters.Administration]
-    public class EditContentController(ContentService contentService, IWebsiteContext websiteContext) : Controller
+    public class EditContentController(ContentService contentService) : Controller
     {
         #region Actions
 
@@ -36,12 +35,11 @@ namespace BrandUp.Pages.Controllers
                 return BadRequest();
 
             var cancellationToken = HttpContext.RequestAborted;
-            var websiteId = websiteContext.Website.Id;
 
             var result = new Models.Contents.BeginPageEditResult();
 
             var userId = await accessProvider.GetUserIdAsync(cancellationToken);
-            var content = await contentService.FindContentByKeyAsync(websiteId, key, cancellationToken);
+            var content = await contentService.FindContentAsync(key, cancellationToken);
 
             IContentEdit currentEdit = null;
             if (content != null)
@@ -61,7 +59,7 @@ namespace BrandUp.Pages.Controllers
 
             if (currentEdit == null)
             {
-                currentEdit = await contentService.BeginEditAsync(websiteId, key, userId, contentMetadata, cancellationToken);
+                currentEdit = await contentService.BeginEditAsync(key, userId, contentMetadata, cancellationToken);
                 if (currentEdit == null)
                     return NotFound();
             }

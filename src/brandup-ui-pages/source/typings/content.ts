@@ -1,23 +1,24 @@
-﻿import { AjaxQueue, AjaxRequest } from "brandup-ui-ajax";
-
-export interface IContentForm {
-    modelPath: string;
-    queue: AjaxQueue;
+﻿export interface IContentForm {
+    readonly modelPath: string;
 
     navigate(modelPath: string);
     getField(name: string): IContentField;
 }
 
-export interface IContentFieldProvider {  
-    setValue(value: any);
-    setErrors(errors: Array<string>);
+export interface IContentFieldProvider {
+    readonly name: string;
+    readonly title: string;
+    readonly options: any;
+    readonly isRequired: boolean;
+    readonly valueElem: HTMLElement;
+
     renderDesigner();
     getValue();
     destroy();
 }
 
 export interface IContentField {
-    name: string;
+    readonly name: string;
     
     setValue(value: any);
     hasValue(): boolean;
@@ -27,45 +28,17 @@ export interface IContentField {
 }
 
 export interface IPageDesigner {
-    editId: string;
-    queue: AjaxQueue;
-    redraw();
+    readonly editId: string;
     destroy();
 }
 
 export interface IContentFieldDesigner {
+    provider: IContentFieldProvider;
     element: HTMLElement;
-    path: string;
-    name: string;
-    fullPath: string;
     
-    hasValue(): boolean;
-    getValue(): any;
-    setValue(val: any);
-    setValid(val: boolean);
     destroy();
 }
 
-export interface PageContentForm {
-    path: PageContentPath;
-    fields: Array<ContentFieldModel<any, any>>;
-    values: { [key: string]: any };
-}
+export interface IParentContent {
 
-export interface PageContentPath {
-    parent: PageContentPath;
-    name: string;
-    title: string;
-    index: number;
-    modelPath: string;
-}
-
-export interface ContentFieldModel<TValue, TOptions> {
-    type: string;
-    name: string;
-    title: string;
-    options: TOptions;
-    value: TValue;
-    errors: string[];
-    isRequired: boolean;
 }

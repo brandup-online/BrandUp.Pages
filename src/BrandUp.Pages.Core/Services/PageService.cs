@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Content;
+using BrandUp.Pages.Content.Items;
 using BrandUp.Pages.Interfaces;
 using BrandUp.Pages.Metadata;
 
@@ -6,11 +7,6 @@ namespace BrandUp.Pages.Services
 {
     public class PageService(IPageRepository pageRepository, IPageCollectionRepository pageCollectionRepository, PageMetadataManager pageMetadataManager, Url.IPageUrlHelper pageUrlHelper)
     {
-        public async Task<string> GetContentKeyAsync(Guid pageId, CancellationToken cancellationToken = default)
-        {
-            return await Task.FromResult($"page-{pageId}");
-        }
-
         public async Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(collection);
@@ -208,9 +204,18 @@ namespace BrandUp.Pages.Services
         {
             ArgumentNullException.ThrowIfNull(page);
 
-            var pageContentKey = await GetContentKeyAsync(page.Id, cancellationToken);
+            await pageRepository.DeletePageAsync(page, cancellationToken);
 
-            await pageRepository.DeletePageAsync(page, pageContentKey, cancellationToken);
+            return Result.Success;
+        }
+
+        public async Task<Result> UpdateHeaderAsync(IPage page, string header, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(page);
+
+            await pageRepository.SetPageHeaderAsync(page, header, cancellationToken);
+
+            await pageRepository.UpdatePageAsync(page, cancellationToken);
 
             return Result.Success;
         }
@@ -266,7 +271,9 @@ namespace BrandUp.Pages.Services
         }
     }
 
-    public interface IPage
+
+    [ContentItem("brandup.content-page")]
+    public interface IPage : IItemContent
     {
         Guid Id { get; }
         DateTime CreatedDate { get; }

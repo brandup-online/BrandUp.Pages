@@ -21,6 +21,8 @@ namespace BrandUp.Pages.MongoDb.Documents
         public PageSeoDocument Seo { get; set; }
         public bool IsPublished { get => Status == PageStatus.Published; }
         public int Order { get; set; }
+
+        string Content.Items.IItemContent.ItemId => Id.ToString();
     }
 
     public enum PageStatus

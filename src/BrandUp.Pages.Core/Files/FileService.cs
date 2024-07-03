@@ -2,15 +2,14 @@
 {
     public class FileService(IFileRepository repository)
     {
-        public Task<IFile> UploadFileAsync(string websiteId, string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        public Task<IFile> UploadFileAsync(string contentKey, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
         {
-            ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(contentKey);
             ArgumentNullException.ThrowIfNull(fileName);
             ArgumentNullException.ThrowIfNull(contentType);
             ArgumentNullException.ThrowIfNull(stream);
 
-            return repository.UploadFileAsync(websiteId, contentKey, fileName, contentType, stream, cancellationToken);
+            return repository.UploadFileAsync(contentKey, fileName, contentType, stream, cancellationToken);
         }
 
         public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)

@@ -1,6 +1,5 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Views;
-using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +21,6 @@ namespace BrandUp.Pages.Filters
             var httpContext = context.HttpContext;
             var cancellationToken = httpContext.RequestAborted;
             var contentMetadataManager = httpContext.RequestServices.GetRequiredService<ContentMetadataManager>();
-            var websiteContext = httpContext.RequestServices.GetRequiredService<IWebsiteContext>();
             var pageModelType = pageModel.GetType();
             foreach (var @interface in pageModelType.GetInterfaces())
             {
@@ -35,10 +33,11 @@ namespace BrandUp.Pages.Filters
                     var contentType = @interface.GenericTypeArguments[0];
                     var contentProvider = contentMetadataManager.GetMetadata(contentType);
 
-                    var keyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                    var contentKey = (string)keyProperty.GetValue(pageModel);
+                    var contentKeyProperty = @interface.GetProperty("ContentKey", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    var contentKey = (string)contentKeyProperty.GetValue(pageModel);
+
                     var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                    var content = await contentService.FindContentByKeyAsync(websiteContext.Website.Id, contentKey, cancellationToken);
+                    var content = await contentService.FindContentAsync(contentKey, cancellationToken);
 
                     object contentModel;
                     IContentEdit contentEdit;
@@ -76,7 +75,7 @@ namespace BrandUp.Pages.Filters
                 }
             }
 
-            var c = await next();
+            await next();
         }
 
         public async Task OnPageHandlerSelectionAsync(PageHandlerSelectedContext context)

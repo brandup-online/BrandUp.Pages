@@ -1,31 +1,23 @@
-import { AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { ModelDesigner, ModelDesignerOptions } from "../designer/model";
 import { FieldProvider } from "./base";
-import { ContentFieldModel, IContentFieldDesigner } from "../../typings/content";
+import { ModelDesigner } from "../designer/model";
+import { AjaxResponse } from "brandup-ui-ajax";
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
-import { ModelField, ModelFieldFormValue } from "../../content/field/model";
-import { Content } from "../../content/content";
+import { FieldValueResult } from "../../typings/models";
+import { IParentContent } from "../../typings/content";
 
-export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, ModelDesignerOptions> {
-    protected __designerType;
-
-    constructor(content: Content, model: ContentFieldModel<ModelFieldFormValue, ModelDesignerOptions>, valueElem: HTMLElement) {
-        super(content, model, valueElem);
-        let type = this.__valueElem.getAttribute("data-content-designer");
-        this.__designerType = type === "page-blocks" ? PageBlocksDesigner : ModelDesigner;
-    }
-
+export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent {
     createDesigner() {
-        const designer = new this.__designerType(this.__valueElem, this.__model.options, this);
-        return designer;
+        let type = this.valueElem.getAttribute("data-content-designer");
+        const designerType = type === "page-blocks" ? PageBlocksDesigner : ModelDesigner;
+        return new designerType(this);
     }
 
     createField() {
-        const { name, errors, options } = this.__model;
-        this.field = new ModelField(name, errors, options, this);
-        return this.field;
+        throw "";
+        //this.field = new ModelField(name, errors, options, this);
+        //return this.field;
     }
 
     itemUp(index: number, elem: Element) {
@@ -53,8 +45,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
             method: "DELETE",
             success: (() => {
                 (this.designer as ModelDesigner)?.deleteItem(index);
-                (this.field as ModelField)?.deleteItem(index);
-                this.content.__editor.removeContentItem(path);
+                //(this.field as ModelField)?.deleteItem(index);
+                this.content.editor.removeContentItem(path);
             })
         });
     }
@@ -66,14 +58,14 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
             method: "POST",
             success: (response: AjaxResponse) => {
                 if (response.status === 200) {
-                    this.setValue(response.data.value);
+                    //this.setValue(response.data.value);
                 }
             }
         });
     }
 
     settingItem(contentPath: string) {
-        editPage(this.content.__editor, contentPath).then(() => {
+        editPage(this.content.editor, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {
             // this.__refreshItem(e.target, e.value.index);
@@ -89,7 +81,6 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
             method: "GET",
             success: (response: AjaxResponse<string>) => {
                 (this.designer as ModelDesigner)?.refreshItem(elem, response.data);
-                this.content.__editor.redraw();
             }
         });
     }
@@ -103,8 +94,15 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
                     itemIndex: index.toString()
                 },
                 method: "PUT",
-                success: (response: AjaxResponse) => {
+                success: (response: AjaxResponse<FieldValueResult>) => {
                     if (response.status === 200) {
+                        this.onSavedValue(response.data);
+
+                        const value = this.getValue();
+                        value.items.forEach((model, index) => {
+
+                        });
+
                         this.request({
                             url: '/brandup.pages/content/model/view',
                             urlParams: { itemIndex: index.toString() },
@@ -112,7 +110,6 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
                             success: (response: AjaxResponse<string>) => {
                                 if (response.status === 200) {
                                     (this.designer as ModelDesigner)?.addItem(response.data, index);
-                                    this.content.__editor.redraw();
                                 }
                             }
                         });
@@ -120,12 +117,35 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldFormValue, Model
                 }
             });
         }
+
         if (!itemType) {
-            selectContentType(this.__model.options.itemTypes).then((type) => {
+            selectContentType(this.options.itemTypes).then((type) => {
                 itemType = type.name;
                 fetchData();  
             });
         }
-        else fetchData();
+        else
+            fetchData();
     }
+}
+
+export interface ModelFieldValue {
+    items: Array<ContentModel>;
+}
+
+export interface ContentModel {
+    title: string;
+    type: ContentTypeModel;
+}
+
+export interface ModelFieldOptions {
+    addText: string;
+    isListValue: boolean;
+    itemType: ContentTypeModel;
+    itemTypes: Array<ContentTypeModel>;
+}
+
+export interface ContentTypeModel {
+    name: string;
+    title: string;
 }
