@@ -63,12 +63,12 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         while (path || path === "") {
             const model = this.__content.__editor.getContentItem(path).model;
             let title = model.typeTitle;
-            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === model.path ? { class: "current" } : null, [
+            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
                 DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
                     DOM.tag("bolt", null, path || "root"),
                     DOM.tag("div", null, [
                         DOM.tag("span", null, title),
-                        DOM.tag("span", null, model.typeTitle),
+                        DOM.tag("span", null, model.typeName),
                     ]),
                 ]),
             ]));
@@ -89,18 +89,13 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     navigate(modelPath: string) {
         this.__modelPath = modelPath ? modelPath : "";
         this.__content.getFields().forEach(provider => provider.destroyField());
+        DOM.empty(this.__fieldsElem);
         this.__content = this.__content.__editor.getContentItem(modelPath);
         this.__renderForm();
     }
 
     validate(): boolean {
         return true;
-    }
-    setValues(values: { [key: string]: any }) {
-        for (const key in values) {
-            const field = this.getField(key);
-            field.setValue(values[key]);
-        }
     }
 
     getField(name: string): IContentField {

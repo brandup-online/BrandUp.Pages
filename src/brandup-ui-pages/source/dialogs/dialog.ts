@@ -163,16 +163,16 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
             this.__childDialog.destroy();
             this.__childDialog = null;
         }
-
+        
         if (!this.__parentDialog) {
             currentDialog = null;
-
+            
             document.body.classList.remove("website-state-showdialog");
         }
         else {
             currentDialog = this.__parentDialog;
             currentDialog.element.classList.remove("hide");
-
+            
             this.__parentDialog.__childDialog = null;
             this.__parentDialog = null;
         }
