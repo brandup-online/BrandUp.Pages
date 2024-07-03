@@ -12,13 +12,17 @@ namespace BrandUp.Pages.Controllers
     {
         #region Actions
 
-        [HttpGet("content")]
-        public async Task<IActionResult> BeginAsync([FromQuery] Guid editId, [FromServices] ContentMetadataManager contentMetadataManager)
+        [HttpGet]
+        public async Task<IActionResult> BeginAsync([FromQuery] Guid editId, [FromQuery] string path, [FromServices] ContentMetadataManager contentMetadataManager)
         {
             var cancellationToken = HttpContext.RequestAborted;
             IContentEdit currentEdit = await contentService.FindEditByIdAsync(editId, cancellationToken);
             var contentModel = await contentService.GetEditContentAsync(currentEdit, cancellationToken);
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
+
+            if (!string.IsNullOrEmpty(path))
+                contentExplorer = contentExplorer.Navigate(path);
+
             List<Models.Contents.ContentModel> result = [];
             await EnsureContentsAsync(contentExplorer, result);
 

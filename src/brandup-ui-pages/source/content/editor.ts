@@ -51,7 +51,7 @@ export class Editor extends UIElement implements IPageDesigner {
 
     private __renderContent() {
         this.queue.push({
-            url: "/brandup.pages/page/content/content",
+            url: "/brandup.pages/page/content",
             urlParams: { editId: this.editId },
             method: "GET",
             success: (response: AjaxResponse) => {
