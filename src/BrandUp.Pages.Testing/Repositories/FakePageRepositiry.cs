@@ -120,6 +120,15 @@ namespace BrandUp.Pages.Repositories
             return Task.CompletedTask;
         }
 
+        public async Task SetPageHeaderAsync(IPage page, string header, CancellationToken cancellationToken = default)
+        {
+            var pageDocument = (Page)page;
+
+            pageDocument.Header = header;
+
+            await Task.CompletedTask;
+        }
+
         public Task SetUrlPathAsync(IPage page, string urlPath, CancellationToken cancellationToken = default)
         {
             if (urlPath == null)

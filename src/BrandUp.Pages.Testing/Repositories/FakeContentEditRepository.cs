@@ -17,14 +17,13 @@ namespace BrandUp.Pages.Repositories
             {
                 Id = editId,
                 CreatedDate = DateTime.UtcNow,
-                WebsiteId = content.WebsiteId,
                 ContentKey = content.Key,
                 BaseCommitId = content.CommitId,
                 UserId = userId,
                 Content = contentData
             };
 
-            var uniqueId = GetId(content.WebsiteId, content.Key, userId);
+            var uniqueId = GetId(content.Key, userId);
             edits.Add(uniqueId, edit);
             ids.Add(editId, uniqueId);
 
@@ -41,11 +40,12 @@ namespace BrandUp.Pages.Repositories
             return await Task.FromResult<IContentEdit>(pageEdit);
         }
 
-        public async Task<IContentEdit> FindEditByUserAsync(string websiteId, string key, string userId, CancellationToken cancellationToken = default)
+        public async Task<IContentEdit> FindEditByUserAsync(Guid contentId, string userId, CancellationToken cancellationToken = default)
         {
-            var uniqueId = GetId(websiteId, key, userId);
-            edits.TryGetValue(uniqueId, out ContentEdit pageEdit);
-            return await Task.FromResult<IContentEdit>(pageEdit);
+            if (!ids.TryGetValue(contentId, out var key))
+                return null;
+
+            return await Task.FromResult<IContentEdit>(edits[key]);
         }
 
         public async Task<IDictionary<string, object>> GetContentAsync(IContentEdit contentEdit, CancellationToken cancellationToken = default)
@@ -75,12 +75,12 @@ namespace BrandUp.Pages.Repositories
 
         static string GetId(IContentEdit contentEdit)
         {
-            return GetId(contentEdit.WebsiteId, contentEdit.ContentKey, contentEdit.UserId);
+            return GetId(contentEdit.ContentKey, contentEdit.UserId);
         }
 
-        static string GetId(string websiteId, string key, string userId)
+        static string GetId(string key, string userId)
         {
-            return $"{websiteId}-{key}-{userId}".ToLower();
+            return $"{key}-{userId}".ToLower();
         }
 
         class ContentEdit : IContentEdit
