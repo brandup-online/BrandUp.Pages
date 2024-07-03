@@ -67,6 +67,10 @@ export interface ContentModel {
     fields: ContentFieldModel[];
 }
 
+export interface ValidationContentModel extends ContentModel {
+    errors: string[];
+}
+
 export interface ContentFieldModel {
     type: string;
     name: string;

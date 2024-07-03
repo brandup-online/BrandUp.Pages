@@ -1,4 +1,6 @@
-﻿export interface IContentForm {
+﻿import { Content } from "../content/content";
+
+export interface IContentForm {
     readonly modelPath: string;
 
     navigate(modelPath: string);
@@ -11,10 +13,15 @@ export interface IContentFieldProvider {
     readonly options: any;
     readonly isRequired: boolean;
     readonly valueElem: HTMLElement;
+    readonly isModelField: boolean;
 
     renderDesigner();
     getValue();
     destroy();
+}
+
+export interface IModelFieldProvider extends IContentFieldProvider{
+    insertContent(item: Content);
 }
 
 export interface IContentField {
@@ -37,6 +44,7 @@ export interface IContentFieldDesigner {
     element: HTMLElement;
     
     destroy();
+    setErrors(errors: string[]);
 }
 
 export interface IParentContent {

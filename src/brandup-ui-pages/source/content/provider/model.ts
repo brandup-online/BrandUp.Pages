@@ -5,9 +5,15 @@ import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
 import { FieldValueResult } from "../../typings/models";
-import { IParentContent } from "../../typings/content";
+import { IModelFieldProvider, IParentContent } from "../../typings/content";
+import { Content } from "../../content/content";
+import { DOM } from "brandup-ui-dom";
 
-export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent {
+export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent, IModelFieldProvider {
+    private __contentItems: Content[] = [];
+    private __insertIndex: number = 0;
+    readonly isModelField = true;
+
     createDesigner() {
         let type = this.valueElem.getAttribute("data-content-designer");
         const designerType = type === "page-blocks" ? PageBlocksDesigner : ModelDesigner;
@@ -21,6 +27,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     itemUp(index: number, elem: Element) {
+        [this.__contentItems[index], this.__contentItems[index-1]] = [this.__contentItems[index-1], this.__contentItems[index]]
+        this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/up',
             urlParams: { itemIndex: index.toString() },
@@ -30,6 +38,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     itemDown(index: number, elem: Element) {
+        [this.__contentItems[index], this.__contentItems[index+1]] = [this.__contentItems[index+1], this.__contentItems[index]]
+        this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/down',
             urlParams: { itemIndex: index.toString() },
@@ -44,8 +54,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             urlParams: { itemIndex: index.toString() },
             method: "DELETE",
             success: (() => {
-                (this.designer as ModelDesigner)?.deleteItem(index);
-                //(this.field as ModelField)?.deleteItem(index);
+                this.__contentItems[index].container?.remove();
+                this.__contentItems = this.__contentItems.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
                 this.content.editor.removeContentItem(path);
             })
         });
@@ -85,6 +95,50 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         });
     }
 
+    insertContent(item: Content) {
+        this.__contentItems.splice(this.__insertIndex, 0, item);
+        this.__insertIndex = this.__contentItems.length;
+        this._refreshIndexses();
+    }
+
+    protected _refreshIndexses(start: number = 0) {
+        for (let i = start; i < this.__contentItems.length; i++) {
+            this.__contentItems[i].container?.setAttribute("data-content-path-index", i.toString());
+        }
+    }
+
+    protected getItemIndex(container: HTMLElement) {
+        let index = -1;
+        for (let i = 0; i < this.__contentItems.length; i++) {
+            if (this.__contentItems[i].container === container) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    private __addItemDOM(data: string, index: number) {
+        const fragment = document.createDocumentFragment();
+        const container = DOM.tag("div", null, data);
+        fragment.appendChild(container);
+        const newElem = DOM.queryElement(container, "[data-content-path]");
+
+        let elem;
+
+        while (index >= 0 && !elem) {
+            elem = this.__contentItems[index].container;
+            index -= 1;
+        }
+        if (index < 0 && !elem ) {
+            this.designer.element.insertAdjacentElement("afterbegin", newElem);
+        } else {
+            elem.insertAdjacentElement("beforebegin", newElem);
+        }
+
+        return newElem;
+    }
+
     addItem(itemType: string, index: number) {
         const fetchData = () => {
             this.request({
@@ -109,7 +163,12 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                             method: "GET",
                             success: (response: AjaxResponse<string>) => {
                                 if (response.status === 200) {
-                                    (this.designer as ModelDesigner)?.addItem(response.data, index);
+                                    const newElem = this.__addItemDOM(response.data, index);
+                                    const modelPath = newElem.dataset.contentPath;
+                                    this.content.editor.createContent(modelPath, newElem, () => {
+                                        (this.designer as ModelDesigner).renderBlock(newElem);
+                                        this._refreshIndexses();
+                                    });
                                 }
                             }
                         });
@@ -117,6 +176,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                 }
             });
         }
+
+        this.__insertIndex = index;
 
         if (!itemType) {
             selectContentType(this.options.itemTypes).then((type) => {

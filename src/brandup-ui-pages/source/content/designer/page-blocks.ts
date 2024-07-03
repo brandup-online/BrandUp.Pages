@@ -26,8 +26,8 @@ export class PageBlocksDesigner extends ModelDesigner {
         super.onRender(elem);
     }
 
-    protected _renderBlock(blockElem: HTMLElement) {
-        super._renderBlock(blockElem);
+    renderBlock(blockElem: HTMLElement) {
+        super.renderBlock(blockElem);
         if (blockElem.classList.contains("page-blocks-designer-item")) {
             blockElem.classList.remove("page-blocks-designer-item");
 

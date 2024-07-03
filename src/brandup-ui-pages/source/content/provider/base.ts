@@ -12,6 +12,8 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
     readonly valueElem: HTMLElement;
     readonly designerType: string;
 
+    readonly isModelField:boolean = false;
+
     private __value: TValue;
     private __errors: Array<string>;
 
@@ -65,6 +67,8 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
     protected onSavedValue(model: FieldValueResult) {
         this.__value = model.value;
         this.__errors = model.errors;
+        this.field?.setErrors(this.__errors);
+        this.designer?.setErrors(this.__errors);
     }
 
     destroy() {

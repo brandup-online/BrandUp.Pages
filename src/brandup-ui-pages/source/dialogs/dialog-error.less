@@ -1,0 +1,84 @@
+@import "../vars.less";
+
+.error-list {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 16px;
+    padding: 16px;
+
+    & .content-error-block {
+        padding: 8px 12px;
+        border-radius: 5px;
+        border: 1px solid @Neutral-Light;
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 15px;
+
+        & span {
+            font-weight: 400;
+            font-size: 12px;
+            color: @Neutral-Dark;
+        }
+
+        & h3 {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        & h4 {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        & .error-values {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            color: @Error-Darkest;
+
+            & li {
+                width: fit-content;
+                
+                &:not(:last-child) {
+                    &:after {
+                        content: "•";
+                        margin-left: 6px;
+                    }
+                }
+            }
+            
+        }
+
+        & .fields-errors {
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 4px;
+
+            & li {
+                .header {
+                    display: flex;
+                    gap: 8px;
+                }
+            }
+
+            & .field-error {
+                color: @Error-Darkest;
+                display: flex;
+                align-items: center;
+                font-size: 12px;
+
+                & svg {
+                    fill: @Error-Darkest;
+                    width: 20px;
+                }
+            }
+        }
+
+        & a {
+            font-size: 14px;
+            font-weight: 600;
+            color: @Accent-Darkest;
+            text-decoration: none;
+        }
+    }
+}

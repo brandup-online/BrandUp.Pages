@@ -18,8 +18,8 @@ export abstract class FieldDesigner<TProvider extends IContentFieldProvider> ext
     
     protected abstract onRender(elem: HTMLElement);
 
-    setValid(val: boolean) {
-        val ? this.element.classList.remove("invalid") : this.element.classList.add("invalid");
+    setErrors(errors: string[]) {
+        errors.length === 0 ? this.element.classList.remove("invalid") : this.element.classList.add("invalid");
     }
     
     destroy() {

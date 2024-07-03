@@ -9,7 +9,6 @@ import { ModelFieldProvider } from "../../content/provider/model";
 import "./model.less";
 
 export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOptions, ModelFieldProvider> implements IContentField {
-    readonly form: IContentForm;
     private __value: ModelFieldFormValue;
     private __itemsElem: HTMLElement;
 
@@ -26,16 +25,10 @@ export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOpti
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = itemElem.getAttribute("data-content-path-index");
-            let modelPath = `${this.name}[${itemIndex}]`;
+            let contentPath = this.provider.content.model.path;
+            let modelPath = (contentPath ? contentPath + "." : "") + `${this.name}[${itemIndex}]`;
 
-            if (this.form.modelPath)
-                modelPath = this.form.modelPath + "." + modelPath;
-
-            this.form.navigate(modelPath);
-
-            //editPage(this.form.editId, contentPath).then(() => {
-            //    this.__refreshItem(itemElem);
-            //});
+            this.provider.settingItem(modelPath);
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
