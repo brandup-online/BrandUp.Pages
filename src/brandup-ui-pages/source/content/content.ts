@@ -20,7 +20,7 @@ export class Content {
         this.parent = parent;
         this.model = model;
         this.__container = container;
-
+        
         this.__fields = new Map<string, FieldProvider<any, any>>();
 
         model.fields.forEach(field => {
