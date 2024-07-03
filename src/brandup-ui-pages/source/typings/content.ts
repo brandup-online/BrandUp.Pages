@@ -38,3 +38,7 @@ export interface IContentFieldDesigner {
     
     destroy();
 }
+
+export interface IParentContent {
+
+}

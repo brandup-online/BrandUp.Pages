@@ -81,7 +81,7 @@ export class Editor extends UIElement implements IPageDesigner {
                 for (const contentItem of contents) {
                     const contentElem = contentElemMap.get(contentItem.path);
                     const fieldElems = contentFieldElemMap.get(contentItem.path);
-                    this.__contentItems.set(contentItem.path, new Content(this, contentItem, contentElem, fieldElems));                    
+                    this.__contentItems.set(contentItem.path, new Content(this, null, contentItem, contentElem, fieldElems));                    
                 }
             },
         });

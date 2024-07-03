@@ -2,7 +2,6 @@ import { IContentField, IContentFieldDesigner, IContentFieldProvider } from "../
 import { AjaxRequest } from "brandup-ui-ajax";
 import { Content } from "../../content/content";
 import { ContentFieldModel, FieldValueResult } from "../../typings/models";
-import defs from "../defs";
 
 export abstract class FieldProvider<TValue, TOptions> implements IContentFieldProvider {
     readonly content: Content;
@@ -54,11 +53,11 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
         if (!options.urlParams)
             options.urlParams = {};
 
-        options.urlParams["editId"] = this.content.__editor.editId;
+        options.urlParams["editId"] = this.content.editor.editId;
         options.urlParams["path"] = this.valueElem.dataset.contentFieldPath;
         options.urlParams["field"] = this.name;
 
-        this.content.__editor.queue.push(options);
+        this.content.editor.queue.push(options);
     }
 
     abstract createDesigner(): IContentFieldDesigner;

@@ -4,8 +4,10 @@ import { AjaxResponse } from "brandup-ui-ajax";
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
+import { FieldValueResult } from "../../typings/models";
+import { IParentContent } from "../../typings/content";
 
-export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> {
+export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent {
     createDesigner() {
         let type = this.valueElem.getAttribute("data-content-designer");
         const designerType = type === "page-blocks" ? PageBlocksDesigner : ModelDesigner;
@@ -44,7 +46,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             success: (() => {
                 (this.designer as ModelDesigner)?.deleteItem(index);
                 //(this.field as ModelField)?.deleteItem(index);
-                this.content.__editor.removeContentItem(path);
+                this.content.editor.removeContentItem(path);
             })
         });
     }
@@ -63,7 +65,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     settingItem(contentPath: string) {
-        editPage(this.content.__editor, contentPath).then(() => {
+        editPage(this.content.editor, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {
             // this.__refreshItem(e.target, e.value.index);
@@ -92,8 +94,15 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                     itemIndex: index.toString()
                 },
                 method: "PUT",
-                success: (response: AjaxResponse) => {
+                success: (response: AjaxResponse<FieldValueResult>) => {
                     if (response.status === 200) {
+                        this.onSavedValue(response.data);
+
+                        const value = this.getValue();
+                        value.items.forEach((model, index) => {
+
+                        });
+
                         this.request({
                             url: '/brandup.pages/content/model/view',
                             urlParams: { itemIndex: index.toString() },
@@ -108,13 +117,15 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                 }
             });
         }
+
         if (!itemType) {
             selectContentType(this.options.itemTypes).then((type) => {
                 itemType = type.name;
                 fetchData();  
             });
         }
-        else fetchData();
+        else
+            fetchData();
     }
 }
 

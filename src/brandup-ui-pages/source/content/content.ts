@@ -6,24 +6,23 @@ import { HyperlinkFieldProvider } from "./provider/hyperlink";
 import { ImageFieldProvider } from "./provider/image";
 import { TextFieldProvider } from "./provider/text";
 import { ContentModel } from "../typings/models";
+import { IParentContent } from "../typings/content";
 
 export class Content {
-    private __fields: Map<string, FieldProvider<any, any>>;
-    private __container: HTMLElement;
-    readonly __editor: Editor;
+    readonly editor: Editor;
+    readonly parent: IParentContent;
     readonly model: ContentModel;
-    private __parent: ModelFieldProvider | null;
-
-    get parent() { return this.__parent }
-    set parent(field: ModelFieldProvider) { this.__parent = field; }
-
-    constructor(editor: Editor, model: ContentModel, container: HTMLElement = null, fieldsElements: Map<string, HTMLElement>) {
+    private __container: HTMLElement;
+    private __fields: Map<string, FieldProvider<any, any>>;
+    
+    constructor(editor: Editor, parent: IParentContent, model: ContentModel, container: HTMLElement = null, fieldsElements: Map<string, HTMLElement>) {
+        this.editor = editor;
+        this.parent = parent;
+        this.model = model;
         this.__container = container;
-        this.__editor = editor;
 
         this.__fields = new Map<string, FieldProvider<any, any>>();
 
-        this.model = model;
         model.fields.forEach(field => {
             const fieldElem = fieldsElements.get(field.name);
 
