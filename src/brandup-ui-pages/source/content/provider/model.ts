@@ -133,7 +133,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         if (index < 0 && !elem ) {
             this.designer.element.insertAdjacentElement("afterbegin", newElem);
         } else {
-            elem.insertAdjacentElement("beforebegin", newElem);
+            elem.insertAdjacentElement("afterend", newElem);
         }
 
         return newElem;
@@ -145,7 +145,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                 url: '/brandup.pages/content/model',
                 urlParams: {
                     itemType: itemType,
-                    itemIndex: index.toString()
+                    itemIndex: (index + 1).toString()
                 },
                 method: "PUT",
                 success: (response: AjaxResponse<FieldValueResult>) => {
@@ -159,7 +159,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
 
                         this.request({
                             url: '/brandup.pages/content/model/view',
-                            urlParams: { itemIndex: index.toString() },
+                            urlParams: { itemIndex: (index + 1).toString() },
                             method: "GET",
                             success: (response: AjaxResponse<string>) => {
                                 if (response.status === 200) {

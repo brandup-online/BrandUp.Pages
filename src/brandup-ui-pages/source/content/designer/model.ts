@@ -13,7 +13,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         this.registerCommand("item-add", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemType = itemElem?.getAttribute("data-item-type");
-            const itemIndex = this.getItemIndex(itemElem) + 1;
+            const itemIndex = this.getItemIndex(itemElem);
             this.provider.addItem(itemType, itemIndex);
         });
 
