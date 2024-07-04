@@ -155,7 +155,7 @@ export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOpti
         });
     }
     private __addItem(itemType: string) {
-        this.provider.addItem(itemType, 0);
+        this.provider.addItem( 0);
     }
 }
 

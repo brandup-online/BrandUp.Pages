@@ -11,10 +11,18 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         // this._refreshBlockIndexes();
 
         this.registerCommand("item-add", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
-            const itemType = itemElem?.getAttribute("data-item-type");
-            const itemIndex = this.getItemIndex(itemElem);
-            this.provider.addItem(itemType, itemIndex);
+            const position = elem.dataset.position ?? "last";
+
+            let itemIndex: number = -1;
+            if (this.provider.options.isListValue) {
+                if (position == "after") {
+                    const contentElem = <HTMLElement>elem.closest("[data-content-path]");
+                    const content = this.provider.editor.getContentItem(contentElem.dataset.contentPath);
+                    itemIndex = content.index + 1;
+                }
+            }
+
+            this.provider.addItem(itemIndex);
         });
 
         this.registerCommand("item-view", () => { return; });
@@ -76,16 +84,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             this.provider.refreshItem(itemElem, this.getItemIndex(itemElem));
         });
     }
-
-    hasValue(): boolean {
-        for (let i = 0; i < this.element.children.length; i++) {
-            const itemElem = this.element.children.item(i);
-            if (itemElem.hasAttribute("data-content-path"))
-                return true;
-        }
-        return false;
-    }
-
+    
     refreshItem(elem: Element, content: any) {
         const fragment = document.createDocumentFragment();
         const container = DOM.tag("div", null, content);

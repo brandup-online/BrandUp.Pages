@@ -9,7 +9,8 @@
 
     public class ContentModel
     {
-        public string Parent { get; set; }
+        public string ParentPath { get; set; }
+        public string ParentField { get; set; }
         public string Path { get; set; }
         public int Index { get; set; }
         public string TypeName { get; set; }

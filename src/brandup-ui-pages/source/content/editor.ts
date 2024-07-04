@@ -9,152 +9,124 @@ import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
 import { Content } from "./content";
 import { ContentModel } from "../typings/models";
-import { FieldProvider } from "./provider/base";
 import { ModelFieldProvider } from "./provider/model";
 import { errorPage } from "../dialogs/dialog-error";
 
 export class Editor extends UIElement implements IPageDesigner {
     readonly page: Page;
-    readonly contentElem: HTMLElement;
     readonly editId: string;
+    readonly contentElem: HTMLElement;
     readonly queue: AjaxQueue;
-    private __contentItems: Map<string, Content>;
-    private __modelFields: {[key: string]: FieldProvider<any, any>} = {};
+    private __contents: Map<string, Content> = new Map();
+    private __content: Content;
     private __accentedField: IContentFieldDesigner = null;
     private __isLoading = false;
 
     get typeName(): string { return "BrandUpPages.Editor"; }
+    get content(): Content { return this.__content; }
 
     constructor(page: Page, contentElem: HTMLElement) {
         super();
               
         this.page = page;
-        this.contentElem = contentElem;
-        this.contentElem.classList.add("root-designer");
         this.editId = contentElem.dataset["contentEditId"];
-
+        this.contentElem = contentElem;
         this.queue = new AjaxQueue();
 
-        this.__renderToolbar();
-        this.__fetchContent();
-        this.__initLogic();
+        this.buildContent(this.contentElem)
+            .then((content) => {
+                this.__content = content;
 
-        document.body.classList.add("bp-state-design");
+                this.__renderToolbar();
+
+                this.contentElem.classList.add("root-designer");
+                document.body.classList.add("bp-state-design");
+            }).catch(() => {
+                console.error("Error building content.");
+            });
+    }
+
+    buildContent(container: HTMLElement): Promise<Content> {
+        if (!container.hasAttribute("data-content-path"))
+            throw "Require data-content-path attribute.";
+            
+        return new Promise<Content>((resolve, reject) => {
+            this.__isLoading = true;
+            this.queue.push({
+                url: "/brandup.pages/page/content",
+                urlParams: { editId: this.editId, path: container.dataset.contentPath },
+                method: "GET",
+                success: (response: AjaxResponse<ContentModel[]>) => {
+                    this.__isLoading = false;
+
+                    if (response.status !== 200)
+                        throw "Error get content.";
+
+                    const content = this.__renderContent(container, response.data);
+                    resolve(content);
+                },
+            });
+        });
+    }
+
+    private __renderContent(rootContainer: HTMLElement, contents: ContentModel[]): Content {
+        const contentElements = new Map<string, ContentStructure>();
+        const addContainer = elem => {
+            const contentPath = elem.dataset.contentPath;
+
+            contentElements.set(contentPath, {
+                path: contentPath,
+                container: elem,
+                fields: new Map<string, HTMLElement>
+            });
+        };
+
+        // Ensure all content elements
+        addContainer(rootContainer);
+        DOM.queryElements(rootContainer, "[data-content-path]").forEach(addContainer);
+
+        // Ensure all fields by contents
+        DOM.queryElements(rootContainer, "[data-content-field-path][data-content-field-name]").forEach(elem => {
+            const contentPath = elem.dataset.contentFieldPath;
+            const fieldName = elem.dataset.contentFieldName;
+            contentElements.get(contentPath).fields.set(fieldName, elem);
+        });
+
+        // Create content wrappers
+        let rootContent: Content;
+        contents.forEach((contentModel, index) => {
+            const contentStructure = contentElements.get(contentModel.path);
+
+            let parentField: ModelFieldProvider = null;
+            if (contentModel.parentPath !== null) {
+                const parentContent = this.getContentItem(contentModel.parentPath);
+                parentField = <ModelFieldProvider>parentContent.getField(contentModel.parentField);
+            }
+
+            const content = new Content(this, parentField, contentModel, contentStructure.container, contentStructure.fields);
+            this.__contents.set(content.path, content);
+
+            if (index === 0)
+                rootContent = content;
+        });
+
+        return rootContent;
     }
 
     private __renderToolbar() {
         const toolbarElem = DOM.tag("div", { class: "bp-elem editor-toolbar" }, [
-            DOM.tag("button", { class: "bp-button", command: "bp-commit", title:"Применить изменения" }, [saveIcon, "Сохранить"]),
-            DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title:"Отменить изменения" }, [cancelIcon, "Отмена"]),
-            DOM.tag("button", { class: "bp-button neutral right", command: "bp-content", title:"Показать контент" }, [editBlockIcon, "Контент"]),
+            DOM.tag("button", { class: "bp-button", command: "bp-commit", title: "Применить изменения" }, [saveIcon, "Сохранить"]),
+            DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title: "Отменить изменения" }, [cancelIcon, "Отмена"]),
+            DOM.tag("button", { class: "bp-button neutral right", command: "bp-content", title: "Показать контент" }, [editBlockIcon, "Контент"]),
         ]);
 
         document.body.appendChild(toolbarElem);
-        this.setElement(toolbarElem)
+        this.setElement(toolbarElem);
+
+        this.__initToolbarLogic();
     }
 
-    private __fetchContent() {
-        this.__isLoading = true;
-        this.queue.push({
-            url: "/brandup.pages/page/content",
-            urlParams: { editId: this.editId },
-            method: "GET",
-            success: (response: AjaxResponse) => {
-                this.__isLoading = false;
-
-                if (response.status !== 200) {
-                    throw "Error get content.";
-                }
-
-                const contents: ContentModel[] = response.data;
-                this.__contentItems = new Map();
-                this.__renderContent(this.contentElem, contents);
-            },
-        });
-    }
-
-    private __renderContent(rootElem: HTMLElement, contents: ContentModel[]) {
-        const contentElemMap = new Map<string, HTMLElement>();
-        const contentFieldElemMap = new Map<string, Map<string, HTMLElement>>();
-        
-        contentElemMap.set(contents[0].path, rootElem);
-        DOM.queryElements(rootElem, "[data-content-path]").forEach(elem => contentElemMap.set(elem.dataset.contentPath, elem));
-        DOM.queryElements(rootElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
-            const fieldPath = elem.dataset.contentFieldPath;
-            const fieldName = elem.dataset.contentFieldName;
-            if (!contentFieldElemMap.has(fieldPath)) {
-                contentFieldElemMap.set(fieldPath, new Map());
-            }
-            contentFieldElemMap.get(fieldPath).set(fieldName, elem);
-        });
-        
-        for (const contentModelItem of contents) {
-            const contentElem = contentElemMap.get(contentModelItem.path);
-            const fieldElems = contentFieldElemMap.get(contentModelItem.path);
-
-            const parentField = this.__modelFields[this.__trimdPath(contentModelItem.path)] || null;
-            const contentItem = new Content(this, parentField, contentModelItem, contentElem, fieldElems);
-            if (parentField) (parentField as ModelFieldProvider).insertContent(contentItem);
-
-            contentItem.getFields().forEach(field => {
-                if (field.isModelField)
-                    this.__modelFields[this.__buildPath([contentModelItem.path, field.name])] = field;
-            });
-            this.__contentItems.set(contentModelItem.path, contentItem);
-        }
-    }
-
-    createContent(modelpath: string, container: HTMLElement = null, callback?: () => void) {
-        this.__isLoading = true;
-        this.queue.push({
-            url: "/brandup.pages/page/content",
-            urlParams: { editId: this.editId, path: modelpath },
-            method: "GET",
-            success: (response: AjaxResponse) => {
-                this.__isLoading = false;
-                
-                if (response.status !== 200) {
-                    throw "Error get content.";
-                }
-                
-                const contents: ContentModel[] = response.data;
-                this.__renderContent(container, contents);
-                
-                if (callback) callback();
-            } 
-        });
-    }
-
-    private __buildPath(paths: string[]) {
-        let result = "";
-        paths.forEach((path, index) => {
-            if (path === "") return;
-            if (index === paths.length - 1) return result += path;
-            result += path + ".";
-        })
-        return result;
-    }
-
-    private __trimdPath(path: string) {
-        const paths: string[] = path.split(".");
-        paths[paths.length-1] = paths[paths.length-1].replace(/\W|\d/gm, "");
-        return this.__buildPath(paths);
-    }
-
-    removeContentItem(path: string) {
-        this.__contentItems.forEach((item, key) => {
-            if (key.startsWith(path)) {
-                item.destroy();
-                this.__contentItems.delete(key);
-            }
-        });
-    }
-
-    getContentItem(path: string) {
-        return this.__contentItems.get(path);
-    }
-    
-    private __initLogic() {
+    private __initToolbarLogic() {
         this.registerCommand("bp-content", () => {
             editPage(this, "");
         });
@@ -200,6 +172,21 @@ export class Editor extends UIElement implements IPageDesigner {
         });
     }
 
+    getContentItem(path: string) {
+        if (!this.__contents.has(path))
+            throw `Not found content by path "${path}".`;
+        return this.__contents.get(path);
+    }
+
+    removeContentItem(path: string) {
+        this.__contents.forEach((content, key) => {
+            if (key.startsWith(path)) {
+                content.destroy();
+                this.__contents.delete(key);
+            }
+        });
+    }
+
     private __complateEdit() {
         delete this.contentElem.dataset["contentEditId"];
         
@@ -211,16 +198,21 @@ export class Editor extends UIElement implements IPageDesigner {
     }
 
     destroy() {
-        this.__contentItems.forEach(item => item.destroy());
+        this.__contents.forEach(content => content.destroy());
 
         this.queue.destroy();
 
-        this.contentElem.classList.remove("page-designer");
-
+        this.contentElem.classList.remove("root-designer");
         document.body.classList.remove("bp-state-design");
 
         this.element.remove();
 
         super.destroy();
     }
+}
+
+interface ContentStructure {
+    path: string;
+    container: HTMLElement;
+    fields: Map<string, HTMLElement>;
 }

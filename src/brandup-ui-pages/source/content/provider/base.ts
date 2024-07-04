@@ -2,6 +2,7 @@ import { IContentField, IContentFieldDesigner, IContentFieldProvider } from "../
 import { AjaxRequest } from "brandup-ui-ajax";
 import { Content } from "../../content/content";
 import { ContentFieldModel, FieldValueResult } from "../../typings/models";
+import { Editor } from "../editor";
 
 export abstract class FieldProvider<TValue, TOptions> implements IContentFieldProvider {
     readonly content: Content;
@@ -11,14 +12,14 @@ export abstract class FieldProvider<TValue, TOptions> implements IContentFieldPr
     readonly isRequired: boolean;
     readonly valueElem: HTMLElement;
     readonly designerType: string;
-
-    readonly isModelField:boolean = false;
-
+    
     private __value: TValue;
     private __errors: Array<string>;
 
     designer: IContentFieldDesigner;
     field: IContentField;
+
+    get editor(): Editor { return this.content.editor; }
     
     constructor(content: Content, model: ContentFieldModel, valueElem: HTMLElement) {
         this.content = content;

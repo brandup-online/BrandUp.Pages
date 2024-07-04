@@ -8,20 +8,20 @@ export interface IContentForm {
 }
 
 export interface IContentFieldProvider {
+    readonly editor: IPageDesigner;
+    readonly content: IContent;
     readonly name: string;
     readonly title: string;
     readonly options: any;
     readonly isRequired: boolean;
     readonly valueElem: HTMLElement;
-    readonly isModelField: boolean;
 
     renderDesigner();
     getValue();
     destroy();
 }
 
-export interface IModelFieldProvider extends IContentFieldProvider{
-    insertContent(item: Content);
+export interface IModelFieldProvider extends IContentFieldProvider {
 }
 
 export interface IContentField {
@@ -36,6 +36,7 @@ export interface IContentField {
 
 export interface IPageDesigner {
     readonly editId: string;
+    get content(): Content;
     destroy();
 }
 
@@ -47,6 +48,15 @@ export interface IContentFieldDesigner {
     setErrors(errors: string[]);
 }
 
-export interface IParentContent {
+export interface IContent {
+    readonly editor: IPageDesigner;
+    readonly path: string;
+    readonly index: number;
+    readonly container?: HTMLElement;
 
+    getField(name: string): IContentFieldProvider;
+}
+
+export interface IParentContent {
+    map(content: IContent);
 }
