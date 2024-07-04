@@ -6,13 +6,18 @@ import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
 import { FieldValueResult } from "../../typings/models";
 import { IModelFieldProvider, IParentContent } from "../../typings/content";
-import { Content } from "../../content/content";
 import { DOM } from "brandup-ui-dom";
+import { Content } from "../content";
 
 export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent, IModelFieldProvider {
-    private __contentItems: Content[] = [];
-    private __insertIndex: number = 0;
-    readonly isModelField = true;
+    private __contents: Content[] = [];
+
+    map(content: Content) {
+        if (this.options.isListValue)
+            this.__contents.splice(content.index, 0, content);
+        else
+            this.__contents[0] = content;
+    }
 
     createDesigner() {
         let type = this.valueElem.getAttribute("data-content-designer");
@@ -27,7 +32,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     itemUp(index: number, elem: Element) {
-        [this.__contentItems[index], this.__contentItems[index-1]] = [this.__contentItems[index-1], this.__contentItems[index]]
+        [this.__contents[index], this.__contents[index - 1]] = [this.__contents[index - 1], this.__contents[index]]
         this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/up',
@@ -38,7 +43,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     itemDown(index: number, elem: Element) {
-        [this.__contentItems[index], this.__contentItems[index+1]] = [this.__contentItems[index+1], this.__contentItems[index]]
+        [this.__contents[index], this.__contents[index + 1]] = [this.__contents[index + 1], this.__contents[index]]
         this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/down',
@@ -54,8 +59,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             urlParams: { itemIndex: index.toString() },
             method: "DELETE",
             success: (() => {
-                this.__contentItems[index].container?.remove();
-                this.__contentItems = this.__contentItems.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
+                this.__contents[index].container?.remove();
+                this.__contents = this.__contents.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
                 this.content.editor.removeContentItem(path);
             })
         });
@@ -94,23 +99,17 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             }
         });
     }
-
-    insertContent(item: Content) {
-        this.__contentItems.splice(this.__insertIndex, 0, item);
-        this.__insertIndex = this.__contentItems.length;
-        this._refreshIndexses();
-    }
-
+    
     protected _refreshIndexses(start: number = 0) {
-        for (let i = start; i < this.__contentItems.length; i++) {
-            this.__contentItems[i].container?.setAttribute("data-content-path-index", i.toString());
+        for (let i = start; i < this.__contents.length; i++) {
+            this.__contents[i].container?.setAttribute("data-content-path-index", i.toString());
         }
     }
 
     protected getItemIndex(container: HTMLElement) {
         let index = -1;
-        for (let i = 0; i < this.__contentItems.length; i++) {
-            if (this.__contentItems[i].container === container) {
+        for (let i = 0; i < this.__contents.length; i++) {
+            if (this.__contents[i].container === container) {
                 index = i;
                 break;
             }
@@ -118,75 +117,68 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         return index;
     }
 
-    private __addItemDOM(data: string, index: number) {
+    addItem(index: number) {
+        if (!this.options.isListValue && this.hasValue())
+            throw "Content already exists.";
+
+        selectContentType(this.options.itemTypes)
+            .then(type => new Promise<FieldValueResult>((resolve) => {
+                this.request({
+                    url: '/brandup.pages/content/model',
+                    urlParams: {
+                        itemType: type.name,
+                        itemIndex: index.toString()
+                    },
+                    method: "PUT",
+                    success: (response: AjaxResponse<FieldValueResult>) => {
+                        if (response.status === 200) {
+                            this.onSavedValue(response.data);
+
+                            resolve(response.data);
+                        }
+                        else
+                            throw "Error add content.";
+                    }
+                });
+            }))
+            .then(value => new Promise<Content>(resolve => {
+                this.request({
+                    url: '/brandup.pages/content/model/view',
+                    urlParams: { itemIndex: index.toString() },
+                    method: "GET",
+                    success: (response: AjaxResponse<string>) => {
+                        if (response.status === 200) {
+                            const newElem = this.__addItemDOM(response.data, index);
+
+                            resolve(this.content.editor.buildContent(newElem));
+                        }
+                        else
+                            throw "Error load content view.";
+                    }
+                });
+            }));
+    }
+
+
+    private __addItemDOM(html: string, index: number) {
         const fragment = document.createDocumentFragment();
-        const container = DOM.tag("div", null, data);
+        const container = DOM.tag("div", null, html);
         fragment.appendChild(container);
         const newElem = DOM.queryElement(container, "[data-content-path]");
 
         let elem;
 
         while (index >= 0 && !elem) {
-            elem = this.__contentItems[index].container;
+            elem = this.__contents[index].container;
             index -= 1;
         }
-        if (index < 0 && !elem ) {
+        if (index < 0 && !elem) {
             this.designer.element.insertAdjacentElement("afterbegin", newElem);
         } else {
             elem.insertAdjacentElement("beforebegin", newElem);
         }
 
         return newElem;
-    }
-
-    addItem(itemType: string, index: number) {
-        const fetchData = () => {
-            this.request({
-                url: '/brandup.pages/content/model',
-                urlParams: {
-                    itemType: itemType,
-                    itemIndex: index.toString()
-                },
-                method: "PUT",
-                success: (response: AjaxResponse<FieldValueResult>) => {
-                    if (response.status === 200) {
-                        this.onSavedValue(response.data);
-
-                        const value = this.getValue();
-                        value.items.forEach((model, index) => {
-
-                        });
-
-                        this.request({
-                            url: '/brandup.pages/content/model/view',
-                            urlParams: { itemIndex: index.toString() },
-                            method: "GET",
-                            success: (response: AjaxResponse<string>) => {
-                                if (response.status === 200) {
-                                    const newElem = this.__addItemDOM(response.data, index);
-                                    const modelPath = newElem.dataset.contentPath;
-                                    this.content.editor.createContent(modelPath, newElem, () => {
-                                        (this.designer as ModelDesigner).renderBlock(newElem);
-                                        this._refreshIndexses();
-                                    });
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-        }
-
-        this.__insertIndex = index;
-
-        if (!itemType) {
-            selectContentType(this.options.itemTypes).then((type) => {
-                itemType = type.name;
-                fetchData();  
-            });
-        }
-        else
-            fetchData();
     }
 }
 

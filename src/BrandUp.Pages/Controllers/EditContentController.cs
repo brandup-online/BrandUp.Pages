@@ -21,7 +21,11 @@ namespace BrandUp.Pages.Controllers
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
 
             if (!string.IsNullOrEmpty(path))
+            {
                 contentExplorer = contentExplorer.Navigate(path);
+                if (contentExplorer == null)
+                    return Problem($"Path \"{path}\" is not exist.");
+            }
 
             List<Models.Contents.ContentModel> result = [];
             await EnsureContentsAsync(contentExplorer, result);
@@ -213,14 +217,12 @@ namespace BrandUp.Pages.Controllers
             ArgumentNullException.ThrowIfNull(contentExplorer);
             ArgumentNullException.ThrowIfNull(output);
 
-            //if (output.Count == 0 && !contentExplorer.IsRoot)
-                //throw new ArgumentException("Начать заполнение моделей контента можно только с рутового контента.");
-
             var serviceProvider = HttpContext.RequestServices;
 
             var content = new Models.Contents.ContentModel
             {
-                Parent = contentExplorer.Parent?.ModelPath,
+                ParentPath = contentExplorer.Parent?.ModelPath,
+                ParentField = contentExplorer.Field?.Name,
                 Path = contentExplorer.ModelPath,
                 Index = contentExplorer.Index,
                 TypeName = contentExplorer.Metadata.Name,

@@ -71,7 +71,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                 ]),
             ]));
 
-            path = model.parent;
+            path = model.parentPath;
         }
 
         const providers = this.__content.getFields();

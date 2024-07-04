@@ -59,7 +59,8 @@ export interface BeginPageEditResult {
 }
 
 export interface ContentModel {
-    parent: string;
+    parentPath: string;
+    parentField: string;
     path: string;
     index: number;
     typeName: string;

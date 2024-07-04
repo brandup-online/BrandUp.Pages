@@ -114,7 +114,12 @@ namespace BrandUp.Pages.Controllers
                 Field.SetModelValue(ContentContext.Content, list);
             }
             else
+            {
+                if (Field.HasValue(ContentContext.Content))
+                    throw new InvalidOperationException();
+
                 Field.SetModelValue(ContentContext.Content, newItem);
+            }
 
             await SaveChangesAsync();
 
