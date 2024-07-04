@@ -1,7 +1,7 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
 import { DOM } from "brandup-ui-dom";
-import { ContentTypeModel } from "../typings/models";
 import "./dialog-select-content-type.less";
+import { ContentTypeModel } from "../content/provider/model";
 
 export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
     private __types: Array<ContentTypeModel>;

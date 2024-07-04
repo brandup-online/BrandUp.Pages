@@ -1,6 +1,6 @@
 ﻿import { DeleteDialog } from "../dialog-delete";
 import { DialogOptions } from "../dialog";
-import { PageModel } from "../../typings/models";
+import { PageModel } from "../../typings/page";
 
 export class PageDeleteDialog extends DeleteDialog<PageModel> {
     readonly pageId: string;

@@ -3,8 +3,7 @@
     public class BeginContentEditResult
     {
         public Guid EditId { get; set; }
-        public DateTime? CurrentDate { get; set; }
-        public List<ContentModel> Content { get; set; }
+        public bool Exist { get; set; }
     }
 
     public class GetContentEditResult

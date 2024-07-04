@@ -4,10 +4,10 @@ import { AjaxResponse } from "brandup-ui-ajax";
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
-import { FieldValueResult } from "../../typings/models";
-import { IContentEditor, IContentHost } from "../../typings/content";
 import { DOM } from "brandup-ui-dom";
-import { Content } from "../content";
+import { Content, IContentHost } from "../content";
+import { ContentEditor } from "../editor";
+import { FieldValueResult } from "../../typings/content";
 
 export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IContentHost {
 
@@ -15,7 +15,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
 
     // IContentHost members
 
-    get editor(): IContentEditor { return this.content.host.editor; }
+    get editor(): ContentEditor { return this.content.host.editor; }
 
     get isList(): boolean { return this.options.isListValue; }
 

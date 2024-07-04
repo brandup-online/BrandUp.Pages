@@ -1,9 +1,9 @@
-﻿import { IContentField } from "../../typings/content";
-import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "brandup-ui-dom";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 import { FormField } from "./base";
 import { HtmlFieldProvider } from "../../content/provider/html";
+import { IContentField } from "../provider/base";
 
 export class HtmlContent extends FormField<string, HtmlFieldFormOptions, HtmlFieldProvider>  implements IContentField {
     private __isChanged: boolean;

@@ -1,8 +1,8 @@
 ﻿import { UIElement } from "brandup-ui";
-import { IFieldDesigner, IFieldProvider } from "../../typings/content";
 import "./base.less";
+import { FieldProvider, IFieldDesigner } from "../provider/base";
 
-export abstract class FieldDesigner<TProvider extends IFieldProvider> extends UIElement implements IFieldDesigner {
+export abstract class FieldDesigner<TProvider extends FieldProvider<any, any>> extends UIElement implements IFieldDesigner {
     readonly provider: TProvider;
 
     constructor(provider: TProvider) {

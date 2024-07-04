@@ -1,7 +1,7 @@
 import { FieldProvider } from "./base";
 import { HtmlDesigner } from "../designer/html";
 import { AjaxResponse } from "brandup-ui-ajax";
-import { FieldValueResult } from "../../typings/models";
+import { FieldValueResult } from "../../typings/content";
 
 export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldOptions> {
     createDesigner() {

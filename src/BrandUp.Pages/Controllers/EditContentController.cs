@@ -66,7 +66,7 @@ namespace BrandUp.Pages.Controllers
                         currentEdit = null;
                     }
                     else
-                        result.CurrentDate = currentEdit.CreatedDate;
+                        result.Exist = true;
                 }
             }
 
@@ -81,9 +81,6 @@ namespace BrandUp.Pages.Controllers
 
             var contentModel = await contentService.GetEditContentAsync(currentEdit, cancellationToken);
             var contentExplorer = ContentExplorer.Create(contentMetadataManager, contentModel);
-
-            result.Content = [];
-            await EnsureContentsAsync(contentExplorer, result.Content);
 
             return Ok(result);
         }

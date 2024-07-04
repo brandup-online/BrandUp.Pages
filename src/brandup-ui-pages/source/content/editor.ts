@@ -1,49 +1,91 @@
 ﻿import { DOM } from "brandup-ui-dom";
-import { IContentEditor, IContentHost } from "../typings/content";
 import { AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { WebsiteContext } from "brandup-ui-website";
+import { Page, PageModel, WebsiteContext } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
 import { editPage } from "../dialogs/pages/edit";
 import { UIElement } from "brandup-ui";
-import { Content } from "./content";
-import { GetContentEditResult } from "../typings/models";
+import { Content, IContentHost } from "./content";
 import { ModelFieldProvider } from "./provider/model";
 import { errorPage } from "../dialogs/dialog-error";
+import { BeginContentEditResult, ContentModel, GetContentEditResult } from "../typings/content";
 
-export class ContentEditor extends UIElement implements IContentEditor, IContentHost {
+export class ContentEditor extends UIElement implements IContentHost {
     readonly website: WebsiteContext;
     readonly editId: string;
-    readonly contentElem: HTMLElement;
     readonly queue: AjaxQueue;
+
+    private __contentElem?: HTMLElement;
     private __contents: Map<string, Content> = new Map();
     private __content: Content;
     private __isLoading = false;
 
+    private __complate: (value: EditResult) => void;
+    private __error: (reason?: any) => void;
+
     get typeName(): string { return "BrandUpPages.Editor"; }
     
-    constructor(website: WebsiteContext, editId: string) {
+    private constructor(website: WebsiteContext, editId: string) {
         super();
 
         this.website = website;
         this.editId = editId;
         this.queue = new AjaxQueue();
+    }
+    
+    static begin(page: Page<PageModel>, key: string, type: string, force: boolean = false) {
+        return new Promise<{ editId: string, exist: boolean }>((resolve) => {
+            page.website.request({
+                url: "/brandup.pages/page/content/begin",
+                urlParams: { bpcommand: "begin", key: key, type: type, force: force.toString() },
+                method: "POST",
+                success: (response: AjaxResponse<BeginContentEditResult>) => {
+                    if (response.status !== 200)
+                        throw "Error begin content edit.";
+                        
+                    resolve({ editId: response.data.editId, exist: response.data.exist });
+                }
+            });
+        });
+    }
 
-        //const contentElem = DOM.queryElement(document.body, `[data-content-root='${contentKey}']`);
+    static create(website: WebsiteContext, editId: string) {
+        const editor = new ContentEditor(website, editId);
+        return editor;
+    }
 
-        this.buildContent("")
+    edit(container?: HTMLElement) {
+        if (document.body.classList.contains("bp-state-design"))
+            throw "Content editor already started.";
+        document.body.classList.add("bp-state-design");
+        
+        this.__contentElem = container;
+        this.__contentElem?.classList.add("root-designer");
+
+        return this.loadContent(null)
             .then(() => {
                 this.__renderToolbar();
-
-                this.contentElem.classList.add("root-designer");
-                document.body.classList.add("bp-state-design");
-            }).catch(() => {
-                console.error("Error building content.");
+                this.__renderDesigner();
+                
+                return new Promise<EditResult>((resolve, reject) => {
+                    this.__complate = resolve;
+                    this.__error = reject;
+                });
             });
     }
     
-    // IContentEditor members
+    // IContentHost members
+    get editor(): ContentEditor { return this; }
+    get isList(): boolean { return false; }
+
+    attach(content: Content) {
+        if (this.__content)
+            throw "Model field already exist content.";
+        this.__content = content;
+    }
+
+    // Editor members
 
     get content(): Content { return this.__content; }
 
@@ -55,89 +97,45 @@ export class ContentEditor extends UIElement implements IContentEditor, IContent
         this.queue.push(request);
     }
 
-    // IContentHost members
-    get editor(): IContentEditor { return this; }
-    get isList(): boolean { return false; }
-
-    attach(content: Content) {
-        if (this.__content)
-            throw "Model field already exist content.";
-        this.__content = content;
-    }
-
-    // Editor members
-
-    buildContent(path: string): Promise<Content> {
-        return new Promise<Content>((resolve, reject) => {
-            this.__isLoading = true;
-
+    loadContent(path: string): Promise<Content> {
+        return new Promise<Content>((resolve) => {
             this.queue.push({
                 url: "/brandup.pages/page/content",
                 urlParams: { editId: this.editId, path },
                 method: "GET",
                 success: (response: AjaxResponse<GetContentEditResult>) => {
-                    this.__isLoading = false;
-
                     if (response.status !== 200)
-                        throw "Error get content.";
+                        throw `Error load editor contents by path "${path}".`;
 
-                    const content = this.__renderContent(response.data);
-                    resolve(content);
+                    let rootContent: Content = null;
+
+                    response.data.contents.forEach((contentModel, index) => {
+                        if (this.__contents.has(contentModel.path))
+                            return;
+
+                        let host: IContentHost;
+                        if (contentModel.parentPath !== null) {
+                            const parentContent = this.navigate(contentModel.parentPath);
+                            if (!parentContent)
+                                throw `Not found content by path "${contentModel.parentPath}".`;
+                            host = <ModelFieldProvider>parentContent.getField(contentModel.parentField);
+                        }
+                        else
+                            host = this;
+
+                        const content = new Content(host, contentModel);
+                        this.__contents.set(content.path, content);
+
+                        if (index === 0)
+                            rootContent = content;
+                    });
+
+                    resolve(rootContent);
                 },
             });
         });
     }
-
-    private __renderContent(edit: GetContentEditResult): Content {
-        const contentElements = new Map<string, ContentStructure>();
-        //if (rootContainer) {
-        //    const addContainer = elem => {
-        //        const contentPath = elem.dataset.contentPath;
-
-        //        contentElements.set(contentPath, {
-        //            path: contentPath,
-        //            container: elem,
-        //            fields: new Map<string, HTMLElement>
-        //        });
-        //    };
-
-        //    // Ensure all content elements
-        //    addContainer(rootContainer);
-        //    DOM.queryElements(rootContainer, "[data-content-path]").forEach(addContainer);
-
-        //    // Ensure all fields by contents
-        //    DOM.queryElements(rootContainer, "[data-content-field-path][data-content-field-name]").forEach(elem => {
-        //        const contentPath = elem.dataset.contentFieldPath;
-        //        const fieldName = elem.dataset.contentFieldName;
-        //        contentElements.get(contentPath).fields.set(fieldName, elem);
-        //    });
-        //}
-
-        // Create content wrappers
-        let rootContent: Content;
-        edit.contents.forEach((contentModel, index) => {
-            const contentStructure = contentElements.get(contentModel.path);
-
-            let host: IContentHost;
-            if (contentModel.parentPath !== null) {
-                const parentContent = this.navigate(contentModel.parentPath);
-                if (!parentContent)
-                    throw `Not found content by path "${contentModel.parentPath}".`;
-                host = <ModelFieldProvider>parentContent.getField(contentModel.parentField);
-            }
-            else
-                host = this;
-
-            const content = new Content(host, contentModel, contentStructure?.container, contentStructure?.fields);
-            this.__contents.set(content.path, content);
-
-            if (index === 0)
-                rootContent = content;
-        });
-
-        return rootContent;
-    }
-
+    
     private __renderToolbar() {
         const toolbarElem = DOM.tag("div", { class: "bp-elem editor-toolbar" }, [
             DOM.tag("button", { class: "bp-button", command: "bp-commit", title: "Применить изменения" }, [saveIcon, "Сохранить"]),
@@ -148,20 +146,14 @@ export class ContentEditor extends UIElement implements IContentEditor, IContent
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
 
-        this.__initToolbarLogic();
-    }
-
-    private __initToolbarLogic() {
-        this.registerCommand("bp-content", () => {
-            editPage(this, "");
-        });
+        this.registerCommand("bp-content", () => editPage(this, ""));
 
         this.registerCommand("bp-commit", () => {
             if (this.__isLoading)
                 return;
             this.__isLoading = true;
 
-            this.queue.push({
+            this.api({
                 url: "/brandup.pages/page/content/commit",
                 urlParams: { editId: this.editId },
                 method: "POST",
@@ -169,8 +161,9 @@ export class ContentEditor extends UIElement implements IContentEditor, IContent
                     this.__isLoading = false;
                     if (response.status !== 200)
                         throw "Error commit content editing.";
+
                     if (response.data.isSuccess)
-                        this.__complateEdit();
+                        this.__complate({ reason: "Commit" });
                     else {
                         errorPage(this, response.data.validation);
                     }
@@ -183,7 +176,7 @@ export class ContentEditor extends UIElement implements IContentEditor, IContent
                 return;
             this.__isLoading = true;
 
-            this.queue.push({
+            this.api({
                 url: "/brandup.pages/page/content/discard",
                 urlParams: { editId: this.editId },
                 method: "POST",
@@ -191,43 +184,67 @@ export class ContentEditor extends UIElement implements IContentEditor, IContent
                     if (response.status !== 200)
                         throw "Error discard content editing.";
 
-                    this.__complateEdit();
+                    this.__complate({ reason: "Discard" });
                 },
             });
         });
     }
     
-    removeContentItem(path: string) {
-        this.__contents.forEach((content, key) => {
-            if (key.startsWith(path)) {
-                content.destroy();
-                this.__contents.delete(key);
-            }
+    private __renderDesigner() {
+        if (!this.__contentElem)
+            return;
+
+        const contentElements = new Map<string, ContentStructure>();
+
+        const addContainer = elem => {
+            const contentPath = elem.dataset.contentPath;
+
+            contentElements.set(contentPath, {
+                path: contentPath,
+                container: elem,
+                fields: new Map<string, HTMLElement>
+            });
+        };
+
+        // Ensure all content elements
+        addContainer(this.__contentElem);
+        DOM.queryElements(this.__contentElem, "[data-content-path]").forEach(addContainer);
+
+        // Ensure all fields by contents
+        DOM.queryElements(this.__contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
+            const contentPath = elem.dataset.contentFieldPath;
+            const fieldName = elem.dataset.contentFieldName;
+            contentElements.get(contentPath).fields.set(fieldName, elem);
+        });
+
+        Array.from(contentElements.values()).forEach(contentStructure => {
+            if (!this.__contents.has(contentStructure.path))
+                throw "";
+
+            const content = this.__contents.get(contentStructure.path);
+            content.renderDesigner(contentStructure);
         });
     }
 
-    private __complateEdit() {
-        delete this.contentElem.dataset["contentEditId"];
-        
-        const url = new URL(location.href);
-        url.searchParams.delete("editid");
-        
-        this.website.nav({ url: url.toString(), replace: true });
-        this.__isLoading = false;
-    }
-
     destroy() {
+        if (this.__complate)
+            this.__complate({ reason: "Destroy" });
+
         this.__contents.forEach(content => content.destroy());
 
         this.queue.destroy();
 
-        this.contentElem.classList.remove("root-designer");
+        this.__contentElem?.classList.remove("root-designer");
         document.body.classList.remove("bp-state-design");
 
-        this.element.remove();
+        this.element?.remove();
 
         super.destroy();
     }
+}
+
+export interface EditResult {
+    reason: "Commit" | "Discard" | "Destroy";
 }
 
 interface ContentStructure {

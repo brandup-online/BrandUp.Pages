@@ -1,20 +1,18 @@
-﻿using BrandUp.Pages.Identity;
-using BrandUp.Website;
+﻿using BrandUp.Website;
 using BrandUp.Website.Pages;
 
 namespace LandingWebSite.Pages
 {
-    public class PageEvents(IAccessProvider pageAccessProvider) : IPageEvents
+    public class PageEvents : IPageEvents
     {
         public Task PageClientBuildAsync(PageClientBuildContext context)
         {
             return Task.CompletedTask;
         }
 
-        public async Task PageClientNavigationAsync(PageClientNavidationContext context)
+        public Task PageClientNavigationAsync(PageClientNavidationContext context)
         {
-            var enableAdmin = await pageAccessProvider.CheckAccessAsync(context.CancellationToken);
-            context.ClientData.Add("enableAdministration", enableAdmin);
+            return Task.CompletedTask;
         }
 
         public Task PageRequestAsync(PageRequestContext context)

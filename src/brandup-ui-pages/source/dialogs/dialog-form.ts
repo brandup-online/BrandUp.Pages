@@ -4,7 +4,7 @@ import { Field } from "../form/field";
 import { TextboxOptions, Textbox } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
 import { StringArrayFieldOptions, StringArrayField } from "../form/string-array";
-import { ValidationProblemDetails } from "../typings/models";
+import { ValidationProblemDetails } from "../typings/page";
 import { AjaxQueue } from "brandup-ui-ajax";
 import "./dialog-form.less";
 

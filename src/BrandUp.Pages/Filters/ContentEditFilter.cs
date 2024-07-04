@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Content;
 using BrandUp.Pages.Features;
+using BrandUp.Website.Pages.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,26 +20,52 @@ namespace BrandUp.Pages.Filters
             var cancellationToken = httpContext.RequestAborted;
             var accessProvider = httpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
 
-            if (await accessProvider.CheckAccessAsync(cancellationToken) && httpContext.Request.Query.TryGetValue("editid", out string editIdValue) && Guid.TryParse(editIdValue, out var editId))
+            if (await accessProvider.CheckAccessAsync(cancellationToken))
             {
                 var contentService = httpContext.RequestServices.GetRequiredService<ContentService>();
-                var editSession = await contentService.FindEditByIdAsync(editId, cancellationToken);
-                if (editSession == null)
+                if (httpContext.Request.Query.TryGetValue("editid", out string editIdValue) && Guid.TryParse(editIdValue, out var editId))
                 {
-                    context.Result = new NotFoundResult();
+                    var editSession = await contentService.FindEditByIdAsync(editId, cancellationToken);
+                    if (editSession == null)
+                    {
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
+
+                    var userId = await accessProvider.GetUserIdAsync(cancellationToken);
+                    if (!editSession.UserId.Equals(userId, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        context.Result = new NotFoundResult();
+                        return;
+                    }
+
+                    var content = await contentService.GetEditContentAsync(editSession, cancellationToken);
+
+                    httpContext.Features.Set(new ContentEditFeature(editSession, content));
+                }
+                else if (httpContext.Request.Query.TryGetValue("bpcommand", out string commandName) && httpContext.Request.Method.Equals("POST", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    commandName = commandName.ToLower();
+                    switch (commandName)
+                    {
+                        case "begin":
+                            httpContext.Request.QueryString.Add("editid", "");
+
+                            context.Result = new PageRedirectResult("") { ReplaceUrl = true };
+                            break;
+                        case "commit":
+                            context.Result = new BadRequestResult();
+                            break;
+                        case "discard":
+                            context.Result = new BadRequestResult();
+                            break;
+                        default:
+                            context.Result = new BadRequestResult();
+                            break;
+                    }
+
                     return;
                 }
-
-                var userId = await accessProvider.GetUserIdAsync(cancellationToken);
-                if (!editSession.UserId.Equals(userId, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    context.Result = new NotFoundResult();
-                    return;
-                }
-
-                var content = await contentService.GetEditContentAsync(editSession, cancellationToken);
-
-                httpContext.Features.Set(new ContentEditFeature(editSession, content));
             }
 
             await next();

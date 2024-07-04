@@ -1,25 +1,18 @@
-﻿import { IContentField, IContentForm } from "../../typings/content";
-import { Field } from "../../form/field";
+﻿import { Field } from "../../form/field";
 import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { PageCollectionModel } from "../../typings/models";
+import { PageCollectionModel } from "../../typings/page";
+import { IContentField } from "../provider/base";
 import "./pages.less";
 import { DOM } from "brandup-ui-dom";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
-    readonly form: IContentForm;
     private inputElem: HTMLInputElement;
     private valueElem: HTMLElement;
     private searchElem: HTMLElement;
     private __searchTimeout: number;
     private __searchRequest: XMLHttpRequest;
     private __closeMenuFunc: (e: MouseEvent) => void;
-
-    constructor (form: IContentForm, name: string, errors: string[], options: PagesFieldFormOptions) {
-        super(name, errors, options);
-
-        this.form = form;
-    }
-
+    
     get typeName(): string { return "BrandUpPages.Form.Field.Pages"; }
 
     protected _onRender() {

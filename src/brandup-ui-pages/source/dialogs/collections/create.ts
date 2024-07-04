@@ -1,7 +1,7 @@
 ﻿import { FormModel, FormDialog } from "../dialog-form";
 import { DialogOptions } from "../dialog";
 import { ComboBoxItem } from "../../form/combobox";
-import { PageCollectionModel, PageModel } from "../../typings/models";
+import { PageCollectionModel, PageModel } from "../../typings/page";
 
 export class PageCollectionCreateDialog extends FormDialog<PageCollectionCreateForm, PageCollectionCreateValues, PageCollectionModel> {
     readonly pageId: string;

@@ -1,7 +1,7 @@
 import { FieldProvider } from "./base";
 import { ImageDesigner } from "../designer/image";
 import { AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { FieldValueResult } from "../../typings/models";
+import { FieldValueResult } from "../../typings/content";
 
 export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFieldOptions> {
     createDesigner() {

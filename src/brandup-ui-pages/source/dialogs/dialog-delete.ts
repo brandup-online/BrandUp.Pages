@@ -1,6 +1,6 @@
 ﻿import { Dialog } from "./dialog";
 import { DOM } from "brandup-ui-dom";
-import { Result } from "../typings/models";
+import { Result } from "../typings/page";
 import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import "./dialog-delete.less";
 

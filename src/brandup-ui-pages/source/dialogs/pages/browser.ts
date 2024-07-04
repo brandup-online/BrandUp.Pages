@@ -5,7 +5,7 @@ import { createPage } from "./create";
 import { createPageCollection } from "../collections/create";
 import { deletePage } from "./delete";
 import { listPageCollection } from "../collections/list";
-import { PageModel, PageCollectionModel } from "../../typings/models";
+import { PageModel, PageCollectionModel } from "../../typings/page";
 import iconClose from "../../svg/list-item-add.svg";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {

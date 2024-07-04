@@ -1,16 +1,17 @@
 import { Page, PageModel } from "brandup-ui-website";
 import { PageToolbar } from "./admin/page-toolbar";
-import { ContentEditor } from "./content/editor";
 import "./styles.less";
 
+let toolbar: PageToolbar = null;
+
 const showUI = (page: Page<PageModel>) => {
-    const editId = page.nav.query["editid"];
-    if (!editId) {
-        page.attachDestroyElement(new PageToolbar(page));
+    if (toolbar) {
+        toolbar.destroy();
+        toolbar = null;
     }
-    else {
-        page.attachDestroyElement(new ContentEditor(page.website, editId));
-    }
+
+    toolbar = new PageToolbar(page);
+    return toolbar.hasEditor;
 }
 
 export default showUI;

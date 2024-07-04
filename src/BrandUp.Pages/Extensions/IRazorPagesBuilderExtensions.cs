@@ -1,6 +1,7 @@
 ﻿using BrandUp.Pages.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Builder
@@ -25,6 +26,8 @@ namespace BrandUp.Pages.Builder
                 options.Filters.Add(new ContentPageFilter());
                 options.Filters.Add(new ContentEditFilter());
             });
+
+            services.AddTransient<ITagHelperComponent, TagHelpers.PagesTagHelperComponent>();
 
             services.AddTransient<Url.IPageLinkGenerator, Url.RazorPageLinkGenerator>();
             services.AddTransient<Files.IFileUrlGenerator, Url.FileUrlGenerator>();

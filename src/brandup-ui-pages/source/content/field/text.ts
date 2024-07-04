@@ -1,6 +1,6 @@
 ﻿import { TextFieldProvider } from "../../content/provider/text";
 import { Textbox, TextboxOptions } from "../../form/textbox";
-import { IContentField, IContentForm } from "../../typings/content";
+import { IContentField } from "../provider/base";
 
 export class TextContent extends Textbox implements IContentField {
     readonly provider: TextFieldProvider;

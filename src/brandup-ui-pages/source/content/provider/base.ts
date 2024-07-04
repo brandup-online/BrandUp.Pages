@@ -1,31 +1,29 @@
-import { IContentField, IFieldDesigner, IFieldProvider } from "../../typings/content";
 import { AjaxRequest } from "brandup-ui-ajax";
 import { Content } from "../../content/content";
-import { ContentFieldModel, FieldValueResult } from "../../typings/models";
+import { ContentFieldModel, FieldValueResult } from "../../typings/content";
 
-export abstract class FieldProvider<TValue, TOptions> implements IFieldProvider {
+export abstract class FieldProvider<TValue, TOptions> {
     readonly content: Content;
     readonly name: string;
     readonly title: string;
     readonly options: TOptions;
     readonly isRequired: boolean;
-    readonly valueElem: HTMLElement;
-    readonly designerType: string;
     
     private __value: TValue;
     private __errors: Array<string>;
+    private __valueElem?: HTMLElement = null;
 
     designer: IFieldDesigner;
     field: IContentField;
 
-    constructor(content: Content, model: ContentFieldModel, valueElem: HTMLElement) {
+    get valueElem(): HTMLElement { return this.__valueElem; }
+
+    constructor(content: Content, model: ContentFieldModel) {
         this.content = content;
         this.name = model.name;
         this.title = model.title;
         this.options = model.options;
         this.isRequired = model.isRequired;
-        this.valueElem = valueElem;
-        this.designerType = this.valueElem.getAttribute("data-content-designer");
 
         this.__value = model.value;
         this.__errors = model.errors;
@@ -43,7 +41,9 @@ export abstract class FieldProvider<TValue, TOptions> implements IFieldProvider 
 
     // other
 
-    renderDesigner() {
+    renderDesigner(valueElem: HTMLElement) {
+        this.__valueElem = valueElem;
+
         this.designer = this.createDesigner();
     }
 
@@ -54,7 +54,7 @@ export abstract class FieldProvider<TValue, TOptions> implements IFieldProvider 
             options.urlParams = {};
 
         options.urlParams["editId"] = this.content.host.editor.editId;
-        options.urlParams["path"] = this.valueElem.dataset.contentFieldPath;
+        options.urlParams["path"] = this.content.path;
         options.urlParams["field"] = this.name;
 
         this.content.host.editor.api(options);
@@ -72,4 +72,22 @@ export abstract class FieldProvider<TValue, TOptions> implements IFieldProvider 
     destroy() {
         this.designer?.destroy();
     }
+}
+
+export interface IFieldDesigner {
+    provider: FieldProvider<any, any>;
+    element: HTMLElement;
+
+    destroy();
+    setErrors(errors: string[]);
+}
+
+export interface IContentField {
+    readonly name: string;
+
+    setValue(value: any);
+    hasValue(): boolean;
+    setErrors(errors: Array<string>);
+    render(containr: HTMLElement);
+    destroy();
 }

@@ -6,12 +6,11 @@
     bottom: 77px;
     background: @Accent-Darkest;
     border-radius: @Border-Radius;
-    height: 50px;
     display: flex;
     flex-flow: row nowrap;
     z-index: 500;
     align-items: center;
-    padding: 2px 6px;
+    padding: 6px;
     gap: 5px;
 
     & .first-button {
@@ -37,6 +36,8 @@
         display: flex;
         align-items: center;
         border-radius: 3px;
+        min-width: 42px;
+        height: 42px;
 
         & svg {
             display: block;
@@ -45,11 +46,11 @@
             fill: #fff;
         }
 
-        &.active ~ menu {
+        &.expanded ~ menu {
             display: block;
         }
 
-        &:hover, &:focus {
+        &:hover, &:focus, &.expanded {
             background: @Accent-Dark;
         }
 
@@ -95,6 +96,7 @@
         margin: 0;
         overflow: hidden;
         scrollbar-width: 6px;
+        width: 270px;
 
         &::-webkit-scrollbar {
             width: 6px;
@@ -114,17 +116,21 @@
             cursor: default;
         }
 
-        & a {
-            align-items: center;
+        & button {
             display: flex;
-            flex-wrap: nowrap;
-            gap: 12px;
+            flex-flow: row nowrap;
+            align-items: flex-start;
+            justify-content: flex-start;
+            column-gap: 12px;
             padding: 14px 16px;
             color: @Text-Color;
             text-decoration: none;
             white-space: nowrap;
-            font-weight: 600;
-            min-width: 270px;
+            font-weight: 500;
+            border: 0;
+            background: none;
+            width: 100%;
+            text-align: left;
 
             &:first-child {
                 padding-top: 18px;
@@ -135,8 +141,32 @@
             }
 
             & svg {
+                flex: 0 0 auto;
                 width: 18px;
                 fill: @Text-Color;
+            }
+
+            & span {
+                flex: 1 1 auto;
+                display: flex;
+                flex-flow: column nowrap;
+                align-items: flex-start;
+                justify-content: flex-start;
+                row-gap: 4px;
+                width: 100%;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+
+                & i {
+                    display: block;
+                    width: 100%;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    font-size: 10px;
+                    color: @Neutral-Dark;
+                }
             }
 
             &:hover {
@@ -150,57 +180,6 @@
                 & svg {
                     fill: #6E7072;
                 }
-            }
-        }
-
-        &.edit-menu {
-            max-height: 400px;
-            overflow: auto;
-
-            & a {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 3px;
-
-                & span {
-                    font-size: 10px;
-                    color: @Neutral-Dark;
-                }
-            }
-        }
-    }
-
-    &-popup {
-        position: absolute;
-        left: 0;
-        bottom: 60px;
-        min-width: 250px;
-        padding: 30px 0;
-        background: #FFFFFF;
-        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-
-        & .text {
-            padding: 0 30px 20px;
-        }
-
-        & .buttons {
-            display: flex;
-            flex-flow: row nowrap;
-            margin: 0 25px;
-
-            & button {
-                background: @Accent-Color;
-                color: @Main-Color;
-                border: 0;
-                border-radius: @Border-Radius;
-                outline: none;
-                height: 42px;
-                box-sizing: border-box;
-                padding: 0 20px;
-                white-space: nowrap;
-                margin: 0 5px;
-                cursor: pointer;
             }
         }
     }

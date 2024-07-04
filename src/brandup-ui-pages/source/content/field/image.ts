@@ -1,8 +1,8 @@
-﻿import { IContentField } from "../../typings/content";
-import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "brandup-ui-dom";
 import "./image.less";
 import { FormField } from "./base";
 import { ImageFieldProvider } from "../../content/provider/image";
+import { IContentField } from "../provider/base";
 
 export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, ImageFieldProvider> implements IContentField {
     private valueElem: HTMLElement;

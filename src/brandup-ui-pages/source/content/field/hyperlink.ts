@@ -1,15 +1,13 @@
-﻿import { IContentField, IContentForm } from "../../typings/content";
-import { Field } from "../../form/field";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+﻿import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import iconArrow from "../../svg/combobox-arrow.svg";
-import { PageModel } from "../../typings/models";
+import { PageModel } from "../../typings/page";
 import "./hyperlink.less";
 import { DOM } from "brandup-ui-dom";
 import { FormField } from "./base";
 import { HyperlinkFieldProvider } from "../../content/provider/hyperlink";
+import { IContentField } from "../provider/base";
 
 export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLinkFieldFormOptions, HyperlinkFieldProvider> implements IContentField {
-    readonly form: IContentForm;
     private __typeElem: HTMLElement;
     private __valueElem: HTMLElement;
     private __urlValueInput: HTMLInputElement;

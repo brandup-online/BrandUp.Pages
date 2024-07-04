@@ -4,7 +4,7 @@ import { deletePageCollection } from "./delete";
 import { updatePageCollection } from "./update";
 import { ListDialog } from "../dialog-list";
 import { DOM } from "brandup-ui-dom";
-import { PageCollectionModel } from "../../typings/models";
+import { PageCollectionModel } from "../../typings/page";
 import { PagePathModel } from "../pages/browser";
 
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {

@@ -1,15 +1,14 @@
-﻿import { IContentField, IContentForm } from "../../typings/content";
-import { DOM } from "brandup-ui-dom";
-import { ContentModel, ContentTypeModel } from "../../typings/models";
+﻿import { DOM } from "brandup-ui-dom";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { FormField } from "./base";
-import { ModelFieldProvider } from "../../content/provider/model";
+import { ContentModel, ModelFieldOptions, ModelFieldProvider, ModelFieldValue } from "../../content/provider/model";
+import { IContentField } from "../provider/base";
 import "./model.less";
 
-export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOptions, ModelFieldProvider> implements IContentField {
-    private __value: ModelFieldFormValue;
+export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, ModelFieldProvider> implements IContentField {
+    private __value: ModelFieldValue;
     private __itemsElem: HTMLElement;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Content"; }
@@ -101,10 +100,10 @@ export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOpti
         this._refreshBlockIndexes();
     }
 
-    getValue(): ModelFieldFormValue {
+    getValue(): ModelFieldValue {
         return this.__value;
     }
-    setValue(value: ModelFieldFormValue) {
+    setValue(value: ModelFieldValue) {
         this.__value = value;
 
         this.__renderItems();
@@ -157,15 +156,4 @@ export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOpti
     private __addItem(itemType: string) {
         this.provider.addItem( 0);
     }
-}
-
-export interface ModelDesignerOptions {
-    addText: string;
-    isListValue: boolean;
-    itemType: ContentTypeModel;
-    itemTypes: Array<ContentTypeModel>;
-}
-
-export interface ModelFieldFormValue {
-    items: Array<ContentModel>;
 }

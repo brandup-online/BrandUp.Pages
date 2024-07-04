@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { DeleteDialog } from "../dialog-delete";
-import { PageCollectionModel } from "../../typings/models";
+import { PageCollectionModel } from "../../typings/page";
 
 class PageCollectionDeleteDialog extends DeleteDialog<PageCollectionModel> {
     readonly collectionId: string;

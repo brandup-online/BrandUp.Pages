@@ -1,7 +1,7 @@
 ﻿import { FormDialog } from "../dialog-form";
 import { DialogOptions } from "../dialog";
 import { FormModel } from "../dialog-form";
-import { PageModel } from "../../typings/models";
+import { PageModel } from "../../typings/page";
 
 export class PagePublishDialog extends FormDialog<PagePublishForm, PagePublishValues, PagePublishResult> {
     readonly pageId: string;

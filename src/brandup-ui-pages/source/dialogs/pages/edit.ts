@@ -1,19 +1,21 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
 import { AjaxQueue } from "brandup-ui-ajax";
-import { IContentForm, IContentField, IContentEditor, IContent } from "../../typings/content";
-import "../dialog-form.less";
 import { DOM } from "brandup-ui-dom";
+import { ContentEditor } from "../../content/editor";
+import { Content } from "../../content/content";
+import "../dialog-form.less";
+import { IContentField } from "../../content/provider/base";
 
-export class PageEditDialog extends Dialog<any> implements IContentForm {
+export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
     private navElem: HTMLElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IContentField } = {};
     private __modelPath: string;
     private __queue: AjaxQueue;
-    private __content: IContent;
+    private __content: Content;
 
-    constructor(editor: IContentEditor, modelPath?: string, options?: DialogOptions) {
+    constructor(editor: ContentEditor, modelPath?: string, options?: DialogOptions) {
         super(options);
 
         this.__content = editor.navigate(modelPath);
@@ -123,7 +125,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 }
 
-export const editPage = (editor: IContentEditor, path?: string) => {
+export const editPage = (editor: ContentEditor, path?: string) => {
     const dialog = new PageEditDialog(editor, path);
     return dialog.open();
 };

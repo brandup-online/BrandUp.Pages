@@ -1,6 +1,6 @@
 import { AjaxResponse } from "brandup-ui-ajax";
 import { FieldProvider } from "./base";
-import { FieldValueResult } from "../../typings/models";
+import { FieldValueResult } from "../../typings/content";
 
 export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperLinkFieldOptions> {
     createDesigner() {

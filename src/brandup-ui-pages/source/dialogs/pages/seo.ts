@@ -1,7 +1,7 @@
 ﻿import { DialogOptions } from "../dialog";
 import { FormDialog, FormModel } from "../dialog-form";
 import { ComboBoxItem } from "../../form/combobox";
-import { PageModel } from "../../typings/models";
+import { PageModel } from "../../typings/page";
 
 export class PageSeoDialog extends FormDialog<PageSeoForm, PageSeoValues, PageModel> {
     readonly pageId: string;
