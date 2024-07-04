@@ -1,10 +1,8 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
 import { AjaxQueue } from "brandup-ui-ajax";
-import { IContentForm, IContentField } from "../../typings/content";
+import { IContentForm, IContentField, IContentEditor, IContent } from "../../typings/content";
 import "../dialog-form.less";
 import { DOM } from "brandup-ui-dom";
-import { Editor } from "../../content/editor";
-import { Content } from "../../content/content";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem: HTMLFormElement;
@@ -13,12 +11,12 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __fields: { [key: string]: IContentField } = {};
     private __modelPath: string;
     private __queue: AjaxQueue;
-    private __content: Content;
+    private __content: IContent;
 
-    constructor(editor: Editor, modelPath?: string, options?: DialogOptions) {
+    constructor(editor: IContentEditor, modelPath?: string, options?: DialogOptions) {
         super(options);
 
-        this.__content = editor.getContentItem(modelPath);
+        this.__content = editor.navigate(modelPath);
         this.__modelPath = modelPath ? modelPath : "";
     }
 
@@ -48,7 +46,6 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 
     private __renderForm() {
-        const model = this.__content.model;
         if (!this.navElem) {
             this.navElem = DOM.tag("ol", { class: "nav" });
             this.content.insertAdjacentElement("afterbegin", this.navElem);
@@ -57,37 +54,32 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             DOM.empty(this.navElem);
         }
 
-        let path = model.path;
-        while (path || path === "") {
-            const model = this.__content.editor.getContentItem(path).model;
-            let title = model.typeTitle;
-            this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
-                DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
-                    DOM.tag("bolt", null, path || "root"),
-                    DOM.tag("div", null, [
-                        DOM.tag("span", null, title),
-                        DOM.tag("span", null, model.typeName),
-                    ]),
-                ]),
-            ]));
+        let path = this.__content.path;
+        //while (path || path === "") {
+        //    const content = this.__content.host.editor.navigate(path);
+        //    let title = content.typeTitle;
+        //    this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
+        //        DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
+        //            DOM.tag("bolt", null, path || "root"),
+        //            DOM.tag("div", null, [
+        //                DOM.tag("span", null, title),
+        //                DOM.tag("span", null, model.typeName),
+        //            ]),
+        //        ]),
+        //    ]));
 
-            path = model.parentPath;
-        }
-
-        const providers = this.__content.getFields();
-
-        for (let i = 0; i < model.fields.length; i++) {
-            const fieldModel = model.fields[i];
-            const provider = providers.get(fieldModel.name);
-            this.addField(fieldModel.title, provider.createField());
-            //provider.setValue(fieldModel.value)
-        }
+        //    path = content.parentPath;
+        //}
+        
+        this.__content.fields.forEach(field => {
+            //this.addField(field.title, field.createField());
+        });
     }
 
     navigate(modelPath: string) {
         this.__modelPath = modelPath ? modelPath : "";
-        this.__content.getFields().forEach(provider => provider.destroyField());
-        this.__content = this.__content.editor.getContentItem(modelPath);
+        //this.__content.getFields().forEach(provider => provider.destroyField());
+        this.__content = this.__content.host.editor.navigate(modelPath);
         this.__renderForm();
     }
 
@@ -131,7 +123,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
     }
 }
 
-export const editPage = (editor: Editor, modelPath?: string) => {
-    const dialog = new PageEditDialog(editor, modelPath);
+export const editPage = (editor: IContentEditor, path?: string) => {
+    const dialog = new PageEditDialog(editor, path);
     return dialog.open();
 };

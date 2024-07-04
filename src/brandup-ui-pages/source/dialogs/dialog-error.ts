@@ -1,5 +1,5 @@
 import { ValidationContentModel } from "../typings/models";
-import { Editor } from "../content/editor";
+import { ContentEditor } from "../content/editor";
 import { Dialog, DialogOptions } from "./dialog";
 import { DOM } from "brandup-ui-dom";
 import infoIcon from "../svg/new/info.svg";
@@ -11,7 +11,7 @@ export class ErrorDialog extends Dialog {
 
     get typeName(): string { return "BrandUpPages.ErrorDialog"; }
 
-    constructor(editor: Editor, errors: ValidationContentModel[], options?: DialogOptions) {
+    constructor(editor: ContentEditor, errors: ValidationContentModel[], options?: DialogOptions) {
         super(options);
 
         this.__errors = errors;
@@ -44,7 +44,7 @@ export class ErrorDialog extends Dialog {
     }
 }
 
-export const errorPage = (editor: Editor, errors: ValidationContentModel[]) => {
+export const errorPage = (editor: ContentEditor, errors: ValidationContentModel[]) => {
     const dialog = new ErrorDialog(editor, errors);
     return dialog.open();
 };

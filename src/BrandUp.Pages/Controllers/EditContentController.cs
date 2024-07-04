@@ -13,7 +13,7 @@ namespace BrandUp.Pages.Controllers
         #region Actions
 
         [HttpGet]
-        public async Task<IActionResult> BeginAsync([FromQuery] Guid editId, [FromQuery] string path, [FromServices] ContentMetadataManager contentMetadataManager)
+        public async Task<IActionResult> GetAsync([FromQuery] Guid editId, [FromQuery] string path, [FromServices] ContentMetadataManager contentMetadataManager)
         {
             var cancellationToken = HttpContext.RequestAborted;
             IContentEdit currentEdit = await contentService.FindEditByIdAsync(editId, cancellationToken);
@@ -27,10 +27,15 @@ namespace BrandUp.Pages.Controllers
                     return Problem($"Path \"{path}\" is not exist.");
             }
 
-            List<Models.Contents.ContentModel> result = [];
-            await EnsureContentsAsync(contentExplorer, result);
+            List<Models.Contents.ContentModel> contents = [];
+            await EnsureContentsAsync(contentExplorer, contents);
 
-            return Ok(result);
+            return Ok(new Models.Contents.GetContentEditResult
+            {
+                ContentKey = currentEdit.ContentKey,
+                Path = contentExplorer.ModelPath,
+                Contents = contents
+            });
         }
 
         [HttpPost("begin")]
@@ -44,7 +49,7 @@ namespace BrandUp.Pages.Controllers
 
             var cancellationToken = HttpContext.RequestAborted;
 
-            var result = new Models.Contents.BeginPageEditResult();
+            var result = new Models.Contents.BeginContentEditResult();
 
             var userId = await accessProvider.GetUserIdAsync(cancellationToken);
             var content = await contentService.FindContentAsync(key, cancellationToken);

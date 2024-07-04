@@ -25,7 +25,7 @@ export class ModelField extends FormField<ModelFieldFormValue, ModelDesignerOpti
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = itemElem.getAttribute("data-content-path-index");
-            let contentPath = this.provider.content.model.path;
+            let contentPath = this.provider.content.path;
             let modelPath = (contentPath ? contentPath + "." : "") + `${this.name}[${itemIndex}]`;
 
             this.provider.settingItem(modelPath);

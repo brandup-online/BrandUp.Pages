@@ -5,18 +5,28 @@ import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/pages/edit";
 import { FieldValueResult } from "../../typings/models";
-import { IModelFieldProvider, IParentContent } from "../../typings/content";
+import { IContentEditor, IContentHost } from "../../typings/content";
 import { DOM } from "brandup-ui-dom";
 import { Content } from "../content";
 
-export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IParentContent, IModelFieldProvider {
+export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IContentHost {
+
     private __contents: Content[] = [];
 
-    map(content: Content) {
+    // IContentHost members
+
+    get editor(): IContentEditor { return this.content.host.editor; }
+
+    get isList(): boolean { return this.options.isListValue; }
+
+    attach(content: Content) {
         if (this.options.isListValue)
             this.__contents.splice(content.index, 0, content);
-        else
+        else {
+            if (this.__contents.length !== 0)
+                throw "Model field already exist content.";
             this.__contents[0] = content;
+        }
     }
 
     createDesigner() {
@@ -59,10 +69,10 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             urlParams: { itemIndex: index.toString() },
             method: "DELETE",
             success: (() => {
-                this.__contents[index].container?.remove();
-                this.__contents = this.__contents.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
-                this.content.editor.removeContentItem(path);
-                this._refreshIndexses();
+                //this.__contents[index].container?.remove();
+                //this.__contents = this.__contents.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
+                //this.content.host.editor.removeContentItem(path);
+                //this._refreshIndexses();
             })
         });
     }
@@ -81,7 +91,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     settingItem(contentPath: string) {
-        editPage(this.content.editor, contentPath).then(() => {
+        editPage(this.content.host.editor, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {
             // this.__refreshItem(e.target, e.value.index);
@@ -143,24 +153,25 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                 });
             }))
             .then(value => new Promise<Content>(resolve => {
-                this.request({
-                    url: '/brandup.pages/content/model/view',
-                    urlParams: { itemIndex: index.toString() },
-                    method: "GET",
-                    success: (response: AjaxResponse<string>) => {
-                        if (response.status === 200) {
-                            const newElem = this.__addItemDOM(response.data, index);
+                if (this.valueElem) {
+                    this.request({
+                        url: '/brandup.pages/content/model/view',
+                        urlParams: { itemIndex: index.toString() },
+                        method: "GET",
+                        success: (response: AjaxResponse<string>) => {
+                            if (response.status === 200) {
+                                const newElem = this.__addItemDOM(response.data, index);
 
-                            resolve(this.content.editor.buildContent(newElem));
+                                //resolve(this.content.editor.buildContent(newElem));
+                            }
+                            else
+                                throw "Error load content view.";
                         }
-                        else
-                            throw "Error load content view.";
-                    }
-                });
+                    });
+                }
             }));
     }
-
-
+    
     private __addItemDOM(html: string, index: number) {
         const fragment = document.createDocumentFragment();
         const container = DOM.tag("div", null, html);

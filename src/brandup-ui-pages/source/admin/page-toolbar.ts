@@ -16,7 +16,7 @@ import iconPlus from "../svg/new/plus.svg";
 import iconStructure from "../svg/new/structure.svg";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
-import { BeginPageEditResult } from "../typings/models";
+import { BeginContentEditResult } from "../typings/models";
 
 export class PageToolbar extends UIElement {
     private __closeMenuFunc: (e: MouseEvent) => void;
@@ -185,7 +185,7 @@ export class PageToolbar extends UIElement {
                 url: "/brandup.pages/page/content/begin",
                 urlParams: { key: contentKey, type: contentType },
                 method: "POST",
-                success: (response: AjaxResponse<BeginPageEditResult>) => {
+                success: (response: AjaxResponse<BeginContentEditResult>) => {
                     this.__isLoading = false;
 
                     if (response.status !== 200) {
@@ -233,7 +233,7 @@ export class PageToolbar extends UIElement {
                 url: "/brandup.pages/page/content/begin",
                 urlParams: { key: contentKey, type: contentType, force: "true" },
                 method: "POST",
-                success: (response: AjaxResponse<BeginPageEditResult>) => {
+                success: (response: AjaxResponse<BeginContentEditResult>) => {
                     this.__isLoading = false;
 
                     if (response.status !== 200)

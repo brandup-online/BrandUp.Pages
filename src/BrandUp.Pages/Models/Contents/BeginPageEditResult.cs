@@ -1,10 +1,17 @@
 ﻿namespace BrandUp.Pages.Models.Contents
 {
-    public class BeginPageEditResult
+    public class BeginContentEditResult
     {
         public Guid EditId { get; set; }
         public DateTime? CurrentDate { get; set; }
         public List<ContentModel> Content { get; set; }
+    }
+
+    public class GetContentEditResult
+    {
+        public string ContentKey { get; set; }
+        public string Path { get; set; }
+        public List<ContentModel> Contents { get; set; }
     }
 
     public class ContentModel

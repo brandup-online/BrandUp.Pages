@@ -1,7 +1,7 @@
 import { Field } from "../../form/field";
-import { IContentFieldProvider } from "../../typings/content";
+import { IFieldProvider } from "../../typings/content";
 
-export abstract class FormField <TValue, TOptions, TProvider extends IContentFieldProvider> extends Field<TValue, TOptions>  {
+export abstract class FormField <TValue, TOptions, TProvider extends IFieldProvider> extends Field<TValue, TOptions>  {
     readonly provider: TProvider;
 
     constructor(name: string, errors: string[], options: TOptions, provider: TProvider) {

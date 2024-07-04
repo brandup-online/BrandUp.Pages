@@ -52,10 +52,16 @@ export interface ValidationProblemDetails {
     errors: { [key: string]: Array<string> };
 }
 
-export interface BeginPageEditResult {
+export interface BeginContentEditResult {
     editId: string;
     currentDate: string;
     content: ContentModel[];
+}
+
+export interface GetContentEditResult {
+    contentKey: string;
+    path: string;
+    contents: Array<ContentModel>;
 }
 
 export interface ContentModel {

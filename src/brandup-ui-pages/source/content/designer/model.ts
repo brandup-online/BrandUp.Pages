@@ -17,7 +17,9 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             if (this.provider.options.isListValue) {
                 if (position == "after") {
                     const contentElem = <HTMLElement>elem.closest("[data-content-path]");
-                    const content = this.provider.editor.getContentItem(contentElem.dataset.contentPath);
+                    const content = this.provider.content.host.editor.navigate(contentElem.dataset.contentPath);
+                    if (!content)
+                        throw "";
                     itemIndex = content.index + 1;
                 }
             }

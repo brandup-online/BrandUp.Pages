@@ -1,4 +1,3 @@
-import { Editor } from "./editor";
 import { FieldProvider } from "./provider/base";
 import { ModelFieldProvider } from "./provider/model";
 import { HtmlFieldProvider } from "./provider/html";
@@ -6,26 +5,22 @@ import { HyperlinkFieldProvider } from "./provider/hyperlink";
 import { ImageFieldProvider } from "./provider/image";
 import { TextFieldProvider } from "./provider/text";
 import { ContentModel } from "../typings/models";
-import { IContent, IParentContent } from "../typings/content";
+import { IContent, IContentHost, IFieldProvider } from "../typings/content";
 
 export class Content implements IContent {
-    readonly editor: Editor;
+    readonly host: IContentHost;
     readonly path: string;
     readonly index: number;
-    readonly parent: IParentContent;
-    readonly model: ContentModel;
     readonly container: HTMLElement;
     private __fields: Map<string, FieldProvider<any, any>>;
     
-    constructor(editor: Editor, parent: IParentContent, model: ContentModel, container?: HTMLElement, fieldsElements?: Map<string, HTMLElement>) {
-        this.editor = editor;
+    constructor(host: IContentHost, model: ContentModel, container?: HTMLElement, fieldsElements?: Map<string, HTMLElement>) {
+        this.host = host;
         this.path = model.path;
         this.index = model.index;
-        this.parent = parent;
-        this.model = model;
         this.container = container;
 
-        this.parent?.map(this);
+        this.host.attach(this);
 
         if (this.index >= 0 && this.container)
             this.container.dataset.contentPathIndex = this.index.toString();
@@ -41,6 +36,12 @@ export class Content implements IContent {
 
         this.renderDesigner();
     }
+
+    // IContent members
+    
+    get fields(): ReadonlyMap<string, IFieldProvider> { return this.__fields; }
+
+    // Content members
 
     private __getFieldType(type: string): any {
         switch (type) {
@@ -65,11 +66,7 @@ export class Content implements IContent {
 
         return this.__fields.get(name);
     }
-
-    getFields() {
-        return this.__fields;
-    }
-
+    
     renderDesigner() {
         if (!this.container)
             return;
