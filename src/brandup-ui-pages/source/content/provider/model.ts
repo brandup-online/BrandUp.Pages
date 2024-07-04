@@ -57,6 +57,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                 this.__contentItems[index].container?.remove();
                 this.__contentItems = this.__contentItems.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
                 this.content.editor.removeContentItem(path);
+                this._refreshIndexses();
             })
         });
     }
@@ -96,6 +97,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     insertContent(item: Content) {
+        console.log("🚀 ~ ModelFieldProvider ~ insertContent ~ this.__insertIndex:", this.__insertIndex)
         this.__contentItems.splice(this.__insertIndex, 0, item);
         this.__insertIndex = this.__contentItems.length;
         this._refreshIndexses();
@@ -104,6 +106,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     protected _refreshIndexses(start: number = 0) {
         for (let i = start; i < this.__contentItems.length; i++) {
             this.__contentItems[i].container?.setAttribute("data-content-path-index", i.toString());
+            console.log("🚀 ~ ModelFieldProvider ~ _refreshIndexses ~ this.__contentItems[i].container:", this.__contentItems[i].container)
         }
     }
 
@@ -167,7 +170,6 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                                     const modelPath = newElem.dataset.contentPath;
                                     this.content.editor.createContent(modelPath, newElem, () => {
                                         (this.designer as ModelDesigner).renderBlock(newElem);
-                                        this._refreshIndexses();
                                     });
                                 }
                             }
@@ -177,7 +179,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             });
         }
 
-        this.__insertIndex = index;
+        this.__insertIndex = index + 1;
 
         if (!itemType) {
             selectContentType(this.options.itemTypes).then((type) => {
