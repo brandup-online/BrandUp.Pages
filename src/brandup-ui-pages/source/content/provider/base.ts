@@ -53,6 +53,8 @@ export abstract class FieldProvider<TValue, TOptions> {
         if (!options.urlParams)
             options.urlParams = {};
 
+        options.disableCache = true;
+
         options.urlParams["editId"] = this.content.host.editor.editId;
         options.urlParams["path"] = this.content.path;
         options.urlParams["field"] = this.name;

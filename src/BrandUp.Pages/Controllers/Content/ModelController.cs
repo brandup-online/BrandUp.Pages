@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.ComponentModel.DataAnnotations;
 using BrandUp.Pages.Content;
 using BrandUp.Pages.Content.Fields;
 using BrandUp.Pages.Views;
@@ -101,6 +102,7 @@ namespace BrandUp.Pages.Controllers
             var newItem = await contentService.CreateDefaultAsync(contentMetadataProvider, HttpContext.RequestAborted);
             newItem ??= contentMetadataProvider.CreateModelInstance();
 
+            ContentExplorer newItemExplorer;
             if (Field.IsListValue)
             {
                 if (Field.GetModelValue(ContentContext.Content) is not IList list)
@@ -112,6 +114,8 @@ namespace BrandUp.Pages.Controllers
                 list.Insert(itemIndex, newItem);
 
                 Field.SetModelValue(ContentContext.Content, list);
+
+                newItemExplorer = ContentContext.Explorer.Navigate($"{Field.Name}[{itemIndex}]");
             }
             else
             {
@@ -119,11 +123,21 @@ namespace BrandUp.Pages.Controllers
                     throw new InvalidOperationException();
 
                 Field.SetModelValue(ContentContext.Content, newItem);
+
+                newItemExplorer = ContentContext.Explorer.Navigate($"{Field.Name}");
             }
 
             await SaveChangesAsync();
 
-            return await FormValueResultAsync();
+            var result = new Models.Contents.AddContentResult
+            {
+                FieldValue = await CreateFormValueAsync(),
+                Content = []
+            };
+
+            await EnsureContentsAsync(newItemExplorer, result.Content);
+
+            return Ok(result);
         }
 
         [HttpPost("up")]
@@ -217,6 +231,63 @@ namespace BrandUp.Pages.Controllers
             }
 
             return await FormValueResultAsync();
+        }
+
+        async Task EnsureContentsAsync(ContentExplorer contentExplorer, ICollection<Models.Contents.ContentModel> output)
+        {
+            ArgumentNullException.ThrowIfNull(contentExplorer);
+            ArgumentNullException.ThrowIfNull(output);
+
+            var serviceProvider = HttpContext.RequestServices;
+
+            var content = new Models.Contents.ContentModel
+            {
+                ParentPath = contentExplorer.Parent?.ModelPath,
+                ParentField = contentExplorer.Field?.Name,
+                Path = contentExplorer.ModelPath,
+                Index = contentExplorer.Index,
+                TypeName = contentExplorer.Metadata.Name,
+                TypeTitle = contentExplorer.Metadata.Title,
+                Fields = []
+            };
+            output.Add(content);
+
+            var validationContext = new ValidationContext(contentExplorer.Model, HttpContext.RequestServices, null);
+
+            foreach (var field in contentExplorer.Metadata.Fields)
+            {
+                var modelValue = field.GetModelValue(contentExplorer.Model);
+                var fieldModel = new Models.Contents.ContentModel.Field
+                {
+                    Type = field.Type,
+                    Name = field.Name,
+                    Options = field.GetFormOptions(serviceProvider),
+                    Title = field.Title,
+                    IsRequired = field.IsRequired,
+                    Value = await field.GetFormValueAsync(modelValue, serviceProvider),
+                    Errors = field.GetErrors(contentExplorer.Model, validationContext)
+                };
+                content.Fields.Add(fieldModel);
+
+                if (field is IModelField modelField && modelField.HasValue(modelValue))
+                {
+                    if (modelField.IsListValue)
+                    {
+                        var i = 0;
+                        foreach (var item in (IList)modelValue)
+                        {
+                            var childContentExplorer = contentExplorer.Navigate($"{modelField.Name}[{i}]");
+                            await EnsureContentsAsync(childContentExplorer, output);
+                            i++;
+                        }
+                    }
+                    else
+                    {
+                        var childContentExplorer = contentExplorer.Navigate(modelField.Name);
+                        await EnsureContentsAsync(childContentExplorer, output);
+                    }
+                }
+            }
         }
     }
 }

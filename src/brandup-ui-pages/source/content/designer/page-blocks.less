@@ -134,6 +134,25 @@
             visibility: visible;
         }
     }
+
+    &:after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        right: 0;
+        height: 2px;
+        overflow: hidden;
+        background: @Neutral-Dark;
+        opacity: 0;
+        transition: opacity ease 120ms;
+    }
+
+    &:has(> a.page-blocks-designer-item-add:hover) {
+        &:after {
+            opacity: 1;
+        }
+    }
 }
 
 .page-blocks-designer-item-tools {
@@ -250,11 +269,13 @@ a.page-blocks-designer-item-add {
     position: absolute;
     left: 50%;
     bottom: -19px;
+    transform: translateX(-50%);
     border-radius: 50%;
     padding: 10px;
     background-color: @Neutral-Darkest;
     display: none;
     z-index: 10;
+    transition: background-color ease 120ms;
 
     & svg {
         display: block;
@@ -263,7 +284,12 @@ a.page-blocks-designer-item-add {
         fill: #fff;
     }
 
-    &:hover, &:active {
+    &:hover,
+    &:focus {
         background-color: @Neutral-Dark;
+    }
+
+    &:active {
+        background-color: @Neutral-Darkest;
     }
 }

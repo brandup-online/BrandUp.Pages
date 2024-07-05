@@ -3,7 +3,7 @@ import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { FormField } from "./base";
-import { ContentModel, ModelFieldOptions, ModelFieldProvider, ModelFieldValue } from "../../content/provider/model";
+import { ContentInfoModel, ModelFieldOptions, ModelFieldProvider, ModelFieldValue } from "../../content/provider/model";
 import { IContentField } from "../provider/base";
 import "./model.less";
 
@@ -126,7 +126,7 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
             DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, this.options.addText ? this.options.addText : "Добавить")
         ]));
     }
-    private __createItemElem(item: ContentModel, index: number) {
+    private __createItemElem(item: ContentInfoModel, index: number) {
         const itemElem = DOM.tag("div", { class: "item", "data-content-path-index": index.toString() }, [
             DOM.tag("div", { class: "index", draggable: "true", title: "Нажмите, чтобы перетащить" }, `#${index + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-settings" }, item.title),

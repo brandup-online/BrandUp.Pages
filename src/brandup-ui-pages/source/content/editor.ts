@@ -99,7 +99,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     loadContent(path: string): Promise<Content> {
         return new Promise<Content>((resolve) => {
-            this.queue.push({
+            this.api({
                 url: "/brandup.pages/page/content",
                 urlParams: { editId: this.editId, path },
                 method: "GET",
@@ -107,40 +107,49 @@ export class ContentEditor extends UIElement implements IContentHost {
                     if (response.status !== 200)
                         throw `Error load editor contents by path "${path}".`;
 
-                    let rootContent: Content = null;
-
-                    response.data.contents.forEach((contentModel, index) => {
-                        if (this.__contents.has(contentModel.path))
-                            return;
-
-                        let host: IContentHost;
-                        if (contentModel.parentPath !== null) {
-                            const parentContent = this.navigate(contentModel.parentPath);
-                            if (!parentContent)
-                                throw `Not found content by path "${contentModel.parentPath}".`;
-                            host = <ModelFieldProvider>parentContent.getField(contentModel.parentField);
-                        }
-                        else
-                            host = this;
-
-                        const content = new Content(host, contentModel);
-                        this.__contents.set(content.path, content);
-
-                        if (index === 0)
-                            rootContent = content;
-                    });
-
+                    let rootContent: Content = this.initContent(response.data.contents);
                     resolve(rootContent);
                 },
             });
         });
     }
+
+    initContent(contents: Array<ContentModel>) {
+        let rootContent: Content = null;
+
+        contents.forEach((contentModel, index) => {
+            if (this.__contents.has(contentModel.path))
+                throw `Content "${contentModel.path}" already initialized.`;
+
+            let host: IContentHost;
+            if (contentModel.parentPath !== null) {
+                const parentContent = this.navigate(contentModel.parentPath);
+                if (!parentContent)
+                    throw `Not found content by path "${contentModel.parentPath}".`;
+                host = <ModelFieldProvider>parentContent.getField(contentModel.parentField);
+            }
+            else
+                host = this;
+
+            const content = new Content(host, contentModel);
+            this.__contents.set(content.path, content);
+
+            if (index === 0)
+                rootContent = content;
+        });
+
+        return rootContent;
+    }
     
     private __renderToolbar() {
         const toolbarElem = DOM.tag("div", { class: "bp-elem editor-toolbar" }, [
-            DOM.tag("button", { class: "bp-button", command: "bp-commit", title: "Применить изменения" }, [saveIcon, "Сохранить"]),
-            DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title: "Отменить изменения" }, [cancelIcon, "Отмена"]),
-            DOM.tag("button", { class: "bp-button neutral right", command: "bp-content", title: "Показать контент" }, [editBlockIcon, "Контент"]),
+            DOM.tag("menu", "primary", [
+                DOM.tag("button", { class: "bp-button", command: "bp-commit", title: "Применить изменения" }, [saveIcon, DOM.tag("span", null, "Сохранить")]),
+                DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title: "Отменить изменения" }, [cancelIcon, DOM.tag("span", null, "Отмена")])
+            ]),
+            DOM.tag("menu", null, [
+                DOM.tag("button", { class: "bp-button neutral", command: "bp-content", title: "Показать контент" }, [editBlockIcon, DOM.tag("span", null, "Контент")])
+            ])
         ]);
 
         document.body.appendChild(toolbarElem);
@@ -219,7 +228,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
         Array.from(contentElements.values()).forEach(contentStructure => {
             if (!this.__contents.has(contentStructure.path))
-                throw "";
+                throw `Content is not exist by path "${contentStructure.path}".`;
 
             const content = this.__contents.get(contentStructure.path);
             content.renderDesigner(contentStructure);

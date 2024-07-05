@@ -11,7 +11,7 @@ export class Content {
     readonly host: IContentHost;
     readonly path: string;
     readonly index: number;
-    private __fields: Map<string, FieldProvider<any, any>>;
+    private __fields = new Map<string, FieldProvider<any, any>>();
 
     private __container: HTMLElement = null;
     
@@ -24,11 +24,8 @@ export class Content {
 
         this.host.attach(this);
 
-        if (this.index >= 0 && this.container)
-            this.container.dataset.contentPathIndex = this.index.toString();
+        console.log(`init content "${this.path}" ${model.typeName}`);
         
-        this.__fields = new Map<string, FieldProvider<any, any>>();
-
         model.fields.forEach(field => {
             const provider = this.__getFieldType(field.type.toLowerCase());
             this.__fields.set(field.name, new provider(this, field));

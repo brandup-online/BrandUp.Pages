@@ -8,7 +8,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("content-designer");
-        // this._refreshBlockIndexes();
 
         this.registerCommand("item-add", (elem: HTMLElement) => {
             const position = elem.dataset.position ?? "last";

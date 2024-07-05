@@ -205,7 +205,7 @@ main.app-content {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 600;
+	z-index: 400;
 	visibility: hidden;
 	touch-action: pan-y;
 	overflow: hidden;
@@ -225,7 +225,7 @@ main.app-content {
 		position: absolute;
 		top: 0;
 		left: 100%;
-		height: 100%;
+		bottom: 0;
 		width: 256px;
 		transform: translate3d(0px, 0px, 0px);
 		transition: transform ease 250ms;
@@ -267,6 +267,22 @@ main.app-content {
 					font-weight: 500;
 				}
 			}
+		}
+	}
+
+	&.root-designer {
+		visibility: visible;
+		transition: none;
+		background: rgba(255,255,255,0.8);
+
+		& .close {
+			display: none;
+		}
+
+		& .content {
+			left: auto;
+			right: 0;
+			bottom: 76px;
 		}
 	}
 }

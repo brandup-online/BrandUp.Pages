@@ -19,8 +19,8 @@ namespace BrandUp.Pages.Controllers
         ContentContext rootContentContext;
 
         public IContentEdit ContentEdit => editSession;
-        public TField Field => field;
         public ContentContext ContentContext => contentContext;
+        public TField Field => field;
 
         #region IAsyncActionFilter members
 
@@ -87,17 +87,22 @@ namespace BrandUp.Pages.Controllers
 
         protected async Task<IActionResult> FormValueResultAsync()
         {
+            return new JsonResult(await CreateFormValueAsync());
+        }
+
+        protected async Task<FieldValueResult> CreateFormValueAsync()
+        {
             var modelValue = Field.GetModelValue(contentContext.Content);
             var formValue = await Field.GetFormValueAsync(modelValue, HttpContext.RequestServices);
 
             var validationContext = new ValidationContext(contentContext.Content, HttpContext.RequestServices, null);
             var errors = Field.GetErrors(contentContext.Content, validationContext);
 
-            return new JsonResult(new FieldValueResult
+            return new FieldValueResult
             {
                 Value = formValue,
                 Errors = errors
-            });
+            };
         }
     }
 }

@@ -7,10 +7,9 @@ import { editPage } from "../../dialogs/pages/edit";
 import { DOM } from "brandup-ui-dom";
 import { Content, IContentHost } from "../content";
 import { ContentEditor } from "../editor";
-import { FieldValueResult } from "../../typings/content";
+import { ContentModel, FieldValueResult } from "../../typings/content";
 
 export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFieldOptions> implements IContentHost {
-
     private __contents: Content[] = [];
 
     // IContentHost members
@@ -27,6 +26,70 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                 throw "Model field already exist content.";
             this.__contents[0] = content;
         }
+    }
+
+    // ModelFieldProvider members
+    
+    addItem(index: number) {
+        if (!this.options.isListValue && this.hasValue())
+            throw "Content already exists.";
+
+        return selectContentType(this.options.itemTypes)
+            .then(type => new Promise<Content>((resolve) => {
+                this.request({
+                    url: '/brandup.pages/content/model',
+                    urlParams: { itemType: type.name, itemIndex: index.toString() },
+                    method: "PUT",
+                    success: (response: AjaxResponse<AddContentResult>) => {
+                        if (response.status === 200) {
+                            this.onSavedValue(response.data.fieldValue);
+
+                            const newContent = this.editor.initContent(response.data.content);
+                            resolve(newContent);
+                        }
+                        else
+                            throw "Error add content.";
+                    }
+                });
+            }));
+
+            //.then(value => new Promise<Content>(resolve => {
+            //    if (this.valueElem) {
+            //        this.request({
+            //            url: '/brandup.pages/content/model/view',
+            //            urlParams: { itemIndex: index.toString() },
+            //            method: "GET",
+            //            success: (response: AjaxResponse<string>) => {
+            //                if (response.status === 200) {
+            //                    const newElem = this.__addItemDOM(response.data, index);
+            //                }
+            //                else
+            //                    throw "Error load content view.";
+            //            }
+            //        });
+            //    }
+            //}));
+    }
+
+    private __addItemDOM(html: string, index: number) {
+        const fragment = document.createDocumentFragment();
+        const container = DOM.tag("div", null, html);
+        fragment.appendChild(container);
+        const newElem = DOM.queryElement(container, "[data-content-path]");
+
+        let elem;
+
+        while (index >= 0 && !elem) {
+            elem = this.__contents[index].container;
+            index -= 1;
+        }
+        if (index < 0 && !elem) {
+            this.designer.element.insertAdjacentElement("afterbegin", newElem);
+        } else {
+            elem.insertAdjacentElement("beforebegin", newElem);
+        }
+
+        return newElem;
     }
 
     createDesigner() {
@@ -127,78 +190,13 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         }
         return index;
     }
-
-    addItem(index: number) {
-        if (!this.options.isListValue && this.hasValue())
-            throw "Content already exists.";
-
-        selectContentType(this.options.itemTypes)
-            .then(type => new Promise<FieldValueResult>((resolve) => {
-                this.request({
-                    url: '/brandup.pages/content/model',
-                    urlParams: {
-                        itemType: type.name,
-                        itemIndex: index.toString()
-                    },
-                    method: "PUT",
-                    success: (response: AjaxResponse<FieldValueResult>) => {
-                        if (response.status === 200) {
-                            this.onSavedValue(response.data);
-
-                            resolve(response.data);
-                        }
-                        else
-                            throw "Error add content.";
-                    }
-                });
-            }))
-            .then(value => new Promise<Content>(resolve => {
-                if (this.valueElem) {
-                    this.request({
-                        url: '/brandup.pages/content/model/view',
-                        urlParams: { itemIndex: index.toString() },
-                        method: "GET",
-                        success: (response: AjaxResponse<string>) => {
-                            if (response.status === 200) {
-                                const newElem = this.__addItemDOM(response.data, index);
-
-                                //resolve(this.content.editor.buildContent(newElem));
-                            }
-                            else
-                                throw "Error load content view.";
-                        }
-                    });
-                }
-            }));
-    }
-    
-    private __addItemDOM(html: string, index: number) {
-        const fragment = document.createDocumentFragment();
-        const container = DOM.tag("div", null, html);
-        fragment.appendChild(container);
-        const newElem = DOM.queryElement(container, "[data-content-path]");
-
-        let elem;
-
-        while (index >= 0 && !elem) {
-            elem = this.__contents[index].container;
-            index -= 1;
-        }
-        if (index < 0 && !elem) {
-            this.designer.element.insertAdjacentElement("afterbegin", newElem);
-        } else {
-            elem.insertAdjacentElement("beforebegin", newElem);
-        }
-
-        return newElem;
-    }
 }
 
 export interface ModelFieldValue {
-    items: Array<ContentModel>;
+    items: Array<ContentInfoModel>;
 }
 
-export interface ContentModel {
+export interface ContentInfoModel {
     title: string;
     type: ContentTypeModel;
 }
@@ -213,4 +211,12 @@ export interface ModelFieldOptions {
 export interface ContentTypeModel {
     name: string;
     title: string;
+}
+
+interface ContentModelResult {
+    fieldValue: FieldValueResult;
+}
+
+interface AddContentResult extends ContentModelResult {
+    content: Array<ContentModel>;
 }
