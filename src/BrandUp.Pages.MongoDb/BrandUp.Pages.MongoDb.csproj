@@ -20,8 +20,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BrandUp.Extensions.Migrations" Version="8.0.4" />
-		<PackageReference Include="BrandUp.MongoDB" Version="7.2.5" />
+		<PackageReference Include="BrandUp.Extensions.Migrations" Version="8.1.1" />
+		<PackageReference Include="BrandUp.MongoDB" Version="7.3.2" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.27.0" />
 	</ItemGroup>
 
