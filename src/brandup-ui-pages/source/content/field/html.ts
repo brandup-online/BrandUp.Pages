@@ -2,28 +2,21 @@
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 import { FormField } from "./base";
-import { HtmlFieldProvider } from "../../content/provider/html";
-import { IContentField } from "../provider/base";
+import { IFormField } from "../provider/base";
 
-export class HtmlContent extends FormField<string, HtmlFieldFormOptions, HtmlFieldProvider>  implements IContentField {
+export class HtmlContent extends FormField<HtmlFieldFormOptions> {
     private __isChanged: boolean;
-    private __value: HTMLElement;
     private __editor: ContentEditor;
     private __editorPromise: Promise<any>;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Html"; }
 
-    protected _onRender() {
-        super._onRender();
-
-        this.element.classList.add("html");
-
-        this.element.appendChild(this.__value = DOM.tag("div", { class: "value" }));
-
+    protected _renderValueElem() {
+        const valueElem = DOM.tag("div", { class: "value" });
         if (this.options.placeholder)
-            this.__value.setAttribute("data-placeholder", this.options.placeholder);
+            valueElem.setAttribute("data-placeholder", this.options.placeholder);
 
-        this.__editorPromise = ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
+        this.__editorPromise = ContentEditor.create(valueElem, { placeholder: this.options.placeholder })
             .then(editor => {
                 this.__editor = editor;
 
@@ -37,10 +30,10 @@ export class HtmlContent extends FormField<string, HtmlFieldFormOptions, HtmlFie
                 this.__refreshUI();
             });
 
-        this.__value.addEventListener("focus", () => {
+        valueElem.addEventListener("focus", () => {
             this.__isChanged = false;
         });
-        this.__value.addEventListener("blur", () => {
+        valueElem.addEventListener("blur", () => {
             if (this.__isChanged) {
                 this.__editor.model.document.differ.reset();
                 this._onChanged();
@@ -48,6 +41,13 @@ export class HtmlContent extends FormField<string, HtmlFieldFormOptions, HtmlFie
 
             this.__refreshUI();
         });
+
+        return valueElem;
+    }
+
+    render(ownElem: HTMLElement): void {
+        super.render(ownElem);
+        this.element.classList.add("html");
     }
 
     getValue(): string {
@@ -55,28 +55,23 @@ export class HtmlContent extends FormField<string, HtmlFieldFormOptions, HtmlFie
         return data ? data : null;
     }
 
-    setValue(value: string) {
+    protected _setValue(value: string) {
         this.__editorPromise.then (()=> { // если editor еще не создался - ждем
             if (this.__editor) {
                 this.__editor.data.set(value ? value : "");
                 this.__refreshUI();
             }
             else
-                this.__value.innerHTML = value ? value : "";
+                this.__valueElem.innerHTML = value ? value : "";
         });
     }
     hasValue(): boolean {
-        const value = this.normalizeValue(this.__value.innerText);
+        const value = this.normalizeValue(this.__valueElem.innerText);
         if (!value)
             return false;
 
         const val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
         return value && val ? true : false;
-    }
-
-    protected _onChanged() {
-        this.__refreshUI();
-        super._onChanged();
     }
     private __refreshUI() {
         if (this.hasValue())

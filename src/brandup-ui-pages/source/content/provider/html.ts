@@ -8,14 +8,6 @@ export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldOptions> {
         return new HtmlDesigner(this);
     }
 
-    createField() {
-        //const { name, errors, options } = this.model;
-        //this.field = new HtmlContent(name, errors, options, this);
-        //return this.field;
-
-        throw "";
-    }
-
     saveValue(value: string): void {
         this.request({
             url: '/brandup.pages/content/html',

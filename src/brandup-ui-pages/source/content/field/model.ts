@@ -4,36 +4,40 @@ import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { FormField } from "./base";
 import { ContentInfoModel, ModelFieldOptions, ModelFieldProvider, ModelFieldValue } from "../../content/provider/model";
-import { IContentField } from "../provider/base";
 import "./model.less";
 
-export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, ModelFieldProvider> implements IContentField {
+export class ModelField extends FormField<ModelFieldOptions> {
     private __value: ModelFieldValue;
-    private __itemsElem: HTMLElement;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Content"; }
 
-    protected _onRender() {
-        super._onRender();
-
+    render(ownElem: HTMLElement): void {
+        super.render(ownElem);
         this.element.classList.add("content");
+    }
 
-        this.__itemsElem = DOM.tag("div", { class: "items" });
-        this.element.appendChild(this.__itemsElem);
+    protected _renderValueElem() {
+        if (this.options.isListValue) {
+            return this.__renderListValue();
+        }
+    }
+
+    private __renderListValue() {
+        const valueElem = DOM.tag("div", { class: "items" });
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = itemElem.getAttribute("data-content-path-index");
             let contentPath = this.provider.content.path;
-            let modelPath = (contentPath ? contentPath + "." : "") + `${this.name}[${itemIndex}]`;
+            let modelPath = (contentPath ? contentPath + "." : "") + `${this.provider.name}[${itemIndex}]`;
 
-            this.provider.settingItem(modelPath);
+            // this.provider.settingItem(modelPath);
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index"));
             const path = itemElem.getAttribute("data-content-path")
-            this.provider.deleteItem(itemIndex, path);
+            // this.provider.deleteItem(itemIndex, path);
         });
 
         this.registerCommand("item-add", () => {
@@ -47,7 +51,7 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
             }
         });
 
-        this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
+        valueElem.addEventListener("dragstart", (e: DragEvent) => {
             const target = e.target as Element;
             const itemElem = target.closest("[data-content-path-index]");
             if (itemElem) {
@@ -60,14 +64,14 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
             e.preventDefault();
             return false;
         }, false);
-        this.__itemsElem.addEventListener("dragenter", (e: DragEvent) => {
+        valueElem.addEventListener("dragenter", (e: DragEvent) => {
             e.preventDefault();
             return true;
         });
-        this.__itemsElem.addEventListener("dragover", (e: DragEvent) => {
+        valueElem.addEventListener("dragover", (e: DragEvent) => {
             e.preventDefault();
         });
-        this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
+        valueElem.addEventListener("drop", (e: DragEvent) => {
             const target = e.target as Element;
             const sourceIndex = e.dataTransfer.getData("data-content-path-index");
             const elem = target.closest("[data-content-path-index]");
@@ -76,7 +80,7 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
                 if (destIndex !== sourceIndex) {
                     console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
 
-                    const sourceElem = DOM.queryElement(this.__itemsElem, `[data-content-path-index="${sourceIndex}"]`);
+                    const sourceElem = DOM.queryElement(valueElem, `[data-content-path-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {
                             elem.insertAdjacentElement("beforebegin", sourceElem);
@@ -84,7 +88,7 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
                         else {
                             elem.insertAdjacentElement("afterend", sourceElem);
                         }
-                        this.provider.moveItem(+sourceIndex, +destIndex)
+                        // this.provider.moveItem(+sourceIndex, +destIndex)
                     }
                 }
             }
@@ -92,10 +96,11 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
             e.stopPropagation();
             return false;
         });
+        return valueElem;
     }
 
     deleteItem(index: number) {
-        const itemElem = DOM.queryElement(this.__itemsElem, `[data-content-path-index="${index}"]`);
+        const itemElem = DOM.queryElement(this.__valueElem, `[data-content-path-index="${index}"]`);
         itemElem.remove();
         this._refreshBlockIndexes();
     }
@@ -103,25 +108,26 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
     getValue(): ModelFieldValue {
         return this.__value;
     }
-    setValue(value: ModelFieldValue) {
+    protected _setValue(value: ModelFieldValue) {
         this.__value = value;
 
-        this.__renderItems();
+        if (this.options.isListValue)
+            this.__renderItems();
     }
     hasValue(): boolean {
         return this.__value && this.__value.items && this.__value.items.length > 0;
     }
 
     private __renderItems() {
-        DOM.empty(this.__itemsElem);
+        DOM.empty(this.__valueElem);
 
         let i = 0
         for (i = 0; i < this.__value.items.length; i++) {
             const item = this.__value.items[i];
-            this.__itemsElem.appendChild(this.__createItemElem(item, i));
+            this.__valueElem.appendChild(this.__createItemElem(item, i));
         }
 
-        this.__itemsElem.appendChild(DOM.tag("div", { class: "item new" }, [
+        this.__valueElem.appendChild(DOM.tag("div", { class: "item new" }, [
             DOM.tag("div", { class: "index" }, `#${i + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, this.options.addText ? this.options.addText : "Добавить")
         ]));
@@ -140,8 +146,8 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
         return itemElem;
     }
     private eachItems(f: (elem: Element, index: number) => void) {
-        for (let i = 0; i < this.__itemsElem.children.length; i++) {
-            const itemElem = this.__itemsElem.children.item(i);
+        for (let i = 0; i < this.__valueElem.children.length; i++) {
+            const itemElem = this.__valueElem.children.item(i);
             if (!itemElem.hasAttribute("data-content-path-index"))
                 continue;
             f(itemElem, i);
@@ -154,6 +160,6 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
         });
     }
     private __addItem(itemType: string) {
-        this.provider.addItem( 0);
+        // this.provider.addItem( 0);
     }
 }

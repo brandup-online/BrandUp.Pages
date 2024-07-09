@@ -1,13 +1,12 @@
-﻿import { Field } from "../../form/field";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+﻿import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import { PageCollectionModel } from "../../typings/page";
-import { IContentField } from "../provider/base";
 import "./pages.less";
 import { DOM } from "brandup-ui-dom";
+import { FormField } from "./base";
 
-export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
+export class PagesContent extends FormField<PagesFieldFormOptions> {
     private inputElem: HTMLInputElement;
-    private valueElem: HTMLElement;
+    private __pagesValueElem: HTMLElement;
     private searchElem: HTMLElement;
     private __searchTimeout: number;
     private __searchRequest: XMLHttpRequest;
@@ -15,15 +14,18 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
     
     get typeName(): string { return "BrandUpPages.Form.Field.Pages"; }
 
-    protected _onRender() {
-        super._onRender();
-
+    render(ownElem: HTMLElement): void {
+        super.render(ownElem);
         this.element.classList.add("pages");
+    }
 
-        this.element.appendChild(this.inputElem = DOM.tag("input", { type: "text" }) as HTMLInputElement);
-        this.element.appendChild(this.valueElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
-        this.element.appendChild(DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }, this.options.placeholder));
-        this.element.appendChild(this.searchElem = DOM.tag("ul", { class: "pages-menu" }));
+    protected _renderValueElem() {
+        const valueElem = DOM.tag("div", {class: "value"}, [
+            this.inputElem = DOM.tag("input", { type: "text" }) as HTMLInputElement,
+            this.__pagesValueElem = DOM.tag("div", { class: "pages-value", "data-command": "begin-input" }),
+            DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }, this.options.placeholder),
+            this.searchElem = DOM.tag("ul", { class: "pages-menu" })
+        ])
 
         this.inputElem.addEventListener("keyup", () => {
             const title = this.inputElem.value;
@@ -71,19 +73,19 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
         this.__closeMenuFunc = (e: MouseEvent) => {
             const t = e.target as Element;
-            if (!t.closest(".pages") && this.element) {
-                this.element.classList.remove("inputing");
+            if (!t.closest(".pages") && valueElem) {
+                valueElem.classList.remove("inputing");
                 document.body.removeEventListener("click", this.__closeMenuFunc, false);
             }
         };
 
         this.registerCommand("begin-input", () => {
-            if (!this.element.classList.toggle("inputing")) {
+            if (!valueElem.classList.toggle("inputing")) {
                 document.body.removeEventListener("click", this.__closeMenuFunc, false);
                 return;
             }
 
-            this.element.classList.add("inputing");
+            valueElem.classList.add("inputing");
 
             DOM.empty(this.searchElem);
             this.searchElem.appendChild(DOM.tag("li", { class: "text" }, "Начните вводить название коллекции страниц."));
@@ -95,13 +97,13 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
         });
 
         this.registerCommand("select", (elem: HTMLElement) => {
-            this.element.classList.remove("inputing");
+            valueElem.classList.remove("inputing");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
             const pageCollectionId = elem.getAttribute("data-value");
             const pageUrl = elem.getAttribute("data-url");
 
-            this.setValue({
+            this._setValue({
                 id: pageCollectionId,
                 title: elem.innerText,
                 pageUrl: pageUrl
@@ -125,19 +127,20 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
         });
 
         this.__refreshUI();
+        return valueElem;
     }
 
     getValue(): PagesFieldFormValue { throw new Error("Method not implemented."); }
-    setValue(value: PagesFieldFormValue) {
+    protected _setValue(value: PagesFieldFormValue) {
         if (!value) {
             this.inputElem.removeAttribute("value-collection-id");
             this.inputElem.value = "";
-            this.valueElem.innerText = "";
+            this.__pagesValueElem.innerText = "";
         }
         else {
             this.inputElem.setAttribute("value-collection-id", value.id);
             this.inputElem.value = value.title;
-            this.valueElem.innerText = value.title + ": " + value.pageUrl;
+            this.__pagesValueElem.innerText = value.title + ": " + value.pageUrl;
         }
 
         this.__refreshUI();

@@ -3,7 +3,7 @@ import { ModelDesigner } from "../designer/model";
 import { AjaxResponse } from "brandup-ui-ajax";
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
-import { editPage } from "../../dialogs/pages/edit";
+import { editPage } from "../../dialogs/content/edit";
 import { DOM } from "brandup-ui-dom";
 import { Content, IContentHost } from "../content";
 import { ContentEditor } from "../editor";
@@ -98,10 +98,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         return new designerType(this);
     }
 
-    createField() {
-        throw "";
-        //this.field = new ModelField(name, errors, options, this);
-        //return this.field;
+    saveValue(value: any) {
+        throw "method saveValue not implemented in ModelFieldProvider"
     }
 
     itemUp(index: number, elem: Element) {
@@ -154,7 +152,11 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     settingItem(contentPath: string) {
-        editPage(this.content.host.editor, contentPath).then(() => {
+        const content = this.__contents.find(content => {
+            return content.path === contentPath
+        });
+        if (!content) throw `content with path ${contentPath} not found`;
+        editPage(content, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {
             // this.__refreshItem(e.target, e.value.index);

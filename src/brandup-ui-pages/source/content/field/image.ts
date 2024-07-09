@@ -1,30 +1,28 @@
 ﻿import { DOM } from "brandup-ui-dom";
 import "./image.less";
 import { FormField } from "./base";
-import { ImageFieldProvider } from "../../content/provider/image";
-import { IContentField } from "../provider/base";
 
-export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, ImageFieldProvider> implements IContentField {
-    private valueElem: HTMLElement;
+export class ImageContent extends FormField<ImageFieldOptions> {
     private __isChanged = false;
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Image"; }
 
-    protected _onRender() {
-        super._onRender();
-
+    render(ownElem: HTMLElement): void {
+        super.render(ownElem);
         this.element.classList.add("image");
+    }
 
-        this.valueElem = DOM.tag("div", { class: "value", "tabindex": 0 }, [
+    protected _renderValueElem() {
+        const valueElem = DOM.tag("div", { class: "value", "tabindex": 0 }, [
             DOM.tag("span", null, "Выберите или перетащите суда файл с изображением"),
             DOM.tag("button", { "data-command": "select-file" }, [
                 "Выбрать файл"
             ]),
             this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement
         ]);
-        this.element.appendChild(this.valueElem);
+        this.element.appendChild(valueElem);
 
         this.__fileInputElem.addEventListener("change", () => {
             if (this.__fileInputElem.files.length === 0)
@@ -32,24 +30,24 @@ export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, 
 
             this.__uploadFile(this.__fileInputElem.files.item(0));
 
-            this.valueElem.focus();
+            valueElem.focus();
         });
 
         let dragleaveTime = 0;
-        this.valueElem.ondragover = () => {
+        valueElem.ondragover = () => {
             clearTimeout(dragleaveTime);
-            this.valueElem.classList.add("draging");
+            valueElem.classList.add("draging");
             return false;
         };
-        this.valueElem.ondragleave = () => {
-            dragleaveTime = window.setTimeout(() => { this.valueElem.classList.remove("draging"); }, 50);
+        valueElem.ondragleave = () => {
+            dragleaveTime = window.setTimeout(() => { valueElem.classList.remove("draging"); }, 50);
             return false;
         };
-        this.valueElem.ondrop = (e: DragEvent) => {
+        valueElem.ondrop = (e: DragEvent) => {
             e.stopPropagation();
             e.preventDefault();
 
-            this.valueElem.classList.remove("draging");
+            valueElem.classList.remove("draging");
 
             const file = e.dataTransfer.files.item(0);
             if (!file.type)
@@ -62,12 +60,12 @@ export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, 
             else
                 e.dataTransfer.clearData();
 
-            this.valueElem.focus();
+            valueElem.focus();
 
             return false;
         };
 
-        this.valueElem.addEventListener("paste", (e: ClipboardEvent) => {
+        valueElem.addEventListener("paste", (e: ClipboardEvent) => {
             e.preventDefault();
 
             if (e.clipboardData.files.length > 0) {
@@ -79,19 +77,21 @@ export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, 
                     this.__uploadFile(url);
             }
 
-            this.valueElem.blur();
+            valueElem.blur();
         });
 
         this.registerCommand("select-file", () => {
             this.__fileInputElem.click();
         });
+
+        return valueElem;
     }
     private __uploadFile(file: File | string) {
-        this.provider.changeImage(file);
+        // this.provider.changeImage(file);
     }
 
     private __refreshValueUI() {
-        this.valueElem.style.backgroundImage = this.__value ? "url(" + this.__value.previewUrl + ")" : "none";
+        this.__valueElem.style.backgroundImage = this.__value ? "url(" + this.__value.previewUrl + ")" : "none";
 
         if (this.__value)
             this.element.classList.add("has-value");
@@ -102,7 +102,7 @@ export class ImageContent extends FormField<ImageFieldValue, ImageFieldOptions, 
     getValue(): ImageFieldValue {
         return this.__value;
     }
-    setValue(value: ImageFieldValue) {
+    protected _setValue(value: ImageFieldValue) {
         this.__value = value;
 
         this.__refreshValueUI();

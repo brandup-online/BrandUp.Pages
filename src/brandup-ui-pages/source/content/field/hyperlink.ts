@@ -4,12 +4,10 @@ import { PageModel } from "../../typings/page";
 import "./hyperlink.less";
 import { DOM } from "brandup-ui-dom";
 import { FormField } from "./base";
-import { HyperlinkFieldProvider } from "../../content/provider/hyperlink";
-import { IContentField } from "../provider/base";
 
-export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLinkFieldFormOptions, HyperlinkFieldProvider> implements IContentField {
+export class HyperLinkContent extends FormField<HyperLinkFieldFormOptions> {
     private __typeElem: HTMLElement;
-    private __valueElem: HTMLElement;
+    private __inputElem: HTMLElement;
     private __urlValueInput: HTMLInputElement;
     private __pageValueInput: HTMLInputElement;
     private __typeMenuElem: HTMLElement;
@@ -23,29 +21,32 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
 
     get typeName(): string { return "BrandUpPages.Form.Field.HyperLink"; }
 
-    protected _onRender() {
-        super._onRender();
+    render(ownElem: HTMLElement): void {
+        super.render(ownElem);
+        this.__valueElem.classList.add("hyperlink");
+    }
 
-        this.element.classList.add("hyperlink");
+    protected _renderValueElem() {
+        const valueElem = DOM.tag("div", { class: "value" });
 
-        this.element.appendChild(DOM.tag("div", { class: "value-type", "data-command": "open-types-menu" }, [
+        valueElem.appendChild(DOM.tag("div", { class: "value-type", "data-command": "open-types-menu" }, [
             this.__typeElem = DOM.tag("span", null, "Page"),
             iconArrow
         ]));
-        this.element.appendChild(this.__valueElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
-        this.element.appendChild(this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }));
+        valueElem.appendChild(this.__inputElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
+        valueElem.appendChild(this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }));
 
         this.__urlValueInput = DOM.tag("input", { type: "text", class: "url" }) as HTMLInputElement;
         this.__urlValueInput.addEventListener("change", () => {
             this.__refreshUI();
 
-            this.provider.changeValue(this.__urlValueInput.value);
+            this.provider.saveValue(this.__urlValueInput.value);
         });
         this.__urlValueInput.addEventListener("blur", () => {
-            this.element.classList.remove("inputing");
-            this.__valueElem.innerText = this.__urlValueInput.value;
+            valueElem.classList.remove("inputing");
+            this.__inputElem.innerText = this.__urlValueInput.value;
         });
-        this.element.appendChild(this.__urlValueInput);
+        valueElem.appendChild(this.__urlValueInput);
 
         this.__pageValueInput = DOM.tag("input", { type: "text", class: "page" }) as HTMLInputElement;
         this.__pageValueInput.addEventListener("keyup", () => {
@@ -89,55 +90,55 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
                 });
             }, 500);
         });
-        this.element.appendChild(this.__pageValueInput);
+        valueElem.appendChild(this.__pageValueInput);
 
         this.__typeMenuElem = DOM.tag("ul", { class: "hyperlink-menu types" }, [
             DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Page" }, "Page")),
             DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-type", "data-value": "Url" }, "Url"))
         ]);
-        this.element.appendChild(this.__typeMenuElem);
+        valueElem.appendChild(this.__typeMenuElem);
 
         this.__searchElem = DOM.tag("ul", { class: "hyperlink-menu pages" });
-        this.element.appendChild(this.__searchElem);
+        valueElem.appendChild(this.__searchElem);
 
         this.__closeTypeMenuFunc = (e: MouseEvent) => {
             const t = e.target as Element;
-            if (!t.closest(".hyperlink-menu") && this.element) {
-                this.element.classList.remove("opened-types");
+            if (!t.closest(".hyperlink-menu") && valueElem) {
+                valueElem.classList.remove("opened-types");
                 document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
             }
         };
         this.__closePageMenuFunc = (e: MouseEvent) => {
             const t = e.target as Element;
-            if (!t.closest(".hyperlink") && this.element) {
-                this.element.classList.remove("inputing");
-                this.element.classList.remove("opened-pages");
+            if (!t.closest(".hyperlink") && valueElem) {
+                valueElem.classList.remove("inputing");
+                valueElem.classList.remove("opened-pages");
                 document.body.removeEventListener("click", this.__closePageMenuFunc, false);
             }
         };
 
         this.registerCommand("open-types-menu", () => {
-            if (this.element.classList.contains("opened-types")) {
-                this.element.classList.remove("opened-types");
+            if (valueElem.classList.contains("opened-types")) {
+                valueElem.classList.remove("opened-types");
                 document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
                 return;
             }
 
-            if (this.element.classList.contains("opened-pages")) {
-                this.element.classList.remove("inputing");
-                this.element.classList.remove("opened-pages");
+            if (valueElem.classList.contains("opened-pages")) {
+                valueElem.classList.remove("inputing");
+                valueElem.classList.remove("opened-pages");
                 document.body.removeEventListener("click", this.__closePageMenuFunc, false);
             }
 
-            this.element.classList.add("opened-types")
+            valueElem.classList.add("opened-types")
             document.body.addEventListener("mousedown", this.__closeTypeMenuFunc, false);
         });
         this.registerCommand("begin-input", () => {
-            this.element.classList.add("inputing");
+            valueElem.classList.add("inputing");
 
             switch (this.__type) {
                 case "Page":
-                    if (!this.element.classList.toggle("opened-pages")) {
+                    if (!valueElem.classList.toggle("opened-pages")) {
                         document.body.removeEventListener("click", this.__closePageMenuFunc, false);
                         return;
                     }
@@ -160,45 +161,46 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
         this.registerCommand("select-type", (elem: HTMLElement) => {
             const type = elem.getAttribute("data-value") as HyperLinkType;
 
-            this.element.classList.remove("opened-types");
+            valueElem.classList.remove("opened-types");
             document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
 
             this.__type = type;
             this.__refreshUI();
         });
         this.registerCommand("select-page", (elem: HTMLElement) => {
-            this.element.classList.remove("inputing");
-            this.element.classList.remove("opened-pages");
+            valueElem.classList.remove("inputing");
+            valueElem.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
             const pageId = elem.getAttribute("data-value");
             this.__pageValueInput.setAttribute("value-page-id", pageId);
-            this.__valueElem.innerText = elem.innerText;
+            this.__inputElem.innerText = elem.innerText;
             this.__pageValueInput.value = elem.innerText;
 
             this.__refreshUI();
 
-            this.provider.selectPage(pageId);
+            // this.provider.selectPage(pageId);
         });
 
         this.__refreshUI();
+        return valueElem;
     }
 
     getValue(): HyperLinkFieldFormValue { throw "Not implemented"; }
-    setValue(value: HyperLinkFieldFormValue) {
+    protected _setValue(value: HyperLinkFieldFormValue) {
         if (value) {
             this.__type = value.valueType;
 
             switch (value.valueType) {
                 case "Page": {
                     this.__pageValueInput.setAttribute("value-page-id", value.value);
-                    this.__valueElem.innerText = value.pageTitle;
+                    this.__inputElem.innerText = value.pageTitle;
                     this.__pageValueInput.value = value.pageTitle;
                     break;
                 }
                 case "Url": {
                     this.__urlValueInput.value = value.value;
-                    this.__valueElem.innerText = value.value;
+                    this.__inputElem.innerText = value.value;
                     break;
                 }
                 default:
@@ -223,24 +225,24 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
 
     private __refreshUI() {
         if (this.hasValue())
-            this.element.classList.add("has-value");
+            this.__valueElem.classList.add("has-value");
         else
-            this.element.classList.remove("has-value");
+            this.__valueElem.classList.remove("has-value");
 
         this.__typeElem.innerText = this.__type;
 
         switch (this.__type) {
             case "Page": {
-                this.element.classList.remove("url-value");
-                this.element.classList.add("page-value");
-                this.__valueElem.innerText = this.__pageValueInput.value;
+                this.__valueElem.classList.remove("url-value");
+                this.__valueElem.classList.add("page-value");
+                this.__inputElem.innerText = this.__pageValueInput.value;
                 this.__placeholderElem.innerText = "Выберите страницу";
                 break;
             }
             case "Url": {
-                this.element.classList.remove("page-value");
-                this.element.classList.add("url-value");
-                this.__valueElem.innerText = this.__urlValueInput.value;
+                this.__valueElem.classList.remove("page-value");
+                this.__valueElem.classList.add("url-value");
+                this.__inputElem.innerText = this.__urlValueInput.value;
                 this.__placeholderElem.innerText = "Введите url";
                 break;
             }

@@ -4,21 +4,26 @@ import { DOM } from "brandup-ui-dom";
 import { ContentEditor } from "../../content/editor";
 import { Content } from "../../content/content";
 import "../dialog-form.less";
-import { IContentField } from "../../content/provider/base";
+import defs from "../../content/defs"
+import { FieldProvider, IFormField } from "../../content/provider/base";
+import { HtmlContent } from "../../content/field/html";
+import { FormField } from "../../content/field/base";
+import { TextContent } from "../../content/field/text";
+import { ModelField } from "../../content/field/model";
 
 export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
     private navElem: HTMLElement;
     private __fieldsElem: HTMLElement;
-    private __fields: { [key: string]: IContentField } = {};
+    private __fields: { [key: string]: IFormField } = {};
     private __modelPath: string;
     private __queue: AjaxQueue;
     private __content: Content;
 
-    constructor(editor: ContentEditor, modelPath?: string, options?: DialogOptions) {
+    constructor(content: Content, modelPath?: string, options?: DialogOptions) {
         super(options);
 
-        this.__content = editor.navigate(modelPath);
+        this.__content = content;
         this.__modelPath = modelPath ? modelPath : "";
     }
 
@@ -39,12 +44,19 @@ export class PageEditDialog extends Dialog<any> {
 
         this.setHeader("Контент страницы");
 
+        this.__registerFieldsTypes();
         this.__renderForm();
 
         this.registerCommand("navigate", (elem: HTMLElement) => {
             const path = elem.getAttribute("data-path");
             this.navigate(path);
         });
+    }
+
+    private __registerFieldsTypes() {
+        defs.registerFormField("html", () => new Promise<typeof HtmlContent>((resolve) => resolve(HtmlContent)));
+        defs.registerFormField("text", () => new Promise<typeof TextContent>((resolve) => resolve(TextContent)));
+        defs.registerFormField("model", () => new Promise<typeof ModelField>((resolve) => resolve(ModelField)));
     }
 
     private __renderForm() {
@@ -74,7 +86,7 @@ export class PageEditDialog extends Dialog<any> {
         //}
         
         this.__content.fields.forEach(field => {
-            //this.addField(field.title, field.createField());
+            this.addField(field);
         });
     }
 
@@ -89,24 +101,27 @@ export class PageEditDialog extends Dialog<any> {
         return true;
     }
 
-    getField(name: string): IContentField {
+    getField(name: string): IFormField {
         if (!this.__fields.hasOwnProperty(name.toLowerCase()))
             throw `Field "${name}" not exists.`;
         return this.__fields[name.toLowerCase()];
     }
-    protected addField(title: string, field: IContentField) {
-        if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
-            throw `Field name "${field.name}" already exists.`;
-
-        const containerElem = DOM.tag("div", { class: "field" });
-
-        if (title)
-            containerElem.appendChild(DOM.tag("label", { for: field.name }, title));
-
-        field.render(containerElem);
-
-        this.__fieldsElem.appendChild(containerElem);
-        this.__fields[field.name.toLowerCase()] = field;
+    protected addField(provider: FieldProvider<any, any>) {
+        defs.resolveFormField(provider.type.toLowerCase()).then((type) => {
+            const field: FormField<any> = new type(provider.title, provider.options, provider);
+    
+            if (this.__fields.hasOwnProperty(provider.name.toLowerCase()))
+                throw `Field name "${provider.name}" already exists.`;
+    
+            const containerElem = DOM.tag("div", { class: "field" });
+    
+            provider.registerForm(field);
+            field.render(containerElem);
+            field.raiseUpdateValue(provider.getValue());
+            
+            this.__fieldsElem.appendChild(containerElem);
+            this.__fields[provider.name.toLowerCase()] = field;
+        }).catch((e) => console.log(e));
     }
 
     protected _onClose() {
@@ -125,7 +140,7 @@ export class PageEditDialog extends Dialog<any> {
     }
 }
 
-export const editPage = (editor: ContentEditor, path?: string) => {
-    const dialog = new PageEditDialog(editor, path);
+export const editPage = (content: Content, path?: string) => {
+    const dialog = new PageEditDialog(content, path);
     return dialog.open();
 };

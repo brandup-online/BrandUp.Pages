@@ -20,24 +20,14 @@ export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {
             success: (response: AjaxResponse<FieldValueResult>) => {
                 if (response.status === 200) {
                     this.onSavedValue(response.data);
-
-                    let value = this.getValue();
-                    value = this.normalizeValue(value);
-                    if (value && this.options.allowMultiline)
-                        value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
-
-                    this.valueElem.innerHTML = value ? value : "";
                 }
             }
         });
     }
 
-    createField() {
-        //const { name, errors, options } = this.model;
-        //this.field = new TextContent(name, errors, options, this);
-        //return this.field;
-
-        throw "";
+    protected onSavedValue(model: FieldValueResult) {
+        model.value = this.normalizeValue(model.value);
+        super.onSavedValue(model);
     }
     
     normalizeValue(value: string): string {
@@ -47,7 +37,7 @@ export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {
         value = value.trim();
 
         if (!this.options.allowMultiline)
-            value = value.replace("\n\r", " ");
+            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
 
         return value;
     }

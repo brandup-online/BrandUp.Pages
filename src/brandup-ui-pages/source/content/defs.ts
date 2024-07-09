@@ -1,5 +1,6 @@
 const fieldProviders: { [type: string]: () => Promise<any> } = {};
 const fieldDesigners: { [type: string]: () => Promise<any> } = {};
+const formFields: { [type: string]: () => Promise<any> } = {};
 
 export default {
     registerProvider: (type: string, resolve: () => Promise<any>) => {
@@ -19,5 +20,15 @@ export default {
         if (!designerType)
             throw `Not found field designer by type "${type}"`;
         return designerType();
+    },
+
+    registerFormField: (type: string, resolve: () => Promise<any>) => {
+        formFields[type] = resolve;
+    },
+    resolveFormField: (type: string) => {
+        var fieldType = formFields[type];
+        if (!fieldType)
+            throw `Not found form field by type "${type}"`;
+        return fieldType();
     }
 };

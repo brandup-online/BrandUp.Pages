@@ -4,7 +4,7 @@ import { Page, PageModel, WebsiteContext } from "brandup-ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
-import { editPage } from "../dialogs/pages/edit";
+import { editPage } from "../dialogs/content/edit";
 import { UIElement } from "brandup-ui";
 import { Content, IContentHost } from "./content";
 import { ModelFieldProvider } from "./provider/model";
@@ -155,7 +155,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
 
-        this.registerCommand("bp-content", () => editPage(this, ""));
+        this.registerCommand("bp-content", () => editPage(this.__contents.get(""), ""));
 
         this.registerCommand("bp-commit", () => {
             if (this.__isLoading)

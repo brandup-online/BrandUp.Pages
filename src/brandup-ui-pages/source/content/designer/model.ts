@@ -29,7 +29,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         this.registerCommand("item-view", () => { return; });
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
+            const itemElem = elem.closest("[data-content-path]");
             const contentPath = itemElem.getAttribute("data-content-path");
 
             this.provider.settingItem(contentPath);

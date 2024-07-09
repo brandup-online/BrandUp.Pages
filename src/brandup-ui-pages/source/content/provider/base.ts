@@ -6,6 +6,7 @@ export abstract class FieldProvider<TValue, TOptions> {
     readonly content: Content;
     readonly name: string;
     readonly title: string;
+    readonly type: string;
     readonly options: TOptions;
     readonly isRequired: boolean;
     
@@ -14,7 +15,7 @@ export abstract class FieldProvider<TValue, TOptions> {
     private __valueElem?: HTMLElement = null;
 
     designer: IFieldDesigner;
-    field: IContentField;
+    field: IFormField;
 
     get valueElem(): HTMLElement { return this.__valueElem; }
 
@@ -24,6 +25,7 @@ export abstract class FieldProvider<TValue, TOptions> {
         this.title = model.title;
         this.options = model.options;
         this.isRequired = model.isRequired;
+        this.type = model.type;
 
         this.__value = model.value;
         this.__errors = model.errors;
@@ -47,8 +49,10 @@ export abstract class FieldProvider<TValue, TOptions> {
         this.designer = this.createDesigner();
     }
 
-    abstract createField();
-    
+    registerForm(field: IFormField) {
+        this.field = field;
+    }
+
     protected request(options: AjaxRequest) {
         if (!options.urlParams)
             options.urlParams = {};
@@ -63,11 +67,14 @@ export abstract class FieldProvider<TValue, TOptions> {
     }
 
     abstract createDesigner(): IFieldDesigner;
+
+    abstract saveValue(value: any);
     
     protected onSavedValue(model: FieldValueResult) {
         this.__value = model.value;
         this.__errors = model.errors;
-        this.field?.setErrors(this.__errors);
+        this.field?.raiseUpdateErrors(this.__errors);
+        this.field?.raiseUpdateValue(this.__value);
         this.designer?.setErrors(this.__errors);
     }
 
@@ -84,12 +91,8 @@ export interface IFieldDesigner {
     setErrors(errors: string[]);
 }
 
-export interface IContentField {
-    readonly name: string;
-
-    setValue(value: any);
-    hasValue(): boolean;
-    setErrors(errors: Array<string>);
-    render(containr: HTMLElement);
+export interface IFormField {
+    raiseUpdateValue(value: any);
+    raiseUpdateErrors(errors: Array<string>);
     destroy();
 }

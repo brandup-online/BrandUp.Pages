@@ -7,12 +7,8 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
         return null;
     }
 
-    createField() {
-        //const { name, errors, options } = this.model;
-        //this.field = new HyperLinkContent(name, errors, options, this);
-        //return this.field;
-
-        throw "";
+    saveValue(value: any) {
+        throw "method saveValue not implemented in HyperlinkFieldProvider";
     }
 
     changeValue(url: string) {

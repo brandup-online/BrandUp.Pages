@@ -8,12 +8,8 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         return new ImageDesigner(this);
     }
 
-    createField() {
-        //const { name, errors, options } = this.model;
-        //this.field = new ImageContent(name, errors, options, this);
-        //return this.field;
-
-        throw "";
+    saveValue(value: any) {
+        throw "method saveValue not implemented in ImageFieldProvider"
     }
 
     changeImage(value: File | string): void {
