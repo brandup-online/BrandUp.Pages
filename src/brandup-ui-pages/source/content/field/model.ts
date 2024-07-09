@@ -7,6 +7,7 @@ import { ContentInfoModel, ModelFieldOptions, ModelFieldProvider, ModelFieldValu
 import "./model.less";
 
 export class ModelField extends FormField<ModelFieldOptions> {
+    declare readonly provider: ModelFieldProvider;
     private __value: ModelFieldValue;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Content"; }
@@ -29,15 +30,14 @@ export class ModelField extends FormField<ModelFieldOptions> {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = itemElem.getAttribute("data-content-path-index");
             let contentPath = this.provider.content.path;
-            let modelPath = (contentPath ? contentPath + "." : "") + `${this.provider.name}[${itemIndex}]`;
-
-            // this.provider.settingItem(modelPath);
+            let modelPath = (contentPath ? contentPath + "." : "") + `${this.provider.name}[${itemIndex}]`; // TODO придумать, как нормально определять contentPath
+            this.provider.settingItem(modelPath);
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index"));
             const path = itemElem.getAttribute("data-content-path")
-            // this.provider.deleteItem(itemIndex, path);
+            this.provider.deleteItem(itemIndex, path);
         });
 
         this.registerCommand("item-add", () => {
@@ -88,7 +88,7 @@ export class ModelField extends FormField<ModelFieldOptions> {
                         else {
                             elem.insertAdjacentElement("afterend", sourceElem);
                         }
-                        // this.provider.moveItem(+sourceIndex, +destIndex)
+                        this.provider.moveItem(+sourceIndex, +destIndex)
                     }
                 }
             }
@@ -160,6 +160,6 @@ export class ModelField extends FormField<ModelFieldOptions> {
         });
     }
     private __addItem(itemType: string) {
-        // this.provider.addItem( 0);
+        this.provider.addItem(0);
     }
 }

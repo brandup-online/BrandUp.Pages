@@ -150,12 +150,12 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             }
         });
     }
-
+    
     settingItem(contentPath: string) {
         const content = this.__contents.find(content => {
             return content.path === contentPath
         });
-        if (!content) throw `content with path ${contentPath} not found`;
+        if (!content) return `content with path ${contentPath} not found`;
         editPage(content, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {

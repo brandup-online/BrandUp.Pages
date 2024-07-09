@@ -10,6 +10,13 @@ import { Content, IContentHost } from "./content";
 import { ModelFieldProvider } from "./provider/model";
 import { errorPage } from "../dialogs/dialog-error";
 import { BeginContentEditResult, ContentModel, GetContentEditResult } from "../typings/content";
+import defs from "./defs";
+import { HtmlContent } from "./field/html";
+import { HyperLinkContent } from "./field/hyperlink";
+import { ImageContent } from "./field/image";
+import { ModelField } from "./field/model";
+import { PagesContent } from "./field/pages";
+import { TextContent } from "./field/text";
 
 export class ContentEditor extends UIElement implements IContentHost {
     readonly website: WebsiteContext;
@@ -67,6 +74,7 @@ export class ContentEditor extends UIElement implements IContentHost {
             .then(() => {
                 this.__renderToolbar();
                 this.__renderDesigner();
+                this.registerContentTypes();
                 
                 return new Promise<EditResult>((resolve, reject) => {
                     this.__complate = resolve;
@@ -112,6 +120,15 @@ export class ContentEditor extends UIElement implements IContentHost {
                 },
             });
         });
+    }
+
+    registerContentTypes() {
+        defs.registerFormField("html", () => new Promise<typeof HtmlContent>((resolve) => resolve(HtmlContent)));
+        defs.registerFormField("text", () => new Promise<typeof TextContent>((resolve) => resolve(TextContent)));
+        defs.registerFormField("model", () => new Promise<typeof ModelField>((resolve) => resolve(ModelField)));
+        defs.registerFormField("image", () => new Promise<typeof ImageContent>((resolve) => resolve(ImageContent)));
+        defs.registerFormField("hyperlink", () => new Promise<typeof HyperLinkContent>((resolve) => resolve(HyperLinkContent)));
+        defs.registerFormField("pages", () => new Promise<typeof PagesContent>((resolve) => resolve(PagesContent)));
     }
 
     initContent(contents: Array<ContentModel>) {

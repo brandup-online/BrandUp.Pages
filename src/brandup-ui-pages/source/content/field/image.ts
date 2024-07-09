@@ -22,7 +22,6 @@ export class ImageContent extends FormField<ImageFieldOptions> {
             ]),
             this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement
         ]);
-        this.element.appendChild(valueElem);
 
         this.__fileInputElem.addEventListener("change", () => {
             if (this.__fileInputElem.files.length === 0)
@@ -86,6 +85,7 @@ export class ImageContent extends FormField<ImageFieldOptions> {
 
         return valueElem;
     }
+
     private __uploadFile(file: File | string) {
         // this.provider.changeImage(file);
     }

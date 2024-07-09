@@ -23,7 +23,7 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormOptions> {
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.__valueElem.classList.add("hyperlink");
+        this.element.classList.add("hyperlink");
     }
 
     protected _renderValueElem() {
@@ -33,7 +33,7 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormOptions> {
             this.__typeElem = DOM.tag("span", null, "Page"),
             iconArrow
         ]));
-        valueElem.appendChild(this.__inputElem = DOM.tag("div", { class: "value", "data-command": "begin-input" }));
+        valueElem.appendChild(this.__inputElem = DOM.tag("div", { class: "input-value", "data-command": "begin-input" }));
         valueElem.appendChild(this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }));
 
         this.__urlValueInput = DOM.tag("input", { type: "text", class: "url" }) as HTMLInputElement;
@@ -181,8 +181,6 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormOptions> {
 
             // this.provider.selectPage(pageId);
         });
-
-        this.__refreshUI();
         return valueElem;
     }
 

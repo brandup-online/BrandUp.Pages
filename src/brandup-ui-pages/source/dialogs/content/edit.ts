@@ -1,15 +1,10 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { AjaxQueue } from "brandup-ui-ajax";
 import { DOM } from "brandup-ui-dom";
-import { ContentEditor } from "../../content/editor";
 import { Content } from "../../content/content";
 import "../dialog-form.less";
 import defs from "../../content/defs"
 import { FieldProvider, IFormField } from "../../content/provider/base";
-import { HtmlContent } from "../../content/field/html";
 import { FormField } from "../../content/field/base";
-import { TextContent } from "../../content/field/text";
-import { ModelField } from "../../content/field/model";
 
 export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
@@ -17,7 +12,6 @@ export class PageEditDialog extends Dialog<any> {
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IFormField } = {};
     private __modelPath: string;
-    private __queue: AjaxQueue;
     private __content: Content;
 
     constructor(content: Content, modelPath?: string, options?: DialogOptions) {
@@ -29,7 +23,6 @@ export class PageEditDialog extends Dialog<any> {
 
     get typeName(): string { return "BrandUpPages.PageEditDialog"; }
     get modelPath(): string { return this.__modelPath; }
-    get queue(): AjaxQueue { return this.__queue; }
 
     protected _onRenderContent() {
         this.element.classList.add("bp-dialog-form");
@@ -44,19 +37,12 @@ export class PageEditDialog extends Dialog<any> {
 
         this.setHeader("Контент страницы");
 
-        this.__registerFieldsTypes();
         this.__renderForm();
 
         this.registerCommand("navigate", (elem: HTMLElement) => {
             const path = elem.getAttribute("data-path");
             this.navigate(path);
         });
-    }
-
-    private __registerFieldsTypes() {
-        defs.registerFormField("html", () => new Promise<typeof HtmlContent>((resolve) => resolve(HtmlContent)));
-        defs.registerFormField("text", () => new Promise<typeof TextContent>((resolve) => resolve(TextContent)));
-        defs.registerFormField("model", () => new Promise<typeof ModelField>((resolve) => resolve(ModelField)));
     }
 
     private __renderForm() {
@@ -68,46 +54,37 @@ export class PageEditDialog extends Dialog<any> {
             DOM.empty(this.navElem);
         }
 
+        // Breadcrumbs
         let path = this.__content.path;
-        //while (path || path === "") {
-        //    const content = this.__content.host.editor.navigate(path);
-        //    let title = content.typeTitle;
-        //    this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
-        //        DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
-        //            DOM.tag("bolt", null, path || "root"),
-        //            DOM.tag("div", null, [
-        //                DOM.tag("span", null, title),
-        //                DOM.tag("span", null, model.typeName),
-        //            ]),
-        //        ]),
-        //    ]));
+        while (path || path === "") {
+           const content = this.__content.host.editor.navigate(path);
+           let title = content.typeTitle;
+           this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
+               DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
+                   DOM.tag("bolt", null, path || "root"),
+                   DOM.tag("div", null, [
+                       DOM.tag("span", null, title),
+                       DOM.tag("span", null, content.typeName),
+                   ]),
+               ]),
+           ]));
 
-        //    path = content.parentPath;
-        //}
+           path = content.parentPath;
+        }
         
+        // Fields
+        const fieldsArr = [];
         this.__content.fields.forEach(field => {
-            this.addField(field);
+            fieldsArr.push(field);
         });
+
+        Promise.allSettled(fieldsArr.map(field => {
+            return this.addField(field);
+        }));
     }
 
-    navigate(modelPath: string) {
-        this.__modelPath = modelPath ? modelPath : "";
-        //this.__content.getFields().forEach(provider => provider.destroyField());
-        this.__content = this.__content.host.editor.navigate(modelPath);
-        this.__renderForm();
-    }
-
-    validate(): boolean {
-        return true;
-    }
-
-    getField(name: string): IFormField {
-        if (!this.__fields.hasOwnProperty(name.toLowerCase()))
-            throw `Field "${name}" not exists.`;
-        return this.__fields[name.toLowerCase()];
-    }
     protected addField(provider: FieldProvider<any, any>) {
-        defs.resolveFormField(provider.type.toLowerCase()).then((type) => {
+        return defs.resolveFormField(provider.type.toLowerCase()).then((type) => {
             const field: FormField<any> = new type(provider.title, provider.options, provider);
     
             if (this.__fields.hasOwnProperty(provider.name.toLowerCase()))
@@ -124,18 +101,34 @@ export class PageEditDialog extends Dialog<any> {
         }).catch((e) => console.log(e));
     }
 
+    navigate(modelPath: string) {
+        this.destroyFields();
+        this.__modelPath = modelPath ? modelPath : "";
+
+        this.__content = this.__content.host.editor.navigate(modelPath);
+        this.__renderForm();
+    }
+
+    getField(name: string): IFormField {
+        if (!this.__fields.hasOwnProperty(name.toLowerCase()))
+            throw `Field "${name}" not exists.`;
+        return this.__fields[name.toLowerCase()];
+    }
+
     protected _onClose() {
         this.resolve(null);
     }
 
-    destroy() {
-        this.__queue.destroy();
-
-        for (const fieldName in this.__fields) {
-            const field = this.__fields[fieldName];
-            field.destroy();
+    destroyFields() {
+        for (const key in this.__fields) {
+            this.__fields[key].destroy();
         }
+        this.__fields = {};
+        DOM.empty(this.__fieldsElem);
+    }
 
+    destroy() {
+        this.destroyFields();
         super.destroy();
     }
 }

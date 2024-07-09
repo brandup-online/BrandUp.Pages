@@ -11,6 +11,9 @@ export class Content {
     readonly host: IContentHost;
     readonly path: string;
     readonly index: number;
+    readonly typeTitle: string;
+    readonly typeName: string;
+    readonly parentPath: string;
     private __fields = new Map<string, FieldProvider<any, any>>();
 
     private __container: HTMLElement = null;
@@ -21,6 +24,11 @@ export class Content {
         this.host = host;
         this.path = model.path;
         this.index = model.index;
+
+        this.typeTitle = model.typeTitle;
+        this.typeName = model.typeName;
+        this.parentPath = model.parentPath;
+
 
         this.host.attach(this);
 

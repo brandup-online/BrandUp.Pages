@@ -73,16 +73,15 @@ export abstract class FieldProvider<TValue, TOptions> {
     protected onSavedValue(model: FieldValueResult) {
         this.__value = model.value;
         this.__errors = model.errors;
-        this.field?.raiseUpdateErrors(this.__errors);
-        this.field?.raiseUpdateValue(this.__value);
         this.designer?.setErrors(this.__errors);
+        this.field?.raiseUpdateErrors(model.errors);
+        this.field?.raiseUpdateValue(model.value);
     }
 
     destroy() {
         this.designer?.destroy();
     }
 }
-
 export interface IFieldDesigner {
     provider: FieldProvider<any, any>;
     element: HTMLElement;
