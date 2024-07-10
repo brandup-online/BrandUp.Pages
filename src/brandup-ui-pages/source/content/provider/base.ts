@@ -18,6 +18,7 @@ export abstract class FieldProvider<TValue, TOptions> {
     field: IFormField;
 
     get valueElem(): HTMLElement { return this.__valueElem; }
+    get errors(): string[] { return this.__errors; }
 
     constructor(content: Content, model: ContentFieldModel) {
         this.content = content;

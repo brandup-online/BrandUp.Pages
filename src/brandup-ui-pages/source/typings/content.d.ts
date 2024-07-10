@@ -39,3 +39,12 @@ export interface FieldValueResult {
     value: any;
     errors: Array<string>;
 }
+
+export interface IFieldValueElement {
+    element: HTMLElement;
+
+    onChange: (value: any) => void;
+    setValue: (value: any) => void;
+    getValue: () => any;
+    destroy: () => void;
+}

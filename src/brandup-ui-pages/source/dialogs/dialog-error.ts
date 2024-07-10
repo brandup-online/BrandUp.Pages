@@ -4,6 +4,7 @@ import { DOM } from "brandup-ui-dom";
 import infoIcon from "../svg/new/info.svg";
 import "./dialog-error.less";
 import { ValidationContentModel } from "../typings/content";
+import { editPage } from "./content/edit";
 
 export class ErrorDialog extends Dialog {
     private __errors: ValidationContentModel[];
@@ -15,12 +16,26 @@ export class ErrorDialog extends Dialog {
         super(options);
 
         this.__errors = errors;
+        this.registerCommand("navigate", (elem) => {
+            const contentPath = elem.dataset.contentPath;
+            const content = editor.navigate(contentPath);
+            if (!content) throw `content path ${contentPath} not found`;
+            editPage(content, contentPath).then(() => {
+                // TODO повторная валидация по contentPath
+                this.__refreshErrors();
+            });
+        })
     }
 
     protected _onRenderContent() {
         this.setHeader("Ошибка");
 
         this.content.appendChild(this.__listElem = DOM.tag("div", { class: "error-list" }));
+        this.__refreshErrors();
+    }
+
+    private __refreshErrors() {
+        DOM.empty(this.__listElem);
 
         this.__errors.forEach(err => {
             this._addError(err);
@@ -37,7 +52,7 @@ export class ErrorDialog extends Dialog {
                     fieldError.errors.length === 0 ? null : DOM.tag("ul", null, ...fieldError.errors.map(err => DOM.tag("li", {class: "field-error"}, [infoIcon, err]))),
                 ])
             })),
-            DOM.tag("a", { href: "", "data-content-path": error.path }, "Редактировать")
+            DOM.tag("a", { href: "#", command: "navigate", "data-content-path": error.path }, "Редактировать")
         ]);
 
         this.__listElem.appendChild(containerElem);
