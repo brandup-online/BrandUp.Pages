@@ -1,10 +1,11 @@
 import { UIElement } from "brandup-ui";
 import { DOM } from "brandup-ui-dom";
-import { HyperLinkFieldFormOptions, HyperLinkFieldFormValue, HyperLinkType } from "../hyperlink";
+import { HyperLinkFieldFormOptions } from "../hyperlink";
 import iconArrow from "../../../svg/combobox-arrow.svg";
 import { IFieldValueElement } from "../../../typings/content";
 import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import { PageModel } from "../../../typings/page";
+import { HyperLinkValue } from "../../../content/provider/hyperlink";
 
 export class HyperlinkValue extends UIElement implements IFieldValueElement {
     private __typeElem: HTMLElement;
@@ -20,7 +21,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     private __searchTimeout: number;
     private __searchRequest: XMLHttpRequest;
 
-    private __onChange: (value: string) => void;
+    private __onChange: (value: HyperLinkValue) => void;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.Hyperlink"; }
 
@@ -141,13 +142,13 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
 
             this.refreshUI();
 
-            this.__onChange(pageId);
+            this.__onChange({value: pageId, valueType: "Page"});
         });
 
         this.__urlValueInput.addEventListener("change", () => {
             this.refreshUI();
 
-            this.__onChange(this.__urlValueInput.value);
+            this.__onChange({value: this.__urlValueInput.value, valueType: "Url"});
         });
 
         this.__pageValueInput.addEventListener("keyup", () => {
@@ -193,11 +194,11 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
         });
     }
 
-    onChange(handler: (file: File | string) => void) {
+    onChange(handler: (value: HyperLinkValue) => void) {
         this.__onChange = handler;
     }
 
-    getValue(): HyperLinkFieldFormValue { throw "Not implemented"; }
+    getValue(): HyperLinkValue { throw "Not implemented"; }
     
     private renderUrlValue() {
         this.__urlValueInput = DOM.tag("input", { type: "text", class: "url" }) as HTMLInputElement;
@@ -221,7 +222,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
         }
     }
 
-    setValue(value: HyperLinkFieldFormValue) {
+    setValue(value: HyperLinkValue) {
         if (value) {
             this.__type = value.valueType;
 
@@ -288,3 +289,5 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
         super.destroy();
     }
 }
+
+export type HyperLinkType = "Url" | "Page";
