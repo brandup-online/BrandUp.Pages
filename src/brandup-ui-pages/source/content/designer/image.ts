@@ -117,7 +117,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
     
     private __uploadFile(file: File | string) {
         this.element.classList.add("uploading");
-        this.provider.changeImage(file);
+        this.provider.saveValue(file);
     }
 
     destroy() {

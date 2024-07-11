@@ -7,11 +7,14 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
         return null;
     }
 
-    saveValue(value: any) {
-        throw "method saveValue not implemented in HyperlinkFieldProvider";
+    saveValue(value: HyperLinkValue) {
+        if (value.valueType === "Page")
+            this.selectPage(value.value);
+        else if (value.valueType === "Url")
+            this.changeUrl(value.value);
     }
 
-    changeValue(url: string) {
+    changeUrl(url: string) {
         this.request({
             url: `/brandup.pages/content/hyperlink/url`,
             urlParams: { url },

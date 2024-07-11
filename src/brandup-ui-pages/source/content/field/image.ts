@@ -11,15 +11,10 @@ export class ImageContent extends FormField<ImageFieldOptions> {
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
         this.element.classList.add("image");
-        this.__valueElem.onChange((file: File | string) => this.__uploadFile(file));
     }
 
     protected _renderValueElem() {
         return new ImageValue(this.options);
-    }
-
-    private __uploadFile(file: File | string) {
-        this.provider.changeImage(file);
     }
 }
 

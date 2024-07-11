@@ -8,11 +8,7 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         return new ImageDesigner(this);
     }
 
-    saveValue(value: any) {
-        throw "method saveValue not implemented in ImageFieldProvider"
-    }
-
-    changeImage(value: File | string): void {
+    saveValue(value: File | string): void {
         let requestOptions: AjaxRequest = {};
         if (value instanceof File) {
             requestOptions = {
