@@ -9,7 +9,7 @@ import { UIElement } from "brandup-ui";
 import { Content, IContentHost } from "./content";
 import { ModelFieldProvider } from "./provider/model";
 import { errorPage } from "../dialogs/dialog-error";
-import { BeginContentEditResult, ContentModel, GetContentEditResult } from "../typings/content";
+import { BeginContentEditResult, ContentModel, GetContentEditResult, ValidationContentModel } from "../typings/content";
 import defs from "./defs";
 import { HtmlContent } from "./field/html";
 import { HyperLinkContent } from "./field/hyperlink";
@@ -177,6 +177,11 @@ export class ContentEditor extends UIElement implements IContentHost {
         this.registerCommand("bp-commit", () => {
             if (this.__isLoading)
                 return;
+
+            const errorModels: ValidationContentModel[] = this.validate();
+            if (errorModels.length)
+                return errorPage(this, errorModels);
+
             this.__isLoading = true;
 
             this.api({
@@ -214,6 +219,16 @@ export class ContentEditor extends UIElement implements IContentHost {
                 },
             });
         });
+    }
+
+    validate() {
+        const errorModels: ValidationContentModel[] = [];
+        this.__contents.forEach(content => {
+            const errors = content.validate();
+            if (errors) errorModels.push(errors);
+        })
+
+        return errorModels;
     }
     
     private __renderDesigner() {

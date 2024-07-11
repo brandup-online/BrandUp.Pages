@@ -15,10 +15,12 @@ export class Content {
     readonly typeName: string;
     readonly parentPath: string;
     private __fields = new Map<string, FieldProvider<any, any>>();
+    private __errors: Array<string> = [];
 
     private __container: HTMLElement = null;
     
     get container(): HTMLElement { return this.__container; }
+    get errors(): string[] { return this.__errors; }
 
     constructor(host: IContentHost, model: ContentModel) {
         this.host = host;
@@ -56,6 +58,21 @@ export class Content {
                 return ModelFieldProvider;
             default:
                 throw new Error(`field type ${type} not found`);
+        }
+    }
+
+    validate() {
+        const fieldsErrors = [];
+        this.fields.forEach(field => {
+            if (field.errors.length) fieldsErrors.push({ errors: field.errors, ...field })
+        })
+        if (fieldsErrors.length) {
+            return({
+                fields: fieldsErrors,
+                ...this,
+                errors: this.__errors,
+                parentField: this.parentPath
+            })
         }
     }
 

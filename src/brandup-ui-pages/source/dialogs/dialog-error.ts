@@ -21,7 +21,8 @@ export class ErrorDialog extends Dialog {
             const content = editor.navigate(contentPath);
             if (!content) throw `content path ${contentPath} not found`;
             editPage(content, contentPath).then(() => {
-                // TODO повторная валидация по contentPath
+                this.__errors = editor.validate();
+                if (this.__errors.length === 0) this._onClose();
                 this.__refreshErrors();
             });
         })
@@ -30,7 +31,7 @@ export class ErrorDialog extends Dialog {
     protected _onRenderContent() {
         this.setHeader("Ошибка");
 
-        this.content.appendChild(this.__listElem = DOM.tag("div", { class: "error-list" }));
+        this.content.appendChild(this.__listElem = DOM.tag("ul", { class: "error-list" }));
         this.__refreshErrors();
     }
 
@@ -43,12 +44,12 @@ export class ErrorDialog extends Dialog {
     }
 
     protected _addError(error: ValidationContentModel) {
-        const containerElem = DOM.tag("div", { class: "content-error-block" }, [
-            DOM.tag("div", null, [DOM.tag("span", null, error.path), DOM.tag("h3", null, error.typeTitle)]),
+        const containerElem = DOM.tag("li", { class: "content-error-block" }, [
+            DOM.tag("hgroup", null, [DOM.tag("span", null, error.path), DOM.tag("h3", null, error.typeTitle)]),
             error.errors.length === 0 ? null : DOM.tag("ul", {class: "error-values"}, error.errors.map(err => DOM.tag("li", null, err))),
             error.fields.length === 0 ? null : DOM.tag("ul", {class: "fields-errors"}, error.fields.map(fieldError => {
                 return DOM.tag("li", null, [
-                    DOM.tag("div", {class: "header"}, [DOM.tag("span", null, fieldError.name), DOM.tag("h4", null, fieldError.title)]),
+                    DOM.tag("hgroup", {class: "header"}, [DOM.tag("span", null, fieldError.name), DOM.tag("h4", null, fieldError.title)]),
                     fieldError.errors.length === 0 ? null : DOM.tag("ul", null, ...fieldError.errors.map(err => DOM.tag("li", {class: "field-error"}, [infoIcon, err]))),
                 ])
             })),
