@@ -182,6 +182,12 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         }
     }
 
+    getItem(index: number) {
+        const item = this.__contents[index];
+        if (!item) throw `content by index ${index} not found`;
+        return item;
+    }
+
     protected getItemIndex(container: HTMLElement) {
         let index = -1;
         for (let i = 0; i < this.__contents.length; i++) {

@@ -28,9 +28,8 @@ export default class ModelField extends FormField<ModelFieldOptions> {
         this.registerCommand("item-settings", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = itemElem.getAttribute("data-content-path-index");
-            let contentPath = this.provider.content.path;
-            let modelPath = (contentPath ? contentPath + "." : "") + `${this.provider.name}[${itemIndex}]`; // TODO придумать, как нормально определять contentPath
-            this.provider.settingItem(modelPath);
+            const content = this.provider.getItem(+itemIndex);
+            this.provider.settingItem(content.path);
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
             const itemElem = elem.closest("[data-content-path-index]");
