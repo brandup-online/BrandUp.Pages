@@ -219,7 +219,7 @@ export class PageToolbar extends UIElement {
                     return result;
                 })
                 .then(result => {
-                    const editUrl = this.__page.website.buildUrl(null, { editid: result.editId });
+                    const editUrl = this.__page.website.buildUrl(null, { editid: result.editId }); // TODO разобраться с website.buildUrl
 
                     const contentLocation = findContent(contentKey)
                     if (!contentLocation || contentLocation.inPage)

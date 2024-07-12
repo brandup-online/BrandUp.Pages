@@ -33,6 +33,7 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
         ownElem.appendChild(this.element);
 
         this.raiseUpdateErrors(this.provider.errors);
+        this._setValue(this.provider.getValue());
     }
 
     raiseUpdateErrors(errors: Array<string>) {
@@ -68,5 +69,8 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
 
     destroy(): void {
         this.__valueElem.destroy();
+        
+        this.element.remove();
+        super.destroy();
     }
 }

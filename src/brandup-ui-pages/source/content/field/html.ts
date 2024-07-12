@@ -2,7 +2,7 @@
 import { FormField } from "./base";
 import { HTMLValue } from "./value/html";
 
-export class HtmlContent extends FormField<HtmlFieldFormOptions> {
+export default class HtmlContent extends FormField<HtmlFieldFormOptions> {
     get typeName(): string { return "BrandUpPages.Form.Field.Html"; }
 
     protected _renderValueElem() {

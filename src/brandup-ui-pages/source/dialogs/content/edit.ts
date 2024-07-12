@@ -78,14 +78,14 @@ export class PageEditDialog extends Dialog<any> {
             fieldsArr.push(field);
         });
 
-        Promise.allSettled(fieldsArr.map(field => {
+        Promise.all(fieldsArr.map(field => {
             return this.addField(field);
         }));
     }
 
     protected addField(provider: FieldProvider<any, any>) {
         return defs.resolveFormField(provider.type.toLowerCase()).then((type) => {
-            const field: FormField<any> = new type(provider.title, provider.options, provider);
+            const field: FormField<any> = new type.default(provider.title, provider.options, provider);
     
             if (this.__fields.hasOwnProperty(provider.name.toLowerCase()))
                 throw `Field name "${provider.name}" already exists.`;
@@ -94,7 +94,6 @@ export class PageEditDialog extends Dialog<any> {
     
             provider.registerForm(field);
             field.render(containerElem);
-            field.raiseUpdateValue(provider.getValue());
             
             this.__fieldsElem.appendChild(containerElem);
             this.__fields[provider.name.toLowerCase()] = field;

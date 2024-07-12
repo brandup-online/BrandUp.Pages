@@ -4,7 +4,7 @@ import { ModelFieldOptions, ModelFieldProvider } from "../../content/provider/mo
 import "./model.less";
 import { ModelListValue } from "./value/model-list";
 
-export class ModelField extends FormField<ModelFieldOptions> {
+export default class ModelField extends FormField<ModelFieldOptions> {
     declare readonly provider: ModelFieldProvider;
     declare protected __valueElem: ModelListValue;
 

@@ -2,7 +2,7 @@
 import { FormField } from "./base";
 import { PageValue } from "./value/page";
 
-export class PagesContent extends FormField<PagesFieldFormOptions> {
+export default class PagesContent extends FormField<PagesFieldFormOptions> {
     get typeName(): string { return "BrandUpPages.Form.Field.Pages"; }
 
     render(ownElem: HTMLElement): void {

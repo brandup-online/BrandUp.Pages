@@ -3,7 +3,7 @@ import { FormField } from "./base";
 import { ImageFieldProvider } from "../../content/provider/image";
 import { ImageValue } from "./value/image";
 
-export class ImageContent extends FormField<ImageFieldOptions> {
+export default class ImageContent extends FormField<ImageFieldOptions> {
     declare readonly provider: ImageFieldProvider;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Image"; }
