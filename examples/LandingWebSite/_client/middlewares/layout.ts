@@ -1,5 +1,6 @@
-﻿import { Middleware, NavigateContext } from "brandup-ui-app";
-export class LayoutMiddleware extends Middleware {
+﻿import { Application, ApplicationModel, Middleware, NavigateContext } from "brandup-ui-app";
+
+export class LayoutMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
     start(context, next) {
         next();
 

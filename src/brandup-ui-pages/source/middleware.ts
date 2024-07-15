@@ -1,9 +1,9 @@
-﻿import { Middleware, NavigateContext } from "brandup-ui-app";
+﻿import { Application, ApplicationModel, Middleware, NavigateContext } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
 
 const UI = () => import("./ui");
 
-export class PagesMiddleware extends Middleware {
+export class PagesMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
     private __isEditing: boolean = false;
 
     start(context, next) {

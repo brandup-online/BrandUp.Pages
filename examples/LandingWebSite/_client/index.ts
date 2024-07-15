@@ -1,10 +1,10 @@
-﻿import { host } from "brandup-ui-website";
+﻿import { WebApp } from "brandup-ui-website";
 import { ajaxRequest } from "brandup-ui-ajax";
 import { PagesMiddleware } from "brandup-ui-pages";
-import "./styles.less";
 import { LayoutMiddleware } from "./middlewares/layout";
+import "./styles.less";
 
-host.start({
+WebApp.run({
     pageTypes: {
         "content": () => import("brandup-ui-pages/source/pages/content"),
         "about": () => import("./pages/about/index")
