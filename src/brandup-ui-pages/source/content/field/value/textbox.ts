@@ -4,8 +4,8 @@ import { TextboxOptions } from "../../../form/textbox";
 import { IFieldValueElement } from "../../../typings/content";
 
 export class TextBoxValue extends UIElement implements IFieldValueElement {
-    private __isChanged: boolean;
-    private __onChange: (value: string) => void;
+    private __isChanged: boolean = false;
+    private __onChange: (value: string) => void = () => {};
 
     readonly options: TextboxOptions;
 
@@ -30,33 +30,34 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
     }
 
     private __initLogic() {
-        this.element.addEventListener("paste", (e: ClipboardEvent) => {
+        this.element?.addEventListener("paste", (e: ClipboardEvent) => {
             this.__isChanged = true;
 
             e.preventDefault();
 
-            const text = e.clipboardData.getData("text/plain");
+            const text = e.clipboardData?.getData("text/plain");
+            if (!text) throw "paste event error";
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
-        this.element.addEventListener("cut", () => {
+        this.element?.addEventListener("cut", () => {
             this.__isChanged = true;
         });
-        this.element.addEventListener("keydown", (e: KeyboardEvent) => {
+        this.element?.addEventListener("keydown", (e: KeyboardEvent) => {
             if (!this.options.allowMultiline && e.keyCode === 13) {
                 e.preventDefault();
                 return false;
             }
         });
-        this.element.addEventListener("keyup", () => {
+        this.element?.addEventListener("keyup", () => {
             this.__isChanged = true;
         });
-        this.element.addEventListener("focus", () => {
+        this.element?.addEventListener("focus", () => {
             this.__isChanged = false;
-            this.element.classList.add("focused");
+            this.element?.classList.add("focused");
         });
 
-        this.element.addEventListener("blur", () => {
-            this.element.classList.remove("focused");
+        this.element?.addEventListener("blur", () => {
+            this.element?.classList.remove("focused");
             if (this.__isChanged)
                 this.__onChange(this.getValue());
         });
@@ -66,12 +67,16 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
         this.__onChange = handler;
     }
 
-    getValue(): string {
-        const val = this.normalizeValue(this.element.innerText);
-        return val ? val : null;
+    getValue(): string{
+        if (!this.element) throw "element not defined";
+
+        const val = this.normalizeValue(this.element?.innerText);
+        return val;
     }
 
     setValue(value: string) {
+        if (!this.element) throw "element not defined";
+
         value = this.normalizeValue(value);
         if (value && this.options.allowMultiline) {
             value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");

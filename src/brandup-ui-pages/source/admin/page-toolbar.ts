@@ -26,10 +26,10 @@ export class PageToolbar extends UIElement {
 
     readonly isContentPage: boolean;
 
-    private __menuCloseFunc: (e: MouseEvent) => void;
-    private __menuExpandedElem: HTMLElement = null;
+    private __menuCloseFunc: ((e: MouseEvent) => void) | null = null;
+    private __menuExpandedElem: HTMLElement | null = null;
 
-    private __editor: ContentEditor = null;
+    private __editor: ContentEditor | null = null;
     
     get typeName(): string {
         return "BrandUpPages.PageToolbar";
@@ -156,7 +156,7 @@ export class PageToolbar extends UIElement {
         };
 
         this.registerCommand("bp-back", () => {
-            let parentPageId: string = null;
+            let parentPageId: string = "";
             if (this.isContentPage)
                 parentPageId = this.__page.model.parentPageId;
             if (parentPageId) {
@@ -179,21 +179,27 @@ export class PageToolbar extends UIElement {
             });
 
         this.registerCommand("bp-pages", () => {
-            let parentPageId: string = null;
+            let parentPageId: string = "";
             if (this.isContentPage)
                 parentPageId = this.__page.model.parentPageId;
+
+            if (!parentPageId) throw "parent page not found";
+
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-pages-child", () => {
-            let parentPageId: string = null;
+            let parentPageId: string = "";
             if (this.isContentPage)
                 parentPageId = this.__page.model.id;
+
+            if (!parentPageId) throw "parent page not found";
+
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-content-types", () => {
-            this.element.classList.remove("opened-menu");
+            this.element?.classList.remove("opened-menu");
             listContentType();
         });
 
@@ -219,7 +225,7 @@ export class PageToolbar extends UIElement {
                     return result;
                 })
                 .then(result => {
-                    const editUrl = this.__page.website.buildUrl(null, { editid: result.editId }); // TODO разобраться с website.buildUrl
+                    const editUrl = this.__page.website.buildUrl(this.__page.nav.path, { editid: result.editId });
 
                     const contentLocation = findContent(contentKey)
                     if (!contentLocation || contentLocation.inPage)
@@ -237,12 +243,16 @@ export class PageToolbar extends UIElement {
     }
     
     private __openMenu(ownElem: HTMLElement) {
+        if (!this.__menuCloseFunc) return;
+
         document.body.addEventListener("click", this.__menuCloseFunc);
 
         this.__menuExpandedElem = ownElem;
     }
 
     private __closeMenu() {
+        if (!this.__menuCloseFunc) return;
+
         if (this.__menuExpandedElem)
             this.__menuExpandedElem.classList.remove("expanded"); // закрываем последнее открытое контекстное меню
 
@@ -302,7 +312,7 @@ const findContents = (): Array <ContentLocation> => {
 const findContent = (contentKey: string): ContentLocation => {
     const contentElem = DOM.queryElement(document.body, `[data-content-root='${contentKey}']`);
     if (!contentElem)
-        return null;
+        throw "couldn't find the content";
 
     return createContentLocation(contentElem);
 };
@@ -312,7 +322,10 @@ const findEditContent = (editId: string): ContentLocation => {
     if (contentElem && contentElem.dataset.contentEditId != editId)
         throw "";
 
-    return contentElem ? createContentLocation(contentElem) : null;
+    if (!contentElem)
+        throw "couldn't find the content";
+
+    return createContentLocation(contentElem);
 };
 
 export interface ContentLocation {

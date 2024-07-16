@@ -10,10 +10,10 @@ export class PageValue extends UIElement implements IFieldValueElement {
     private __pagesValueElem: HTMLElement;
     private __searchElem: HTMLElement;
     private __closeMenuFunc: (e: MouseEvent) => void;
-    private __searchTimeout: number;
-    private __searchRequest: XMLHttpRequest;
+    private __searchTimeout: number = 0;
+    private __searchRequest: XMLHttpRequest | null = null;
 
-    private __onChange: (value: string) => void;
+    private __onChange: (value: string) => void = () => {};
 
     readonly options: PagesFieldFormOptions;
 
@@ -38,24 +38,24 @@ export class PageValue extends UIElement implements IFieldValueElement {
         this.__refreshUI();
 
         this.__initLogic();
-    }
 
-    private __initLogic() {
         this.__closeMenuFunc = (e: MouseEvent) => {
             const t = e.target as Element;
             if (!t.closest(".pages") && this.element) {
-                this.element.classList.remove("inputing");
+                this.element?.classList.remove("inputing");
                 document.body.removeEventListener("click", this.__closeMenuFunc, false);
             }
         };
+    }
 
+    private __initLogic() {
         this.registerCommand("begin-input", () => {
-            if (!this.element.classList.toggle("inputing")) {
+            if (!this.element?.classList.toggle("inputing")) {
                 document.body.removeEventListener("click", this.__closeMenuFunc, false);
                 return;
             }
 
-            this.element.classList.add("inputing");
+            this.element?.classList.add("inputing");
 
             DOM.empty(this.__searchElem);
             this.__searchElem.appendChild(DOM.tag("li", { class: "text" }, "Начните вводить название коллекции страниц."));
@@ -67,11 +67,13 @@ export class PageValue extends UIElement implements IFieldValueElement {
         });
 
         this.registerCommand("select", (elem: HTMLElement) => {
-            this.element.classList.remove("inputing");
+            this.element?.classList.remove("inputing");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
             const pageCollectionId = elem.getAttribute("data-value");
             const pageUrl = elem.getAttribute("data-url");
+
+            if (!pageCollectionId || !pageUrl) return;
 
             this.setValue({
                 id: pageCollectionId,
@@ -145,7 +147,9 @@ export class PageValue extends UIElement implements IFieldValueElement {
         return this.__inputElem.hasAttribute("value-collection-id");
     }
 
-    getValue: () => any;
+    getValue(): any {
+        throw "getValue method not implemented"
+    }
 
     setValue(value: PagesFieldFormValue) {
         if (!value) {
@@ -164,9 +168,9 @@ export class PageValue extends UIElement implements IFieldValueElement {
 
     private __refreshUI() {
         if (this.hasValue())
-            this.element.classList.add("has-value");
+            this.element?.classList.add("has-value");
         else
-            this.element.classList.remove("has-value");
+            this.element?.classList.remove("has-value");
     }
 
     onChange(handler: (file: File | string) => void) {

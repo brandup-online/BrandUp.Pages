@@ -12,7 +12,7 @@ export default class ModelField extends FormField<ModelFieldOptions> {
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.element.classList.add("content");
+        this.element?.classList.add("content");
         this.__valueElem.onChange((sourceIndex: number, destIndex: number) => this.provider.moveItem(sourceIndex, destIndex));
     }
 
@@ -20,21 +20,25 @@ export default class ModelField extends FormField<ModelFieldOptions> {
         if (this.options.isListValue) {
             return this.__renderListValue();
         }
+        throw "ModelValue class not implemented";
     }
 
-    private __renderListValue() {
+    private __renderListValue(): ModelListValue {
         const valueElem = new ModelListValue(this.options);
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
-            const itemIndex = itemElem.getAttribute("data-content-path-index");
+            const itemElem = this.__getItemElem(elem);
+
+            const itemIndex = itemElem.getAttribute("data-content-path-index")!;
             const content = this.provider.getItem(+itemIndex);
             this.provider.settingItem(content.path);
         });
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
-            const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index"));
-            const path = itemElem.getAttribute("data-content-path")
+            const itemElem = this.__getItemElem(elem);
+            const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index")!);
+            const path = itemElem.getAttribute("data-content-path");
+            if (path === null) throw "the element does not have an attribute data-content-path";
+
             this.provider.deleteItem(itemIndex, path);
             valueElem.deleteItem(itemIndex);
         });
@@ -50,6 +54,12 @@ export default class ModelField extends FormField<ModelFieldOptions> {
             }
         });
         return valueElem;
+    }
+
+    private __getItemElem(elem: HTMLElement) {
+        const itemElem = elem.closest("[data-content-path-index]");
+        if (!itemElem) throw `item element with attribute data-content-path-index not found`;
+        return itemElem;
     }
 
     private __addItem(itemType: string) {

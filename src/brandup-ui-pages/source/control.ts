@@ -3,7 +3,7 @@ import { Utility } from "brandup-ui-helpers";
 
 export abstract class UIControl<TOptions = {}> extends UIElement {
     readonly options: TOptions = {} as TOptions;
-    private __fragment: DocumentFragment;
+    private __fragment?: DocumentFragment | null = null;
 
     readonly isInject: boolean = false;
 
@@ -42,7 +42,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
         return "div";
     }
     protected _getHtmlTemplate(): string {
-        return null;
+        return "";
     }
     render(container: HTMLElement | string, position: InsertPosition = "afterbegin"): this {
         if (container) {
@@ -50,7 +50,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
                 throw new Error();
 
             if (Utility.isString(container)) {
-                container = document.getElementById((container as string).substr(1));
+                container = document.getElementById((container as string).substr(1)) || "";
                 if (!container)
                     throw new Error();
             }
@@ -58,7 +58,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
 
         const htmlTemplate = this._getHtmlTemplate();
         if (htmlTemplate)
-            this.element.insertAdjacentHTML(position, htmlTemplate);
+            this.element?.insertAdjacentHTML(position, htmlTemplate);
 
         if (this.__fragment) {
             (container as HTMLElement).appendChild(this.__fragment);
@@ -71,7 +71,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
     }
     destroy() {
         if (!this.isInject && this.element)
-            this.element.remove();
+            this.element?.remove();
 
         super.destroy();
     }

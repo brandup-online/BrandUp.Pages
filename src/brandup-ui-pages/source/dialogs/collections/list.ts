@@ -10,7 +10,7 @@ import { PagePathModel } from "../pages/browser";
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {
     private pageId: string;
     private __isModified: boolean = false;
-    private navElem: HTMLElement;
+    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
 
     constructor(pageId: string, options?: DialogOptions) {
         super(options);
@@ -46,6 +46,8 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
         });
         this.registerCommand("nav", (elem) => {
             let pageId = elem.getAttribute("data-page-id");
+            if (!pageId) return;
+
             this.pageId = pageId;
             this.refresh();
         });
@@ -53,7 +55,7 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
 
     protected _onClose() {
         if (this.__isModified)
-            this.resolve(null);
+            this.resolve({});
         else
             super._onClose();
     }
@@ -67,8 +69,7 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
     }
     protected _buildList(model: PageCollectionListModel) {
         if (!this.navElem) {
-            this.navElem = DOM.tag("ol", { class: "nav" })
-            this.content.insertAdjacentElement("afterbegin", this.navElem);
+            this.content?.insertAdjacentElement("afterbegin", this.navElem);
         }
         else {
             DOM.empty(this.navElem);

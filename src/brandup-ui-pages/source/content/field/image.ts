@@ -10,7 +10,7 @@ export default class ImageContent extends FormField<ImageFieldOptions> {
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.element.classList.add("image");
+        this.element?.classList.add("image");
     }
 
     protected _renderValueElem() {

@@ -7,7 +7,7 @@ export default class PagesContent extends FormField<PagesFieldFormOptions> {
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.element.classList.add("pages");
+        this.element?.classList.add("pages");
     }
 
     protected _renderValueElem() {

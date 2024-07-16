@@ -5,11 +5,11 @@ import { IFieldValueElement } from "../../../typings/content";
 import ContentEditor from "brandup-pages-ckeditor";
 
 export class HTMLValue extends UIElement implements IFieldValueElement {
-    private __isChanged: boolean;
-    private __editor: ContentEditor;
+    private __isChanged: boolean = false;
+    private __editor: ContentEditor | null = null;
     private __editorPromise: Promise<any>;
 
-    private __onChange: (value: string) => void;
+    private __onChange: (value: string) => void = () => {};
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.HTML"; }
 
@@ -26,8 +26,9 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
 
         valueElem.addEventListener("blur", () => {
             if (this.__isChanged) {
-                this.__editor.model.document.differ.reset();
+                this.__editor?.model.document.differ.reset();
                 const value = this.getValue();
+                if (value === null) throw "value not set"; 
                 this.__onChange(value);
             }
 
@@ -53,9 +54,9 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
 
     private __refreshUI() {
         if (this.hasValue())
-            this.element.classList.remove("empty-value");
+            this.element?.classList.remove("empty-value");
         else
-            this.element.classList.add("empty-value");
+            this.element?.classList.add("empty-value");
     }
 
     normalizeValue(value: string): string {
@@ -68,11 +69,13 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     hasValue(): boolean {
-        const value = this.normalizeValue(this.element.innerText);
+        const value = this.normalizeValue(this.element?.innerText || "");
         if (!value)
             return false;
+        const root = this.__editor?.model.document.getRoot();
+        if (!root) return false;
 
-        const val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
+        const val = this.__editor?.model.hasContent(root, { ignoreWhitespaces: true });
         return value && val ? true : false;
     }
 
@@ -82,13 +85,13 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
                 this.__editor.data.set(value ? value : "");
                 this.__refreshUI();
             }
-            else
+            else if (this.element)
                 this.element.innerHTML = value ? value : "";
         });
     }
 
-    getValue(): string {
-        const data = this.__editor.data.get();
+    getValue(): string | null {
+        const data = this.__editor?.data.get();
         return data ? data : null;
     }
 
@@ -97,7 +100,7 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     destroy() {
-        this.__editor.destroy().then(() => {
+        this.__editor?.destroy().then(() => {
             super.destroy();
         });
 

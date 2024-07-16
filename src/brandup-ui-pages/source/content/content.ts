@@ -5,7 +5,7 @@ import { HyperlinkFieldProvider } from "./provider/hyperlink";
 import { ImageFieldProvider } from "./provider/image";
 import { TextFieldProvider } from "./provider/text";
 import { ContentEditor } from "./editor";
-import { ContentModel } from "../typings/content";
+import { ContentModel, ContentFieldModel } from "../typings/content";
 
 export class Content {
     readonly host: IContentHost;
@@ -17,9 +17,9 @@ export class Content {
     private __fields = new Map<string, FieldProvider<any, any>>();
     private __errors: Array<string> = [];
 
-    private __container: HTMLElement = null;
+    private __container: HTMLElement | null = null;
     
-    get container(): HTMLElement { return this.__container; }
+    get container(): HTMLElement | null { return this.__container; }
     get errors(): string[] { return this.__errors; }
 
     constructor(host: IContentHost, model: ContentModel) {
@@ -62,14 +62,18 @@ export class Content {
     }
 
     validate() {
-        const fieldsErrors = [];
+        const fieldsErrors: ContentFieldModel[] = [];
         this.fields.forEach(field => {
-            if (field.errors.length) fieldsErrors.push({ errors: field.errors, ...field })
+            if (field.errors.length) fieldsErrors.push({
+                ...field,
+                value: field.getValue(),
+                errors: field.errors
+            })
         })
         if (fieldsErrors.length) {
             return({
-                fields: fieldsErrors,
                 ...this,
+                fields: fieldsErrors,
                 errors: this.__errors,
                 parentField: this.parentPath
             })
@@ -91,6 +95,7 @@ export class Content {
                 return;
 
             const fieldElem = structure.fields.get(field.name);
+            if (!fieldElem) return;
             field.renderDesigner(fieldElem);
         });
     }

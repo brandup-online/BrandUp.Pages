@@ -4,10 +4,10 @@ import { DOM } from "brandup-ui-dom";
 
 export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, ContentTypeItemModel> {
     private __isModified: boolean = false;
-    private navElem: HTMLElement;
-    private baseContentType: string;
+    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
+    private baseContentType?: string | null;
 
-    constructor(baseContentType?: string, options?: DialogOptions) {
+    constructor(baseContentType: string | null, options?: DialogOptions) {
         super(options);
 
         this.baseContentType = baseContentType ? baseContentType : null;
@@ -35,7 +35,7 @@ export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, Cont
 
     protected _onClose() {
         if (this.__isModified)
-            this.resolve(null);
+            this.resolve({});
         else
             super._onClose();
     }
@@ -49,8 +49,7 @@ export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, Cont
     }
     protected _buildList(model: ContentTypeListModel) {
         if (!this.navElem) {
-            this.navElem = DOM.tag("ol", { class: "nav" })
-            this.content.insertAdjacentElement("afterbegin", this.navElem);
+            this.content?.insertAdjacentElement("afterbegin", this.navElem);
         }
         else {
             DOM.empty(this.navElem);
@@ -89,7 +88,7 @@ interface ContentTypeItemModel {
     isAbstract: boolean;
 }
 
-export var listContentType = (baseContentType: string = null) => {
+export var listContentType = (baseContentType: string | null = null) => {
     let dialog = new ContentTypeListDialog(baseContentType);
     return dialog.open();
 };

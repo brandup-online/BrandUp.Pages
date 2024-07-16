@@ -6,7 +6,7 @@ class BB1 extends UIElement {
 
         this.setElement(elem);
 
-        //this.element.addEventListener("click", () => { alert("test"); });
+        //this.element?.addEventListener("click", () => { alert("test"); });
     }
 
     get typeName(): string { return "LandingWebSite.BB1" }

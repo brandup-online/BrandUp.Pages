@@ -18,8 +18,10 @@ export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldOptions> {
                 if (response.status === 200) {
                     this.onSavedValue(response.data);
 
-                    let value = this.getValue();
-                    this.valueElem.innerHTML = value ? value : "";
+                    if (this.valueElem) {
+                        let value = this.getValue();
+                        this.valueElem.innerHTML = value ? value : "";
+                    }
                 }
             }
         });

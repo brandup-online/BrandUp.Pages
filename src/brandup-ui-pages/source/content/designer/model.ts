@@ -16,7 +16,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             if (this.provider.options.isListValue) {
                 if (position == "after") {
                     const contentElem = <HTMLElement>elem.closest("[data-content-path]");
-                    const content = this.provider.content.host.editor.navigate(contentElem.dataset.contentPath);
+                    const content = this.provider.content.host.editor.navigate(contentElem.dataset.contentPath!);
                     if (!content)
                         throw "";
                     itemIndex = content.index + 1;
@@ -29,17 +29,19 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         this.registerCommand("item-view", () => { return; });
 
         this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
+            const itemElem = this.__findItemElem(elem, "[data-content-path]");
             const contentPath = itemElem.getAttribute("data-content-path");
 
-            this.provider.settingItem(contentPath);
+            this.provider.settingItem(contentPath!);
         });
 
         this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
+            const itemElem = this.__findItemElem(elem, "[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             const path = itemElem.getAttribute("data-content-path");
+            if (path === null) throw "the element does not have an attribute data-content-path";
+
             itemElem.classList.add("processing");
             const index = this.getItemIndex(itemElem);
             
@@ -47,7 +49,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
 
         this.registerCommand("item-up", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
+            const itemElem = this.__findItemElem(elem, "[data-content-path-index]");
             const itemIndex = this.getItemIndex(itemElem);
             if (itemIndex <= 0)
                 return;
@@ -56,13 +58,13 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
                 return;
             itemElem.classList.add("processing");
 
-            itemElem.previousElementSibling.insertAdjacentElement("beforebegin", itemElem);
+            itemElem.previousElementSibling?.insertAdjacentElement("beforebegin", itemElem);
 
             this.provider.itemUp(itemIndex, itemElem);
         });
 
         this.registerCommand("item-down", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path]");
+            const itemElem = this.__findItemElem(elem, "[data-content-path]");
             const itemIndex = this.getItemIndex(itemElem);
 
             if (itemIndex + 1 >= this.countItems())
@@ -72,18 +74,24 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
                 return;
             itemElem.classList.add("processing");
 
-            itemElem.nextElementSibling.insertAdjacentElement("afterend", itemElem);
+            itemElem.nextElementSibling?.insertAdjacentElement("afterend", itemElem);
             this.provider.itemDown(itemIndex, itemElem);
         });
 
         this.registerCommand("item-refresh", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
+            const itemElem = this.__findItemElem(elem, "[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");
 
             this.provider.refreshItem(itemElem, this.getItemIndex(itemElem));
         });
+    }
+
+    private __findItemElem(elem: HTMLElement, selector: string) {
+        const itemElem = elem.closest(selector);
+        if (!itemElem) throw `item element with attribute ${selector} not found`;
+        return itemElem;
     }
     
     refreshItem(elem: Element, content: any) {
@@ -99,13 +107,18 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     }
 
     protected getItem(index: number): Element {
-        let itemElem: Element;
+        let itemElem: Element | null = null;
+
+        if (!this.element) throw "element not defined";
 
         for (let i = 0; i < this.element.children.length; i++) {
-            itemElem = this.element.children.item(i);
+            itemElem = this.element.children.item(i)!;
+
             if (itemElem.hasAttribute("data-content-path") && i === index)
                 return itemElem;
         }
+
+        if (!itemElem) throw "ModelDesigner ~ getItem ~ itemElem not found";
 
         return itemElem;
     }  
@@ -115,7 +128,9 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     }
 
     protected getItemIndex(item: Element) {
-        const index = +item?.getAttribute("data-content-path-index");
+        if (!item.hasAttribute("data-content-path-index")) 
+            throw "the element does not have an attribute data-content-path-index";
+        const index = Number(item?.getAttribute("data-content-path-index"));
         if (index >=0) return index;
         return -1;
     }
@@ -133,6 +148,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     }
 
     protected getItems () {
+        if (!this.element) throw "element not defined";
         return DOM.queryElements(this.element, `.page-blocks-designer > [data-content-path]`);
     }
 }

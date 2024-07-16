@@ -7,8 +7,8 @@ import { ValidationContentModel } from "../typings/content";
 import { editPage } from "./content/edit";
 
 export class ErrorDialog extends Dialog {
-    private __errors: ValidationContentModel[];
-    private __listElem: HTMLElement
+    private __errors: ValidationContentModel[] = [];
+    private __listElem: HTMLElement = DOM.tag("ul", { class: "error-list" });
 
     get typeName(): string { return "BrandUpPages.ErrorDialog"; }
 
@@ -18,6 +18,8 @@ export class ErrorDialog extends Dialog {
         this.__errors = errors;
         this.registerCommand("navigate", (elem) => {
             const contentPath = elem.dataset.contentPath;
+            if (!contentPath) throw "data-content-path attribute not found"
+
             const content = editor.navigate(contentPath);
             if (!content) throw `content path ${contentPath} not found`;
             editPage(content, contentPath).then(() => {
@@ -31,7 +33,7 @@ export class ErrorDialog extends Dialog {
     protected _onRenderContent() {
         this.setHeader("Ошибка");
 
-        this.content.appendChild(this.__listElem = DOM.tag("ul", { class: "error-list" }));
+        this.content?.appendChild(this.__listElem);
         this.__refreshErrors();
     }
 
@@ -46,11 +48,11 @@ export class ErrorDialog extends Dialog {
     protected _addError(error: ValidationContentModel) {
         const containerElem = DOM.tag("li", { class: "content-error-block" }, [
             DOM.tag("hgroup", null, [DOM.tag("span", null, error.path), DOM.tag("h3", null, error.typeTitle)]),
-            error.errors.length === 0 ? null : DOM.tag("ul", {class: "error-values"}, error.errors.map(err => DOM.tag("li", null, err))),
-            error.fields.length === 0 ? null : DOM.tag("ul", {class: "fields-errors"}, error.fields.map(fieldError => {
+            error.errors.length === 0 ? "" : DOM.tag("ul", {class: "error-values"}, error.errors.map(err => DOM.tag("li", null, err))),
+            error.fields.length === 0 ? "" : DOM.tag("ul", {class: "fields-errors"}, error.fields.map(fieldError => {
                 return DOM.tag("li", null, [
                     DOM.tag("hgroup", {class: "header"}, [DOM.tag("span", null, fieldError.name), DOM.tag("h4", null, fieldError.title)]),
-                    fieldError.errors.length === 0 ? null : DOM.tag("ul", null, ...fieldError.errors.map(err => DOM.tag("li", {class: "field-error"}, [infoIcon, err]))),
+                    fieldError.errors.length === 0 ? "" : DOM.tag("ul", null, ...fieldError.errors.map(err => DOM.tag("li", {class: "field-error"}, [infoIcon, err]))),
                 ])
             })),
             DOM.tag("a", { href: "#", command: "navigate", "data-content-path": error.path }, "Редактировать")

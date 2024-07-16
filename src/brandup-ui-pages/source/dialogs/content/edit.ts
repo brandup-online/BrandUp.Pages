@@ -7,9 +7,9 @@ import { FieldProvider, IFormField } from "../../content/provider/base";
 import { FormField } from "../../content/field/base";
 
 export class PageEditDialog extends Dialog<any> {
-    private __formElem: HTMLFormElement;
-    private navElem: HTMLElement;
-    private __fieldsElem: HTMLElement;
+    private __formElem: HTMLFormElement = DOM.tag("form", { method: "POST", class: "nopad" }) as HTMLFormElement;
+    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
+    private __fieldsElem: HTMLElement = DOM.tag("div", { class: "fields" });
     private __fields: { [key: string]: IFormField } = {};
     private __modelPath: string;
     private __content: Content;
@@ -25,10 +25,10 @@ export class PageEditDialog extends Dialog<any> {
     get modelPath(): string { return this.__modelPath; }
 
     protected _onRenderContent() {
-        this.element.classList.add("bp-dialog-form");
+        this.element?.classList.add("bp-dialog-form");
 
-        this.content.appendChild(this.__formElem = DOM.tag("form", { method: "POST", class: "nopad" }) as HTMLFormElement);
-        this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));
+        this.content?.appendChild(this.__formElem);
+        this.__formElem.appendChild(this.__fieldsElem);
 
         this.__formElem.addEventListener("submit", (e: Event) => {
             e.preventDefault();
@@ -41,14 +41,15 @@ export class PageEditDialog extends Dialog<any> {
 
         this.registerCommand("navigate", (elem: HTMLElement) => {
             const path = elem.getAttribute("data-path");
+            if (!path) throw "not found attribute data-path";
+
             this.navigate(path);
         });
     }
 
     private __renderForm() {
         if (!this.navElem) {
-            this.navElem = DOM.tag("ol", { class: "nav" });
-            this.content.insertAdjacentElement("afterbegin", this.navElem);
+            this.content?.insertAdjacentElement("afterbegin", this.navElem);
         }
         else {
             DOM.empty(this.navElem);
@@ -73,7 +74,7 @@ export class PageEditDialog extends Dialog<any> {
         }
         
         // Fields
-        const fieldsArr = [];
+        const fieldsArr: FieldProvider<any, any>[] = [];
         this.__content.fields.forEach(field => {
             fieldsArr.push(field);
         });

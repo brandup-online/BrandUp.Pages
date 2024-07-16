@@ -41,8 +41,10 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
                     case 200:
                         this.onSavedValue(response.data);
 
-                        let value = this.getValue();
-                        this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
+                        if (this.valueElem) {
+                            let value = this.getValue();
+                            this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
+                        }
 
                         break;
                 }

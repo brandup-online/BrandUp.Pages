@@ -11,7 +11,7 @@ export default class HtmlContent extends FormField<HtmlFieldFormOptions> {
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.element.classList.add("html");
+        this.element?.classList.add("html");
     }
 }
 

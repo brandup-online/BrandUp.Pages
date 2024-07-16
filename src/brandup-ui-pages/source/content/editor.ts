@@ -26,11 +26,11 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     private __contentElem?: HTMLElement;
     private __contents: Map<string, Content> = new Map();
-    private __content: Content;
+    private __content: Content | null = null;
     private __isLoading = false;
 
-    private __complate: (value: EditResult) => void;
-    private __error: (reason?: any) => void;
+    private __complate: ((value: EditResult) => void) | null = null;
+    private __error: ((reason?: any) => void) | null = null;
 
     get typeName(): string { return "BrandUpPages.Editor"; }
     
@@ -71,7 +71,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         this.__contentElem = container;
         this.__contentElem?.classList.add("root-designer");
 
-        return this.loadContent(null)
+        return this.loadContent("")
             .then(() => {
                 this.__renderToolbar();
                 this.__renderDesigner();
@@ -95,10 +95,12 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     // Editor members
 
-    get content(): Content { return this.__content; }
+    get content(): Content | null { return this.__content; }
 
     navigate(path: string) {
-        return this.__contents.get(path);
+        const content = this.__contents.get(path);
+        if (!content) throw `content by path "${path}" not found`;
+        return content;
     }
 
     api(request: AjaxRequest) {
@@ -115,15 +117,18 @@ export class ContentEditor extends UIElement implements IContentHost {
                     if (response.status !== 200)
                         throw `Error load editor contents by path "${path}".`;
 
-                    let rootContent: Content = this.initContent(response.data.contents);
+                    let rootContent: Content | null = this.initContent(response.data.contents);
+                    if (!rootContent) throw "rootContent not found";
                     resolve(rootContent);
                 },
             });
         });
     }
 
-    initContent(contents: Array<ContentModel>) {
-        let rootContent: Content = null;
+    initContent(contents: Array<ContentModel>): Content {
+        let rootContent: Content;
+
+        if (!contents.length) throw "empty contents array";
 
         contents.forEach((contentModel, index) => {
             if (this.__contents.has(contentModel.path))
@@ -146,7 +151,7 @@ export class ContentEditor extends UIElement implements IContentHost {
                 rootContent = content;
         });
 
-        return rootContent;
+        return rootContent!;
     }
     
     private __renderToolbar() {
@@ -163,7 +168,9 @@ export class ContentEditor extends UIElement implements IContentHost {
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
 
-        this.registerCommand("bp-content", () => editPage(this.__contents.get(""), ""));
+        const rootContent = this.__contents.get("");
+        if (rootContent)
+            this.registerCommand("bp-content", () => editPage(rootContent, ""));
 
         this.registerCommand("bp-commit", () => {
             if (this.__isLoading)
@@ -184,9 +191,11 @@ export class ContentEditor extends UIElement implements IContentHost {
                     if (response.status !== 200)
                         throw "Error commit content editing.";
 
-                    if (response.data.isSuccess)
+                    if (response.data.isSuccess) {
+                        if (!this.__complate)
+                            throw "Complate function not set";
                         this.__complate({ reason: "Commit" });
-                    else {
+                    } else {
                         errorPage(this, response.data.validation);
                     }
                 }
@@ -205,6 +214,8 @@ export class ContentEditor extends UIElement implements IContentHost {
                 success: (response) => {
                     if (response.status !== 200)
                         throw "Error discard content editing.";
+                    if (!this.__complate)
+                        throw "Complate function not set";
 
                     this.__complate({ reason: "Discard" });
                 },
@@ -246,7 +257,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         DOM.queryElements(this.__contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
             const contentPath = elem.dataset.contentFieldPath;
             const fieldName = elem.dataset.contentFieldName;
-            contentElements.get(contentPath).fields.set(fieldName, elem);
+            contentElements.get(contentPath!)?.fields.set(fieldName!, elem);
         });
 
         Array.from(contentElements.values()).forEach(contentStructure => {
@@ -254,7 +265,7 @@ export class ContentEditor extends UIElement implements IContentHost {
                 throw `Content is not exist by path "${contentStructure.path}".`;
 
             const content = this.__contents.get(contentStructure.path);
-            content.renderDesigner(contentStructure);
+            content?.renderDesigner(contentStructure);
         });
     }
 

@@ -24,8 +24,10 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
                     case 200:
                         this.onSavedValue(response.data);
 
-                        const value = this.getValue();
-                        this.valueElem.setAttribute("href", value.value);
+                        if (this.valueElem) {
+                            const value = this.getValue();
+                            this.valueElem.setAttribute("href", value.value);
+                        }
 
                         break;
                     default:
@@ -45,8 +47,10 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
                     case 200:
                         this.onSavedValue(response.data);
 
-                        const value = this.getValue();
-                        this.valueElem.setAttribute("href", value.value);
+                        if (this.valueElem) {
+                            const value = this.getValue();
+                            this.valueElem.setAttribute("href", value.value);
+                        }
 
                         break;
                     default:

@@ -3,30 +3,28 @@ import { DOM } from "brandup-ui-dom";
 import iconArrow from "../svg/combobox-arrow.svg";
 import "./combobox.less";
 
-export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
-    private __valueElem: HTMLElement;
-    private __itemsElem: HTMLElement;
-    private __value: string = null;
-    private __isChanged: boolean;
+export class ComboBoxField extends Field<string | null, ComboBoxFieldOptions> {
+    private __valueElem: HTMLElement = DOM.tag("div", { class: "value" }) as HTMLInputElement;
+    private __itemsElem: HTMLElement = DOM.tag("ul");
+    private __value: string | null = null;
+    private __isChanged: boolean = false;
 
     get typeName(): string { return "BrandUpPages.Form.ComboBoxField"; }
 
     protected _onRender() {
         super._onRender();
 
-        this.element.classList.add("combobox");
-        this.element.setAttribute("tabindex", "0");
+        this.element?.classList.add("combobox");
+        this.element?.setAttribute("tabindex", "0");
 
-        this.element.appendChild(DOM.tag("i", null, iconArrow));
+        this.element?.appendChild(DOM.tag("i", null, iconArrow));
 
-        this.__valueElem = DOM.tag("div", { class: "value" }) as HTMLInputElement;
-        this.element.appendChild(this.__valueElem);
+        this.element?.appendChild(this.__valueElem);
 
         const placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "toggle" }, this.options.placeholder);
-        this.element.appendChild(placeholderElem);
+        this.element?.appendChild(placeholderElem);
 
-        this.__itemsElem = DOM.tag("ul");
-        this.element.appendChild(this.__itemsElem);
+        this.element?.appendChild(this.__itemsElem);
 
         let isFocused = false;
         let md = false;
@@ -43,7 +41,7 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
         placeholderElem.addEventListener("mouseup", () => {
             if (md && isFocused)
-                this.element.blur();
+                this.element?.blur();
         });
 
         this.registerCommand("select", (elem: HTMLElement) => {
@@ -56,7 +54,7 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
             this.__refreshUI();
 
-            this.element.blur();
+            this.element?.blur();
 
             this.raiseChanged();
         });
@@ -65,9 +63,9 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     private __refreshUI() {
         const hasVal = this.hasValue();
         if (hasVal)
-            this.element.classList.add("has-value");
+            this.element?.classList.add("has-value");
         else
-            this.element.classList.remove("has-value");
+            this.element?.classList.remove("has-value");
     }
 
     addItem(item: ComboBoxItem) {
@@ -85,10 +83,10 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
         this.__value = null;
     }
 
-    getValue(): string {
+    getValue(): string | null {
         return this.__value;
     }
-    setValue(value: string) {
+    setValue(value: string | null) {
         let text = "";
         if (value !== null) {
             const itemElem = DOM.queryElement(this.__itemsElem, `li[data-value="${value}"]`);

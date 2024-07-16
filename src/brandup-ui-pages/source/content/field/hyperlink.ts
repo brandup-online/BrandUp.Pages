@@ -7,7 +7,7 @@ export default class HyperLinkContent extends FormField<HyperLinkFieldFormOption
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.element.classList.add("hyperlink");
+        this.element?.classList.add("hyperlink");
     }
 
     protected _renderValueElem() {

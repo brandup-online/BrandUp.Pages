@@ -5,12 +5,12 @@ import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
-    private __textElem: HTMLElement;
-    private __errorsElem: HTMLElement;
-    private __item: TItem;
+    private __textElem: HTMLElement = DOM.tag("div", { class: "confirm-text" }, this._getText());
+    private __errorsElem: HTMLElement = DOM.tag("div", { class: "errors" });
+    private __item: TItem | null = null;
 
     protected _onRenderContent() {
-        this.element.classList.add("bp-dialog-delete");
+        this.element?.classList.add("bp-dialog-delete");
 
         this.addAction("close", "Отмена");
         this.addAction("confirm", "Удалить", true);
@@ -19,10 +19,8 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
             this.__delete();
         });
 
-        this.__textElem = DOM.tag("div", { class: "confirm-text" }, this._getText());
-        this.content.appendChild(this.__textElem);
-        this.__errorsElem = DOM.tag("div", { class: "errors" });
-        this.content.appendChild(this.__errorsElem);
+        this.content?.appendChild(this.__textElem);
+        this.content?.appendChild(this.__errorsElem);
 
         const urlParams: { [key: string]: string } = {};
 
@@ -72,7 +70,8 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
                         break;
                     }
                     case 200: {
-                        this.resolve(this.__item);
+                        if (this.__item)
+                            this.resolve(this.__item);
                         return;
                     }
                     default:

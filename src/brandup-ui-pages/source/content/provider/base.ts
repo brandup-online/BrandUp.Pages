@@ -12,12 +12,12 @@ export abstract class FieldProvider<TValue, TOptions> {
     
     private __value: TValue;
     private __errors: Array<string>;
-    private __valueElem?: HTMLElement = null;
+    private __valueElem: HTMLElement | null = null;
 
-    designer: IFieldDesigner;
-    field: IFormField;
+    designer: IFieldDesigner | null = null;
+    field: IFormField | null = null;
 
-    get valueElem(): HTMLElement { return this.__valueElem; }
+    get valueElem(): HTMLElement | null { return this.__valueElem; }
     get errors(): string[] { return this.__errors; }
 
     constructor(content: Content, model: ContentFieldModel) {
@@ -67,7 +67,7 @@ export abstract class FieldProvider<TValue, TOptions> {
         this.content.host.editor.api(options);
     }
 
-    abstract createDesigner(): IFieldDesigner;
+    abstract createDesigner(): IFieldDesigner | null;
 
     abstract saveValue(value: any);
     
@@ -85,7 +85,7 @@ export abstract class FieldProvider<TValue, TOptions> {
 }
 export interface IFieldDesigner {
     provider: FieldProvider<any, any>;
-    element: HTMLElement;
+    element: HTMLElement | null;
 
     destroy();
     setErrors(errors: string[]);

@@ -6,24 +6,24 @@ import iconClose from "../svg/dialog-close.svg";
 import "./dialog.less";
 
 const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
-let currentDialog: Dialog = null;
+let currentDialog: Dialog<any> | null = null;
 document.body.appendChild(dialogsPanelElem);
 
 export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
-    protected headerElem: HTMLElement;
-    protected headerTitleElem: HTMLElement;
-    protected footerElem: HTMLElement;
-    protected footerNotesElem: HTMLElement;
-    protected contentElem: HTMLElement;
-    private __errorElem: HTMLElement;
-    private __parentDialog: Dialog<any> = null;
-    private __childDialog: Dialog<any> = null;
+    protected headerElem: HTMLElement | null = null;
+    protected headerTitleElem: HTMLElement | null = null;
+    protected footerElem: HTMLElement | null = null;
+    protected footerNotesElem: HTMLElement | null = null;
+    protected contentElem: HTMLElement | null = null;
+    private __errorElem: HTMLElement | null = null;
+    private __parentDialog: Dialog<any> | null = null;
+    private __childDialog: Dialog<any> | null = null;
 
     constructor(options?: DialogOptions) {
         super(options);
     }
 
-    get content(): HTMLElement {
+    get content(): HTMLElement | null {
         return this.contentElem;
     }
 
@@ -37,6 +37,8 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
             '</div>';
     }
     protected _onRender() {
+        if (!this.element) return;
+
         this.element.classList.add("bp-dialog");
 
         this.headerElem = DOM.getElementByClass(this.element, "bp-dialog-header");
@@ -70,35 +72,38 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     }
 
     setHeader(html: string) {
-        this.headerTitleElem.innerHTML = html ? html : "";
+        if (this.headerTitleElem)
+            this.headerTitleElem.innerHTML = html ? html : "";
     }
     setNotes(html: string) {
+        if (!this.footerNotesElem) return;
+
         if (html) {
             this.footerNotesElem.innerHTML = html;
-            this.element.classList.add("has-notes");
+            this.element?.classList.add("has-notes");
         }
         else {
             this.footerNotesElem.innerHTML = "";
-            this.element.classList.remove("has-notes");
+            this.element?.classList.remove("has-notes");
         }
     }
     setLoading(value: boolean) {
         if (value)
-            this.element.classList.add("loading");
+            this.element?.classList.add("loading");
         else
-            this.element.classList.remove("loading");
+            this.element?.classList.remove("loading");
     }
     addAction(name: string, title: string, isAccent = false) {
         const b = DOM.tag("button", { class: "button", "data-command": name }, title);
         if (isAccent)
             b.classList.add("accent");
-        this.footerElem.appendChild(b);
+        this.footerElem?.appendChild(b);
 
-        this.element.classList.add("has-actions");
+        this.element?.classList.add("has-actions");
     }
 
     setError(message: string | Array<string>) {
-        this.element.classList.add("has-error");
+        this.element?.classList.add("has-error");
 
         const list = DOM.tag("ul");
         if (Utility.isArray(message)) {
@@ -111,10 +116,10 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
 
         this.__errorElem = DOM.tag("div", { class: "bp-dialog-error" }, list);
 
-        this.content.insertAdjacentElement("beforebegin", this.__errorElem);
+        this.content?.insertAdjacentElement("beforebegin", this.__errorElem);
     }
     removeError() {
-        this.element.classList.remove("has-error");
+        this.element?.classList.remove("has-error");
 
         if (this.__errorElem) {
             this.__errorElem.remove();
@@ -122,12 +127,12 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         }
     }
 
-    private __resolve: (value: TResult) => void;
-    private __reject: (reason: any) => void;
+    private __resolve?: (value: TResult) => void;
+    private __reject?: (reason: any) => void;
 
     open(): Promise<TResult> {
         if (currentDialog) {
-            currentDialog.element.classList.add("hide");
+            currentDialog.element?.classList.add("hide");
             this.__parentDialog = currentDialog;
             currentDialog.__childDialog = this;
         }
@@ -137,7 +142,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         currentDialog = this;
 
         this.render(dialogsPanelElem);
-        this.element.classList.add("opened");
+        this.element?.classList.add("opened");
 
         return new Promise<TResult>((resolve, reject) => {
             this.__resolve = resolve;
@@ -171,7 +176,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         }
         else {
             currentDialog = this.__parentDialog;
-            currentDialog.element.classList.remove("hide");
+            currentDialog.element?.classList.remove("hide");
             
             this.__parentDialog.__childDialog = null;
             this.__parentDialog = null;

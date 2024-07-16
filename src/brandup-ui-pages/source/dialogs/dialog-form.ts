@@ -9,10 +9,10 @@ import { AjaxQueue } from "brandup-ui-ajax";
 import "./dialog-form.less";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
-    private __formElem: HTMLFormElement;
-    private __fieldsElem: HTMLElement;
+    private __formElem: HTMLFormElement = DOM.tag("form", { method: "POST" }) as HTMLFormElement;
+    private __fieldsElem: HTMLElement = DOM.tag("div", { class: "fields" });
     private __fields: { [key: string]: Field<any, any> } = {};
-    private __model: TForm = null;
+    private __model: TForm | null = null;
     readonly queue: AjaxQueue;
 
     constructor(options?: DialogOptions) {
@@ -21,13 +21,13 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         this.queue = new AjaxQueue();
     }
 
-    get model(): TForm { return this.__model; }
+    get model(): TForm | null { return this.__model; }
 
     protected _onRenderContent() {
-        this.element.classList.add("bp-dialog-form");
+        this.element?.classList.add("bp-dialog-form");
 
-        this.content.appendChild(this.__formElem = DOM.tag("form", { method: "POST" }) as HTMLFormElement);
-        this.__formElem.appendChild(this.__fieldsElem = DOM.tag("div", { class: "fields" }));
+        this.content?.appendChild(this.__formElem);
+        this.__formElem.appendChild(this.__fieldsElem);
 
         this.__formElem.addEventListener("submit", (e: Event) => {
             e.preventDefault();
@@ -36,10 +36,12 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
             return false;
         });
+
+        /* @ts-ignore */
         this.__formElem.addEventListener("changed", (e: CustomEvent) => {
             this.__changeValue(e.detail.field);
         });
-
+        
         this.registerCommand("save", () => { this.__save(); });
 
         this.__loadForm();
@@ -65,7 +67,8 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
                         break;
                     }
                     case 200: {
-                        this.__model = response.data;
+                        if (!response.data) return;
+                        this.__model = response.data as TForm;
                         this._buildForm(this.__model);
                         this.setValues(this.__model.values);
 
@@ -146,7 +149,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
     private __applyModelState(state: ValidationProblemDetails) {
         for (const key in this.__fields) {
             const field = this.__fields[key];
-            field.setErrors(null);
+            field.setErrors([]);
         }
 
         if (state && state.errors) {

@@ -6,11 +6,11 @@ import iconSort from "../svg/list-item-sort.svg";
 import { DOM } from "brandup-ui-dom";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
-    protected __itemsElem: HTMLElement;
-    private __newItemElem: HTMLElement;
+    protected __itemsElem: HTMLElement = DOM.tag("div", { class: "items" });
+    private __newItemElem: HTMLElement | null = null;
     readonly queue: AjaxQueue;
-    private __closeItemMenuFunc: (e: MouseEvent) => void;
-    protected __model: TList;
+    private __closeItemMenuFunc: (e: MouseEvent) => void = () => {};
+    protected __model: TList | null = null;
     private __enableSorting = false;
 
     constructor(options?: DialogOptions) {
@@ -24,13 +24,12 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     }
 
     protected _onRenderContent() {
-        this.element.classList.add("bp-dialog-list");
+        this.element?.classList.add("bp-dialog-list");
 
-        this.__itemsElem = DOM.tag("div", { class: "items" });
-        this.content.appendChild(this.__itemsElem);
+        this.content?.appendChild(this.__itemsElem);
 
         this.registerCommand("item-open-menu", (el: HTMLElement) => {
-            el.parentElement.parentElement.classList.add("opened-menu");
+            el.parentElement?.parentElement?.classList.add("opened-menu");
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
@@ -46,10 +45,10 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         this.__itemsElem.addEventListener("dragstart", (e: DragEvent) => {
             const target = e.target as Element;
             const itemElem = target.closest("[data-index]");
-            if (itemElem) {
+            if (itemElem && e.dataTransfer && itemElem.hasAttribute("data-id") && itemElem.hasAttribute("data-id")) {
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData("data-id", itemElem.getAttribute("data-id"));
-                e.dataTransfer.setData("data-index", itemElem.getAttribute("data-index"));
+                e.dataTransfer.setData("data-id", itemElem.getAttribute("data-id")!);
+                e.dataTransfer.setData("data-index", itemElem.getAttribute("data-index")!);
                 e.dataTransfer.setDragImage(itemElem, 0, 0);
                 return true;
             }
@@ -66,13 +65,13 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
             const target = e.target as Element;
-            const sourceId = e.dataTransfer.getData("data-id");
-            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
+            const sourceId = e.dataTransfer?.getData("data-id");
+            const sourceIndex = parseInt(e.dataTransfer?.getData("data-index") || "-1");
             const elem = target.closest("[data-index]");
-            if (elem) {
+            if (elem && sourceId && sourceIndex >= 0) {
                 const destId = elem.getAttribute("data-id");
-                const destIndex = parseInt(elem.getAttribute("data-index"));
-                if (destIndex !== sourceIndex) {
+                const destIndex = parseInt(elem.getAttribute("data-index") || "-1");
+                if (destIndex !== sourceIndex && destId && destIndex >= 0) {
                     const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         let destPosition: string;
@@ -129,7 +128,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     private __refreshIndexes() {
         for (let i = 0; i < this.__itemsElem.childElementCount; i++) {
             const elem = this.__itemsElem.children.item(i);
-            elem.setAttribute("data-index", i.toString());
+            elem?.setAttribute("data-index", i.toString());
         }
     }
     private __loadList() {
@@ -223,9 +222,9 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {
         const itemElem = elem.closest(".item[data-id]");
         if (!itemElem)
-            return null;
+            throw "";
 
-        return { id: itemElem.getAttribute("data-id"), model: itemElem["_model_"] };
+        return { id: itemElem.getAttribute("data-id")!, model: itemElem["_model_"] };
     }
 
     private __renderItems(items: Array<TItem>) {
@@ -255,7 +254,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         if (!this.__newItemElem) {
             this.__newItemElem = DOM.tag("div", { class: "new-item" });
-            this.content.appendChild(this.__newItemElem);
+            this.content?.appendChild(this.__newItemElem);
             this._renderNewItem(this.__newItemElem);
         }
     }

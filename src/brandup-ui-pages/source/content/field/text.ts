@@ -6,7 +6,7 @@ export default class TextContent extends FormField<TextboxOptions> {
 
     render(ownElem: HTMLElement): void {
         super.render(ownElem);
-        this.element.classList.add("text");
+        this.element?.classList.add("text");
     }
 
     protected _renderValueElem() {

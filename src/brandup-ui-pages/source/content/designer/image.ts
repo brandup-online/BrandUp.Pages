@@ -5,45 +5,50 @@ import iconUpload from "../../svg/toolbar-button-picture.svg";
 import "./image.less";
 
 export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
-    private __fileInputElem: HTMLInputElement;
-    private __menuElem: HTMLElement;
-    private __progressElem: HTMLElement;
-    private __button: HTMLElement;
-    private __closeFunc: (e: MouseEvent) => void;
+    private __fileInputElem: HTMLInputElement = DOM.tag("input", { type: "file" }) as HTMLInputElement;
+    private __menuElem: HTMLElement = this.__initMenuElem();
+    private __progressElem: HTMLElement = DOM.tag("div", { class: "bp-elem image-designer-progress" });
+    private __button: HTMLElement = DOM.tag("button", { title: "Управление картинкой" }, iconUpload);
+    private __textInput: HTMLInputElement = DOM.tag("input", { type: "text" }) as HTMLInputElement;
+    private __closeFunc: (e: MouseEvent) => void = () => {};
 
     get typeName(): string { return "BrandUpPages.ImageDesigner"; }
 
-    protected onRender(elem: HTMLElement) {
-        elem.classList.add("image-designer");
-
-        let textInput: HTMLInputElement;
-        elem.appendChild(this.__menuElem = DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
+    private __initMenuElem() {
+        return DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
             DOM.tag("ul", { class: "field-designer-popup" }, [
                 //DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "open-editor" }, "Редактор")),
                 //DOM.tag("li", { class: "split" }),
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "upload-file" }, "Загрузить с компьютера"))
             ]),
-            this.__button = DOM.tag("button", { title: "Управление картинкой" }, iconUpload),
-            textInput = DOM.tag("input", { type: "text" }) as HTMLInputElement
-        ]));
+            this.__button,
+            this.__textInput
+        ])
+    }
 
-        elem.appendChild(this.__progressElem = DOM.tag("div", { class: "bp-elem image-designer-progress" }));
+    protected onRender(elem: HTMLElement) {
+        elem.classList.add("image-designer");
 
-        this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement;
+        elem.appendChild(this.__menuElem);
+
+        elem.appendChild(this.__progressElem);
+
         this.__fileInputElem.addEventListener("change", () => {
-            if (this.__fileInputElem.files.length === 0)
+            if (!this.__fileInputElem.files || this.__fileInputElem.files.length === 0)
                 return;
 
-            this.__uploadFile(this.__fileInputElem.files.item(0));
+            this.__uploadFile(this.__fileInputElem.files.item(0)!);
 
-            textInput.focus();
+            this.__textInput.focus();
         });
 
-        textInput.addEventListener("paste", (e: ClipboardEvent) => {
+        this.__textInput.addEventListener("paste", (e: ClipboardEvent) => {
             e.preventDefault();
 
+            if (!e.clipboardData) return;
+
             if (e.clipboardData.files.length > 0) {
-                this.__uploadFile(e.clipboardData.files.item(0));
+                this.__uploadFile(e.clipboardData.files.item(0)!);
             }
             else if (e.clipboardData.types.indexOf("text/plain") >= 0) {
                 const url = e.clipboardData.getData("text");
@@ -51,7 +56,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
                     this.__uploadFile(url);
             }
 
-            textInput.focus();
+            this.__textInput.focus();
 
             elem.classList.remove("opened-menu");
             document.body.removeEventListener("click", this.__closeFunc, false);
@@ -73,7 +78,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
             }
 
             document.body.addEventListener("click", this.__closeFunc, false);
-            textInput.focus();
+            this.__textInput.focus();
         });
 
         this.registerCommand("upload-file", () => {
@@ -98,30 +103,32 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
 
             elem.classList.remove("draging");
 
-            const file = e.dataTransfer.files.item(0);
-            if (!file.type)
+            const file = e.dataTransfer?.files.item(0);
+            if (!file?.type)
                 return false;
 
             this.__uploadFile(file);
+
+            if (!e.dataTransfer) return false;
 
             if (e.dataTransfer.items)
                 e.dataTransfer.items.clear();
             else
                 e.dataTransfer.clearData();
 
-            textInput.focus();
+            this.__textInput.focus();
 
             return false;
         };
     }
     
     private __uploadFile(file: File | string) {
-        this.element.classList.add("uploading");
+        this.element?.classList.add("uploading");
         this.provider.saveValue(file);
     }
 
     destroy() {
-        this.element.classList.remove("image-designer");
+        this.element?.classList.remove("image-designer");
 
         this.__menuElem?.remove();
         this.__fileInputElem?.remove();

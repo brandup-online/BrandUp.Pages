@@ -84,7 +84,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             index -= 1;
         }
         if (index < 0 && !elem) {
-            this.designer.element.insertAdjacentElement("afterbegin", newElem);
+            this.designer?.element?.insertAdjacentElement("afterbegin", newElem);
         } else {
             elem.insertAdjacentElement("beforebegin", newElem);
         }
@@ -93,7 +93,9 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     createDesigner() {
-        let type = this.valueElem.getAttribute("data-content-designer");
+        let type = this.valueElem?.getAttribute("data-content-designer");
+        if (!type) throw "failed to identify the element type for ModelDesigner";
+
         const designerType = type === "page-blocks" ? PageBlocksDesigner : ModelDesigner;
         return new designerType(this);
     }
@@ -164,7 +166,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     }
 
     refreshItem(elem: Element, index?: number) {
-        const urlParams = { itemIndex: index?.toString() };
+        const urlParams = { itemIndex: index?.toString() || "-1"};
 
         this.request({
             url: '/brandup.pages/content/model/view',

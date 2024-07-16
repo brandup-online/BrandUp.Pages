@@ -9,11 +9,11 @@ import { PageModel, PageCollectionModel } from "../../typings/page";
 import iconClose from "../../svg/list-item-add.svg";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
-    private __pageId: string;
-    private collectionId: string = null;
-    private navElem: HTMLElement;
-    private tabsElem: HTMLElement;
-    private __createCollElem: HTMLElement;
+    private __pageId: string | null;
+    private collectionId: string | null = null;
+    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
+    private tabsElem: HTMLElement | null = null;
+    private __createCollElem: HTMLElement | null = null;
 
     constructor(pageId: string, options?: DialogOptions) {
         super(options);
@@ -23,7 +23,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         this.setSorting(true);
     }
 
-    get pageId(): string { return this.__pageId; }
+    get pageId(): string | null { return this.__pageId; }
     get typeName(): string { return "BrandUpPages.PageBrowserDialog"; }
 
     protected _onRenderContent() {
@@ -59,22 +59,26 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             this.selectCollection(collectionId, true);
         });
         this.registerCommand("collection-sesttings", () => {
-            listPageCollection(this.pageId).then(() => {
-                this.refresh();
-            });
+            if (this.pageId)
+                listPageCollection(this.pageId).then(() => {
+                    this.refresh();
+                });
         });
         this.registerCommand("create-collection", () => {
-            createPageCollection(this.pageId).then(() => {
-                this.refresh();
-            });
+            if (this.pageId)
+                createPageCollection(this.pageId).then(() => {
+                    this.refresh();
+                });
         });
     }
 
-    private selectCollection(collectionId: string, needLoad: boolean) {
-        if (this.collectionId)
+    private selectCollection(collectionId: string | null, needLoad: boolean) {
+        if (this.collectionId && this.tabsElem)
             DOM.removeClass(this.tabsElem, "a[data-value]", "selected");
 
         this.collectionId = collectionId;
+
+        if (!this.__model) return;
 
         for (let i = 0; i < this.__model.collections.length; i++) {
             let collection = this.__model.collections[i];
@@ -84,7 +88,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             }
         }
 
-        if (this.collectionId) {
+        if (this.collectionId && this.tabsElem) {
             let tabItem = DOM.queryElement(this.tabsElem, `a[data-value="${this.collectionId}"]`);
             if (tabItem)
                 tabItem.classList.add("selected");
@@ -103,10 +107,10 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         return `/brandup.pages/page/list`;
     }
     protected _buildUrlParams(urlParams: { [key: string]: string; }) {
-        if (this.__pageId)
+        if (this.__pageId && this.collectionId) {
             urlParams["pageId"] = this.__pageId;
-
-        urlParams["collectionId"] = this.collectionId;
+            urlParams["collectionId"] = this.collectionId;
+        }
     }
     protected _buildList(model: PageListModel) {
         if (this.__createCollElem) {
@@ -115,8 +119,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         }
 
         if (!this.tabsElem) {
-            this.navElem = DOM.tag("ol", { class: "nav" })
-            this.content.insertAdjacentElement("afterbegin", this.navElem);
+            this.content?.insertAdjacentElement("afterbegin", this.navElem);
 
             this.tabsElem = DOM.tag("ul", { class: "tabs" })
             this.navElem.insertAdjacentElement("afterend", this.tabsElem);

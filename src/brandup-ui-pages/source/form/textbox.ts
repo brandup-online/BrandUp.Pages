@@ -3,31 +3,30 @@ import { DOM } from "brandup-ui-dom";
 import "./textbox.less";
 
 export class Textbox extends Field<string, TextboxOptions> {
-    private __valueElem: HTMLElement;
-    private __isChanged: boolean;
+    private __valueElem: HTMLElement = DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
+    private __isChanged: boolean = false;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Text"; }
 
     protected _onRender() {
         super._onRender();
 
-        this.element.classList.add("text");
+        this.element?.classList.add("text");
 
-        this.__valueElem = DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
-        this.element.appendChild(this.__valueElem);
+        this.element?.appendChild(this.__valueElem);
 
         const placeholderElem = DOM.tag("div", { class: "placeholder" }, this.options.placeholder);
         placeholderElem.addEventListener("click", () => {
             this.__valueElem.focus();
         });
-        this.element.appendChild(placeholderElem);
+        this.element?.appendChild(placeholderElem);
 
         this.__valueElem.addEventListener("paste", (e: ClipboardEvent) => {
             this.__isChanged = true;
 
             e.preventDefault();
 
-            const text = e.clipboardData.getData("text/plain");
+            const text = e.clipboardData?.getData("text/plain") || "";
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
         this.__valueElem.addEventListener("cut", () => {
@@ -44,10 +43,10 @@ export class Textbox extends Field<string, TextboxOptions> {
         });
         this.__valueElem.addEventListener("focus", () => {
             this.__isChanged = false;
-            this.element.classList.add("focused");
+            this.element?.classList.add("focused");
         });
         this.__valueElem.addEventListener("blur", () => {
-            this.element.classList.remove("focused");
+            this.element?.classList.remove("focused");
             if (this.__isChanged)
                 this._onChanged();
         });
@@ -56,9 +55,9 @@ export class Textbox extends Field<string, TextboxOptions> {
     private __refreshUI() {
         const hasVal = this.hasValue();
         if (hasVal)
-            this.element.classList.add("has-value");
+            this.element?.classList.add("has-value");
         else
-            this.element.classList.remove("has-value");
+            this.element?.classList.remove("has-value");
     }
     protected _onChanged() {
         this.__refreshUI();
@@ -68,7 +67,7 @@ export class Textbox extends Field<string, TextboxOptions> {
 
     getValue(): string {
         const val = this.normalizeValue(this.__valueElem.innerText);
-        return val ? val : null;
+        return val ? val : "";
     }
     setValue(value: string) {
         value = this.normalizeValue(value);

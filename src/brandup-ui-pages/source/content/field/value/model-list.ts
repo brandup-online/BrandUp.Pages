@@ -6,8 +6,8 @@ import iconDelete from "../../../svg/toolbar-button-discard.svg";
 import { IFieldValueElement } from "../../../typings/content";
 
 export class ModelListValue extends UIElement implements IFieldValueElement {
-    private __value: ModelFieldValue;
-    private __onChange: (sourceIndex: number, destIndex: number) => void;
+    private __value: ModelFieldValue | null = null;
+    private __onChange: (sourceIndex: number, destIndex: number) => void = () => {};
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.ModelList"; }
     readonly options: ModelFieldOptions;
@@ -24,12 +24,12 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
     }
 
     private __initLogic() {
-        this.element.addEventListener("dragstart", (e: DragEvent) => {
+        this.element?.addEventListener("dragstart", (e: DragEvent) => {
             const target = e.target as Element;
             const itemElem = target.closest("[data-content-path-index]");
-            if (itemElem) {
+            if (itemElem && e.dataTransfer) {
                 e.dataTransfer.effectAllowed = 'move';
-                e.dataTransfer.setData("data-content-path-index", itemElem.getAttribute('data-content-path-index'));
+                e.dataTransfer.setData("data-content-path-index", itemElem.getAttribute('data-content-path-index')!);
                 e.dataTransfer.setDragImage(itemElem, 0, 0);
                 return true;
             }
@@ -37,23 +37,23 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
             e.preventDefault();
             return false;
         }, false);
-        this.element.addEventListener("dragenter", (e: DragEvent) => {
+        this.element?.addEventListener("dragenter", (e: DragEvent) => {
             e.preventDefault();
             return true;
         });
-        this.element.addEventListener("dragover", (e: DragEvent) => {
+        this.element?.addEventListener("dragover", (e: DragEvent) => {
             e.preventDefault();
         });
-        this.element.addEventListener("drop", (e: DragEvent) => {
+        this.element?.addEventListener("drop", (e: DragEvent) => {
             const target = e.target as Element;
-            const sourceIndex = e.dataTransfer.getData("data-content-path-index");
+            const sourceIndex = e.dataTransfer?.getData("data-content-path-index") || -1;
             const elem = target.closest("[data-content-path-index]");
             if (elem) {
-                const destIndex = elem.getAttribute("data-content-path-index");
+                const destIndex = elem.getAttribute("data-content-path-index")!;
                 if (destIndex !== sourceIndex) {
                     console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
 
-                    const sourceElem = DOM.queryElement(this.element, `[data-content-path-index="${sourceIndex}"]`);
+                    const sourceElem = this.element ? DOM.queryElement(this.element, `[data-content-path-index="${sourceIndex}"]`) : null;
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {
                             elem.insertAdjacentElement("beforebegin", sourceElem);
@@ -74,15 +74,17 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
     }
 
     renderItems(items: Array<ContentInfoModel>) {
+        if (!this.element) return;
+
         DOM.empty(this.element);
 
         let i = 0
         for (i = 0; i < items.length; i++) {
             const item = items[i];
-            this.element.appendChild(this.__createItemElem(item, i));
+            this.element?.appendChild(this.__createItemElem(item, i));
         }
 
-        this.element.appendChild(DOM.tag("div", { class: "item new" }, [
+        this.element?.appendChild(DOM.tag("div", { class: "item new" }, [
             DOM.tag("div", { class: "index" }, `#${i + 1}`),
             DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, this.options.addText ? this.options.addText : "Добавить")
         ]));
@@ -101,8 +103,10 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
         return itemElem;
     }
     private eachItems(f: (elem: Element, index: number) => void) {
+        if (!this.element) return;
+
         for (let i = 0; i < this.element.children.length; i++) {
-            const itemElem = this.element.children.item(i);
+            const itemElem = this.element.children.item(i)!;
             if (!itemElem.hasAttribute("data-content-path-index"))
                 continue;
             f(itemElem, i);
@@ -120,12 +124,14 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
     }
 
     deleteItem(index: number) {
+        if (!this.element) return;
+
         const itemElem = DOM.queryElement(this.element, `[data-content-path-index="${index}"]`);
         itemElem.remove();
         this.refreshBlockIndexes();
     }
 
-    getValue(): ModelFieldValue {
+    getValue(): ModelFieldValue | null {
         return this.__value;
     }
     setValue(value: ModelFieldValue) {
@@ -136,6 +142,6 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
     }
     
     hasValue(): boolean {
-        return this.__value && this.__value.items && this.__value.items.length > 0;
+        return Boolean(this.__value && this.__value.items && this.__value.items.length > 0);
     }
 }

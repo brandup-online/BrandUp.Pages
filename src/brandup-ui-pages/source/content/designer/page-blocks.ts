@@ -29,7 +29,7 @@ export class PageBlocksDesigner extends ModelDesigner {
             blockElem.classList.remove("page-blocks-designer-item");
 
             for (let i = 0; i < blockElem.children.length; i++) {
-                let elem = blockElem.children.item(i);
+                let elem = blockElem.children.item(i)!;
 
                 if (elem.classList.contains("page-blocks-designer-item-add")) {
                     elem.remove();
@@ -70,11 +70,13 @@ export class PageBlocksDesigner extends ModelDesigner {
     }
 
     destroy() {
-        DOM.queryElements(this.element, "* > [data-content-path-index] .page-blocks-designer-item-add").forEach((elem) => { elem.remove(); });
-        DOM.queryElements(this.element, "* > [data-content-path-index] .page-blocks-designer-item-tools").forEach((elem) => { elem.remove(); });
-        DOM.queryElements(this.element, "* > .page-blocks-designer-new-item").forEach((elem) => { elem.remove(); });
+        if (this.element) {
+            DOM.queryElements(this.element, "* > [data-content-path-index] .page-blocks-designer-item-add").forEach((elem) => { elem.remove(); });
+            DOM.queryElements(this.element, "* > [data-content-path-index] .page-blocks-designer-item-tools").forEach((elem) => { elem.remove(); });
+            DOM.queryElements(this.element, "* > .page-blocks-designer-new-item").forEach((elem) => { elem.remove(); });
+        }
 
-        this.element.classList.remove("content-designer");
+        this.element?.classList.remove("content-designer");
         super.destroy();
     }
 }

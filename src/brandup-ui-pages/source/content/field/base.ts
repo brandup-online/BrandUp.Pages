@@ -5,8 +5,8 @@ import { IFieldValueElement } from "../../typings/content";
 
 export abstract class FormField<TOptions> extends UIElement implements IFormField {
     readonly provider: FieldProvider<any, any>;
-    protected __errorsElem: HTMLElement;
-    protected __valueElem: IFieldValueElement;
+    protected __errorsElem: HTMLElement = DOM.tag("ul", { class: "field-errors" });
+    protected __valueElem: IFieldValueElement | null = null;
     readonly options: TOptions;
     readonly caption: string;
 
@@ -20,17 +20,21 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
     }
 
     render(ownElem: HTMLElement) {
+        this.__valueElem = this._renderValueElem();
+
+        if (!this.__valueElem.element) return;
+
         const container = DOM.tag("div", {class: "website-form-field"}, [
             DOM.tag("label", null, this.caption),
-            (this.__valueElem = this._renderValueElem()).element,
-            this.__errorsElem = DOM.tag("ul", { class: "field-errors" })
+            this.__valueElem.element,
+            this.__errorsElem
         ])
         
         this.setElement(container);
 
         this.__valueElem.onChange(value => this.provider.saveValue(value));
 
-        ownElem.appendChild(this.element);
+        ownElem.appendChild(this.element!);
 
         this.raiseUpdateErrors(this.provider.errors);
         this._setValue(this.provider.getValue());
@@ -39,11 +43,11 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
     raiseUpdateErrors(errors: Array<string>) {
         this.__errorsElem.innerHTML = '';
         if (!errors || errors.length === 0) {
-            this.element.classList.remove("has-errors");
+            this.element?.classList.remove("has-errors");
             return;
         }
 
-        this.element.classList.add("has-errors");
+        this.element?.classList.add("has-errors");
         for (let i = 0; i < errors.length; i++)
             this.__errorsElem.appendChild(DOM.tag("li", null, errors[i]));
     }
@@ -55,11 +59,11 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
     protected abstract _renderValueElem(): IFieldValueElement;
 
     protected _setValue(value: any) {
-        this.__valueElem.setValue(value);
+        this.__valueElem?.setValue(value);
     }
 
     getValue() {
-        return this.__valueElem.getValue();
+        return this.__valueElem?.getValue();
     };
 
     protected _onChanged() {
@@ -68,9 +72,9 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
     }
 
     destroy(): void {
-        this.__valueElem.destroy();
+        this.__valueElem?.destroy();
         
-        this.element.remove();
+        this.element?.remove();
         super.destroy();
     }
 }
