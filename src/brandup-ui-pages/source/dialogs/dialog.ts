@@ -42,22 +42,25 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this.element.classList.add("bp-dialog");
 
         this.headerElem = DOM.getElementByClass(this.element, "bp-dialog-header");
-        this.headerTitleElem = DOM.getElementByClass(this.headerElem, "title");
         this.contentElem = DOM.getElementByClass(this.element, "bp-dialog-content");
         this.footerElem = DOM.getElementByClass(this.element, "bp-dialog-footer");
-        this.footerNotesElem = DOM.getElementByClass(this.footerElem, "notes");
+        if (this.headerElem)
+            this.headerTitleElem = DOM.getElementByClass(this.headerElem, "title");
+        if (this.footerElem)
+            this.footerNotesElem = DOM.getElementByClass(this.footerElem, "notes");
 
         if (this.options.header)
             this.setHeader(this.options.header);
         if (this.options.notes)
             this.setHeader(this.options.notes);
 
-        if (this.__parentDialog) {
-            this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
-        }
-        else {
-            this.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }, iconClose));
-        }
+        if (this.headerElem)
+            if (this.__parentDialog) {
+                this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
+            }
+            else {
+                this.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }, iconClose));
+            }
 
         this.registerCommand("close", () => {
             this._onClose();

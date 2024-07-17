@@ -60,7 +60,7 @@ export class PageToolbar extends UIElement {
                     else
                         window.location.replace(editUrl);
                 })
-                .catch(() => console.error("Error in content editor."));
+                .catch((e) => console.error("Error in content editor.", e));
         }
         else
             this.__renderTollbar();

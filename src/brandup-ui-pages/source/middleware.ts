@@ -15,7 +15,7 @@ export class PagesMiddleware extends Middleware<Application<ApplicationModel>, A
     navigate(context: NavigateContext, next: () => void) {
         next();
 
-        this._showUI(context.items);
+        this._showUI(context.data);
     }
 
     private _showUI(items: { [key: string]: any }) {

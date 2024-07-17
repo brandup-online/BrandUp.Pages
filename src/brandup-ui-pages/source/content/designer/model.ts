@@ -100,10 +100,12 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         fragment.appendChild(container);
 
         const newElem = DOM.queryElement(container, "[data-content-path]");
-        elem.insertAdjacentElement("afterend", newElem);
-        elem.remove();
-
-        this.renderBlock(newElem);
+        if (newElem) {
+            elem.insertAdjacentElement("afterend", newElem);
+            elem.remove();
+    
+            this.renderBlock(newElem);
+        }
     }
 
     protected getItem(index: number): Element {

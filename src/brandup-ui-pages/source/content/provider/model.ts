@@ -76,6 +76,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         const container = DOM.tag("div", null, html);
         fragment.appendChild(container);
         const newElem = DOM.queryElement(container, "[data-content-path]");
+        if (!newElem) return;
 
         let elem;
 
