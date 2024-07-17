@@ -1,4 +1,4 @@
-﻿import { Application, ApplicationModel, Middleware, NavigateContext } from "brandup-ui-app";
+﻿import { Application, ApplicationModel, Middleware, NavigateContext, StartContext } from "brandup-ui-app";
 import { Page, PageModel } from "brandup-ui-website";
 
 const UI = () => import("./ui");
@@ -6,26 +6,30 @@ const UI = () => import("./ui");
 export class PagesMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
     private __isEditing: boolean = false;
 
-    start(context, next) {
-        next();
-
-        this._showUI(context.items);
+    start(context: StartContext, next: VoidFunction, _end, error: (reason: any) => void) {
+        this._showUI(context.data, next, error);
     }
 
-    navigate(context: NavigateContext, next: () => void) {
-        next();
-
-        this._showUI(context.items);
+    navigate(context: NavigateContext, next: VoidFunction, _end, error: (reason: any) => void) {
+        this._showUI(context.data, next, error);
     }
 
-    private _showUI(items: { [key: string]: any }) {
-        if (document.body.dataset.pagesAdmin) {
-            const page = items["page"] as Page<PageModel>;
-            if (page) {
-                UI().then(t => {
+    private _showUI(data: { [key: string]: any }, next: VoidFunction, error: (reason: any) => void) {
+        if (document.body.dataset.pagesAdmin && data["page"]) {
+            const page = data["page"] as Page<PageModel>;
+
+            UI()
+                .then(t => {
                     this.__isEditing = t.default(page);
-                });
-            }
+
+                    next();
+                })
+                .catch(error);
+
+            return;
+
         }
+
+        next();
     }
 }

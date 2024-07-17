@@ -20,11 +20,11 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "brandup-ui": "^2.3.3",
-    "brandup-ui-ajax": "^2.3.3",
-    "brandup-ui-dom": "^2.3.3",
+    "brandup-ui": "^3.0.3",
+    "brandup-ui-ajax": "^3.0.3",
+    "brandup-ui-dom": "^3.0.3",
     "brandup-ui-pages": "file:../../src/brandup-ui-pages",
-    "brandup-ui-website": "^8.1.9"
+    "brandup-ui-website": "^8.2.2"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",

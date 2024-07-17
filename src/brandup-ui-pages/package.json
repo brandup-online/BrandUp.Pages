@@ -37,12 +37,12 @@
   },
   "dependencies": {
     "brandup-pages-ckeditor": "^1.0.15",
-    "brandup-ui": "^2.3.3",
-    "brandup-ui-ajax": "^2.3.3",
-    "brandup-ui-app": "^2.3.3",
-    "brandup-ui-dom": "^2.3.3",
-    "brandup-ui-helpers": "^2.3.3",
-    "brandup-ui-website": "^8.1.9"
+    "brandup-ui": "^3.0.3",
+    "brandup-ui-ajax": "^3.0.3",
+    "brandup-ui-app": "^3.0.3",
+    "brandup-ui-dom": "^3.0.3",
+    "brandup-ui-helpers": "^3.0.3",
+    "brandup-ui-website": "^8.2.2"
   },
   "scripts": {
     "build": "tsc"
