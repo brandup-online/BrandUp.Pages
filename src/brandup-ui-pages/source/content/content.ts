@@ -108,5 +108,5 @@ export class Content {
 export interface IContentHost {
     get editor(): ContentEditor;
     get isList(): boolean;
-    attach(content: Content);
+    attach(content: Content): void;
 }

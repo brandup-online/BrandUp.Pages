@@ -29,7 +29,7 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     }
 
     abstract getValue(): TValue;
-    abstract setValue(value: TValue);
+    abstract setValue(value: TValue): void;
     abstract hasValue(): boolean;
 
     setErrors(errors: Array<string>) {

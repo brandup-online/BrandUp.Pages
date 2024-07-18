@@ -7,7 +7,6 @@
     "strict": true,
     "lib": [ "DOM", "ES2020" ],
     "esModuleInterop": true,
-    "noImplicitAny": false,
     "noEmitOnError": true,
     "baseUrl": "./source",
     "declaration": false,

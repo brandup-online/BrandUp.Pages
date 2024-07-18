@@ -1,8 +1,8 @@
-﻿import { Application, ApplicationModel, Middleware, NavigateContext } from "brandup-ui-app";
+﻿import { Application, ApplicationModel, Middleware, NavigateContext, StartContext } from "brandup-ui-app";
 import { ajaxRequest } from "brandup-ui-ajax";
 
 export class LayoutMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
-    start(_context, next: VoidFunction) {
+    start(_context: StartContext, next: VoidFunction) {
         next();
 
         this.app.registerCommand("signin", () => {
@@ -28,7 +28,7 @@ export class LayoutMiddleware extends Middleware<Application<ApplicationModel>, 
         });
     }
 
-    navigate(context: NavigateContext, next) {
+    navigate(context: NavigateContext, next: any) {
         next();
 
         document.body.classList.remove("website-state-show-appmenu");

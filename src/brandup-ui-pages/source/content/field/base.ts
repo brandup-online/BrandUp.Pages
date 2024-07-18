@@ -33,7 +33,7 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
         
         this.setElement(container);
 
-        this.__valueElem.onChange(value => this.provider.saveValue(value));
+        this.__valueElem.onChange((value: any) => this.provider.saveValue(value));
 
         ownElem.appendChild(this.element!);
 

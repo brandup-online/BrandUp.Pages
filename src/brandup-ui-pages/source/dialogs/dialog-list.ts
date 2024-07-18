@@ -226,7 +226,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         if (!itemElem)
             throw "";
 
-        return { id: itemElem.getAttribute("data-id")!, model: itemElem["_model_"] };
+        return { id: itemElem.getAttribute("data-id")!, model: (itemElem as any)["_model_"] };
     }
 
     private __renderItems(items: Array<TItem>) {
@@ -238,7 +238,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
                 const itemId = this._getItemId(item);
                 const itemElem = DOM.tag("div", { class: "item", "data-id": itemId, "data-index": i.toString() });
 
-                itemElem["_model_"] = item;
+                (itemElem as any)["_model_"] = item;
 
                 this.__renderItem(itemId, item, itemElem);
 
@@ -284,13 +284,13 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
     protected abstract _buildUrl(): string;
     protected _buildUrlParams(_urlParams: { [key: string]: string }) { }
-    protected abstract _buildList(model: TList);
+    protected abstract _buildList(model: TList): void;
     protected _allowLoadItems(): boolean { return true; }
     protected abstract _getItemId(item: TItem): string;
-    protected abstract _renderItemContent(item: TItem, contentElem: HTMLElement);
-    protected abstract _renderItemMenu(item: TItem, menuElem: HTMLElement);
-    protected abstract _renderEmpty(container: HTMLElement);
-    protected abstract _renderNewItem(containerElem: HTMLElement);
+    protected abstract _renderItemContent(item: TItem, contentElem: HTMLElement): void;
+    protected abstract _renderItemMenu(item: TItem, menuElem: HTMLElement): void;
+    protected abstract _renderEmpty(container: HTMLElement): void;
+    protected abstract _renderNewItem(containerElem: HTMLElement): void;
 
     destroy() {
         document.body.removeEventListener("mousedown", this.__closeItemMenuFunc);

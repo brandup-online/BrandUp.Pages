@@ -77,5 +77,5 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
     }
 
     protected _onInitialize() { return; }
-    protected abstract _onRender();
+    protected abstract _onRender(): void;
 }

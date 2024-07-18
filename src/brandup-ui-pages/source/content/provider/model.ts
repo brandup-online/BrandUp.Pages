@@ -87,7 +87,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         if (index < 0 && !elem) {
             this.designer?.element?.insertAdjacentElement("afterbegin", newElem);
         } else {
-            elem.insertAdjacentElement("beforebegin", newElem);
+            elem?.insertAdjacentElement("beforebegin", newElem);
         }
 
         return newElem;

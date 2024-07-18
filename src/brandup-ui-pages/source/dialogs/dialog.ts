@@ -69,7 +69,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this._onRenderContent();
     }
 
-    protected abstract _onRenderContent();
+    protected abstract _onRenderContent(): void;
     protected _onClose() {
         this.destroy();
     }

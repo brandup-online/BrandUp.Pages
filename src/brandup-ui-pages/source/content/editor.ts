@@ -239,8 +239,10 @@ export class ContentEditor extends UIElement implements IContentHost {
 
         const contentElements = new Map<string, ContentStructure>();
 
-        const addContainer = elem => {
+        const addContainer = (elem: HTMLElement) => {
             const contentPath = elem.dataset.contentPath;
+            if (contentPath === null || contentPath === undefined)
+                return;
 
             contentElements.set(contentPath, {
                 path: contentPath,

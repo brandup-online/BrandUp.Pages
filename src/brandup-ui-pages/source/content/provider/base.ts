@@ -69,7 +69,7 @@ export abstract class FieldProvider<TValue, TOptions> {
 
     abstract createDesigner(): IFieldDesigner | null;
 
-    abstract saveValue(value: any);
+    abstract saveValue(value: any): void;
     
     protected onSavedValue(model: FieldValueResult) {
         this.__value = model.value;
@@ -87,12 +87,12 @@ export interface IFieldDesigner {
     provider: FieldProvider<any, any>;
     element: HTMLElement | null;
 
-    destroy();
-    setErrors(errors: string[]);
+    destroy(): void;
+    setErrors(errors: string[]): void;
 }
 
 export interface IFormField {
-    raiseUpdateValue(value: any);
-    raiseUpdateErrors(errors: Array<string>);
-    destroy();
+    raiseUpdateValue(value: any): void;
+    raiseUpdateErrors(errors: Array<string>): void;
+    destroy(): void;
 }

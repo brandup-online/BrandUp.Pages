@@ -18,7 +18,7 @@ export abstract class FieldDesigner<TProvider extends FieldProvider<any, any>> e
         }
     }
     
-    protected abstract onRender(elem: HTMLElement);
+    protected abstract onRender(elem: HTMLElement): void;
 
     setErrors(errors: string[]) {
         errors.length === 0 ? this.element?.classList.remove("invalid") : this.element?.classList.add("invalid");

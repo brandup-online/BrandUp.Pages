@@ -229,7 +229,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
     protected abstract _getSaveButtonTitle(): string;
     protected abstract _buildUrl(): string;
     protected _buildUrlParams(urlParams: { [key: string]: string; }) { }
-    protected abstract _buildForm(model: TForm);
+    protected abstract _buildForm(model: TForm): void;
 
     destroy() {
         this.queue.destroy();

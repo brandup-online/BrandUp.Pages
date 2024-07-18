@@ -6,11 +6,11 @@ const UI = () => import("./ui");
 export class PagesMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
     private __isEditing: boolean = false;
 
-    start(context: StartContext, next: VoidFunction, _end, error: (reason: any) => void) {
+    start(context: StartContext, next: VoidFunction, _end: () => void, error: (reason: any) => void) {
         this._showUI(context.data, next, error);
     }
 
-    navigate(context: NavigateContext, next: VoidFunction, _end, error: (reason: any) => void) {
+    navigate(context: NavigateContext, next: VoidFunction, _end: () => void, error: (reason: any) => void) {
         this._showUI(context.data, next, error);
     }
 

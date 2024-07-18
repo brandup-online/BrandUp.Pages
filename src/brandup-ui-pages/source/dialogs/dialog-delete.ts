@@ -95,5 +95,5 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
 
     protected abstract _getText(): string;
     protected abstract _buildUrl(): string;
-    protected abstract _buildUrlParams(urlParams: { [key: string]: string });
+    protected abstract _buildUrlParams(urlParams: { [key: string]: string }): void;
 }
