@@ -8,12 +8,14 @@ import { editPage } from "./content/edit";
 
 export class ErrorDialog extends Dialog {
     private __errors: ValidationContentModel[] = [];
-    private __listElem: HTMLElement = DOM.tag("ul", { class: "error-list" });
+    private __listElem: HTMLElement;
 
     get typeName(): string { return "BrandUpPages.ErrorDialog"; }
 
     constructor(editor: ContentEditor, errors: ValidationContentModel[], options?: DialogOptions) {
         super(options);
+
+        this.__listElem = DOM.tag("ul", { class: "error-list" });
 
         this.__errors = errors;
         this.registerCommand("navigate", (elem) => {

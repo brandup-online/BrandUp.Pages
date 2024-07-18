@@ -4,12 +4,19 @@ import iconArrow from "../svg/combobox-arrow.svg";
 import "./combobox.less";
 
 export class ComboBoxField extends Field<string | null, ComboBoxFieldOptions> {
-    private __valueElem: HTMLElement = DOM.tag("div", { class: "value" }) as HTMLInputElement;
-    private __itemsElem: HTMLElement = DOM.tag("ul");
+    private __valueElem: HTMLElement;
+    private __itemsElem: HTMLElement;
     private __value: string | null = null;
     private __isChanged: boolean = false;
 
     get typeName(): string { return "BrandUpPages.Form.ComboBoxField"; }
+
+    constructor(name: string, errors: string[], options: ComboBoxFieldOptions) {
+        super(name, errors, options);
+
+        this.__valueElem = DOM.tag("div", { class: "value" }) as HTMLInputElement;
+        this.__itemsElem = DOM.tag("ul");
+    }
 
     protected _onRender() {
         super._onRender();

@@ -9,14 +9,17 @@ import { AjaxQueue } from "brandup-ui-ajax";
 import "./dialog-form.less";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
-    private __formElem: HTMLFormElement = DOM.tag("form", { method: "POST" }) as HTMLFormElement;
-    private __fieldsElem: HTMLElement = DOM.tag("div", { class: "fields" });
+    private __formElem: HTMLFormElement;
+    private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: Field<any, any> } = {};
     private __model: TForm | null = null;
     readonly queue: AjaxQueue;
 
     constructor(options?: DialogOptions) {
         super(options);
+
+        this.__formElem = DOM.tag("form", { method: "POST" }) as HTMLFormElement;
+        this.__fieldsElem = DOM.tag("div", { class: "fields" });
 
         this.queue = new AjaxQueue();
     }

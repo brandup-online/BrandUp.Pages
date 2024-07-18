@@ -7,15 +7,18 @@ import { FieldProvider, IFormField } from "../../content/provider/base";
 import { FormField } from "../../content/field/base";
 
 export class PageEditDialog extends Dialog<any> {
-    private __formElem: HTMLFormElement = DOM.tag("form", { method: "POST", class: "nopad" }) as HTMLFormElement;
-    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
-    private __fieldsElem: HTMLElement = DOM.tag("div", { class: "fields" });
+    private __formElem: HTMLFormElement;
+    private navElem: HTMLElement | null = null;
+    private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IFormField } = {};
     private __modelPath: string;
     private __content: Content;
 
     constructor(content: Content, modelPath?: string, options?: DialogOptions) {
         super(options);
+
+        this.__formElem = DOM.tag("form", { method: "POST", class: "nopad" }) as HTMLFormElement;
+        this.__fieldsElem = DOM.tag("div", { class: "fields" });
 
         this.__content = content;
         this.__modelPath = modelPath ? modelPath : "";
@@ -41,7 +44,7 @@ export class PageEditDialog extends Dialog<any> {
 
         this.registerCommand("navigate", (elem: HTMLElement) => {
             const path = elem.getAttribute("data-path");
-            if (!path) throw "not found attribute data-path";
+            if (path === null || path === undefined) throw "not found attribute data-path";
 
             this.navigate(path);
         });
@@ -49,6 +52,7 @@ export class PageEditDialog extends Dialog<any> {
 
     private __renderForm() {
         if (!this.navElem) {
+            this.navElem = DOM.tag("ol", { class: "nav" });
             this.content?.insertAdjacentElement("afterbegin", this.navElem);
         }
         else {

@@ -5,8 +5,7 @@ import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
 import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
-    private __textElem: HTMLElement = DOM.tag("div", { class: "confirm-text" }, this._getText());
-    private __errorsElem: HTMLElement = DOM.tag("div", { class: "errors" });
+    private __errorsElem: HTMLElement | null = null;
     private __item: TItem | null = null;
 
     protected _onRenderContent() {
@@ -19,8 +18,8 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
             this.__delete();
         });
 
-        this.content?.appendChild(this.__textElem);
-        this.content?.appendChild(this.__errorsElem);
+        this.content?.appendChild(DOM.tag("div", { class: "confirm-text" }, this._getText()));
+        this.content?.appendChild(this.__errorsElem = DOM.tag("div", { class: "errors" }));
 
         const urlParams: { [key: string]: string } = {};
 
@@ -82,6 +81,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     }
 
     private __renderErrors(errors: Array<string>) {
+        if (!this.__errorsElem) return;
         DOM.empty(this.__errorsElem);
 
         if (errors) {

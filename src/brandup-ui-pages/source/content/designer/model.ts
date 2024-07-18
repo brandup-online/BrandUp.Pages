@@ -130,8 +130,6 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     }
 
     protected getItemIndex(item: Element) {
-        if (!item.hasAttribute("data-content-path-index")) 
-            throw "the element does not have an attribute data-content-path-index";
         const index = Number(item?.getAttribute("data-content-path-index"));
         if (index >=0) return index;
         return -1;

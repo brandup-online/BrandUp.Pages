@@ -10,10 +10,12 @@ import { PagePathModel } from "../pages/browser";
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {
     private pageId: string;
     private __isModified: boolean = false;
-    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
+    private navElem: HTMLElement;
 
     constructor(pageId: string, options?: DialogOptions) {
         super(options);
+
+        this.navElem = DOM.tag("ol", { class: "nav" });
 
         this.pageId = pageId;
     }

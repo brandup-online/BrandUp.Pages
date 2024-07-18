@@ -113,7 +113,7 @@ export class PageToolbar extends UIElement {
             
             if (contentPage.model.status !== "Published") {
                 toolbarButtons.push(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)));
-                pageMenuItems.push(DOM.tag("button", { command: "bp-pages" }, [iconPublish, DOM.tag("span", null, "Опубликовать страницу")]));
+                pageMenuItems.push(DOM.tag("button", { command: "bp-publish" }, [iconPublish, DOM.tag("span", null, "Опубликовать страницу")]));
             }
 
             toolbarButtons.push(DOM.tag("div", null, [
@@ -181,21 +181,13 @@ export class PageToolbar extends UIElement {
         this.registerCommand("bp-pages", () => {
             let parentPageId: string = "";
             if (this.isContentPage)
-                parentPageId = this.__page.model.parentPageId;
-
-            if (!parentPageId) throw "parent page not found";
+                parentPageId = this.__page.model.parentPageId || "";
 
             browserPage(parentPageId);
         });
 
         this.registerCommand("bp-pages-child", () => {
-            let parentPageId: string = "";
-            if (this.isContentPage)
-                parentPageId = this.__page.model.id;
-
-            if (!parentPageId) throw "parent page not found";
-
-            browserPage(parentPageId);
+            browserPage(this.__page.model.id);
         });
 
         this.registerCommand("bp-content-types", () => {

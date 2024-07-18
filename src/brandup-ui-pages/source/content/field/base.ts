@@ -5,7 +5,7 @@ import { IFieldValueElement } from "../../typings/content";
 
 export abstract class FormField<TOptions> extends UIElement implements IFormField {
     readonly provider: FieldProvider<any, any>;
-    protected __errorsElem: HTMLElement = DOM.tag("ul", { class: "field-errors" });
+    protected __errorsElem: HTMLElement;
     protected __valueElem: IFieldValueElement | null = null;
     readonly options: TOptions;
     readonly caption: string;
@@ -17,6 +17,7 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
         this.provider = provider;
         this.options = options;
         this.caption = caption;
+        this.__errorsElem = DOM.tag("ul", { class: "field-errors" });
     }
 
     render(ownElem: HTMLElement) {

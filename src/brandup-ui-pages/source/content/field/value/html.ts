@@ -28,7 +28,6 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
             if (this.__isChanged) {
                 this.__editor?.model.document.differ.reset();
                 const value = this.getValue();
-                if (value === null) throw "value not set"; 
                 this.__onChange(value);
             }
 
@@ -90,9 +89,10 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
         });
     }
 
-    getValue(): string | null {
+    getValue(): string {
         const data = this.__editor?.data.get();
-        return data ? data : null;
+        if (data === undefined) throw "getValue error: data is undefined";
+        return data;
     }
 
     onChange(handler: (value: string) => void) {

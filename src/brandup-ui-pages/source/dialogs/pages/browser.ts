@@ -11,12 +11,14 @@ import iconClose from "../../svg/list-item-add.svg";
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     private __pageId: string | null;
     private collectionId: string | null = null;
-    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
+    private navElem: HTMLElement;
     private tabsElem: HTMLElement | null = null;
     private __createCollElem: HTMLElement | null = null;
 
     constructor(pageId: string, options?: DialogOptions) {
         super(options);
+
+        this.navElem = DOM.tag("ol", { class: "nav" });
 
         this.__pageId = pageId;
 
@@ -107,10 +109,10 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         return `/brandup.pages/page/list`;
     }
     protected _buildUrlParams(urlParams: { [key: string]: string; }) {
-        if (this.__pageId && this.collectionId) {
+        if (this.__pageId)
             urlParams["pageId"] = this.__pageId;
+        if (this.collectionId)
             urlParams["collectionId"] = this.collectionId;
-        }
     }
     protected _buildList(model: PageListModel) {
         if (this.__createCollElem) {

@@ -4,11 +4,17 @@ import iconDelete from "../svg/toolbar-button-discard.svg";
 import "./string-array.less";
 
 export class StringArrayField extends Field<Array<string>, StringArrayFieldOptions> {
-    private __itemsElem: HTMLElement = DOM.tag("div", { class: "items" }) as HTMLInputElement;
+    private __itemsElem: HTMLElement;
     private __isChanged: boolean = false;
     private __items: Array<string> = [];
 
     get typeName(): string { return "BrandUpPages.Form.Field.StringArray"; }
+
+    constructor(name: string, errors: string[], options: StringArrayFieldOptions) {
+        super(name, errors, options);
+
+        this.__itemsElem = DOM.tag("div", { class: "items" }) as HTMLInputElement;
+    }
 
     protected _onRender() {
         super._onRender();

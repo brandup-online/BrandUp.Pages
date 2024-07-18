@@ -3,10 +3,16 @@ import { DOM } from "brandup-ui-dom";
 import "./textbox.less";
 
 export class Textbox extends Field<string, TextboxOptions> {
-    private __valueElem: HTMLElement = DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
+    private __valueElem: HTMLElement;
     private __isChanged: boolean = false;
 
     get typeName(): string { return "BrandUpPages.Form.Field.Text"; }
+
+    constructor(name: string, errors: string[], options: TextboxOptions) {
+        super(name, errors, options);
+
+        this.__valueElem = DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
+    }
 
     protected _onRender() {
         super._onRender();

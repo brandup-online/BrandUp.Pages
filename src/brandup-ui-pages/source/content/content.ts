@@ -89,7 +89,7 @@ export class Content {
     
     renderDesigner(structure: { container: HTMLElement, fields: Map<string, HTMLElement>}) {
         this.__container = structure.container;
-
+        
         this.__fields.forEach(field => {
             if (!structure.fields.has(field.name))
                 return;

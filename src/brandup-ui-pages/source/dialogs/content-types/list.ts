@@ -4,11 +4,13 @@ import { DOM } from "brandup-ui-dom";
 
 export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, ContentTypeItemModel> {
     private __isModified: boolean = false;
-    private navElem: HTMLElement = DOM.tag("ol", { class: "nav" });
+    private navElem: HTMLElement;
     private baseContentType?: string | null;
 
     constructor(baseContentType: string | null, options?: DialogOptions) {
         super(options);
+
+        this.navElem = DOM.tag("ol", { class: "nav" });
 
         this.baseContentType = baseContentType ? baseContentType : null;
     }

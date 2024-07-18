@@ -6,7 +6,7 @@ import iconSort from "../svg/list-item-sort.svg";
 import { DOM } from "brandup-ui-dom";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
-    protected __itemsElem: HTMLElement = DOM.tag("div", { class: "items" });
+    protected __itemsElem: HTMLElement;
     private __newItemElem: HTMLElement | null = null;
     readonly queue: AjaxQueue;
     private __closeItemMenuFunc: (e: MouseEvent) => void = () => {};
@@ -15,6 +15,8 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
     constructor(options?: DialogOptions) {
         super(options);
+
+        this.__itemsElem = DOM.tag("div", { class: "items" });
 
         this.queue = new AjaxQueue();
     }
