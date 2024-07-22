@@ -45,7 +45,7 @@ export class PageEditDialog extends Dialog<any> {
 
         this.registerCommand("navigate", (context: CommandContext) => {
             const path = context.target.getAttribute("data-path");
-            if (path === null || path === undefined) throw "not found attribute data-path";
+            if (path === null || path === undefined) throw new Error("not found attribute data-path");
 
             this.navigate(path);
         });

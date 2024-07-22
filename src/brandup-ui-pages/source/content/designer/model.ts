@@ -19,7 +19,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
                     const contentElem = <HTMLElement>elem.closest("[data-content-path]");
                     const content = this.provider.content.host.editor.navigate(contentElem.dataset.contentPath!);
                     if (!content)
-                        throw "";
+                        throw new Error("");
                     itemIndex = content.index + 1;
                 }
             }
@@ -41,7 +41,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             if (itemElem.classList.contains("processing"))
                 return;
             const path = itemElem.getAttribute("data-content-path");
-            if (path === null) throw "the element does not have an attribute data-content-path";
+            if (path === null) throw new Error("the element does not have an attribute data-content-path");
 
             itemElem.classList.add("processing");
             const index = this.getItemIndex(itemElem);
@@ -112,7 +112,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     protected getItem(index: number): Element {
         let itemElem: Element | null = null;
 
-        if (!this.element) throw "element not defined";
+        if (!this.element) throw new Error("element not defined");
 
         for (let i = 0; i < this.element.children.length; i++) {
             itemElem = this.element.children.item(i)!;
@@ -121,7 +121,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
                 return itemElem;
         }
 
-        if (!itemElem) throw "ModelDesigner ~ getItem ~ itemElem not found";
+        if (!itemElem) throw new Error("ModelDesigner ~ getItem ~ itemElem not found");
 
         return itemElem;
     }  
@@ -149,7 +149,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     }
 
     protected getItems () {
-        if (!this.element) throw "element not defined";
+        if (!this.element) throw new Error("element not defined");
         return DOM.queryElements(this.element, `.page-blocks-designer > [data-content-path]`);
     }
 }

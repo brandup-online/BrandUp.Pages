@@ -23,7 +23,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             this.__contents.splice(content.index, 0, content);
         else {
             if (this.__contents.length !== 0)
-                throw "Model field already exist content.";
+                throw new Error("Model field already exist content.");
             this.__contents[0] = content;
         }
     }
@@ -32,7 +32,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     
     addItem(index: number) {
         if (!this.options.isListValue && this.hasValue())
-            throw "Content already exists.";
+            throw new Error("Content already exists.");
 
         return selectContentType(this.options.itemTypes)
             .then(type => new Promise<Content>((resolve) => {
@@ -48,7 +48,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                             resolve(newContent);
                         }
                         else
-                            throw "Error add content.";
+                            throw new Error("Error add content.");
                     }
                 });
             }));
@@ -64,7 +64,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             //                    const newElem = this.__addItemDOM(response.data, index);
             //                }
             //                else
-            //                    throw "Error load content view.";
+            //                    throw new Error("Error load content view.");
             //            }
             //        });
             //    }
@@ -95,14 +95,14 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
 
     createDesigner() {
         let type = this.valueElem?.getAttribute("data-content-designer");
-        if (!type) throw "failed to identify the element type for ModelDesigner";
+        if (!type) throw new Error("failed to identify the element type for ModelDesigner");
 
         const designerType = type === "page-blocks" ? PageBlocksDesigner : ModelDesigner;
         return new designerType(this);
     }
 
     saveValue(value: any) {
-        throw "method saveValue not implemented in ModelFieldProvider"
+        throw new Error("method saveValue not implemented in ModelFieldProvider")
     }
 
     itemUp(index: number, elem: Element) {

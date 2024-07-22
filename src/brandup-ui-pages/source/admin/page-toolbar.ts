@@ -204,9 +204,9 @@ export class PageToolbar extends UIElement {
             const contentKey = context.target.dataset.contentKey;
             const contentType = context.target.dataset.contentType;
             if (!contentKey || !contentType)
-                throw "Not set content edit parameters.";
+                throw new Error("Not set content edit parameters.");
 
-            ContentEditor.begin(this.__page, contentKey, contentType)
+            return ContentEditor.begin(this.__page, contentKey, contentType)
                 .then(result => {
                     if (result.exist && !confirm("Continue editing?"))
                         return ContentEditor.begin(this.__page, contentKey, contentType, true);
@@ -265,13 +265,13 @@ export class PageToolbar extends UIElement {
 
 const createContentLocation = (container: HTMLElement): ContentLocation => {
     const contentKey = container.dataset.contentRoot;
-    if (!contentKey) throw "Not set content root value.";
+    if (!contentKey) throw new Error("Not set content root value.");
 
     const contentType = container.dataset.contentType;
-    if (!contentType) throw "Not set content type value.";
+    if (!contentType) throw new Error("Not set content type value.");
 
     const contentTitle = container.dataset.contentTitle;
-    if (!contentTitle) throw "Not set content type value.";
+    if (!contentTitle) throw new Error("Not set content type value.");
 
     return {
         key: contentKey,
@@ -298,7 +298,7 @@ const findContents = (): Array <ContentLocation> => {
 const findContent = (contentKey: string): ContentLocation => {
     const contentElem = DOM.queryElement(document.body, `[data-content-root='${contentKey}']`);
     if (!contentElem)
-        throw "couldn't find the content";
+        throw new Error("couldn't find the content");
 
     return createContentLocation(contentElem);
 };
@@ -306,10 +306,10 @@ const findContent = (contentKey: string): ContentLocation => {
 const findEditContent = (editId: string): ContentLocation => {
     var contentElem = DOM.queryElement(document.body, "[data-content-edit-id]");
     if (contentElem && contentElem.dataset.contentEditId != editId)
-        throw "";
+        throw new Error("");
 
     if (!contentElem)
-        throw "couldn't find the content";
+        throw new Error("couldn't find the content");
 
     return createContentLocation(contentElem);
 };

@@ -148,7 +148,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
                 switch (response.status) {
                     case 200: {
-                        if (!response.data) throw "data loading error";
+                        if (!response.data) throw new Error("data loading error");
 
                         this.__model = response.data;
                         this._buildList(this.__model);
@@ -225,7 +225,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {
         const itemElem = elem.closest(".item[data-id]");
         if (!itemElem)
-            throw "";
+            throw new Error("");
 
         return { id: itemElem.getAttribute("data-id")!, model: (itemElem as any)["_model_"] };
     }

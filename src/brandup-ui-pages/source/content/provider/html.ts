@@ -16,7 +16,7 @@ export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldOptions> {
             data: value ? value : "",
             success: (response: AjaxResponse<FieldValueResult>) => {
                 if (response.status === 200) {
-                    if (!response.data) throw "error load data";
+                    if (!response.data) throw new Error("error load data");
 
                     this.onSavedValue(response.data);
 

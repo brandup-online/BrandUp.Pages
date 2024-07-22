@@ -21,7 +21,7 @@ export default class ModelField extends FormField<ModelFieldOptions> {
         if (this.options.isListValue) {
             return this.__renderListValue();
         }
-        throw "ModelValue class not implemented";
+        throw new Error("ModelValue class not implemented");
     }
 
     private __renderListValue(): ModelListValue {
@@ -38,7 +38,7 @@ export default class ModelField extends FormField<ModelFieldOptions> {
             const itemElem = this.__getItemElem(context.target);
             const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index")!);
             const path = itemElem.getAttribute("data-content-path");
-            if (path === null) throw "the element does not have an attribute data-content-path";
+            if (path === null) throw new Error("the element does not have an attribute data-content-path");
 
             this.provider.deleteItem(itemIndex, path);
             valueElem.deleteItem(itemIndex);

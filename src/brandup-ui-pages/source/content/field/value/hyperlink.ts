@@ -125,7 +125,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
                     this.__urlValueInput?.focus();
                     break;
                 default:
-                    throw "";
+                    throw new Error("");
             }
         });
 
@@ -145,7 +145,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
             const pageId = context.target.getAttribute("data-value");
-            if (!pageId) throw "pageId not found";
+            if (!pageId) throw new Error("pageId not found");
             this.__pageValueInput?.setAttribute("value-page-id", pageId);
             this.__inputElem.innerText = context.target.innerText;
             this.__pageValueInput.value = context.target.innerText;
@@ -186,7 +186,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
                 .then((response: AjaxResponse<Array<PageModel>>) => {
                     switch (response.status) {
                         case 200:
-                            if (!this.__searchElem) throw "";
+                            if (!this.__searchElem) throw new Error("");
                             DOM.empty(this.__searchElem);
     
                             if (response.data?.length) {
@@ -201,7 +201,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     
                             break;
                         default:
-                            throw "";
+                            throw new Error("");
                     }
                 });
             }, 500);
@@ -212,7 +212,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
         this.__onChange = handler;
     }
 
-    getValue(): HyperLinkValue { throw "Not implemented"; }
+    getValue(): HyperLinkValue { throw new Error("Not implemented"); }
     
 
     hasValue(): boolean {
@@ -224,7 +224,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
                 return this.__urlValueInput?.value ? true : false;
             }
             default:
-                throw "";
+                throw new Error("");
         }
     }
 
@@ -247,7 +247,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
                     break;
                 }
                 default:
-                    throw "";
+                    throw new Error("");
             }
         }
 
@@ -279,7 +279,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
                 break;
             }
             default:
-                throw "";
+                throw new Error("");
         }
     }
 

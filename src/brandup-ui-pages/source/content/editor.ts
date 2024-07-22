@@ -50,7 +50,7 @@ export class ContentEditor extends UIElement implements IContentHost {
                 method: "POST",
                 success: (response: AjaxResponse<BeginContentEditResult>) => {
                     if (response.status !== 200 || !response.data)
-                        throw "Error begin content edit.";
+                        throw new Error("Error begin content edit.");
                         
                     resolve({ editId: response.data.editId, exist: response.data.exist });
                 }
@@ -65,7 +65,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     edit(container?: HTMLElement) {
         if (document.body.classList.contains("bp-state-design"))
-            throw "Content editor already started.";
+            throw new Error("Content editor already started.");
         document.body.classList.add("bp-state-design");
         
         this.__contentElem = container;
@@ -89,7 +89,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     attach(content: Content) {
         if (this.__content)
-            throw "Model field already exist content.";
+            throw new Error("Model field already exist content.");
         this.__content = content;
     }
 
@@ -118,7 +118,7 @@ export class ContentEditor extends UIElement implements IContentHost {
                         throw `Error load editor contents by path "${path}".`;
 
                     let rootContent: Content | null = this.initContent(response.data.contents);
-                    if (!rootContent) throw "rootContent not found";
+                    if (!rootContent) throw new Error("rootContent not found");
                     resolve(rootContent);
                 },
             });
@@ -128,7 +128,7 @@ export class ContentEditor extends UIElement implements IContentHost {
     initContent(contents: Array<ContentModel>): Content {
         let rootContent: Content;
 
-        if (!contents.length) throw "empty contents array";
+        if (!contents.length) throw new Error("empty contents array");
 
         contents.forEach((contentModel, index) => {
             if (this.__contents.has(contentModel.path))
@@ -189,11 +189,11 @@ export class ContentEditor extends UIElement implements IContentHost {
                 success: (response) => {
                     this.__isLoading = false;
                     if (response.status !== 200)
-                        throw "Error commit content editing.";
+                        throw new Error("Error commit content editing.");
 
                     if (response.data.isSuccess) {
                         if (!this.__complate)
-                            throw "Complate function not set";
+                            throw new Error("Complate function not set");
                         this.__complate({ reason: "Commit" });
                     } else {
                         errorPage(this, response.data.validation);
@@ -213,9 +213,9 @@ export class ContentEditor extends UIElement implements IContentHost {
                 method: "POST",
                 success: (response) => {
                     if (response.status !== 200)
-                        throw "Error discard content editing.";
+                        throw new Error("Error discard content editing.");
                     if (!this.__complate)
-                        throw "Complate function not set";
+                        throw new Error("Complate function not set");
 
                     this.__complate({ reason: "Discard" });
                 },

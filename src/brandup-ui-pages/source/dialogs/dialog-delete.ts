@@ -44,7 +44,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
                 break;
             }
             default:
-                throw "";
+                throw new Error("");
         }
     }
 
@@ -74,7 +74,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
                 return;
             }
             default:
-                throw "";
+                throw new Error("");
         }
     }
 

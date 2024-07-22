@@ -19,7 +19,7 @@ export class TextDesigner extends FieldDesigner<TextFieldProvider> {
 
         const elem = provider.valueElem;
 
-        if (!elem) throw "the provider valueElem does not exist";
+        if (!elem) throw new Error("the provider valueElem does not exist");
 
         this.__onKeyUp = (e: KeyboardEvent) => this.__isChanged = true;
 

@@ -92,7 +92,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
 
             //                 break;
             //             default:
-            //                 throw "";
+            //                 throw new Error("";
             //         }
             //     }
             // });
@@ -138,7 +138,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
     
                             break;
                         default:
-                            throw "";
+                            throw new Error("");
                     }
                 });
             }, 500);
@@ -150,7 +150,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
     }
 
     getValue(): any {
-        throw "getValue method not implemented"
+        throw new Error("getValue method not implemented")
     }
 
     setValue(value: PagesFieldFormValue) {

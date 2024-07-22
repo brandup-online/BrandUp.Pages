@@ -81,7 +81,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
                         break;
                     }
                     default:
-                        throw "";
+                        throw new Error("");
                 }
             }
         });
@@ -109,7 +109,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         //                break;
         //            }
         //            default:
-        //                throw "";
+        //                throw new Error("");
         //        }
         //    }
         //});
@@ -144,7 +144,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
                         break;
                     }
                     default:
-                        throw "";
+                        throw new Error("");
                 }
             }
         });

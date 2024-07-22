@@ -91,7 +91,7 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
 
     getValue(): string {
         const data = this.__editor?.data.get();
-        if (data === undefined) throw "getValue error: data is undefined";
+        if (data === undefined) throw new Error("getValue error: data is undefined");
         return data;
     }
 

@@ -22,7 +22,7 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
             success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {
                     case 200:
-                        if (!response.data) throw "error load data";
+                        if (!response.data) throw new Error("error load data");
 
                         this.onSavedValue(response.data);
 
@@ -33,7 +33,7 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
 
                         break;
                     default:
-                        throw "";
+                        throw new Error("");
                 }
             }
         });
@@ -47,7 +47,7 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
             success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {
                     case 200:
-                        if (!response.data) throw "error load data";
+                        if (!response.data) throw new Error("error load data");
 
                         this.onSavedValue(response.data);
 
@@ -58,7 +58,7 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
 
                         break;
                     default:
-                        throw "";
+                        throw new Error("");
                 }
             }
         });

@@ -36,7 +36,7 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
             e.preventDefault();
 
             const text = e.clipboardData?.getData("text/plain");
-            if (!text) throw "paste event error";
+            if (!text) throw new Error("paste event error");
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
         this.element?.addEventListener("cut", () => {
@@ -68,14 +68,14 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
     }
 
     getValue(): string{
-        if (!this.element) throw "element not defined";
+        if (!this.element) throw new Error("element not defined");
 
         const val = this.normalizeValue(this.element?.innerText);
         return val;
     }
 
     setValue(value: string) {
-        if (!this.element) throw "element not defined";
+        if (!this.element) throw new Error("element not defined");
 
         value = this.normalizeValue(value);
         if (value && this.options.allowMultiline) {

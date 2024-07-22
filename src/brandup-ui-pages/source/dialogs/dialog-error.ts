@@ -20,7 +20,7 @@ export class ErrorDialog extends Dialog {
         this.__errors = errors;
         this.registerCommand("navigate", (context) => {
             const contentPath = context.target.dataset.contentPath;
-            if (!contentPath) throw "data-content-path attribute not found"
+            if (!contentPath) throw new Error("data-content-path attribute not found")
 
             const content = editor.navigate(contentPath);
             if (!content) throw `content path ${contentPath} not found`;
