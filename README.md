@@ -21,10 +21,10 @@ services.AddPages()
 
 Необходимо установить **NPM** пакеты:
 - [brandup-ui-pages](https://www.npmjs.com/package/brandup-ui-pages)
-- [brandup-ui-website](https://www.npmjs.com/package/brandup-ui-website)
+- [@brandup/ui-website](https://www.npmjs.com/package/@brandup/ui-website)
 
 ```
-import { host } from "brandup-ui-website";
+import { host } from "@brandup/ui-website";
 import { PagesMiddleware } from "brandup-ui-pages";
 
 host.start({

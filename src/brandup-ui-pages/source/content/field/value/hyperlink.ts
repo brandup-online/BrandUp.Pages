@@ -1,9 +1,9 @@
-import { UIElement } from "brandup-ui";
-import { DOM } from "brandup-ui-dom";
+import { CommandContext, UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
 import { HyperLinkFieldFormOptions } from "../hyperlink";
 import iconArrow from "../../../svg/combobox-arrow.svg";
 import { IFieldValueElement } from "../../../typings/content";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { request, AjaxResponse } from "@brandup/ui-ajax";
 import { PageModel } from "../../../typings/page";
 import { HyperLinkValue } from "../../../content/provider/hyperlink";
 
@@ -19,7 +19,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     private __closePageMenuFunc: (e: MouseEvent) => void;
     private __type: HyperLinkType = "Page";
     private __searchTimeout: number = 0;
-    private __searchRequest: XMLHttpRequest | null = null;
+    private __abortController: AbortController | null = null;
 
     private __onChange: ((value: HyperLinkValue) => void) = () => {};
 
@@ -129,8 +129,8 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
             }
         });
 
-        this.registerCommand("select-type", (elem: HTMLElement) => {
-            const type = elem.getAttribute("data-value") as HyperLinkType;
+        this.registerCommand("select-type", (context: CommandContext) => {
+            const type = context.target.getAttribute("data-value") as HyperLinkType;
 
             this.element?.classList.remove("opened-types");
             document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
@@ -139,16 +139,16 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
             this.refreshUI();
         });
 
-        this.registerCommand("select-page", (elem: HTMLElement) => {
+        this.registerCommand("select-page", (context: CommandContext) => {
             this.element?.classList.remove("inputing");
             this.element?.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
-            const pageId = elem.getAttribute("data-value");
+            const pageId = context.target.getAttribute("data-value");
             if (!pageId) throw "pageId not found";
             this.__pageValueInput?.setAttribute("value-page-id", pageId);
-            this.__inputElem.innerText = elem.innerText;
-            this.__pageValueInput.value = elem.innerText;
+            this.__inputElem.innerText = context.target.innerText;
+            this.__pageValueInput.value = context.target.innerText;
 
             this.refreshUI();
 
@@ -171,36 +171,37 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
             if (this.__searchTimeout)
                 clearTimeout(this.__searchTimeout);
 
-            if (this.__searchRequest)
-                this.__searchRequest.abort();
+            if (this.__abortController) 
+                this.__abortController.abort();
 
             this.__searchTimeout = window.setTimeout(() => {
-                this.__searchRequest = ajaxRequest({
+                this.__abortController = new AbortController();
+                request({
                     url: `/brandup.pages/page/search`,
-                    urlParams: {
+                    query: {
                         title: title
                     },
                     method: "GET",
-                    success: (response: AjaxResponse<Array<PageModel>>) => {
-                        switch (response.status) {
-                            case 200:
-                                if (!this.__searchElem) throw "";
-                                DOM.empty(this.__searchElem);
-
-                                if (response.data.length) {
-                                    for (let i = 0; i < response.data.length; i++) {
-                                        const page = response.data[i];
-
-                                        this.__searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
-                                    }
+                }, this.__abortController.signal)
+                .then((response: AjaxResponse<Array<PageModel>>) => {
+                    switch (response.status) {
+                        case 200:
+                            if (!this.__searchElem) throw "";
+                            DOM.empty(this.__searchElem);
+    
+                            if (response.data?.length) {
+                                for (let i = 0; i < response.data.length; i++) {
+                                    const page = response.data[i];
+    
+                                    this.__searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select-page", "data-value": page.id }, page.title)));
                                 }
-                                else
-                                    this.__searchElem.appendChild(DOM.tag("li", { class: "text" }, "Страниц не найдено"));
-
-                                break;
-                            default:
-                                throw "";
-                        }
+                            }
+                            else
+                                this.__searchElem.appendChild(DOM.tag("li", { class: "text" }, "Страниц не найдено"));
+    
+                            break;
+                        default:
+                            throw "";
                     }
                 });
             }, 500);
@@ -283,8 +284,8 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     }
 
     destroy() {
-        if (this.__searchRequest)
-            this.__searchRequest.abort();
+        if (this.__abortController)
+            this.__abortController.abort();
 
         window.clearTimeout(this.__searchTimeout || undefined);
         document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);

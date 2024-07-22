@@ -1,7 +1,8 @@
 ﻿import { Field } from "./field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import iconDelete from "../svg/toolbar-button-discard.svg";
 import "./string-array.less";
+import { CommandContext } from "@brandup/ui";
 
 export class StringArrayField extends Field<Array<string>, StringArrayFieldOptions> {
     private __itemsElem: HTMLElement;
@@ -25,8 +26,8 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         this.__renderItems();
         this.__refreshUI();
 
-        this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest(".item");
+        this.registerCommand("item-delete", (context: CommandContext) => {
+            const itemElem = context.target.closest(".item");
             if (!itemElem || !itemElem.hasAttribute("data-index")) return;
 
             const index = parseInt(itemElem.getAttribute("data-index")!);

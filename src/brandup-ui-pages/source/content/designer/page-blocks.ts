@@ -1,5 +1,5 @@
 ﻿import { ModelDesigner } from "./model";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import iconRefresh from "../../svg/new/update.svg";
 import iconEddit from "../../svg/new/edit.svg";
 import iconDelete from "../../svg/new/trash.svg";

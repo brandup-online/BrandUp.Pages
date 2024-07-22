@@ -1,9 +1,10 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { ajaxRequest, AjaxQueue, AjaxResponse } from "brandup-ui-ajax";
+import { request, AjaxQueue, AjaxResponse } from "@brandup/ui-ajax";
 import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 import iconSort from "../svg/list-item-sort.svg";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
+import { CommandContext } from "@brandup/ui";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
     protected __itemsElem: HTMLElement;
@@ -30,8 +31,8 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         this.content?.appendChild(this.__itemsElem);
 
-        this.registerCommand("item-open-menu", (el: HTMLElement) => {
-            el.parentElement?.parentElement?.classList.add("opened-menu");
+        this.registerCommand("item-open-menu", (context: CommandContext) => {
+            context.target.parentElement?.parentElement?.classList.add("opened-menu");
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
@@ -65,7 +66,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         this.__itemsElem.addEventListener("dragover", (e: DragEvent) => {
             e.preventDefault();
         });
-        this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
+        this.__itemsElem.addEventListener("drop", async (e: DragEvent) => {
             const target = e.target as Element;
             const sourceId = e.dataTransfer?.getData("data-id");
             const sourceIndex = parseInt(e.dataTransfer?.getData("data-index") || "-1");
@@ -103,21 +104,20 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
                         this.setLoading(true);
 
-                        ajaxRequest({
+                        const response: AjaxResponse = await request({
                             url: url,
-                            urlParams: urlParams,
+                            query: urlParams,
                             method: "POST",
-                            success: (response: AjaxResponse) => {
-                                this.setLoading(false);
-
-                                if (response.status !== 200) {
-                                    this.setError("Error loading items.");
-                                    return;
-                                }
-
-                                this.loadItems();
-                            }
                         });
+
+                        this.setLoading(false);
+
+                        if (response.status !== 200) {
+                            this.setError("Error loading items.");
+                            return;
+                        }
+
+                        this.loadItems();
                     }
                 }
             }
@@ -141,13 +141,15 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response: AjaxResponse<TList>) => {
                 this.setLoading(false);
 
                 switch (response.status) {
                     case 200: {
+                        if (!response.data) throw "data loading error";
+
                         this.__model = response.data;
                         this._buildList(this.__model);
                         this.loadItems();
@@ -165,7 +167,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     refresh() {
         this.__loadList();
     }
-    loadItems() {
+    async loadItems() {
         if (!this._allowLoadItems()) {
             DOM.empty(this.__itemsElem);
 
@@ -188,37 +190,36 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         let url = this._buildUrl();
         url += "/item";
 
-        ajaxRequest({
+        const response: AjaxResponse<Array<TItem>> = await request({
             url: url,
-            urlParams: urlParams,
-            success: (response: AjaxResponse<Array<TItem>>) => {
-                this.setLoading(false);
-
-                if (response.status !== 200) {
-                    this.setError("Error loading items.");
-                    return;
-                }
-
-                this.__renderItems(response.data);
-            }
+            query: urlParams,
         });
+
+        this.setLoading(false);
+
+        if (response.status !== 200 || !response.data) {
+            this.setError("Error loading items.");
+            return;
+        }
+
+        this.__renderItems(response.data);
     }
     protected registerItemCommand(name: string, execute: (itemId: string, model: any, commandElem: HTMLElement) => void, canExecute?: (itemId: string, model: any, commandElem: HTMLElement) => boolean) {
-        this.registerCommand(name, (elem: HTMLElement) => {
-            const item = this._findItemIdFromElement(elem);
+        this.registerCommand(name, (context: CommandContext) => {
+            const item = this._findItemIdFromElement(context.target);
             if (item === null)
                 return;
 
-            execute(item.id, item.model, elem);
-        }, (elem: HTMLElement) => {
+            execute(item.id, item.model, context.target);
+        }, (context: CommandContext) => {
             if (!canExecute)
                 return true;
 
-            const item = this._findItemIdFromElement(elem);
+            const item = this._findItemIdFromElement(context.target);
             if (item === null)
                 return false;
 
-            return canExecute(item.id, item.model, elem);
+            return canExecute(item.id, item.model, context.target);
         });
     }
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {

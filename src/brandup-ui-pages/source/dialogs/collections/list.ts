@@ -3,7 +3,7 @@ import { createPageCollection } from "./create";
 import { deletePageCollection } from "./delete";
 import { updatePageCollection } from "./update";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { PageCollectionModel } from "../../typings/page";
 import { PagePathModel } from "../pages/browser";
 
@@ -46,8 +46,8 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
                 this.__isModified = true;
             });
         });
-        this.registerCommand("nav", (elem) => {
-            let pageId = elem.getAttribute("data-page-id");
+        this.registerCommand("nav", (context) => {
+            let pageId = context.target.getAttribute("data-page-id");
             if (!pageId) return;
 
             this.pageId = pageId;

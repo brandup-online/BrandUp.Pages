@@ -1,4 +1,4 @@
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 import { TextDesigner } from "../designer/text";
 import { FieldProvider } from "./base";
 import { FieldValueResult } from "../../typings/content";
@@ -18,7 +18,7 @@ export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {
             type: "JSON",
             data: value,
             success: (response: AjaxResponse<FieldValueResult>) => {
-                if (response.status === 200) {
+                if (response.status === 200 && response.data) {
                     this.onSavedValue(response.data);
                 }
             }

@@ -1,6 +1,6 @@
-import { UIElement } from "brandup-ui";
+import { UIElement } from "@brandup/ui";
 import { FieldProvider, IFormField } from "../provider/base";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { IFieldValueElement } from "../../typings/content";
 
 export abstract class FormField<TOptions> extends UIElement implements IFormField {

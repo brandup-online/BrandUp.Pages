@@ -1,5 +1,5 @@
-import { UIElement } from "brandup-ui";
-import { DOM } from "brandup-ui-dom";
+import { UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
 import { ImageFieldOptions } from "../image";
 import { IFieldValueElement } from "../../../typings/content";
 

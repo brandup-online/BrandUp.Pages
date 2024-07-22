@@ -13,10 +13,10 @@ class PageCollectionDeleteDialog extends DeleteDialog<PageCollectionModel> {
 
     get typeName(): string { return "BrandUpPages.PageCollectionDeleteDialog"; }
 
-    protected _onRenderContent() {
+    protected async _onRenderContent() {
         this.setHeader("Удаление коллекции страниц");
 
-        super._onRenderContent();
+        await super._onRenderContent();
     }
     protected _getText(): string {
         return "Подтвердите удаление коллекции страниц.";

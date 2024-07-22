@@ -1,5 +1,5 @@
-import { UIElement } from "brandup-ui";
-import { DOM } from "brandup-ui-dom";
+import { UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
 import { HtmlFieldFormOptions } from "../html";
 import { IFieldValueElement } from "../../../typings/content";
 import ContentEditor from "brandup-pages-ckeditor";

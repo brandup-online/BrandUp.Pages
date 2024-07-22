@@ -1,10 +1,10 @@
 import { FieldProvider } from "./base";
 import { ModelDesigner } from "../designer/model";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 import { PageBlocksDesigner } from "../../content/designer/page-blocks";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { editPage } from "../../dialogs/content/edit";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { Content, IContentHost } from "../content";
 import { ContentEditor } from "../editor";
 import { ContentModel, FieldValueResult } from "../../typings/content";
@@ -38,10 +38,10 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             .then(type => new Promise<Content>((resolve) => {
                 this.request({
                     url: '/brandup.pages/content/model',
-                    urlParams: { itemType: type.name, itemIndex: index.toString() },
+                    query: { itemType: type.name, itemIndex: index.toString() },
                     method: "PUT",
                     success: (response: AjaxResponse<AddContentResult>) => {
-                        if (response.status === 200) {
+                        if (response.status === 200 && response.data) {
                             this.onSavedValue(response.data.fieldValue);
 
                             const newContent = this.editor.initContent(response.data.content);
@@ -110,7 +110,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/up',
-            urlParams: { itemIndex: index.toString() },
+            query: { itemIndex: index.toString() },
             method: "POST",
             success: () => elem.classList.remove("processing")
         });
@@ -121,7 +121,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         this._refreshIndexses();
         this.request({
             url: '/brandup.pages/content/model/down',
-            urlParams: { itemIndex: index.toString() },
+            query: { itemIndex: index.toString() },
             method: "POST",
             success: () => elem.classList.remove("processing")
         });
@@ -130,7 +130,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     deleteItem(index: number, path: string) {
         this.request({
             url: '/brandup.pages/content/model',
-            urlParams: { itemIndex: index.toString() },
+            query: { itemIndex: index.toString() },
             method: "DELETE",
             success: (() => {
                 //this.__contents[index].container?.remove();
@@ -144,7 +144,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
     moveItem(itemIndex: number, newIndex: number) {
         this.request({
             url: '/brandup.pages/content/model/move',
-            urlParams: { itemIndex: itemIndex.toString(), newIndex: newIndex.toString() },
+            query: { itemIndex: itemIndex.toString(), newIndex: newIndex.toString() },
             method: "POST",
             success: (response: AjaxResponse) => {
                 if (response.status === 200) {
@@ -171,7 +171,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
 
         this.request({
             url: '/brandup.pages/content/model/view',
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response: AjaxResponse<string>) => {
                 (this.designer as ModelDesigner)?.refreshItem(elem, response.data);

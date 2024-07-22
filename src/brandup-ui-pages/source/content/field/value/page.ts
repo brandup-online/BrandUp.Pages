@@ -1,8 +1,8 @@
-import { UIElement } from "brandup-ui";
-import { DOM } from "brandup-ui-dom";
+import { CommandContext, UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
 import { PagesFieldFormOptions } from "../pages";
 import { IFieldValueElement } from "../../../typings/content";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse, request } from "@brandup/ui-ajax";
 import { PageCollectionModel } from "../../../typings/page";
 
 export class PageValue extends UIElement implements IFieldValueElement {
@@ -11,7 +11,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
     private __searchElem: HTMLElement;
     private __closeMenuFunc: (e: MouseEvent) => void;
     private __searchTimeout: number = 0;
-    private __searchRequest: XMLHttpRequest | null = null;
+    private __abortController: AbortController | null = null;
 
     private __onChange: (value: string) => void = () => {};
 
@@ -66,18 +66,18 @@ export class PageValue extends UIElement implements IFieldValueElement {
             document.body.addEventListener("mousedown", this.__closeMenuFunc, false);
         });
 
-        this.registerCommand("select", (elem: HTMLElement) => {
+        this.registerCommand("select", (context: CommandContext) => {
             this.element?.classList.remove("inputing");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
-            const pageCollectionId = elem.getAttribute("data-value");
-            const pageUrl = elem.getAttribute("data-url");
+            const pageCollectionId = context.target.getAttribute("data-value");
+            const pageUrl = context.target.getAttribute("data-url");
 
             if (!pageCollectionId || !pageUrl) return;
 
             this.setValue({
                 id: pageCollectionId,
-                title: elem.innerText,
+                title: context.target.innerText,
                 pageUrl: pageUrl
             });
 
@@ -106,37 +106,39 @@ export class PageValue extends UIElement implements IFieldValueElement {
             if (this.__searchTimeout)
                 clearTimeout(this.__searchTimeout);
 
-            if (this.__searchRequest)
-                this.__searchRequest.abort();
+            if (this.__abortController) 
+                this.__abortController.abort();
 
             this.__searchTimeout = window.setTimeout(() => {
-                this.__searchRequest = ajaxRequest({
+                request({
                     url: `/brandup.pages/collection/search`,
-                    urlParams: {
+                    query: {
                         pageType: this.options.pageType,
                         title: title
                     },
                     method: "GET",
-                    success: (response: AjaxResponse<Array<PageCollectionModel>>) => {
-                        switch (response.status) {
-                            case 200:
-                                DOM.empty(this.searchElem);
-
-                                if (response.data.length) {
-                                    for (let i = 0; i < response.data.length; i++) {
-                                        const collection = response.data[i];
-
-                                        this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id, "data-url": collection.pageUrl }, collection.title + ": " + collection.pageUrl)));
-                                    }
+                }, this.__abortController?.signal)
+                .then((response: AjaxResponse<Array<PageCollectionModel>>) => {
+                    switch (response.status) {
+                        case 200:
+                            if (response.data === undefined || response.data === null) break;
+    
+                            DOM.empty(this.searchElem);
+    
+                            if (response.data.length) {
+                                for (let i = 0; i < response.data.length; i++) {
+                                    const collection = response.data[i];
+    
+                                    this.searchElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "select", "data-value": collection.id, "data-url": collection.pageUrl }, collection.title + ": " + collection.pageUrl)));
                                 }
-                                else {
-                                    this.searchElem.appendChild(DOM.tag("li", { class: "text" }, "Коллекций страниц не найдено"));
-                                }
-
-                                break;
-                            default:
-                                throw "";
-                        }
+                            }
+                            else {
+                                this.searchElem.appendChild(DOM.tag("li", { class: "text" }, "Коллекций страниц не найдено"));
+                            }
+    
+                            break;
+                        default:
+                            throw "";
                     }
                 });
             }, 500);
@@ -178,8 +180,8 @@ export class PageValue extends UIElement implements IFieldValueElement {
     }
 
     destroy() {
-        if (this.__searchRequest)
-            this.__searchRequest.abort();
+        if (this.__abortController)
+            this.__abortController.abort();
 
         window.clearTimeout(this.__searchTimeout);
         document.body.removeEventListener("click", this.__closeMenuFunc, false);

@@ -1,6 +1,7 @@
-﻿import { DialogOptions } from "../dialog";
+﻿import { CommandContext } from "@brandup/ui";
+import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, ContentTypeItemModel> {
     private __isModified: boolean = false;
@@ -28,8 +29,8 @@ export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, Cont
             this.refresh();
         });
 
-        this.registerCommand("nav2", (elem: HTMLElement) => {
-            let name = elem.getAttribute("data-value");
+        this.registerCommand("nav2", (context: CommandContext) => {
+            let name = context.target.getAttribute("data-value");
             this.baseContentType = name ? name : null;
             this.refresh();
         });

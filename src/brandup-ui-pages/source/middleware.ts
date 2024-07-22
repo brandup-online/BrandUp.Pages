@@ -1,35 +1,34 @@
-﻿import { Application, ApplicationModel, Middleware, NavigateContext, StartContext } from "brandup-ui-app";
-import { Page, PageModel } from "brandup-ui-website";
+﻿import { Middleware, MiddlewareNext, NavigateContext, StartContext } from "@brandup/ui-app";
+import { Page, PageModel,  } from "@brandup/ui-website";
 
 const UI = () => import("./ui");
 
-export class PagesMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
+export class PagesMiddleware implements Middleware {
     private __isEditing: boolean = false;
 
-    start(context: StartContext, next: VoidFunction, _end: () => void, error: (reason: any) => void) {
-        this._showUI(context.data, next, error);
+    name = "brandup-layout-middleware";
+
+    start(context: StartContext, next: MiddlewareNext) {
+        const middleware = context.app.middleware('website-pages');
+        return this._showUI(middleware, next);
     }
 
-    navigate(context: NavigateContext, next: VoidFunction, _end: () => void, error: (reason: any) => void) {
-        this._showUI(context.data, next, error);
+    navigate(context: NavigateContext, next: MiddlewareNext) {
+        return this._showUI(context.data, next);
     }
 
-    private _showUI(data: { [key: string]: any }, next: VoidFunction, error: (reason: any) => void) {
+    private _showUI(data: { [key: string]: any }, next: MiddlewareNext) {
         if (document.body.dataset.pagesAdmin && data["page"]) {
             const page = data["page"] as Page<PageModel>;
 
-            UI()
-                .then(t => {
-                    this.__isEditing = t.default(page);
+            return UI().then( t => {
+                this.__isEditing = t.default(page);
 
-                    next();
-                })
-                .catch(error);
-
-            return;
-
+                return next();
+            })
+            .catch(error => console.log(error));
         }
 
-        next();
+        return next();
     }
 }

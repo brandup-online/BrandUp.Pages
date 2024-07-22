@@ -1,35 +1,32 @@
-﻿import { Application, ApplicationModel, Middleware, NavigateContext, StartContext } from "brandup-ui-app";
-import { ajaxRequest } from "brandup-ui-ajax";
+﻿import { MiddlewareNext, Middleware, NavigateContext, StartContext } from "@brandup/ui-app";
+import { request } from "@brandup/ui-ajax";
 
-export class LayoutMiddleware extends Middleware<Application<ApplicationModel>, ApplicationModel> {
-    start(_context: StartContext, next: VoidFunction) {
-        next();
+export class LayoutMiddleware implements Middleware {
+    name = "layout-middleware";
 
-        this.app.registerCommand("signin", () => {
-            ajaxRequest({
-                url: this.app.uri("signin"),
-                success: () => {
-                    this.app.reload();
-                }
-            })
+    async start(_context: StartContext, next: MiddlewareNext) {
+        await next();
+
+        _context.app.registerCommand("signin", () => {
+            request({
+                url: _context.app.buildUrl("signin"),
+            }).then(() => _context.app.reload());
+            
         });
 
-        this.app.registerCommand("signout", () => {
-            ajaxRequest({
-                url: this.app.uri("signout"),
-                success: () => {
-                    this.app.reload();
-                }
-            })
+        _context.app.registerCommand("signout", async () => {
+            request({
+                url: _context.app.buildUrl("signout"),
+            }).then(() => _context.app.reload());
         });
 
-        this.app.registerCommand("toggle-app-menu", () => {
+        _context.app.registerCommand("toggle-app-menu", () => {
             document.body.classList.toggle("website-state-show-appmenu");
         });
     }
 
-    navigate(context: NavigateContext, next: any) {
-        next();
+    async navigate(context: NavigateContext, next: MiddlewareNext) {
+        await next();
 
         document.body.classList.remove("website-state-show-appmenu");
     }

@@ -1,6 +1,6 @@
 import { ContentEditor } from "../content/editor";
 import { Dialog, DialogOptions } from "./dialog";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import infoIcon from "../svg/new/info.svg";
 import "./dialog-error.less";
 import { ValidationContentModel } from "../typings/content";
@@ -18,8 +18,8 @@ export class ErrorDialog extends Dialog {
         this.__listElem = DOM.tag("ul", { class: "error-list" });
 
         this.__errors = errors;
-        this.registerCommand("navigate", (elem) => {
-            const contentPath = elem.dataset.contentPath;
+        this.registerCommand("navigate", (context) => {
+            const contentPath = context.target.dataset.contentPath;
             if (!contentPath) throw "data-content-path attribute not found"
 
             const content = editor.navigate(contentPath);

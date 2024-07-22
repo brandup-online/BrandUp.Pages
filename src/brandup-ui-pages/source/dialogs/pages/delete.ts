@@ -13,10 +13,10 @@ export class PageDeleteDialog extends DeleteDialog<PageModel> {
 
     get typeName(): string { return "BrandUpPages.PageDeleteDialog"; }
 
-    protected _onRenderContent() {
+    protected async _onRenderContent() {
         this.setHeader("Удаление страницы");
 
-        super._onRenderContent();
+        await super._onRenderContent();
     }
     protected _getText(): string {
         return "Подтвердите удаление страницы.";

@@ -1,4 +1,4 @@
-import { AjaxRequest } from "brandup-ui-ajax";
+import { AjaxRequest } from "@brandup/ui-ajax";
 import { Content } from "../../content/content";
 import { ContentFieldModel, FieldValueResult } from "../../typings/content";
 
@@ -55,14 +55,14 @@ export abstract class FieldProvider<TValue, TOptions> {
     }
 
     protected request(options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
+        if (!options.query)
+            options.query = {};
 
         options.disableCache = true;
 
-        options.urlParams["editId"] = this.content.host.editor.editId;
-        options.urlParams["path"] = this.content.path;
-        options.urlParams["field"] = this.name;
+        options.query["editId"] = this.content.host.editor.editId;
+        options.query["path"] = this.content.path;
+        options.query["field"] = this.name;
 
         this.content.host.editor.api(options);
     }

@@ -1,4 +1,4 @@
-import { UIElement } from "brandup-ui";
+import { CommandContext, UIElement } from "@brandup/ui";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
@@ -6,11 +6,11 @@ import iconDown from "../svg/new/arrow-down.svg";
 import iconPublish from "../svg/new/upload.svg";
 import iconSeo from "../svg/new/increase.svg";
 import { listContentType } from "../dialogs/content-types/list";
-import { Page, PageModel } from "brandup-ui-website";
+import { Page, PageModel } from "@brandup/ui-website";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
-import { DOM } from "brandup-ui-dom";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { DOM } from "@brandup/ui-dom";
+import { request, AjaxResponse } from "@brandup/ui-ajax";
 import { ContentEditor } from "../content/editor";
 
 import iconList from "../svg/new/menu.svg";
@@ -132,9 +132,9 @@ export class PageToolbar extends UIElement {
     }
 
     private __initTollbarLogic() {
-        this.registerCommand("show-menu", (elem) => {
-            if (elem.classList.toggle("expanded"))
-                this.__openMenu(elem);
+        this.registerCommand("show-menu", (context) => {
+            if (context.target.classList.toggle("expanded"))
+                this.__openMenu(context.target);
             else
                 this.__closeMenu();
         });
@@ -160,12 +160,9 @@ export class PageToolbar extends UIElement {
             if (this.isContentPage)
                 parentPageId = this.__page.model.parentPageId;
             if (parentPageId) {
-                ajaxRequest({
+                request({
                     url: `/brandup.pages/page/${parentPageId}`,
-                    success: (response: AjaxResponse<PageModel>) => {
-                        this.__page.website.nav({ url: response.data.url });
-                    }
-                });
+                }).then((response) => this.__page.website.nav({ url: response.data.url }));
             }
         });
 
@@ -197,11 +194,11 @@ export class PageToolbar extends UIElement {
 
         this.registerCommand("bp-seo", () => {
             seoPage(this.__page.model.id).then(() => {
-                this.__page.website.app.reload();
+                this.__page.website.reload();
             });
         });
 
-        this.registerAsyncCommand("bp-content-edit", (context) => {
+        this.registerCommand("bp-content-edit", (context: CommandContext) => {
             this.__closeMenu();
             
             const contentKey = context.target.dataset.contentKey;
@@ -228,9 +225,6 @@ export class PageToolbar extends UIElement {
                 .catch(() => {
                     console.log(`Unable to begin edit content by key "${contentKey}".`);
                 })
-                .finally(() => {
-                    context.complate();
-                });
         });
     }
     

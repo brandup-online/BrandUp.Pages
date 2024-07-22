@@ -1,5 +1,5 @@
-import { UIElement } from "brandup-ui";
-import { DOM } from "brandup-ui-dom";
+import { UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
 import { TextboxOptions } from "../../../form/textbox";
 import { IFieldValueElement } from "../../../typings/content";
 

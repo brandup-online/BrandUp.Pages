@@ -1,4 +1,4 @@
-import { Page, PageModel } from "brandup-ui-website";
+import { Page, PageModel } from "@brandup/ui-website";
 import { PageToolbar } from "./admin/page-toolbar";
 import "./styles.less";
 

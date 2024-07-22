@@ -1,5 +1,5 @@
-import { UIElement } from "brandup-ui";
-import { DOM } from "brandup-ui-dom";
+import { UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
 import { ContentInfoModel, ModelFieldOptions, ModelFieldValue } from "../../../content/provider/model";
 import iconEdit from "../../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../../svg/toolbar-button-discard.svg";

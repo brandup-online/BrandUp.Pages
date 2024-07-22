@@ -1,11 +1,11 @@
-﻿import { DOM } from "brandup-ui-dom";
-import { AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
-import { Page, PageModel, WebsiteContext } from "brandup-ui-website";
+﻿import { DOM } from "@brandup/ui-dom";
+import { AjaxQueue, AjaxRequest, AjaxResponse } from "@brandup/ui-ajax";
+import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import editBlockIcon from "../svg/new/edit-block.svg";
 import saveIcon from "../svg/toolbar-button-save.svg";
 import cancelIcon from "../svg/new/cancel.svg";
 import { editPage } from "../dialogs/content/edit";
-import { UIElement } from "brandup-ui";
+import { UIElement } from "@brandup/ui";
 import { Content, IContentHost } from "./content";
 import { ModelFieldProvider } from "./provider/model";
 import { errorPage } from "../dialogs/dialog-error";
@@ -20,7 +20,7 @@ defs.registerFormField("hyperlink", () => import ("./field/hyperlink"));
 defs.registerFormField("pages", () => import ("./field/pages"));
 
 export class ContentEditor extends UIElement implements IContentHost {
-    readonly website: WebsiteContext;
+    readonly website: WebsiteApplication;
     readonly editId: string;
     readonly queue: AjaxQueue;
 
@@ -34,7 +34,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     get typeName(): string { return "BrandUpPages.Editor"; }
     
-    private constructor(website: WebsiteContext, editId: string) {
+    private constructor(website: WebsiteApplication, editId: string) {
         super();
 
         this.website = website;
@@ -44,12 +44,12 @@ export class ContentEditor extends UIElement implements IContentHost {
     
     static begin(page: Page<PageModel>, key: string, type: string, force: boolean = false) {
         return new Promise<{ editId: string, exist: boolean }>((resolve) => {
-            page.website.request({
+            page.website.queue.push({
                 url: "/brandup.pages/page/content/begin",
-                urlParams: { bpcommand: "begin", key: key, type: type, force: force.toString() },
+                query: { bpcommand: "begin", key: key, type: type, force: force.toString() },
                 method: "POST",
                 success: (response: AjaxResponse<BeginContentEditResult>) => {
-                    if (response.status !== 200)
+                    if (response.status !== 200 || !response.data)
                         throw "Error begin content edit.";
                         
                     resolve({ editId: response.data.editId, exist: response.data.exist });
@@ -58,7 +58,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         });
     }
 
-    static create(website: WebsiteContext, editId: string) {
+    static create(website: WebsiteApplication, editId: string) {
         const editor = new ContentEditor(website, editId);
         return editor;
     }
@@ -111,10 +111,10 @@ export class ContentEditor extends UIElement implements IContentHost {
         return new Promise<Content>((resolve) => {
             this.api({
                 url: "/brandup.pages/page/content",
-                urlParams: { editId: this.editId, path },
+                query: { editId: this.editId, path },
                 method: "GET",
                 success: (response: AjaxResponse<GetContentEditResult>) => {
-                    if (response.status !== 200)
+                    if (response.status !== 200 || !response.data)
                         throw `Error load editor contents by path "${path}".`;
 
                     let rootContent: Content | null = this.initContent(response.data.contents);
@@ -184,7 +184,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
             this.api({
                 url: "/brandup.pages/page/content/commit",
-                urlParams: { editId: this.editId },
+                query: { editId: this.editId },
                 method: "POST",
                 success: (response) => {
                     this.__isLoading = false;
@@ -209,7 +209,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
             this.api({
                 url: "/brandup.pages/page/content/discard",
-                urlParams: { editId: this.editId },
+                query: { editId: this.editId },
                 method: "POST",
                 success: (response) => {
                     if (response.status !== 200)

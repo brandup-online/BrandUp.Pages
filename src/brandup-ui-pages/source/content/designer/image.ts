@@ -1,6 +1,6 @@
 ﻿import { FieldDesigner } from "./base";
 import { ImageFieldProvider } from "../provider/image";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
 import "./image.less";
 

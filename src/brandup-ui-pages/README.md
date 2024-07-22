@@ -3,7 +3,7 @@
 ## Setup
 
 ```
-import { host } from "brandup-ui-website";
+import { host } from "@brandup/ui-website";
 import { PagesMiddleware } from "brandup-ui-pages";
 
 host.start({

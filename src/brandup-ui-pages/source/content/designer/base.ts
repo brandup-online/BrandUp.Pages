@@ -1,4 +1,4 @@
-﻿import { UIElement } from "brandup-ui";
+﻿import { UIElement } from "@brandup/ui";
 import "./base.less";
 import { FieldProvider, IFieldDesigner } from "../provider/base";
 

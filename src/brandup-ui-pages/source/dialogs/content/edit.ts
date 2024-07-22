@@ -1,10 +1,11 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { Content } from "../../content/content";
 import "../dialog-form.less";
 import defs from "../../content/defs"
 import { FieldProvider, IFormField } from "../../content/provider/base";
 import { FormField } from "../../content/field/base";
+import { CommandContext } from "@brandup/ui";
 
 export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
@@ -42,8 +43,8 @@ export class PageEditDialog extends Dialog<any> {
 
         this.__renderForm();
 
-        this.registerCommand("navigate", (elem: HTMLElement) => {
-            const path = elem.getAttribute("data-path");
+        this.registerCommand("navigate", (context: CommandContext) => {
+            const path = context.target.getAttribute("data-path");
             if (path === null || path === undefined) throw "not found attribute data-path";
 
             this.navigate(path);
