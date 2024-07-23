@@ -23,7 +23,7 @@
     "@brandup/ui": "^1.0.2",
     "@brandup/ui-ajax": "^1.0.2",
     "@brandup/ui-dom": "^1.0.2",
-    "brandup-ui-pages": "file:../../src/brandup-ui-pages",
+    "@brandup/ui-pages": "file:../../src/npm/brandup-ui-pages",
     "@brandup/ui-website": "^9.0.2"
   },
   "scripts": {

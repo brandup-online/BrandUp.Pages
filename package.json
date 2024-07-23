@@ -1,0 +1,49 @@
+{
+  "name": "@brandup/pages",
+  "description": "Brandup.Pages",
+  "keywords": [
+    "brandup",
+    "javascript",
+    "typescript",
+    "pages",
+    "content",
+    "headcms",
+    "cms"
+  ],
+  "author": {
+    "name": "Dmitry Kovyazin",
+    "email": "it@brandup.online"
+  },
+  "homepage": "https://github.com/brandup-online/BrandUp.Pages",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brandup-online/BrandUp.Pages.git"
+  },
+  "bugs": {
+    "url": "https://github.com/brandup-online/BrandUp.Pages/issues",
+    "email": "it@brandup.online"
+  },
+  "license": "Apache-2.0",
+  "version": "1.0.0",
+  "main": "source/index.ts",
+  "types": "source/index.ts",
+  "files": [
+    "source",
+    "tsconfig.json",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@brandup/autonpm": "^1.0.16",
+    "@types/jest": "^29.5.12",
+    "babel-jest": "^29.7.0",
+    "cross-env": "^7.0.3",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.2.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "cross-env NODE_ENV=test jest --config=jest.config.ts --no-cache"
+  }
+}

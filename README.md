@@ -20,16 +20,16 @@ services.AddPages()
 На строне фронта нужно добавить middleware и тип страницы.
 
 Необходимо установить **NPM** пакеты:
-- [brandup-ui-pages](https://www.npmjs.com/package/brandup-ui-pages)
+- [@brandup/ui-pages](https://www.npmjs.com/package/brandup-ui-pages)
 - [@brandup/ui-website](https://www.npmjs.com/package/@brandup/ui-website)
 
 ```
 import { host } from "@brandup/ui-website";
-import { PagesMiddleware } from "brandup-ui-pages";
+import { PagesMiddleware } from "@brandup/ui-pages";
 
 host.start({
     pageTypes: {
-        "content": () => import("brandup-ui-pages/source/pages/content")
+        "content": () => import("@brandup/ui-pages/source/pages/content")
     }
 }, (builder) => {
         builder.useMiddleware(new PagesMiddleware());

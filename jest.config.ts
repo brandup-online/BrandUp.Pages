@@ -8,7 +8,7 @@ const config: Config = {
 	transform: {
 		"^.+\\.ts?$": "ts-jest",
 		"^.+\\.[jt]sx?$": "babel-jest",
-		".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+		// ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
 	},
 	moduleFileExtensions: ["js", "ts"],
 	//moduleDirectories: ["node_modules", "bower_components", "shared"],
