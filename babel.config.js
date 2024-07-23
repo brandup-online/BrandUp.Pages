@@ -16,7 +16,6 @@ module.exports = {
 			useBuiltIns: "usage",
 			corejs: "3.37.1",
 			debug: false,
-			modules: "commonjs",
 			targets: { node: 'current'}
     	}
 	],
