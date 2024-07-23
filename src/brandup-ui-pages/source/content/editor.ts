@@ -43,18 +43,17 @@ export class ContentEditor extends UIElement implements IContentHost {
     }
     
     static begin(page: Page<PageModel>, key: string, type: string, force: boolean = false) {
-        return new Promise<{ editId: string, exist: boolean }>((resolve) => {
-            page.website.queue.push({
+        return new Promise<{ editId: string, exist: boolean }>(async (resolve) => {
+            const response: AjaxResponse<BeginContentEditResult> = await page.website.queue.enque({
                 url: "/brandup.pages/page/content/begin",
                 query: { bpcommand: "begin", key: key, type: type, force: force.toString() },
                 method: "POST",
-                success: (response: AjaxResponse<BeginContentEditResult>) => {
-                    if (response.status !== 200 || !response.data)
-                        throw new Error("Error begin content edit.");
-                        
-                    resolve({ editId: response.data.editId, exist: response.data.exist });
-                }
             });
+
+            if (response.status !== 200 || !response.data)
+                throw new Error("Error begin content edit.");
+                
+            resolve({ editId: response.data.editId, exist: response.data.exist });
         });
     }
 
@@ -104,24 +103,23 @@ export class ContentEditor extends UIElement implements IContentHost {
     }
 
     api(request: AjaxRequest) {
-        this.queue.push(request);
+        return this.queue.enque(request);
     }
 
     loadContent(path: string): Promise<Content> {
-        return new Promise<Content>((resolve) => {
-            this.api({
+        return new Promise<Content>(async (resolve) => {
+            const response: AjaxResponse<GetContentEditResult> = await this.api({
                 url: "/brandup.pages/page/content",
                 query: { editId: this.editId, path },
                 method: "GET",
-                success: (response: AjaxResponse<GetContentEditResult>) => {
-                    if (response.status !== 200 || !response.data)
-                        throw `Error load editor contents by path "${path}".`;
-
-                    let rootContent: Content | null = this.initContent(response.data.contents);
-                    if (!rootContent) throw new Error("rootContent not found");
-                    resolve(rootContent);
-                },
             });
+
+            if (response.status !== 200 || !response.data)
+                throw `Error load editor contents by path "${path}".`;
+
+            let rootContent: Content | null = this.initContent(response.data.contents);
+            if (!rootContent) throw new Error("rootContent not found");
+            resolve(rootContent);
         });
     }
 
@@ -172,7 +170,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         if (rootContent)
             this.registerCommand("bp-content", () => editPage(rootContent, ""));
 
-        this.registerCommand("bp-commit", () => {
+        this.registerCommand("bp-commit", async () => {
             if (this.__isLoading)
                 return;
 
@@ -182,44 +180,42 @@ export class ContentEditor extends UIElement implements IContentHost {
 
             this.__isLoading = true;
 
-            this.api({
+            const response = await this.api({
                 url: "/brandup.pages/page/content/commit",
                 query: { editId: this.editId },
                 method: "POST",
-                success: (response) => {
-                    this.__isLoading = false;
-                    if (response.status !== 200)
-                        throw new Error("Error commit content editing.");
-
-                    if (response.data.isSuccess) {
-                        if (!this.__complate)
-                            throw new Error("Complate function not set");
-                        this.__complate({ reason: "Commit" });
-                    } else {
-                        errorPage(this, response.data.validation);
-                    }
-                }
             });
+
+            this.__isLoading = false;
+            if (response.status !== 200)
+                throw new Error("Error commit content editing.");
+
+            if (response.data.isSuccess) {
+                if (!this.__complate)
+                    throw new Error("Complate function not set");
+                this.__complate({ reason: "Commit" });
+            } else {
+                errorPage(this, response.data.validation);
+            }
         });
 
-        this.registerCommand("bp-discard", () => {
+        this.registerCommand("bp-discard", async () => {
             if (this.__isLoading)
                 return;
             this.__isLoading = true;
 
-            this.api({
+            const response = await this.api({
                 url: "/brandup.pages/page/content/discard",
                 query: { editId: this.editId },
                 method: "POST",
-                success: (response) => {
-                    if (response.status !== 200)
-                        throw new Error("Error discard content editing.");
-                    if (!this.__complate)
-                        throw new Error("Complate function not set");
-
-                    this.__complate({ reason: "Discard" });
-                },
             });
+
+            if (response.status !== 200)
+                throw new Error("Error discard content editing.");
+            if (!this.__complate)
+                throw new Error("Complate function not set");
+
+            this.__complate({ reason: "Discard" });
         });
     }
 

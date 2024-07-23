@@ -40,16 +40,15 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
                     url: '/brandup.pages/content/model',
                     query: { itemType: type.name, itemIndex: index.toString() },
                     method: "PUT",
-                    success: (response: AjaxResponse<AddContentResult>) => {
-                        if (response.status === 200 && response.data) {
-                            this.onSavedValue(response.data.fieldValue);
+                }).then((response: AjaxResponse<AddContentResult>) => {
+                    if (response.status === 200 && response.data) {
+                        this.onSavedValue(response.data.fieldValue);
 
-                            const newContent = this.editor.initContent(response.data.content);
-                            resolve(newContent);
-                        }
-                        else
-                            throw new Error("Error add content.");
+                        const newContent = this.editor.initContent(response.data.content);
+                        resolve(newContent);
                     }
+                    else
+                        throw new Error("Error add content.");
                 });
             }));
 
@@ -112,8 +111,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             url: '/brandup.pages/content/model/up',
             query: { itemIndex: index.toString() },
             method: "POST",
-            success: () => elem.classList.remove("processing")
-        });
+        }).then(() => elem.classList.remove("processing"));
     }
 
     itemDown(index: number, elem: Element) {
@@ -123,8 +121,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             url: '/brandup.pages/content/model/down',
             query: { itemIndex: index.toString() },
             method: "POST",
-            success: () => elem.classList.remove("processing")
-        });
+        }).then(() => elem.classList.remove("processing"));
     }
 
     deleteItem(index: number, path: string) {
@@ -132,13 +129,12 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             url: '/brandup.pages/content/model',
             query: { itemIndex: index.toString() },
             method: "DELETE",
-            success: (() => {
-                //this.__contents[index].container?.remove();
-                //this.__contents = this.__contents.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
-                //this.content.host.editor.removeContentItem(path);
-                //this._refreshIndexses();
-            })
-        });
+        }).then((() => {
+            //this.__contents[index].container?.remove();
+            //this.__contents = this.__contents.filter((content, contentIndex) => {console.log(contentIndex, index); return contentIndex !== index})
+            //this.content.host.editor.removeContentItem(path);
+            //this._refreshIndexses();
+        }));
     }
 
     moveItem(itemIndex: number, newIndex: number) {
@@ -146,10 +142,9 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             url: '/brandup.pages/content/model/move',
             query: { itemIndex: itemIndex.toString(), newIndex: newIndex.toString() },
             method: "POST",
-            success: (response: AjaxResponse) => {
-                if (response.status === 200) {
-                    //this.setValue(response.data.value);
-                }
+        }).then((response: AjaxResponse) => {
+            if (response.status === 200) {
+                //this.setValue(response.data.value);
             }
         });
     }
@@ -158,7 +153,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         const content = this.__contents.find(content => {
             return content.path === contentPath
         });
-        if (!content) return `content with path ${contentPath} not found`;
+        if (content == null) throw new Error(`content with path ${contentPath} not found`);
         editPage(content, contentPath).then(() => {
             // this.__refreshItem(e.target, e.value.index);
         }).catch(() => {
@@ -173,9 +168,8 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
             url: '/brandup.pages/content/model/view',
             query: urlParams,
             method: "GET",
-            success: (response: AjaxResponse<string>) => {
-                (this.designer as ModelDesigner)?.refreshItem(elem, response.data);
-            }
+        }).then((response: AjaxResponse<string>) => {
+            (this.designer as ModelDesigner)?.refreshItem(elem, response.data);
         });
     }
     

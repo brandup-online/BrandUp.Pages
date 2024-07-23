@@ -19,22 +19,21 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
             url: `/brandup.pages/content/hyperlink/url`,
             query: { url },
             method: "POST",
-            success: (response: AjaxResponse<FieldValueResult>) => {
-                switch (response.status) {
-                    case 200:
-                        if (!response.data) throw new Error("error load data");
+        }).then((response: AjaxResponse<FieldValueResult>) => {
+            switch (response.status) {
+                case 200:
+                    if (!response.data) throw new Error("error load data");
 
-                        this.onSavedValue(response.data);
+                    this.onSavedValue(response.data);
 
-                        if (this.valueElem) {
-                            const value = this.getValue();
-                            this.valueElem.setAttribute("href", value.value);
-                        }
+                    if (this.valueElem) {
+                        const value = this.getValue();
+                        this.valueElem.setAttribute("href", value.value);
+                    }
 
-                        break;
-                    default:
-                        throw new Error("");
-                }
+                    break;
+                default:
+                    throw new Error("");
             }
         });
     }
@@ -44,22 +43,21 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
             url: `/brandup.pages/content/hyperlink/page`,
             query: { pageId },
             method: "POST",
-            success: (response: AjaxResponse<FieldValueResult>) => {
-                switch (response.status) {
-                    case 200:
-                        if (!response.data) throw new Error("error load data");
+        }).then((response: AjaxResponse<FieldValueResult>) => {
+            switch (response.status) {
+                case 200:
+                    if (!response.data) throw new Error("error load data");
 
-                        this.onSavedValue(response.data);
+                    this.onSavedValue(response.data);
 
-                        if (this.valueElem) {
-                            const value = this.getValue();
-                            this.valueElem.setAttribute("href", value.value);
-                        }
+                    if (this.valueElem) {
+                        const value = this.getValue();
+                        this.valueElem.setAttribute("href", value.value);
+                    }
 
-                        break;
-                    default:
-                        throw new Error("");
-                }
+                    break;
+                default:
+                    throw new Error("");
             }
         });
     }

@@ -36,20 +36,19 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         this.request({
             ...requestOptions, 
             method: "POST",
-            success: (response: AjaxResponse<FieldValueResult>) => {
-                switch (response.status) {
-                    case 200:
-                        if (!response.data) break;
+        }).then((response: AjaxResponse<FieldValueResult>) => {
+            switch (response.status) {
+                case 200:
+                    if (!response.data) break;
 
-                        this.onSavedValue(response.data);
+                    this.onSavedValue(response.data);
 
-                        if (this.valueElem) {
-                            let value = this.getValue();
-                            this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
-                        }
+                    if (this.valueElem) {
+                        let value = this.getValue();
+                        this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
+                    }
 
-                        break;
-                }
+                    break;
             }
         });
     }

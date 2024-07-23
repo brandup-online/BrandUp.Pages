@@ -11,7 +11,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         elem.classList.add("content-designer");
 
         this.registerCommand("item-add", (context: CommandContext) => {
-            const position = elem.dataset.position ?? "last";
+            const position = context.target.dataset.position ?? "last";
 
             let itemIndex: number = -1;
             if (this.provider.options.isListValue) {
@@ -30,14 +30,14 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         this.registerCommand("item-view", () => { return; });
 
         this.registerCommand("item-settings", (context: CommandContext) => {
-            const itemElem = this.__findItemElem(elem, "[data-content-path]");
+            const itemElem = this.__findItemElem(context.target, "[data-content-path]");
             const contentPath = itemElem.getAttribute("data-content-path");
 
             this.provider.settingItem(contentPath!);
         });
 
         this.registerCommand("item-delete", (context: CommandContext) => {
-            const itemElem = this.__findItemElem(elem, "[data-content-path-index]");
+            const itemElem = this.__findItemElem(context.target, "[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             const path = itemElem.getAttribute("data-content-path");
@@ -50,7 +50,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
 
         this.registerCommand("item-up", (context: CommandContext) => {
-            const itemElem = this.__findItemElem(elem, "[data-content-path-index]");
+            const itemElem = this.__findItemElem(context.target, "[data-content-path-index]");
             const itemIndex = this.getItemIndex(itemElem);
             if (itemIndex <= 0)
                 return;
@@ -65,7 +65,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
 
         this.registerCommand("item-down", (context: CommandContext) => {
-            const itemElem = this.__findItemElem(elem, "[data-content-path]");
+            const itemElem = this.__findItemElem(context.target, "[data-content-path]");
             const itemIndex = this.getItemIndex(itemElem);
 
             if (itemIndex + 1 >= this.countItems())
@@ -80,7 +80,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         });
 
         this.registerCommand("item-refresh", (context: CommandContext) => {
-            const itemElem = this.__findItemElem(elem, "[data-content-path-index]");
+            const itemElem = this.__findItemElem(context.target, "[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");

@@ -14,16 +14,15 @@ export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldOptions> {
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-            success: (response: AjaxResponse<FieldValueResult>) => {
-                if (response.status === 200) {
-                    if (!response.data) throw new Error("error load data");
-
-                    this.onSavedValue(response.data);
-
-                    if (this.valueElem) {
-                        let value = this.getValue();
-                        this.valueElem.innerHTML = value ? value : "";
-                    }
+        }).then((response: AjaxResponse<FieldValueResult>) => {
+            if (response.status === 200) {
+                if (!response.data) throw new Error("error load data");
+    
+                this.onSavedValue(response.data);
+    
+                if (this.valueElem) {
+                    let value = this.getValue();
+                    this.valueElem.innerHTML = value ? value : "";
                 }
             }
         });

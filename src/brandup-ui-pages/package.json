@@ -33,18 +33,25 @@
     "README.md"
   ],
   "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "babel-jest": "^29.7.0",
+    "cross-env": "^7.0.3",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.2.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "brandup-pages-ckeditor": "^1.0.15",
     "@brandup/ui": "^1.0.2",
     "@brandup/ui-ajax": "^1.0.2",
     "@brandup/ui-app": "^1.0.2",
     "@brandup/ui-dom": "^1.0.2",
     "@brandup/ui-helpers": "^1.0.2",
-    "@brandup/ui-website": "^9.0.2"
+    "@brandup/ui-website": "^9.0.2",
+    "brandup-pages-ckeditor": "^1.0.15"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "cross-env NODE_ENV=test jest --config=jest.config.ts --no-cache"
   }
 }

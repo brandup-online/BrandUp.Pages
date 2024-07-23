@@ -64,7 +64,7 @@ export abstract class FieldProvider<TValue, TOptions> {
         options.query["path"] = this.content.path;
         options.query["field"] = this.name;
 
-        this.content.host.editor.api(options);
+        return this.content.host.editor.api(options);
     }
 
     abstract createDesigner(): IFieldDesigner | null;

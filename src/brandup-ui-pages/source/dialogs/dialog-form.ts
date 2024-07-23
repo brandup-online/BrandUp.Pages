@@ -57,32 +57,31 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.setLoading(true);
 
-        this.queue.push({
+        this.queue.enque({
             url: this._buildUrl(),
             query: urlParams,
             method: "GET",
-            success: (response) => {
-                this.setLoading(false);
+        }).then((response) => {
+            this.setLoading(false);
 
-                switch (response.status) {
-                    case 400: {
-                        this.__applyModelState(response.data);
-                        break;
-                    }
-                    case 200: {
-                        if (response.data === undefined) return;
-                        this.__model = response.data as TForm;
-                        this._buildForm(this.__model);
-                        this.setValues(this.__model.values);
-
-                        this.addAction("close", "Отмена", false);
-                        this.addAction("save", this._getSaveButtonTitle(), true);
-
-                        break;
-                    }
-                    default:
-                        throw new Error("");
+            switch (response.status) {
+                case 400: {
+                    this.__applyModelState(response.data);
+                    break;
                 }
+                case 200: {
+                    if (response.data === undefined) return;
+                    this.__model = response.data as TForm;
+                    this._buildForm(this.__model);
+                    this.setValues(this.__model.values);
+
+                    this.addAction("close", "Отмена", false);
+                    this.addAction("save", this._getSaveButtonTitle(), true);
+
+                    break;
+                }
+                default:
+                    throw new Error("");
             }
         });
     }
@@ -124,28 +123,27 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.setLoading(true);
 
-        this.queue.push({
+        this.queue.enque({
             url: this._buildUrl(),
             query: urlParams,
             method: "POST",
             type: "JSON",
             data: this.getValues(),
-            success: (response) => {
-                this.setLoading(false);
+        }).then((response) => {
+            this.setLoading(false);
 
-                switch (response.status) {
-                    case 400: {
-                        this.__applyModelState(response.data);
-                        break;
-                    }
-                    case 201:
-                    case 200: {
-                        this.resolve(response.data);
-                        break;
-                    }
-                    default:
-                        throw new Error("");
+            switch (response.status) {
+                case 400: {
+                    this.__applyModelState(response.data);
+                    break;
                 }
+                case 201:
+                case 200: {
+                    this.resolve(response.data);
+                    break;
+                }
+                default:
+                    throw new Error("");
             }
         });
     }

@@ -17,10 +17,9 @@ export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {
             method: "POST",
             type: "JSON",
             data: value,
-            success: (response: AjaxResponse<FieldValueResult>) => {
-                if (response.status === 200 && response.data) {
-                    this.onSavedValue(response.data);
-                }
+        }).then((response: AjaxResponse<FieldValueResult>) => {
+            if (response.status === 200 && response.data) {
+                this.onSavedValue(response.data);
             }
         });
     }

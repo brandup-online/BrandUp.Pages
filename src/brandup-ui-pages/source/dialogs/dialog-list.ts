@@ -139,26 +139,25 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         this.setLoading(true);
 
-        this.queue.push({
+        this.queue.enque({
             url: this._buildUrl(),
             query: urlParams,
             method: "GET",
-            success: (response: AjaxResponse<TList>) => {
-                this.setLoading(false);
+        }).then((response: AjaxResponse<TList>) => {
+            this.setLoading(false);
 
-                switch (response.status) {
-                    case 200: {
-                        if (!response.data) throw new Error("data loading error");
+            switch (response.status) {
+                case 200: {
+                    if (!response.data) throw new Error("data loading error");
 
-                        this.__model = response.data;
-                        this._buildList(this.__model);
-                        this.loadItems();
-                        break;
-                    }
-                    default: {
-                        this.setError("Error loading list.");
-                        return;
-                    }
+                    this.__model = response.data;
+                    this._buildList(this.__model);
+                    this.loadItems();
+                    break;
+                }
+                default: {
+                    this.setError("Error loading list.");
+                    return;
                 }
             }
         });
