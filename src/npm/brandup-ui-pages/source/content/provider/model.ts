@@ -100,7 +100,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
         return new designerType(this);
     }
 
-    saveValue(value: any) {
+    async saveValue(value: any) {
         throw new Error("method saveValue not implemented in ModelFieldProvider")
     }
 

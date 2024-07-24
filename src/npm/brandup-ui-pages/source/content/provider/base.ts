@@ -69,7 +69,7 @@ export abstract class FieldProvider<TValue, TOptions> {
 
     abstract createDesigner(): IFieldDesigner | null;
 
-    abstract saveValue(value: any): void;
+    abstract saveValue(value: any): Promise<void>;
     
     protected onSavedValue(model: FieldValueResult) {
         this.__value = model.value;

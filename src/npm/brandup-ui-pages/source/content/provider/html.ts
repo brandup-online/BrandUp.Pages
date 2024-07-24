@@ -8,24 +8,24 @@ export class HtmlFieldProvider extends FieldProvider<string, HtmlFieldOptions> {
         return new HtmlDesigner(this);
     }
 
-    saveValue(value: string): void {
-        this.request({
+    async saveValue(value: string) {
+        const response: AjaxResponse<FieldValueResult> = await this.request({
             url: '/brandup.pages/content/html',
             method: "POST",
             type: "JSON",
             data: value ? value : "",
-        }).then((response: AjaxResponse<FieldValueResult>) => {
-            if (response.status === 200) {
-                if (!response.data) throw new Error("error load data");
-    
-                this.onSavedValue(response.data);
-    
-                if (this.valueElem) {
-                    let value = this.getValue();
-                    this.valueElem.innerHTML = value ? value : "";
-                }
-            }
         });
+        
+        if (response.status === 200) {
+            if (!response.data) throw new Error("error load data");
+
+            this.onSavedValue(response.data);
+
+            if (this.valueElem) {
+                let value = this.getValue();
+                this.valueElem.innerHTML = value ? value : "";
+            }
+        }
     }
 }
 

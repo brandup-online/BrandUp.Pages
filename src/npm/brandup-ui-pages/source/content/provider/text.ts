@@ -8,20 +8,19 @@ export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {
         return new TextDesigner(this);
     }
     
-    saveValue(value: string) {
+    async saveValue(value: string) {
         value = value ?? "";
         value = this.normalizeValue(value);
 
-        this.request({
+        const response: AjaxResponse<FieldValueResult> = await this.request({
             url: '/brandup.pages/content/text',
             method: "POST",
             type: "JSON",
             data: value,
-        }).then((response: AjaxResponse<FieldValueResult>) => {
-            if (response.status === 200 && response.data) {
-                this.onSavedValue(response.data);
-            }
         });
+        if (response.status === 200 && response.data) {
+            this.onSavedValue(response.data);
+        }
     }
 
     protected onSavedValue(model: FieldValueResult) {

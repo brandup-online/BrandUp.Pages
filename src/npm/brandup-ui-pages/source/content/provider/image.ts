@@ -8,7 +8,7 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         return new ImageDesigner(this);
     }
 
-    saveValue(value: File | string): void {
+    async saveValue(value: File | string) {
         let requestOptions: AjaxRequest = {};
         if (value instanceof File) {
             requestOptions = {
@@ -33,24 +33,24 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         }
         else return;
 
-        this.request({
+        const response: AjaxResponse<FieldValueResult> = await this.request({
             ...requestOptions, 
             method: "POST",
-        }).then((response: AjaxResponse<FieldValueResult>) => {
-            switch (response.status) {
-                case 200:
-                    if (!response.data) break;
-
-                    this.onSavedValue(response.data);
-
-                    if (this.valueElem) {
-                        let value = this.getValue();
-                        this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
-                    }
-
-                    break;
-            }
         });
+
+        switch (response.status) {
+            case 200:
+                if (!response.data) break;
+
+                this.onSavedValue(response.data);
+
+                if (this.valueElem) {
+                    let value = this.getValue();
+                    this.valueElem.style.backgroundImage = `url(${value.previewUrl})`;
+                }
+
+                break;
+        }
     }
 }
 

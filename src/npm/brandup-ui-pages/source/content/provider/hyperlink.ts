@@ -7,59 +7,59 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
         return null;
     }
 
-    saveValue(value: HyperLinkValue) {
+    async saveValue(value: HyperLinkValue) {
         if (value.valueType === "Page")
-            this.selectPage(value.value);
+            await this.selectPage(value.value);
         else if (value.valueType === "Url")
-            this.changeUrl(value.value);
+            await this.changeUrl(value.value);
     }
 
-    changeUrl(url: string) {
-        this.request({
+    async changeUrl(url: string) {
+        const response: AjaxResponse<FieldValueResult> = await this.request({
             url: `/brandup.pages/content/hyperlink/url`,
             query: { url },
             method: "POST",
-        }).then((response: AjaxResponse<FieldValueResult>) => {
-            switch (response.status) {
-                case 200:
-                    if (!response.data) throw new Error("error load data");
-
-                    this.onSavedValue(response.data);
-
-                    if (this.valueElem) {
-                        const value = this.getValue();
-                        this.valueElem.setAttribute("href", value.value);
-                    }
-
-                    break;
-                default:
-                    throw new Error("");
-            }
         });
+        
+        switch (response.status) {
+            case 200:
+                if (!response.data) throw new Error("error load data");
+
+                this.onSavedValue(response.data);
+
+                if (this.valueElem) {
+                    const value = this.getValue();
+                    this.valueElem.setAttribute("href", value.value);
+                }
+
+                break;
+            default:
+                throw new Error("");
+        }
     }
 
-    selectPage(pageId: string) {
-        this.request({
+    async selectPage(pageId: string) {
+        const response: AjaxResponse<FieldValueResult> = await this.request({
             url: `/brandup.pages/content/hyperlink/page`,
             query: { pageId },
             method: "POST",
-        }).then((response: AjaxResponse<FieldValueResult>) => {
-            switch (response.status) {
-                case 200:
-                    if (!response.data) throw new Error("error load data");
-
-                    this.onSavedValue(response.data);
-
-                    if (this.valueElem) {
-                        const value = this.getValue();
-                        this.valueElem.setAttribute("href", value.value);
-                    }
-
-                    break;
-                default:
-                    throw new Error("");
-            }
         });
+
+        switch (response.status) {
+            case 200:
+                if (!response.data) throw new Error("error load data");
+
+                this.onSavedValue(response.data);
+
+                if (this.valueElem) {
+                    const value = this.getValue();
+                    this.valueElem.setAttribute("href", value.value);
+                }
+
+                break;
+            default:
+                throw new Error("");
+        }
     }
 }
 
