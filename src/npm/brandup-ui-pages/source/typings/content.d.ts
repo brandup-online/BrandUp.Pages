@@ -41,7 +41,7 @@ export interface FieldValueResult {
 }
 
 export interface IFieldValueElement {
-    element: HTMLElement | null;
+    element?: HTMLElement;
 
     onChange: (value: any) => void;
     setValue: (value: any) => void;

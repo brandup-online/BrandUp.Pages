@@ -85,7 +85,7 @@ export abstract class FieldProvider<TValue, TOptions> {
 }
 export interface IFieldDesigner {
     provider: FieldProvider<any, any>;
-    element: HTMLElement | null;
+    element?: HTMLElement;
 
     destroy(): void;
     setErrors(errors: string[]): void;

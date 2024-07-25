@@ -1,5 +1,4 @@
 ﻿import { DOM } from "@brandup/ui-dom";
-import { Utility } from "@brandup/ui-helpers";
 import { UIControl } from "../control";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";
@@ -41,13 +40,13 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
 
         this.element.classList.add("bp-dialog");
 
-        this.headerElem = DOM.getElementByClass(this.element, "bp-dialog-header");
-        this.contentElem = DOM.getElementByClass(this.element, "bp-dialog-content");
-        this.footerElem = DOM.getElementByClass(this.element, "bp-dialog-footer");
+        this.headerElem = DOM.nextElementByClass(this.element, "bp-dialog-header");
+        this.contentElem = DOM.nextElementByClass(this.element, "bp-dialog-content");
+        this.footerElem = DOM.nextElementByClass(this.element, "bp-dialog-footer");
         if (this.headerElem)
-            this.headerTitleElem = DOM.getElementByClass(this.headerElem, "title");
+            this.headerTitleElem = DOM.nextElementByClass(this.headerElem, "title");
         if (this.footerElem)
-            this.footerNotesElem = DOM.getElementByClass(this.footerElem, "notes");
+            this.footerNotesElem = DOM.nextElementByClass(this.footerElem, "notes");
 
         if (this.options.header)
             this.setHeader(this.options.header);
@@ -109,7 +108,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this.element?.classList.add("has-error");
 
         const list = DOM.tag("ul");
-        if (Utility.isArray(message)) {
+        if (Array.isArray(message)) {
             for (let i = 0; i < message.length; i++) {
                 list.appendChild(DOM.tag("li", null, message[i]));
             }

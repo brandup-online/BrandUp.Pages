@@ -1,5 +1,5 @@
 ﻿import { UIElement } from "@brandup/ui";
-import { Utility } from "@brandup/ui-helpers";
+import { TypeHelper } from "@brandup/ui-helpers";
 
 export abstract class UIControl<TOptions = {}> extends UIElement {
     readonly options: TOptions = {} as TOptions;
@@ -33,8 +33,8 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
     // Options
     protected _onApplyDefaultOptions() { return; }
     protected _applyOptions<TOptions>(options: TOptions) {
-        if (options)
-            Utility.extend(this.options, options);
+        // if (options)
+        //     extend(this.options, options); // TODO разобраться с extend
     }
 
     // Render
@@ -49,7 +49,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
             if (!this.__fragment)
                 throw new Error();
 
-            if (Utility.isString(container)) {
+            if (TypeHelper.isString(container)) {
                 container = document.getElementById((container as string).substr(1)) || "";
                 if (!container)
                     throw new Error();
