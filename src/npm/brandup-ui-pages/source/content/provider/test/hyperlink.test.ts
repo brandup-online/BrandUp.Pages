@@ -1,6 +1,6 @@
 import { MockedContent } from "../../../../mocks/content/content"
 import { HyperlinkFieldProvider } from "../hyperlink";
-import { MockProviderValueResponse } from "../../../../mocks/content/provider/common"
+import { MockProviderValueResponse } from "../../../../mocks/common"
 
 const contentModel = {
     "type": "HyperLink",

@@ -1,6 +1,5 @@
 import { ModelFieldProvider } from "../model";
 import { MockedContent } from "../../../../mocks/content/content";
-import { MockProviderValueResponse } from "../../../../mocks/content/provider/common";
 
 const value = {
   "items": [
@@ -66,7 +65,7 @@ describe('Model provider', () => {
         .toThrow(new Error("method saveValue not implemented in ModelFieldProvider"));
     })
 
-    it("Items manipulations", async () => {
+    it("Items manipulations", () => {
         const provider = createProvider();
         for (let i = 0; i < 3; i++) {
           const content = new MockedContent();

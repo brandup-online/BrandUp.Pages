@@ -1,5 +1,5 @@
 import { ImageFieldProvider } from "../image";
-import { MockProviderValueResponse } from "../../../../mocks/content/provider/common"
+import { MockProviderValueResponse } from "../../../../mocks/common"
 import { MockedContent } from "../../../../mocks/content/content"
 
 const contentModel = {
