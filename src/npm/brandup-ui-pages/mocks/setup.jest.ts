@@ -4,5 +4,3 @@ fetchMock.enableMocks();
 beforeEach(() => {
     fetchMock.mockClear();
 })
-
-require("./content/provider/html")

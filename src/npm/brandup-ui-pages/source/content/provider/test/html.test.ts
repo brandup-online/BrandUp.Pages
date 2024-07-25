@@ -1,9 +1,6 @@
-import { AjaxRequest } from "@brandup/ui-ajax";
-import { Content } from "../../../content/content";
+import { MockedContent } from "../../../../mocks/content/content"
 import { HtmlFieldProvider } from "../html";
-import { set_Html_Value_Request_Mock, set_Html_Error_Value_Request_Mock } from "../../../../../__mocks__/content/provider/html"
-
-const editId = "77ace56a-0429-4258-a342-0e61159f082d";
+import { MockProviderValueResponse } from "../../../../mocks/content/provider/common"
 
 const contentModel = {
     "type": "Html",
@@ -16,30 +13,6 @@ const contentModel = {
     "value": "<p>Test test test test test</p>",
     "errors": []
 }
-
-const api = async (request: AjaxRequest) => {
-    const response = await fetch(request.url!.toString());
-    const data = await response.json();
-    return {status: response.status, data};
-}
-
-jest.mock('../../../content/content', () => {
-    return {
-        Content: jest.fn().mockImplementation(() => {
-            return {
-                path: "Blocks[1]",
-                host: {
-                    editor: {
-                        editId: editId,
-                        api: api
-                    }
-                },
-            };
-        })
-    };
-});
-
-const MockedContent = <jest.Mock<Content>>Content;
 
 const createProvider = () => {
     const content = new MockedContent();
@@ -58,7 +31,7 @@ describe('Http provider', () => {
 
         expect(provider.getValue()).toEqual("<p>Test test test test test</p>");
     
-        set_Html_Value_Request_Mock();
+        MockProviderValueResponse({ value: "<p>test123</p>", errors: [] });
 
         await provider.saveValue("<p>test123</p>");
         expect(provider.getValue()).toEqual("<p>test123</p>");
@@ -69,7 +42,7 @@ describe('Http provider', () => {
 
         expect(provider.errors).toEqual([]);
     
-        set_Html_Error_Value_Request_Mock();
+        MockProviderValueResponse({ value: "<p>test123</p>", errors: ["test error"] });
 
         await provider.saveValue("<p>test123</p>");
         expect(provider.errors).toEqual(["test error"]);

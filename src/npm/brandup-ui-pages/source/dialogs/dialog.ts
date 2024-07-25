@@ -40,13 +40,13 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
 
         this.element.classList.add("bp-dialog");
 
-        this.headerElem = DOM.nextElementByClass(this.element, "bp-dialog-header");
-        this.contentElem = DOM.nextElementByClass(this.element, "bp-dialog-content");
-        this.footerElem = DOM.nextElementByClass(this.element, "bp-dialog-footer");
+        this.headerElem = DOM.getByClass(this.element, "bp-dialog-header");
+        this.contentElem = DOM.getByClass(this.element, "bp-dialog-content");
+        this.footerElem = DOM.getByClass(this.element, "bp-dialog-footer");
         if (this.headerElem)
-            this.headerTitleElem = DOM.nextElementByClass(this.headerElem, "title");
+            this.headerTitleElem = DOM.getByClass(this.headerElem, "title");
         if (this.footerElem)
-            this.footerNotesElem = DOM.nextElementByClass(this.footerElem, "notes");
+            this.footerNotesElem = DOM.getByClass(this.footerElem, "notes");
 
         if (this.options.header)
             this.setHeader(this.options.header);

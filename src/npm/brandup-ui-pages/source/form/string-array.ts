@@ -187,7 +187,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             const elem = this.__itemsElem.children.item(i)!;
 
             elem.setAttribute("data-index", i.toString());
-            const indexElem = DOM.nextElementByClass(elem, "index");
+            const indexElem = DOM.getByClass(elem, "index");
             if (indexElem)
                 indexElem.innerText = `#${i + 1}`;
         }

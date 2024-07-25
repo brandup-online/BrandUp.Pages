@@ -181,7 +181,7 @@ export class ModelFieldProvider extends FieldProvider<ModelFieldValue, ModelFiel
 
     getItem(index: number) {
         const item = this.__contents[index];
-        if (!item) throw `content by index ${index} not found`;
+        if (!item) throw new Error(`content by index ${index} not found`);
         return item;
     }
 

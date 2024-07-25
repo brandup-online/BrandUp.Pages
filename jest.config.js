@@ -1,6 +1,6 @@
 const config = {
 	rootDir: __dirname,
-	setupFilesAfterEnv: ['<rootDir>/src/npm/__mocks__/setup.jest.ts'],
+	setupFilesAfterEnv: ['<rootDir>/src/npm/brandup-ui-pages/mocks/setup.jest.ts'],
 	testMatch: ["**/test/**/*.test.ts"],
 	testEnvironment: "jsdom",
 
@@ -8,6 +8,7 @@ const config = {
 	transform: {
 		"^.+\\.[jt]sx?$": "babel-jest",
 		".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub",
+		"^.+\\.svg$": "<rootDir>/transform/svgTransform.js"
 	},
 	moduleFileExtensions: ["js", "ts"],
 	//moduleDirectories: ["node_modules", "bower_components", "shared"],

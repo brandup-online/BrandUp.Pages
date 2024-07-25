@@ -115,7 +115,7 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
     refreshBlockIndexes() {
         this.eachItems((elem, index) => {
             elem.setAttribute("data-content-path-index", index.toString());
-            const indexElem = DOM.nextElementByClass(elem, "index");
+            const indexElem = DOM.getByClass(elem, "index");
             if (indexElem)
                 indexElem.innerText = `#${index + 1}`;
         });

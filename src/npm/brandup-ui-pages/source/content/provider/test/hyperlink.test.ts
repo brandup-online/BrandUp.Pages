@@ -1,13 +1,6 @@
-import { AjaxRequest } from "@brandup/ui-ajax";
-import { Content } from "../../../content/content";
+import { MockedContent } from "../../../../mocks/content/content"
 import { HyperlinkFieldProvider } from "../hyperlink";
-import { 
-    set_Hyperlink_PageValue_Request_Mock,
-    set_Hyperlink_UrlValue_Request_Mock,
-    set_Hyperlink_Error_Value_Request_Mock 
-} from "../../../../../__mocks__/content/provider/hyperlink"
-
-const editId = "77ace56a-0429-4258-a342-0e61159f082d";
+import { MockProviderValueResponse } from "../../../../mocks/content/provider/common"
 
 const contentModel = {
     "type": "HyperLink",
@@ -23,37 +16,13 @@ const contentModel = {
     "errors": []
 }
 
-const api = async (request: AjaxRequest) => {
-    const response = await fetch(request.url!.toString());
-    const data = await response.json();
-    return {status: response.status, data};
-}
-
-jest.mock('../../../content/content', () => {
-    return {
-        Content: jest.fn().mockImplementation(() => {
-            return {
-                path: "Blocks[1]",
-                host: {
-                    editor: {
-                        editId: editId,
-                        api: api
-                    }
-                },
-            };
-        })
-    };
-});
-
-const MockedContent = <jest.Mock<Content>>Content;
-
 const createProvider = () => {
     const content = new MockedContent();
     const provider = new HyperlinkFieldProvider(content, contentModel);
     return provider;
 }
 
-describe('Text provider', () => {
+describe('Hyperlink provider', () => {
     it("Success initialization", () => {
         const provider = createProvider();
         expect (provider).toBeInstanceOf(HyperlinkFieldProvider);
@@ -68,11 +37,11 @@ describe('Text provider', () => {
             "pageTitle": "321"
         });
     
-        set_Hyperlink_PageValue_Request_Mock();
+        MockProviderValueResponse({ value: { "valueType": "Page", "value": "test", "pageTitle": "test" }, errors: [] });
         await provider.saveValue({ "valueType": "Page", "value": "test", "pageTitle": "test" });
         expect(provider.getValue()).toEqual({ "valueType": "Page", "value": "test", "pageTitle": "test" });
 
-        set_Hyperlink_UrlValue_Request_Mock();
+        MockProviderValueResponse({ value: { "valueType": "Url", "value": "123", "pageTitle": null }, errors: [] });
         await provider.saveValue({ "valueType": "Url", "value": "123", "pageTitle": "" });
         expect(provider.getValue()).toEqual({ "valueType": "Url", "value": "123", "pageTitle": null });
     })
@@ -82,7 +51,7 @@ describe('Text provider', () => {
 
         expect(provider.errors).toEqual([]);
     
-        set_Hyperlink_Error_Value_Request_Mock();
+        MockProviderValueResponse({ value: { "valueType": "Url", "value": "123", "pageTitle": "" }, errors: ["test error"] });
 
         await provider.saveValue({ "valueType": "Url", "value": "123", "pageTitle": "" });
         expect(provider.errors).toEqual(["test error"]);
