@@ -3,7 +3,7 @@ import { TypeHelper } from "@brandup/ui-helpers";
 
 export abstract class UIControl<TOptions = {}> extends UIElement {
     readonly options: TOptions = {} as TOptions;
-    private __fragment?: DocumentFragment | null = null;
+    private __fragment?: DocumentFragment;
 
     readonly isInject: boolean = false;
 

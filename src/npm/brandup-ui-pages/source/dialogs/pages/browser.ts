@@ -12,8 +12,8 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     private __pageId: string | null;
     private collectionId: string | null = null;
     private navElem: HTMLElement;
-    private tabsElem: HTMLElement | null = null;
-    private __createCollElem: HTMLElement | null = null;
+    private tabsElem?: HTMLElement;
+    private __createCollElem?: HTMLElement;
 
     constructor(pageId: string, options?: DialogOptions) {
         super(options);
@@ -117,7 +117,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
     protected _buildList(model: PageListModel) {
         if (this.__createCollElem) {
             this.__createCollElem.remove();
-            this.__createCollElem = null;
+            this.__createCollElem = undefined;
         }
 
         if (!this.tabsElem) {

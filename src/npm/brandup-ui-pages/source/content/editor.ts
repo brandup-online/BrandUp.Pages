@@ -26,11 +26,11 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     private __contentElem?: HTMLElement;
     private __contents: Map<string, Content> = new Map();
-    private __content: Content | null = null;
+    private __content?: Content;
     private __isLoading = false;
 
-    private __complate: ((value: EditResult) => void) | null = null;
-    private __error: ((reason?: any) => void) | null = null;
+    private __complate?: ((value: EditResult) => void);
+    private __error?: ((reason?: any) => void);
 
     get typeName(): string { return "BrandUpPages.Editor"; }
     
@@ -94,7 +94,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     // Editor members
 
-    get content(): Content | null { return this.__content; }
+    get content(): Content | undefined { return this.__content; }
 
     navigate(path: string) {
         const content = this.__contents.get(path);

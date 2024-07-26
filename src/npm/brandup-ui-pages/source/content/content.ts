@@ -17,9 +17,9 @@ export class Content {
     private __fields = new Map<string, FieldProvider<any, any>>();
     private __errors: Array<string> = [];
 
-    private __container: HTMLElement | null = null;
+    private __container?: HTMLElement;
     
-    get container(): HTMLElement | null { return this.__container; }
+    get container(): HTMLElement | undefined { return this.__container; }
     get errors(): string[] { return this.__errors; }
 
     constructor(host: IContentHost, model: ContentModel) {

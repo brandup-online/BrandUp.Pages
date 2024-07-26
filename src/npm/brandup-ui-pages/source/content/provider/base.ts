@@ -12,12 +12,12 @@ export abstract class FieldProvider<TValue, TOptions> {
     
     private __value: TValue;
     private __errors: Array<string>;
-    private __valueElem: HTMLElement | null = null;
+    private __valueElem?: HTMLElement;
 
     designer: IFieldDesigner | null = null;
-    field: IFormField | null = null;
+    field?: IFormField;
 
-    get valueElem(): HTMLElement | null { return this.__valueElem; }
+    get valueElem(): HTMLElement | undefined { return this.__valueElem; }
     get errors(): string[] { return this.__errors; }
 
     constructor(content: Content, model: ContentFieldModel) {

@@ -5,7 +5,7 @@ import { IFieldValueElement } from "../../../typings/content";
 
 export class ImageValue extends UIElement implements IFieldValueElement {
     private __fileInputElem: HTMLInputElement;
-    private __value: ImageFieldValue | null = null;
+    private __value?: ImageFieldValue;
     private __onChange: (file: File | string) => void = () => {};
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.Image"; }
@@ -106,7 +106,7 @@ export class ImageValue extends UIElement implements IFieldValueElement {
         return this.__value ? true : false;
     }
 
-    getValue(): ImageFieldValue | null {
+    getValue(): ImageFieldValue | undefined {
         return this.__value;
     }
     setValue(value: ImageFieldValue) {

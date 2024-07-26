@@ -9,7 +9,7 @@ import { CommandContext } from "@brandup/ui";
 
 export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
-    private navElem: HTMLElement | null = null;
+    private navElem?: HTMLElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IFormField } = {};
     private __modelPath: string;

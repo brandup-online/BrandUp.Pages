@@ -8,7 +8,7 @@ import { PageModel } from "../../../typings/page";
 import { HyperLinkValue } from "../../../content/provider/hyperlink";
 
 export class HyperlinkValue extends UIElement implements IFieldValueElement {
-    private __typeElem: HTMLElement | null = null;
+    private __typeElem?: HTMLElement;
     private __inputElem: HTMLElement;
     private __urlValueInput: HTMLInputElement;
     private __pageValueInput: HTMLInputElement;
@@ -19,7 +19,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     private __closePageMenuFunc: (e: MouseEvent) => void;
     private __type: HyperLinkType;
     private __searchTimeout: number = 0;
-    private __abortController: AbortController | null = null;
+    private __abortController?: AbortController;
 
     private __onChange: ((value: HyperLinkValue) => void) = () => {};
 

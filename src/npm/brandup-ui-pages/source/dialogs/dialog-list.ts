@@ -8,10 +8,10 @@ import { CommandContext } from "@brandup/ui";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
     protected __itemsElem: HTMLElement;
-    private __newItemElem: HTMLElement | null = null;
+    private __newItemElem?: HTMLElement;
     readonly queue: AjaxQueue;
     private __closeItemMenuFunc: (e: MouseEvent) => void = () => {};
-    protected __model: TList | null = null;
+    protected __model?: TList;
     private __enableSorting = false;
 
     constructor(options?: DialogOptions) {
@@ -172,7 +172,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
             if (this.__newItemElem) {
                 this.__newItemElem.remove();
-                this.__newItemElem = null;
+                this.__newItemElem = undefined;
             }
 
             return;

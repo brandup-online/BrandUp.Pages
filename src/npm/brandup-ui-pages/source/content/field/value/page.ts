@@ -11,7 +11,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
     private __searchElem: HTMLElement;
     private __closeMenuFunc: (e: MouseEvent) => void;
     private __searchTimeout: number = 0;
-    private __abortController: AbortController | null = null;
+    private __abortController?: AbortController;
 
     private __onChange: (value: string) => void = () => {};
 

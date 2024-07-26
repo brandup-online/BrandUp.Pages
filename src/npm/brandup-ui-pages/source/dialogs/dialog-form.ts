@@ -12,7 +12,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
     private __formElem: HTMLFormElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: Field<any, any> } = {};
-    private __model: TForm | null = null;
+    private __model?: TForm;
     readonly queue: AjaxQueue;
 
     constructor(options?: DialogOptions) {
@@ -24,7 +24,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
         this.queue = new AjaxQueue();
     }
 
-    get model(): TForm | null { return this.__model; }
+    get model(): TForm | undefined { return this.__model; }
 
     protected _onRenderContent() {
         this.element?.classList.add("bp-dialog-form");

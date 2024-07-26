@@ -5,7 +5,7 @@ import { HtmlFieldProvider } from "../../content/provider/html";
 
 export class HtmlDesigner extends FieldDesigner<HtmlFieldProvider> {
     private __isChanged: boolean = false;
-    private __editor: ContentEditor | null = null;
+    private __editor?: ContentEditor;
 
     get typeName(): string { return "BrandUpPages.HtmlDesigner"; }
 

@@ -6,7 +6,7 @@ import ContentEditor from "brandup-pages-ckeditor";
 
 export class HTMLValue extends UIElement implements IFieldValueElement {
     private __isChanged: boolean = false;
-    private __editor: ContentEditor | null = null;
+    private __editor?: ContentEditor;
     private __editorPromise: Promise<any>;
 
     private __onChange: (value: string) => void = () => {};

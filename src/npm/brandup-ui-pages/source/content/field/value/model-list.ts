@@ -6,7 +6,7 @@ import iconDelete from "../../../svg/toolbar-button-discard.svg";
 import { IFieldValueElement } from "../../../typings/content";
 
 export class ModelListValue extends UIElement implements IFieldValueElement {
-    private __value: ModelFieldValue | null = null;
+    private __value?: ModelFieldValue;
     private __onChange: (sourceIndex: number, destIndex: number) => void = () => {};
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.ModelList"; }
@@ -133,7 +133,7 @@ export class ModelListValue extends UIElement implements IFieldValueElement {
         this.refreshBlockIndexes();
     }
 
-    getValue(): ModelFieldValue | null {
+    getValue(): ModelFieldValue | undefined {
         return this.__value;
     }
     setValue(value: ModelFieldValue) {

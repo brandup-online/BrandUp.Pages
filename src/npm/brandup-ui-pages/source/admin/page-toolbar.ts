@@ -26,10 +26,10 @@ export class PageToolbar extends UIElement {
 
     readonly isContentPage: boolean;
 
-    private __menuCloseFunc: ((e: MouseEvent) => void) | null = null;
-    private __menuExpandedElem: HTMLElement | null = null;
+    private __menuCloseFunc?: ((e: MouseEvent) => void);
+    private __menuExpandedElem?: HTMLElement;
 
-    private __editor: ContentEditor | null = null;
+    private __editor?: ContentEditor;
     
     get typeName(): string {
         return "BrandUpPages.PageToolbar";

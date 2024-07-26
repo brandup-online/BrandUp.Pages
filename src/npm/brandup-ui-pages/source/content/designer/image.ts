@@ -5,11 +5,11 @@ import iconUpload from "../../svg/toolbar-button-picture.svg";
 import "./image.less";
 
 export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
-    private __fileInputElem: HTMLInputElement | null = null;
-    private __menuElem: HTMLElement | null = null;
-    private __progressElem: HTMLElement | null = null;
-    private __button: HTMLElement | null = null;
-    private __textInput: HTMLInputElement | null = null;
+    private __fileInputElem?: HTMLInputElement;
+    private __menuElem?: HTMLElement;
+    private __progressElem?: HTMLElement;
+    private __button?: HTMLElement;
+    private __textInput?: HTMLInputElement;
     private __closeFunc: (e: MouseEvent) => void = () => {};
 
     get typeName(): string { return "BrandUpPages.ImageDesigner"; }
