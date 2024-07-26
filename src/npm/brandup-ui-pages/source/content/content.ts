@@ -82,7 +82,7 @@ export class Content {
 
     getField(name: string) {
         if (!this.__fields.has(name))
-            throw `Not found field "${name}" for content path "${this.path}".`;
+            throw new Error(`Not found field "${name}" for content path "${this.path}".`);
 
         return this.__fields.get(name);
     }
