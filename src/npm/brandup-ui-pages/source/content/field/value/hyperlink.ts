@@ -17,7 +17,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     private __placeholderElem: HTMLElement;
     private __closeTypeMenuFunc: (e: MouseEvent) => void;
     private __closePageMenuFunc: (e: MouseEvent) => void;
-    private __type: HyperLinkType = "Page";
+    private __type: HyperLinkType;
     private __searchTimeout: number = 0;
     private __abortController: AbortController | null = null;
 
@@ -27,6 +27,8 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
 
     constructor(options: HyperLinkFieldFormOptions) {
         super();
+
+        this.__type = options.valueType;
 
         this.__inputElem = DOM.tag("div", { class: "input-value", "data-command": "begin-input" });
         this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" });
@@ -212,7 +214,25 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
         this.__onChange = handler;
     }
 
-    getValue(): HyperLinkValue { throw new Error("Not implemented"); }
+    getValue(): HyperLinkValue { 
+        switch (this.__type) {
+            case "Page": {
+                return {
+                    valueType: this.__type,
+                    value: this.__pageValueInput?.value,
+                    pageTitle: this.__pageValueInput?.value
+                };
+            }
+            case "Url": {
+                return {
+                    valueType: this.__type,
+                    value: this.__urlValueInput?.value,
+                };
+            }
+            default:
+                throw new Error("");
+        }
+     }
     
 
     hasValue(): boolean {
@@ -231,7 +251,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
     setValue(value: HyperLinkValue) {
         if (value) {
             this.__type = value.valueType;
-
+            
             switch (value.valueType) {
                 case "Page": {
                     this.__pageValueInput?.setAttribute("value-page-id", value.value);

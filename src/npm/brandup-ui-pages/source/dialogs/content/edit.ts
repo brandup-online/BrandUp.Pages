@@ -74,7 +74,6 @@ export class PageEditDialog extends Dialog<any> {
                    ]),
                ]),
            ]));
-           console.log("🚀 ~ PageEditDialog ~ __renderForm ~ navElem:", this.navElem)
 
            path = content.parentPath;
         }

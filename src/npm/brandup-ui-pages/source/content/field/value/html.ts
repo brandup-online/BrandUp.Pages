@@ -79,14 +79,15 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     setValue(value: string) {
-        this.__editorPromise.then (()=> { // если editor еще не создался - ждем
-            if (this.__editor) {
-                this.__editor.data.set(value ? value : "");
-                this.__refreshUI();
-            }
-            else if (this.element)
-                this.element.innerHTML = value ? value : "";
-        });
+        // console.log("🚀 ~ HTMLValue ~ setValue ~ value:", value)
+        // this.__editorPromise.then (()=> { // если editor еще не создался - ждем
+        //     if (this.__editor) {
+        //         this.__editor.data.set(value ? value : "");
+        //         this.__refreshUI();
+        //     }
+        //     else if (this.element)
+        //         this.element.innerHTML = value ? value : "";
+        // });
     }
 
     getValue(): string {

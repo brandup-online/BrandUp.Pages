@@ -70,7 +70,7 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
     getValue(): string{
         if (!this.element) throw new Error("element not defined");
 
-        const val = this.normalizeValue(this.element?.innerText);
+        const val = this.normalizeValue(this.element.innerText);
         return val;
     }
 
@@ -81,7 +81,7 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
         if (value && this.options.allowMultiline) {
             value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
         }
-        this.element.innerHTML = value ? value : "";
+        this.element.innerText = value ? value : "";
     }
 
     normalizeValue(value: string): string {
