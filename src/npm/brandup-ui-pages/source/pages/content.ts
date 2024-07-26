@@ -1,6 +1,6 @@
-﻿import { Page, PageModel } from "@brandup/ui-website";
+﻿import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 
-class ContentPage extends Page<ContentPageModel> {
+class ContentPage extends Page<WebsiteApplication, ContentPageModel> {
     get typeName(): string { return "BrandUp.ContentPage" }
 }
 

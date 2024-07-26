@@ -42,7 +42,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         this.queue = new AjaxQueue();
     }
     
-    static begin(page: Page<PageModel>, key: string, type: string, force: boolean = false) {
+    static begin(page: Page<WebsiteApplication,PageModel>, key: string, type: string, force: boolean = false) {
         return new Promise<{ editId: string, exist: boolean }>(async (resolve) => {
             const response: AjaxResponse<BeginContentEditResult> = await page.website.queue.enque({
                 url: "/brandup.pages/page/content/begin",

@@ -1,6 +1,6 @@
-﻿import { Page, PageModel } from "@brandup/ui-website";
+﻿import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 
-class AboutPage extends Page<PageModel> {
+class AboutPage extends Page<WebsiteApplication, PageModel> {
     get typeName(): string { return "AboutPage" }
 
     protected onRenderContent() {

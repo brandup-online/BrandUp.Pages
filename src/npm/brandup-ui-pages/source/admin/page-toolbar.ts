@@ -6,7 +6,7 @@ import iconDown from "../svg/new/arrow-down.svg";
 import iconPublish from "../svg/new/upload.svg";
 import iconSeo from "../svg/new/increase.svg";
 import { listContentType } from "../dialogs/content-types/list";
-import { Page, PageModel } from "@brandup/ui-website";
+import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
 import { DOM } from "@brandup/ui-dom";
@@ -21,7 +21,7 @@ import iconPlus from "../svg/new/plus.svg";
 const EDITID_QUERY_KEY = "editid";
 
 export class PageToolbar extends UIElement {
-    private __page: Page<PageModel>;
+    private __page: Page<WebsiteApplication,PageModel>;
     private __isDestroyed: boolean = false;
 
     readonly isContentPage: boolean;
@@ -36,7 +36,7 @@ export class PageToolbar extends UIElement {
     }
     get hasEditor(): boolean { return !!this.__editor; }
 
-    constructor(page: Page<PageModel>) {
+    constructor(page: Page<WebsiteApplication,PageModel>) {
         super();
 
         this.__page = page;
@@ -162,7 +162,7 @@ export class PageToolbar extends UIElement {
             if (parentPageId) {
                 request({
                     url: `/brandup.pages/page/${parentPageId}`,
-                }).then((response) => this.__page.website.nav({ url: response.data.url }));
+                }, this.__page.context.abort).then((response) => this.__page.website.nav({ url: response.data.url }));
             }
         });
 

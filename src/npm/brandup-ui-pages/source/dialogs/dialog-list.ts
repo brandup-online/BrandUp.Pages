@@ -104,7 +104,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
                         this.setLoading(true);
 
-                        const response: AjaxResponse = await request({
+                        const response: AjaxResponse = await this.queue.enque({
                             url: url,
                             query: urlParams,
                             method: "POST",
@@ -189,7 +189,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         let url = this._buildUrl();
         url += "/item";
 
-        const response: AjaxResponse<Array<TItem>> = await request({
+        const response: AjaxResponse<Array<TItem>> = await this.queue.enque({
             url: url,
             query: urlParams,
         });

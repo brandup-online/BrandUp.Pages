@@ -1,10 +1,10 @@
-import { Page, PageModel } from "@brandup/ui-website";
+import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import { PageToolbar } from "./admin/page-toolbar";
 import "./styles.less";
 
 let toolbar: PageToolbar | null = null;
 
-const showUI = (page: Page<PageModel>) => {
+const showUI = (page: Page<WebsiteApplication,PageModel>) => {
     if (toolbar) {
         toolbar.destroy();
         toolbar = null;

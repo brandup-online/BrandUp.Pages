@@ -10,14 +10,13 @@ export class LayoutMiddleware implements Middleware {
         _context.app.registerCommand("signin", () => {
             request({
                 url: _context.app.buildUrl("signin"),
-            }).then(() => _context.app.reload());
-            
+            }, _context.abort).then(() => _context.app.reload());
         });
 
         _context.app.registerCommand("signout", async () => {
             request({
                 url: _context.app.buildUrl("signout"),
-            }).then(() => _context.app.reload());
+            }, _context.abort).then(() => _context.app.reload());
         });
 
         _context.app.registerCommand("toggle-app-menu", () => {
