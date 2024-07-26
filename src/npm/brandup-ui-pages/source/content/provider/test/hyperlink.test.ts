@@ -1,6 +1,6 @@
 import { MockedContent } from "../../../../mocks/content/content"
 import { HyperlinkFieldProvider } from "../hyperlink";
-import { MockProviderValueResponse } from "../../../../mocks/common"
+import { MockResponse } from "../../../../mocks/common"
 
 const contentModel = {
     "type": "HyperLink",
@@ -37,11 +37,11 @@ describe('Hyperlink provider', () => {
             "pageTitle": "321"
         });
     
-        MockProviderValueResponse({ value: { "valueType": "Page", "value": "test", "pageTitle": "test" }, errors: [] });
+        MockResponse({ value: { "valueType": "Page", "value": "test", "pageTitle": "test" }, errors: [] });
         await provider.saveValue({ "valueType": "Page", "value": "test", "pageTitle": "test" });
         expect(provider.getValue()).toEqual({ "valueType": "Page", "value": "test", "pageTitle": "test" });
 
-        MockProviderValueResponse({ value: { "valueType": "Url", "value": "123", "pageTitle": null }, errors: [] });
+        MockResponse({ value: { "valueType": "Url", "value": "123", "pageTitle": null }, errors: [] });
         await provider.saveValue({ "valueType": "Url", "value": "123", "pageTitle": "" });
         expect(provider.getValue()).toEqual({ "valueType": "Url", "value": "123", "pageTitle": null });
     })
@@ -51,7 +51,7 @@ describe('Hyperlink provider', () => {
 
         expect(provider.errors).toEqual([]);
     
-        MockProviderValueResponse({ value: { "valueType": "Url", "value": "123", "pageTitle": "" }, errors: ["test error"] });
+        MockResponse({ value: { "valueType": "Url", "value": "123", "pageTitle": "" }, errors: ["test error"] });
 
         await provider.saveValue({ "valueType": "Url", "value": "123", "pageTitle": "" });
         expect(provider.errors).toEqual(["test error"]);

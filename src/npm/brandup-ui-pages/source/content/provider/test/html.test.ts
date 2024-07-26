@@ -1,6 +1,6 @@
 import { MockedContent } from "../../../../mocks/content/content"
 import { HtmlFieldProvider } from "../html";
-import { MockProviderValueResponse } from "../../../../mocks/common"
+import { MockResponse } from "../../../../mocks/common"
 
 const contentModel = {
     "type": "Html",
@@ -31,7 +31,7 @@ describe('Http provider', () => {
 
         expect(provider.getValue()).toEqual("<p>Test test test test test</p>");
     
-        MockProviderValueResponse({ value: "<p>test123</p>", errors: [] });
+        MockResponse({ value: "<p>test123</p>", errors: [] });
 
         await provider.saveValue("<p>test123</p>");
         expect(provider.getValue()).toEqual("<p>test123</p>");
@@ -42,7 +42,7 @@ describe('Http provider', () => {
 
         expect(provider.errors).toEqual([]);
     
-        MockProviderValueResponse({ value: "<p>test123</p>", errors: ["test error"] });
+        MockResponse({ value: "<p>test123</p>", errors: ["test error"] });
 
         await provider.saveValue("<p>test123</p>");
         expect(provider.errors).toEqual(["test error"]);

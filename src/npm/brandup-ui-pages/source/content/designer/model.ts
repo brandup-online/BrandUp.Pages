@@ -91,7 +91,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
 
     private __findItemElem(elem: HTMLElement, selector: string) {
         const itemElem = elem.closest(selector);
-        if (!itemElem) throw `item element with attribute ${selector} not found`;
+        if (!itemElem) throw new Error(`item element with attribute ${selector} not found`);
         return itemElem;
     }
     

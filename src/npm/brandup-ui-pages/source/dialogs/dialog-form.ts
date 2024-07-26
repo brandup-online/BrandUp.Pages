@@ -191,12 +191,12 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
     protected getField(name: string): Field<any, any> {
         if (!this.__fields.hasOwnProperty(name.toLowerCase()))
-            throw `Field "${name}" not exists.`;
+            throw new Error(`Field "${name}" not exists.`);
         return this.__fields[name.toLowerCase()];
     }
     protected addField(title: string, field: Field<any, any>) {
         if (this.__fields.hasOwnProperty(field.name.toLowerCase()))
-            throw `Field name "${field.name}" already exists.`;
+            throw new Error(`Field name "${field.name}" already exists.`);
 
         const containerElem = DOM.tag("div", { class: "field" });
 

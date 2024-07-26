@@ -59,7 +59,7 @@ export default class ModelField extends FormField<ModelFieldOptions> {
 
     private __getItemElem(elem: HTMLElement) {
         const itemElem = elem.closest("[data-content-path-index]");
-        if (!itemElem) throw `item element with attribute data-content-path-index not found`;
+        if (!itemElem) throw new Error(`item element with attribute data-content-path-index not found`);
         return itemElem;
     }
 

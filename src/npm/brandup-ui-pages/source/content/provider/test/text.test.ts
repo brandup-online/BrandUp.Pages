@@ -1,6 +1,6 @@
 import { MockedContent } from "../../../../mocks/content/content"
 import { TextFieldProvider } from "../text";
-import { MockProviderValueResponse } from "../../../../mocks/common"
+import { MockResponse } from "../../../../mocks/common"
 
 const contentModel = {
     "type": "Text",
@@ -34,7 +34,7 @@ describe('Text provider', () => {
 
         expect(provider.normalizeValue("    test123   \r\n   ")).toEqual("test123");
     
-        MockProviderValueResponse({ value: "    test123   \r\n   ", errors: [] });
+        MockResponse({ value: "    test123   \r\n   ", errors: [] });
 
         await provider.saveValue("    test123   \r\n   ");
         expect(provider.getValue()).toEqual("test123");
@@ -45,7 +45,7 @@ describe('Text provider', () => {
 
         expect(provider.errors).toEqual([]);
     
-        MockProviderValueResponse({ value: "test123", errors: ["test error"] });
+        MockResponse({ value: "test123", errors: ["test error"] });
 
         await provider.saveValue("test123");
         expect(provider.errors).toEqual(["test error"]);

@@ -23,7 +23,7 @@ export class ErrorDialog extends Dialog {
             if (!contentPath) throw new Error("data-content-path attribute not found")
 
             const content = editor.navigate(contentPath);
-            if (!content) throw `content path ${contentPath} not found`;
+            if (!content) throw new Error(`content path ${contentPath} not found`);
             editPage(content, contentPath).then(() => {
                 this.__errors = editor.validate();
                 if (this.__errors.length === 0) this._onClose();

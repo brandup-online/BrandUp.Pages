@@ -98,7 +98,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
     navigate(path: string) {
         const content = this.__contents.get(path);
-        if (!content) throw `content by path "${path}" not found`;
+        if (!content) throw new Error(`content by path "${path}" not found`);
         return content;
     }
 
@@ -107,15 +107,17 @@ export class ContentEditor extends UIElement implements IContentHost {
     }
 
     loadContent(path: string): Promise<Content> {
-        return new Promise<Content>(async (resolve) => {
+        return new Promise<Content>(async (resolve, reject) => {
             const response: AjaxResponse<GetContentEditResult> = await this.api({
                 url: "/brandup.pages/page/content",
                 query: { editId: this.editId, path },
                 method: "GET",
             });
 
-            if (response.status !== 200 || !response.data)
-                throw `Error load editor contents by path "${path}".`;
+            if (response.status !== 200 || !response.data) {
+                reject(`Error load editor contents by path "${path}".`);
+                return;
+            }
 
             let rootContent: Content | null = this.initContent(response.data.contents);
             if (!rootContent) throw new Error("rootContent not found");
@@ -130,13 +132,13 @@ export class ContentEditor extends UIElement implements IContentHost {
 
         contents.forEach((contentModel, index) => {
             if (this.__contents.has(contentModel.path))
-                throw `Content "${contentModel.path}" already initialized.`;
+                throw new Error(`Content "${contentModel.path}" already initialized.`);
 
             let host: IContentHost;
             if (contentModel.parentPath !== null) {
                 const parentContent = this.navigate(contentModel.parentPath);
                 if (!parentContent)
-                    throw `Not found content by path "${contentModel.parentPath}".`;
+                    throw new Error(`Not found content by path "${contentModel.parentPath}".`);
                 host = <ModelFieldProvider>parentContent.getField(contentModel.parentField);
             }
             else
@@ -260,7 +262,7 @@ export class ContentEditor extends UIElement implements IContentHost {
 
         Array.from(contentElements.values()).forEach(contentStructure => {
             if (!this.__contents.has(contentStructure.path))
-                throw `Content is not exist by path "${contentStructure.path}".`;
+                throw new Error(`Content is not exist by path "${contentStructure.path}".`);
 
             const content = this.__contents.get(contentStructure.path);
             content?.renderDesigner(contentStructure);

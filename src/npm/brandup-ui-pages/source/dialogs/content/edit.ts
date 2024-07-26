@@ -94,7 +94,7 @@ export class PageEditDialog extends Dialog<any> {
             const field: FormField<any> = new type.default(provider.title, provider.options, provider);
     
             if (this.__fields.hasOwnProperty(provider.name.toLowerCase()))
-                throw `Field name "${provider.name}" already exists.`;
+                throw new Error(`Field name "${provider.name}" already exists.`);
     
             const containerElem = DOM.tag("div", { class: "field" });
     
@@ -116,7 +116,7 @@ export class PageEditDialog extends Dialog<any> {
 
     getField(name: string): IFormField {
         if (!this.__fields.hasOwnProperty(name.toLowerCase()))
-            throw `Field "${name}" not exists.`;
+            throw new Error(`Field "${name}" not exists.`);
         return this.__fields[name.toLowerCase()];
     }
 

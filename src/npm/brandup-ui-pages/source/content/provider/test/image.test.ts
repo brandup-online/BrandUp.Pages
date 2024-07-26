@@ -1,5 +1,5 @@
 import { ImageFieldProvider } from "../image";
-import { MockProviderValueResponse } from "../../../../mocks/common"
+import { MockResponse } from "../../../../mocks/common"
 import { MockedContent } from "../../../../mocks/content/content"
 
 const contentModel = {
@@ -33,7 +33,7 @@ describe('Image provider', () => {
 
         expect(provider.getValue()).toEqual({ "valueType": "Url", "value": "/images/banner.jpg", "previewUrl": "/images/banner.jpg" });
     
-        MockProviderValueResponse({ 
+        MockResponse({ 
             value: { "valueType": "Url", "value": "test", "previewUrl": "test" },
             errors: [],
         });
@@ -47,7 +47,7 @@ describe('Image provider', () => {
 
         expect(provider.errors).toEqual([]);
     
-        MockProviderValueResponse({ value: "test123", errors: ["test error"] });
+        MockResponse({ value: "test123", errors: ["test error"] });
 
         await provider.saveValue("test123");
         expect(provider.errors).toEqual(["test error"]);

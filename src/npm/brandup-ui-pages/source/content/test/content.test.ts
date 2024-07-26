@@ -1,5 +1,5 @@
 
-import { MockProviderValueResponse } from "../../../mocks/common";
+import { MockResponse } from "../../../mocks/common";
 import { Content, IContentHost } from "../../content/content";
 import { ContentEditor } from "../../content/editor";
 import { contentModel, editId } from "./data";
@@ -20,11 +20,16 @@ describe('Content', () => {
         const HeaderField = content.getField("Header");
         expect (HeaderField).toBeTruthy();
 
-        MockProviderValueResponse({ value: "test", errors: ["test error"] });
+        MockResponse({ value: "test", errors: ["test error"] });
         await HeaderField?.saveValue("");
         expect(HeaderField?.errors).toEqual(["test error"]);
 
         expect (content.validate()).toBeTruthy();
+
+        MockResponse({ value: "test", errors: [] });
+        await HeaderField?.saveValue("");
+        expect(HeaderField?.errors).toEqual([]);
+        expect (content.validate()).toBeFalsy();
     })
 })
 

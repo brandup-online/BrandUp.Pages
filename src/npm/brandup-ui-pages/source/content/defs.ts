@@ -9,7 +9,7 @@ export default {
     resolveProvider: (type: string) => {
         var provderType = fieldProviders[type];
         if (!provderType)
-            throw `Not found field provider by type "${type}"`;
+            throw new Error(`Not found field provider by type "${type}"`);
         return provderType();
     },
     registerDesigner: (type: string, resolve: () => Promise<any>) => {
@@ -18,7 +18,7 @@ export default {
     resolveDesigner: (type: string) => {
         var designerType = fieldDesigners[type];
         if (!designerType)
-            throw `Not found field designer by type "${type}"`;
+            throw new Error(`Not found field designer by type "${type}"`);
         return designerType();
     },
 
@@ -28,7 +28,7 @@ export default {
     resolveFormField: (type: string) => {
         var fieldType = formFields[type];
         if (!fieldType)
-            throw `Not found form field by type "${type}"`;
+            throw new Error(`Not found form field by type "${type}"`);
         return fieldType();
     }
 };
