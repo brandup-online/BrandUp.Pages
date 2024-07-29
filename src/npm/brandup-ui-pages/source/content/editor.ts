@@ -161,6 +161,7 @@ export class ContentEditor extends UIElement implements IContentHost {
                 DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title: "Отменить изменения" }, [cancelIcon, DOM.tag("span", null, "Отмена")])
             ]),
             DOM.tag("menu", null, [
+                DOM.tag("button", { class: "bp-button neutral language", command: "change-language", title: "Сменить язык" }, "en"),
                 DOM.tag("button", { class: "bp-button neutral", command: "bp-content", title: "Показать контент" }, [editBlockIcon, DOM.tag("span", null, "Контент")])
             ])
         ]);

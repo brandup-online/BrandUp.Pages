@@ -5,6 +5,7 @@ import iconBack from "../svg/toolbar-button-back.svg";
 import iconDown from "../svg/new/arrow-down.svg";
 import iconPublish from "../svg/new/upload.svg";
 import iconSeo from "../svg/new/increase.svg";
+import iconStar from "../svg/new/star.svg";
 import { listContentType } from "../dialogs/content-types/list";
 import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import { publishPage } from "../dialogs/pages/publish";
@@ -19,6 +20,18 @@ import iconMore from "../svg/new/more.svg";
 import iconPlus from "../svg/new/plus.svg";
 
 const EDITID_QUERY_KEY = "editid";
+
+export interface ILangguage {
+    code: string,
+    name: string;
+    isMain: boolean;
+    progress: number;
+}
+
+const languagesMock: ILangguage[] = [
+    { code:"en", name: "Английский", isMain: false, progress: 50 },
+    { code:"ru", name: "Русский", isMain: true, progress: 100 },
+]
 
 export class PageToolbar extends UIElement {
     private __page: Page<WebsiteApplication,PageModel>;
@@ -67,36 +80,32 @@ export class PageToolbar extends UIElement {
     }
 
     private __renderTollbar() {
+        const leftToolbar = this.__renderLeftToolbar();
+        const rightToolbar = this.__renderRightToolbar();
+
         document.body.classList.add("bp-state-toolbars");
+
+        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-page-toolbar" }, [leftToolbar, rightToolbar]);
+
+        document.body.appendChild(toolbarElem);
+        this.setElement(toolbarElem);
+
+        this.__initTollbarLogic();
+    }
+
+    private __renderLeftToolbar() {
+        const leftToolbar = DOM.tag("div", { class: "toolbar-menu left" });
+
+        let websiteMenu: HTMLElement;
+        leftToolbar.appendChild(DOM.tag("div", { class: "separator-right" }, [
+            DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Меню сайта" }, iconList),
+            websiteMenu = DOM.tag("menu", { class: "bp-page-toolbar-menu" }),
+        ]));
 
         const websiteMenuItems = document.createDocumentFragment();
         websiteMenuItems.append(DOM.tag("button", { command: "bp-content-types" }, [iconPlus, DOM.tag("span", null, "Типы контента")]));
         websiteMenuItems.append(DOM.tag("button", { command: "bp-pages" }, [iconList, DOM.tag("span", null, "Страницы этого уровня")]));
 
-        let websiteMenu: HTMLElement;
-
-        const toolbarButtons = [
-            DOM.tag("div", { class: "first-button" }, [
-                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Меню сайта" }, iconList),
-                websiteMenu = DOM.tag("menu", { class: "bp-page-toolbar-menu" }),
-            ])
-        ];
-        
-        const pageContents = findContents();
-        if (pageContents.length) {
-            let contentsMenuElem: HTMLElement;
-            toolbarButtons.push(DOM.tag("div", null, [
-                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, iconEdit),
-                contentsMenuElem = DOM.tag("menu", { class: "bp-page-toolbar-menu" })
-            ]));
-
-            pageContents.forEach(contentDefinition => {
-                contentsMenuElem.appendChild(DOM.tag("button", { command: "bp-content-edit", dataset: { contentKey: contentDefinition.key, contentType: contentDefinition.type } }, [
-                    DOM.tag('span', null, [contentDefinition.title, DOM.tag("i", null, contentDefinition.key)])
-                ]));
-            })
-        }
-        
         // Если страница динамическая
         if (this.isContentPage) {
             const contentPage = <ContentPage>this.__page;
@@ -106,29 +115,65 @@ export class PageToolbar extends UIElement {
             if (contentPage.model.parentPageId) {
                 websiteMenuItems.append(DOM.tag("button", { command: "bp-back" }, [iconBack, DOM.tag("span", null, "Перейти к родительской странице")]));
             }
-
-            toolbarButtons.push(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button page-status " + contentPage.model.status.toLowerCase() }, [DOM.tag("span")])));
-
-            const pageMenuItems = [DOM.tag("button", { command: "bp-seo" }, [iconSeo, DOM.tag("span", null, "Индексирование страницы")]) ];
             
-            if (contentPage.model.status !== "Published") {
-                toolbarButtons.push(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)));
-                pageMenuItems.push(DOM.tag("button", { command: "bp-publish" }, [iconPublish, DOM.tag("span", null, "Опубликовать страницу")]));
-            }
+            const pageMenuItems = [DOM.tag("button", { command: "bp-seo" }, [iconSeo, DOM.tag("span", null, "Индексирование страницы")]) ];
 
-            toolbarButtons.push(DOM.tag("div", null, [
+            leftToolbar.appendChild(DOM.tag("div", null, [
                 DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, iconMore),
                 DOM.tag("menu", { class: "bp-page-toolbar-menu", title: "" }, pageMenuItems),
             ]));
+
+            leftToolbar.appendChild(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button page-status " + contentPage.model.status.toLowerCase() }, [DOM.tag("span")])));
+
+            if (contentPage.model.status !== "Published") {
+                leftToolbar.appendChild(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)));
+                pageMenuItems.push(DOM.tag("button", { command: "bp-publish" }, [iconPublish, DOM.tag("span", null, "Опубликовать страницу")]));
+            }
         }
+
         websiteMenu.append(websiteMenuItems);
 
-        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-page-toolbar" }, toolbarButtons);
+        return leftToolbar;
+    }
 
-        document.body.appendChild(toolbarElem);
-        this.setElement(toolbarElem);
+    private __renderRightToolbar() {
+        const rightToolbar = DOM.tag("div", { class: "toolbar-menu right" });
+        const contents = findContents();
 
-        this.__initTollbarLogic();
+        if (contents.length) {
+            let contentsMenuElem: HTMLElement;
+            rightToolbar.appendChild(DOM.tag("div", {class: "separator-right"}, [
+                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Редактировать контент страницы" }, iconEdit),
+                contentsMenuElem = DOM.tag("menu", { class: "bp-page-toolbar-menu" })
+            ]));
+
+            contents.forEach(contentDefinition => {
+                contentsMenuElem.appendChild(DOM.tag("button", { command: "bp-content-edit", dataset: { contentKey: contentDefinition.key, contentType: contentDefinition.type } }, [
+                    DOM.tag('span', null, [contentDefinition.title, DOM.tag("i", null, contentDefinition.key)])
+                ]));
+            })
+        }
+
+        const languages = [
+            ...languagesMock.map(lang => DOM.tag("button", {command: "set-language"},[
+                DOM.tag("div", { class: "code" }, lang.code),
+                DOM.tag("div", { class: "description" }, [
+                    lang.name,
+                    DOM.tag("span", null, lang.isMain ? "Основной язык" : `Прогресс ${lang.progress}%`)
+                ]),
+                lang.isMain ? iconStar : null
+            ])),
+            DOM.tag("button", {command: "add-language"}, [iconPlus, "Сменить"])
+        ]
+
+        rightToolbar.appendChild(DOM.tag("div", null, [
+            DOM.tag("button", { class: "bp-page-toolbar-button language", command: "show-menu", title: "Сменить язык страницы" }, [
+                DOM.tag("span", null, "en"), "50%"
+            ]),
+            DOM.tag("menu", { class: "bp-page-toolbar-menu language", title: "" }, languages),
+        ]));
+
+        return rightToolbar;
     }
 
     private __initTollbarLogic() {
