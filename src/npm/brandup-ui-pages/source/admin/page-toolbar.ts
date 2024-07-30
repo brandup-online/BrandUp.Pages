@@ -42,7 +42,7 @@ export class PageToolbar extends UIElement {
         this.__page = page;
         this.isContentPage = page instanceof ContentPage;
 
-        const editId = page.nav.query[EDITID_QUERY_KEY];
+        const editId = page.context.query.get(EDITID_QUERY_KEY);
         if (editId) {
             this.__editor = ContentEditor.create(page.website, editId);
 
@@ -52,9 +52,9 @@ export class PageToolbar extends UIElement {
                     if (this.__isDestroyed)
                         return;
 
-                    delete page.nav.query[EDITID_QUERY_KEY];
+                    page.context.query.delete(EDITID_QUERY_KEY);
 
-                    const editUrl = this.__page.website.buildUrl(page.nav.path, page.nav.query);
+                    const editUrl = this.__page.website.buildUrl(page.context.path, page.context.query);
                     if (!editContent || editContent.inPage)
                         this.__page.website.nav({ url: editUrl, replace: true });
                     else
@@ -214,7 +214,7 @@ export class PageToolbar extends UIElement {
                     return result;
                 })
                 .then(result => {
-                    const editUrl = this.__page.website.buildUrl(this.__page.nav.path, { editid: result.editId });
+                    const editUrl = this.__page.website.buildUrl(this.__page.context.path, { editid: result.editId });
 
                     const contentLocation = findContent(contentKey)
                     if (!contentLocation || contentLocation.inPage)
