@@ -12,7 +12,7 @@ WEBSITE.run({
         "BB1": { factory: () => import("./contents/BB1") }
     }
     }, (builder) => {
-            builder.useMiddleware(new LayoutMiddleware());
-            builder.useMiddleware(new PagesMiddleware());
+            builder.useMiddleware(() => new LayoutMiddleware());
+            builder.useMiddleware(() => new PagesMiddleware());
         }
     );

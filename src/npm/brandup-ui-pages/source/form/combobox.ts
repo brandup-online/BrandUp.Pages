@@ -36,10 +36,10 @@ export class ComboBoxField extends Field<string | null, ComboBoxFieldOptions> {
 
         let isFocused = false;
         let md = false;
-        this.addEventListener("focus", () => {
+        this.on("focus", () => {
             isFocused = true;
         });
-        this.addEventListener("blur", () => {
+        this.on("blur", () => {
             isFocused = false;
         });
 
