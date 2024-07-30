@@ -2,11 +2,12 @@ import { UIElement } from "@brandup/ui";
 import { FieldProvider, IFormField } from "../provider/base";
 import { DOM } from "@brandup/ui-dom";
 import { IFieldValueElement } from "../../typings/content";
+import LanguageIcon from "../../svg/new/language.svg";
 
 export abstract class FormField<TOptions> extends UIElement implements IFormField {
     readonly provider: FieldProvider<any, any>;
     protected __errorsElem: HTMLElement;
-    protected __valueElem: IFieldValueElement | null = null;
+    protected __valueElem?: IFieldValueElement;
     readonly options: TOptions;
     readonly caption: string;
 
@@ -26,7 +27,10 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
         if (!this.__valueElem.element) return;
 
         const container = DOM.tag("div", {class: "website-form-field"}, [
-            DOM.tag("label", null, this.caption),
+            DOM.tag("div", { class: "caption" }, [
+                DOM.tag("label", null, this.caption),
+                DOM.tag("a", { href: "", command: "localization" }, LanguageIcon)
+            ]),
             this.__valueElem.element,
             this.__errorsElem
         ])
@@ -39,6 +43,10 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
 
         this.raiseUpdateErrors(this.provider.errors);
         this._setValue(this.provider.getValue());
+
+        this.registerCommand("localization", () => {
+            this.provider.showLocalization();
+        })
     }
 
     raiseUpdateErrors(errors: Array<string>) {

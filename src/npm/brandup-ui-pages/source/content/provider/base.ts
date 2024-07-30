@@ -1,6 +1,7 @@
 import { AjaxRequest } from "@brandup/ui-ajax";
 import { Content } from "../../content/content";
 import { ContentFieldModel, FieldValueResult } from "../../typings/content";
+import { localizationContent } from "../../dialogs/content/localization";
 
 export abstract class FieldProvider<TValue, TOptions> {
     readonly content: Content;
@@ -13,8 +14,9 @@ export abstract class FieldProvider<TValue, TOptions> {
     private __value: TValue;
     private __errors: Array<string>;
     private __valueElem?: HTMLElement;
+    protected __isTranslatable: boolean = false;
 
-    designer: IFieldDesigner | null = null;
+    designer?: IFieldDesigner;
     field?: IFormField;
 
     get valueElem(): HTMLElement | undefined { return this.__valueElem; }
@@ -54,6 +56,12 @@ export abstract class FieldProvider<TValue, TOptions> {
         this.field = field;
     }
 
+    showLocalization() {
+        if (this.__isTranslatable) {
+            localizationContent(this);
+        }
+    }
+
     protected request(options: AjaxRequest) {
         if (!options.query)
             options.query = {};
@@ -67,7 +75,7 @@ export abstract class FieldProvider<TValue, TOptions> {
         return this.content.host.editor.api(options);
     }
 
-    abstract createDesigner(): IFieldDesigner | null;
+    abstract createDesigner(): IFieldDesigner | undefined;
 
     abstract saveValue(value: any): Promise<void>;
     

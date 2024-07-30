@@ -4,7 +4,7 @@ import { FieldValueResult } from "../../typings/content";
 
 export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperLinkFieldOptions> {
     createDesigner() {
-        return null;
+        return undefined;
     }
 
     async saveValue(value: HyperLinkValue) {

@@ -1,9 +1,15 @@
 import { AjaxResponse } from "@brandup/ui-ajax";
 import { TextDesigner } from "../designer/text";
 import { FieldProvider } from "./base";
-import { FieldValueResult } from "../../typings/content";
+import { ContentFieldModel, FieldValueResult } from "../../typings/content";
+import { Content } from "../../content/content";
 
-export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {
+export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {    
+    constructor(content: Content, model: ContentFieldModel) {
+        super(content, model);
+        this.__isTranslatable = true;
+    }
+
     createDesigner() {
         return new TextDesigner(this);
     }

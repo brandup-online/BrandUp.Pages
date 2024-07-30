@@ -10,4 +10,18 @@
             display: block;
         }
     }
+
+    & .caption {
+        display: flex;
+        justify-content: space-between;
+
+        & svg {
+            fill: @Neutral-Dark;
+
+            &:hover {
+                fill: @Neutral-Darkest;
+                cursor: pointer;
+            }
+        }
+    }
 }

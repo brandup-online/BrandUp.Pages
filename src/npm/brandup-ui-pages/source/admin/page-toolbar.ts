@@ -29,8 +29,8 @@ export interface ILangguage {
 }
 
 const languagesMock: ILangguage[] = [
-    { code:"en", name: "Английский", isMain: false, progress: 50 },
     { code:"ru", name: "Русский", isMain: true, progress: 100 },
+    { code:"en", name: "Английский", isMain: false, progress: 50 },
 ]
 
 export class PageToolbar extends UIElement {
@@ -55,7 +55,7 @@ export class PageToolbar extends UIElement {
         this.__page = page;
         this.isContentPage = page instanceof ContentPage;
 
-        const editId = page.nav.query[EDITID_QUERY_KEY];
+        const editId = page.context.query.get(EDITID_QUERY_KEY);
         if (editId) {
             this.__editor = ContentEditor.create(page.website, editId);
 
@@ -65,9 +65,9 @@ export class PageToolbar extends UIElement {
                     if (this.__isDestroyed)
                         return;
 
-                    delete page.nav.query[EDITID_QUERY_KEY];
+                    page.context.query.delete(EDITID_QUERY_KEY);
 
-                    const editUrl = this.__page.website.buildUrl(page.nav.path, page.nav.query);
+                    const editUrl = this.__page.website.buildUrl(page.context.path, page.context.query);
                     if (!editContent || editContent.inPage)
                         this.__page.website.nav({ url: editUrl, replace: true });
                     else
@@ -118,17 +118,20 @@ export class PageToolbar extends UIElement {
             
             const pageMenuItems = [DOM.tag("button", { command: "bp-seo" }, [iconSeo, DOM.tag("span", null, "Индексирование страницы")]) ];
 
-            leftToolbar.appendChild(DOM.tag("div", null, [
-                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, iconMore),
-                DOM.tag("menu", { class: "bp-page-toolbar-menu", title: "" }, pageMenuItems),
-            ]));
-
-            leftToolbar.appendChild(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button page-status " + contentPage.model.status.toLowerCase() }, [DOM.tag("span")])));
+            leftToolbar.appendChild(DOM.tag("div", null, DOM.tag("button", { 
+                class: "bp-page-toolbar-button page-status " + contentPage.model.status.toLowerCase(),
+                "data-caption": contentPage.model.status === "Published" ? "Опубликовано" : "Черновик",
+            }, [DOM.tag("span")])));
 
             if (contentPage.model.status !== "Published") {
                 leftToolbar.appendChild(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)));
                 pageMenuItems.push(DOM.tag("button", { command: "bp-publish" }, [iconPublish, DOM.tag("span", null, "Опубликовать страницу")]));
             }
+
+            leftToolbar.appendChild(DOM.tag("div", null, [
+                DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Действия над страницей" }, iconMore),
+                DOM.tag("menu", { class: "bp-page-toolbar-menu", title: "" }, pageMenuItems),
+            ]));
         }
 
         websiteMenu.append(websiteMenuItems);
@@ -155,7 +158,7 @@ export class PageToolbar extends UIElement {
         }
 
         const languages = [
-            ...languagesMock.map(lang => DOM.tag("button", {command: "set-language"},[
+            ...languagesMock.map(lang => DOM.tag("button", {command: "set-language", class: lang.code === "en" ? "current" : undefined}, [ //TODO Привсваивать класс current выбранному языку
                 DOM.tag("div", { class: "code" }, lang.code),
                 DOM.tag("div", { class: "description" }, [
                     lang.name,
@@ -163,12 +166,15 @@ export class PageToolbar extends UIElement {
                 ]),
                 lang.isMain ? iconStar : null
             ])),
-            DOM.tag("button", {command: "add-language"}, [iconPlus, "Сменить"])
         ]
 
         rightToolbar.appendChild(DOM.tag("div", null, [
-            DOM.tag("button", { class: "bp-page-toolbar-button language", command: "show-menu", title: "Сменить язык страницы" }, [
-                DOM.tag("span", null, "en"), "50%"
+            DOM.tag("button", { class: "bp-page-toolbar-button language",
+                command: "show-menu",
+                title: "Сменить язык страницы",
+                dataset: { caption: "50%" }
+            }, [
+                DOM.tag("span", null, "en")
             ]),
             DOM.tag("menu", { class: "bp-page-toolbar-menu language", title: "" }, languages),
         ]));
@@ -259,7 +265,7 @@ export class PageToolbar extends UIElement {
                     return result;
                 })
                 .then(result => {
-                    const editUrl = this.__page.website.buildUrl(this.__page.nav.path, { editid: result.editId });
+                    const editUrl = this.__page.website.buildUrl(this.__page.context.path, { editid: result.editId });
 
                     const contentLocation = findContent(contentKey)
                     if (!contentLocation || contentLocation.inPage)

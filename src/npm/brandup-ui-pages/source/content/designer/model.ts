@@ -110,7 +110,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
     }
 
     protected getItem(index: number): Element {
-        let itemElem: Element | null = null;
+        let itemElem: Element | undefined;
 
         if (!this.element) throw new Error("element not defined");
 

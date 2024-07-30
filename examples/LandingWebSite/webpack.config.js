@@ -37,7 +37,12 @@ module.exports = (env) => {
         entry: {
             app: path.resolve(__dirname, '_client', 'index.ts')
         },
-        resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx', '.less'] },
+        resolve: {
+            extensions: ['.js', '.jsx', '.ts', '.tsx', '.less'],
+            alias: {
+                "@brandup/ui": path.resolve(__dirname, 'node_modules/@brandup/ui')
+            }
+        },
         output: {
             path: path.join(__dirname, bundleOutputDir),
             filename: '[name].js',

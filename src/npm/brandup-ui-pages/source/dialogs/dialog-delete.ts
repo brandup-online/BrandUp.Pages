@@ -6,7 +6,7 @@ import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     private __errorsElem?: HTMLElement;
-    private __item: TItem | null = null;
+    private __item?: TItem | null;
     private __abortController?: AbortController;
 
     protected async _onRenderContent() {

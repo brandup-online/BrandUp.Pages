@@ -5,24 +5,24 @@ import iconClose from "../svg/dialog-close.svg";
 import "./dialog.less";
 
 const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
-let currentDialog: Dialog<any> | null = null;
+let currentDialog: Dialog<any> | null;
 document.body.appendChild(dialogsPanelElem);
 
 export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
-    protected headerElem: HTMLElement | null = null;
-    protected headerTitleElem: HTMLElement | null = null;
-    protected footerElem: HTMLElement | null = null;
-    protected footerNotesElem: HTMLElement | null = null;
-    protected contentElem: HTMLElement | null = null;
-    private __errorElem: HTMLElement | null = null;
-    private __parentDialog: Dialog<any> | null = null;
-    private __childDialog: Dialog<any> | null = null;
+    protected headerElem?: HTMLElement | null;
+    protected headerTitleElem?: HTMLElement | null;
+    protected footerElem?: HTMLElement | null;
+    protected footerNotesElem?: HTMLElement | null;
+    protected contentElem?: HTMLElement | null;
+    private __errorElem?: HTMLElement | null;
+    private __parentDialog?: Dialog<any> | null;
+    private __childDialog?: Dialog<any> | null;
 
     constructor(options?: DialogOptions) {
         super(options);
     }
 
-    get content(): HTMLElement | null {
+    get content(): HTMLElement | null | undefined {
         return this.contentElem;
     }
 
