@@ -10,6 +10,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
     private __abortController?: AbortController;
 
     protected async _onRenderContent() {
+        super._onRenderContent();
         this.element?.classList.add("bp-dialog-delete");
 
         this.addAction("close", "Отмена");
@@ -19,8 +20,8 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
             this.__delete();
         });
 
-        this.content?.appendChild(DOM.tag("div", { class: "confirm-text" }, this._getText()));
-        this.content?.appendChild(this.__errorsElem = DOM.tag("div", { class: "errors" }));
+        this.content!.appendChild(DOM.tag("div", { class: "confirm-text" }, this._getText()));
+        this.content!.appendChild(this.__errorsElem = DOM.tag("div", { class: "errors" }));
 
         const urlParams: { [key: string]: string } = {};
 
@@ -58,11 +59,15 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
 
         this._buildUrlParams(urlParams);
 
+        if (this.__abortController)
+            this.__abortController.abort();
+        this.__abortController = new AbortController();
+
         const response: AjaxResponse = await request({
             url: this._buildUrl(),
             query: urlParams,
             method: "DELETE",
-        }, this.__abortController?.signal);
+        }, this.__abortController.signal);
 
         this.setLoading(false);
 

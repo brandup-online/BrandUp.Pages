@@ -15,13 +15,40 @@
         display: flex;
         justify-content: space-between;
 
-        & svg {
-            fill: @Neutral-Dark;
+        & a {
+            text-decoration: underline;
+            display: flex;
+            text-transform: uppercase;
+            align-items: center;
 
-            &:hover {
-                fill: @Neutral-Darkest;
-                cursor: pointer;
+            &.translated {
+                color: @Accent-Darkest;
+
+                & svg {
+                    fill: @Accent-Darkest;
+                }
+
+                &:hover {
+                    color: @Accent-Medium;
+
+                    & svg {
+                        fill: @Accent-Medium;
+                    }
+                }
             }
+    
+            &.untranslatable {
+                cursor: default;
+                pointer-events: none;
+                color: @Neutral-Medium;
+    
+                & svg {
+                    fill: @Neutral-Medium;
+                }
+            }
+
         }
+
+
     }
 }

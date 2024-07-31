@@ -35,9 +35,9 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
             this.__isChanged = true;
 
             e.preventDefault();
-
-            const text = e.clipboardData?.getData("text/plain");
-            if (!text) throw new Error("paste event error");
+            
+            if (!e.clipboardData || !e.clipboardData.getData("text/plain")) throw new Error("paste event error");
+            const text = e.clipboardData.getData("text/plain");
             document.execCommand("insertText", false, this.normalizeValue(text));
         });
         this.element?.addEventListener("cut", () => {

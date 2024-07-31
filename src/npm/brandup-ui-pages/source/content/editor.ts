@@ -62,13 +62,13 @@ export class ContentEditor extends UIElement implements IContentHost {
         return editor;
     }
 
-    edit(container?: HTMLElement) {
+    edit(container: HTMLElement) {
         if (document.body.classList.contains("bp-state-design"))
             throw new Error("Content editor already started.");
         document.body.classList.add("bp-state-design");
         
         this.__contentElem = container;
-        this.__contentElem?.classList.add("root-designer");
+        this.__contentElem.classList.add("root-designer");
 
         return this.loadContent("")
             .then(() => {
@@ -258,7 +258,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         DOM.queryElements(this.__contentElem, "[data-content-field-path][data-content-field-name]").forEach(elem => {
             const contentPath = elem.dataset.contentFieldPath;
             const fieldName = elem.dataset.contentFieldName;
-            contentElements.get(contentPath!)?.fields.set(fieldName!, elem);
+            contentElements.get(contentPath!)!.fields.set(fieldName!, elem);
         });
 
         Array.from(contentElements.values()).forEach(contentStructure => {

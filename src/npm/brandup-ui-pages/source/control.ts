@@ -57,8 +57,8 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
         }
 
         const htmlTemplate = this._getHtmlTemplate();
-        if (htmlTemplate)
-            this.element?.insertAdjacentHTML(position, htmlTemplate);
+        if (htmlTemplate && this.element)
+            this.element.insertAdjacentHTML(position, htmlTemplate);
 
         if (this.__fragment) {
             (container as HTMLElement).appendChild(this.__fragment);

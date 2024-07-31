@@ -82,7 +82,9 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
         this.registerCommand("upload-file", () => {
             elem.classList.remove("opened-menu");
             document.body.removeEventListener("click", this.__closeFunc, false);
-            this.__fileInputElem?.click();
+
+            if (!this.__fileInputElem) throw new Error("File uploading error");
+            this.__fileInputElem.click();
         });
 
         let dragleaveTime = 0;
@@ -101,13 +103,12 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
 
             elem.classList.remove("draging");
 
-            const file = e.dataTransfer?.files.item(0);
+            if (!e.dataTransfer) return false;
+            const file = e.dataTransfer.files.item(0);
             if (!file?.type)
                 return false;
 
             this.__uploadFile(file);
-
-            if (!e.dataTransfer) return false;
 
             if (e.dataTransfer.items)
                 e.dataTransfer.items.clear();

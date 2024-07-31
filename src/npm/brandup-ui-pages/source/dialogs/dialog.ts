@@ -68,7 +68,9 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this._onRenderContent();
     }
 
-    protected abstract _onRenderContent(): void;
+    protected _onRenderContent(): void {
+        if (!this.content) throw new Error("dialog content element is not defined");
+    };
     protected _onClose() {
         this.destroy();
     }

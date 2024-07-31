@@ -27,12 +27,13 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     }
 
     protected _onRenderContent() {
+        super._onRenderContent();
         this.element?.classList.add("bp-dialog-list");
 
-        this.content?.appendChild(this.__itemsElem);
+        this.content!.appendChild(this.__itemsElem);
 
         this.registerCommand("item-open-menu", (context: CommandContext) => {
-            context.target.parentElement?.parentElement?.classList.add("opened-menu");
+            context.target.closest(".item")?.classList.add("opened-menu");
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
@@ -68,8 +69,10 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         });
         this.__itemsElem.addEventListener("drop", async (e: DragEvent) => {
             const target = e.target as Element;
-            const sourceId = e.dataTransfer?.getData("data-id");
-            const sourceIndex = parseInt(e.dataTransfer?.getData("data-index") || "-1");
+            if (!e.dataTransfer) throw new Error();
+
+            const sourceId = e.dataTransfer.getData("data-id");
+            const sourceIndex = parseInt(e.dataTransfer.getData("data-index") || "-1");
             const elem = target.closest("[data-index]");
             if (elem && sourceId && sourceIndex >= 0) {
                 const destId = elem.getAttribute("data-id");

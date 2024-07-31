@@ -32,6 +32,7 @@ export class PageEditDialog extends Dialog<any> {
     get modelPath(): string { return this.__modelPath; }
 
     protected _onRenderContent() {
+        super._onRenderContent();
         this.element?.classList.add("bp-dialog-form");
 
         this.__formElem.appendChild(this.__fieldsElem);

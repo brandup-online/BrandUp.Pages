@@ -33,9 +33,10 @@ export class ErrorDialog extends Dialog {
     }
 
     protected _onRenderContent() {
+        super._onRenderContent();
         this.setHeader("Ошибка");
 
-        this.content?.appendChild(this.__listElem);
+        this.content!.appendChild(this.__listElem);
         this.__refreshErrors();
     }
 

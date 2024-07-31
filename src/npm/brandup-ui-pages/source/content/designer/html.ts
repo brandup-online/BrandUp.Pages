@@ -6,6 +6,7 @@ import { HtmlFieldProvider } from "../../content/provider/html";
 export class HtmlDesigner extends FieldDesigner<HtmlFieldProvider> {
     private __isChanged: boolean = false;
     private __editor?: ContentEditor;
+    private __editorPromise?: Promise<any>;
 
     get typeName(): string { return "BrandUpPages.HtmlDesigner"; }
 
@@ -14,15 +15,15 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldProvider> {
         if (this.provider.options.placeholder)
             elem.setAttribute("data-placeholder", this.provider.options.placeholder);
 
-        ContentEditor.create(elem, { placeholder: this.provider.options.placeholder })
-            .then(editor => {
-                this.__editor = editor;
+        this.__editorPromise = ContentEditor.create(elem, { placeholder: this.provider.options.placeholder });
+        this.__editorPromise.then(editor => {
+            this.__editor = editor;
 
-                editor.model.document.on('change', () => {
-                    if (editor.model.document.differ.hasDataChanges())
-                        this.__isChanged = true;
-                });
+            editor.model.document.on('change', () => {
+                if (editor.model.document.differ.hasDataChanges())
+                    this.__isChanged = true;
             });
+        });
 
         this.element?.addEventListener("focus", () => {
             this.__isChanged = false;
@@ -40,6 +41,11 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldProvider> {
     destroy() {
         this.element?.classList.remove("html-designer");
         this.element?.removeAttribute("data-placeholder");
-        this.__editor?.destroy().then(() => super.destroy());
+
+        if (this.__editor)
+            this.__editor.destroy().then(() => super.destroy());
+        else this.__editorPromise?.then(editor => {
+            editor.destroy().then(() => super.destroy());
+        })
     }
 }

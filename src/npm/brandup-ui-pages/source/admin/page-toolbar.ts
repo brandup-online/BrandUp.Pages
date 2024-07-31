@@ -60,7 +60,7 @@ export class PageToolbar extends UIElement {
             this.__editor = ContentEditor.create(page.website, editId);
 
             const editContent = findEditContent(editId);
-            this.__editor.edit(editContent?.container)
+            this.__editor.edit(editContent.container)
                 .then(() => {
                     if (this.__isDestroyed)
                         return;

@@ -26,7 +26,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.Hyperlink"; }
 
-    constructor(options: HyperLinkFieldFormOptions | null) {
+    constructor(options: HyperLinkFieldFormOptions) {
         super();
 
         this.__type = options?.valueType || "Page";

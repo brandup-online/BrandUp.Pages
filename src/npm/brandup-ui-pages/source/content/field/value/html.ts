@@ -26,8 +26,9 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
         });
 
         valueElem.addEventListener("blur", () => {
+            if (!this.__editor) throw new Error("the html editor has not loaded yet")
             if (this.__isChanged) {
-                this.__editor?.model.document.differ.reset();
+                this.__editor.model.document.differ.reset();
                 const value = this.getValue();
                 this.__onChange(value);
             }
@@ -69,13 +70,15 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     hasValue(): boolean {
-        const value = this.normalizeValue(this.element?.innerText || "");
+        if (!this.element) throw new Error("html field value element is not defined");
+        if (!this.__editor) throw new Error("the html editor has not loaded yet")
+        const value = this.normalizeValue(this.element.innerText);
         if (!value)
             return false;
-        const root = this.__editor?.model.document.getRoot();
+        const root = this.__editor.model.document.getRoot();
         if (!root) return false;
 
-        const val = this.__editor?.model.hasContent(root, { ignoreWhitespaces: true });
+        const val = this.__editor.model.hasContent(root, { ignoreWhitespaces: true });
         return value && val ? true : false;
     }
 
@@ -91,8 +94,9 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     getValue(): string {
-        const data = this.__editor?.data.get();
-        if (data === undefined) throw new Error("getValue error: data is undefined");
+        if (!this.__editor) throw new Error("the html editor has not loaded yet")
+        const data = this.__editor.data.get();
+        if (data === undefined) throw new Error("the html editor has not loaded yet")
         return data;
     }
 
@@ -101,10 +105,15 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     destroy() {
-        this.__editor?.destroy().then(() => {
-            super.destroy();
-        });
-
+        if (this.__editor)
+            this.__editor.destroy().then(() => {
+                super.destroy();
+            });
+        else this.__editorPromise.then(editor => {
+            editor.destroy().then(() => {
+                super.destroy();
+            });
+        })
         super.destroy();
     }
 }

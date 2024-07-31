@@ -2,7 +2,6 @@ import { AjaxQueue } from "@brandup/ui-ajax";
 import { FieldProvider } from "../../content/provider/base";
 import { Dialog, DialogOptions } from "../dialog";
 import { DOM } from "@brandup/ui-dom";
-import { Toggler } from "./components/toggler";
 import { Breadcrumbs } from "./components/breadcrumbs";
 import { editPage } from "./edit";
 import { FormField } from "../../content/field/base";
@@ -33,9 +32,9 @@ export class LocalizationDialog extends Dialog {
     }
 
     protected _onRenderContent() {
+        super._onRenderContent();
         this.element?.classList.add("bp-dialog-form", "localization");
         this.setHeader("Локализация контента");
-        if (!this.content) throw new Error("dialog content is not defined");
 
         const fragment = document.createDocumentFragment();
 
@@ -51,7 +50,7 @@ export class LocalizationDialog extends Dialog {
         this.__renderFields();
         fragment.appendChild(this.__formElem);
 
-        this.content.appendChild(fragment);
+        this.content!.appendChild(fragment);
     }
 
     private async __renderFields() {

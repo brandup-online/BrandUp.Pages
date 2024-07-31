@@ -27,9 +27,10 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
     get model(): TForm | undefined { return this.__model; }
 
     protected _onRenderContent() {
+        super._onRenderContent();
         this.element?.classList.add("bp-dialog-form");
 
-        this.content?.appendChild(this.__formElem);
+        this.content!.appendChild(this.__formElem);
         this.__formElem.appendChild(this.__fieldsElem);
 
         this.__formElem.addEventListener("submit", (e: Event) => {

@@ -16,13 +16,14 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
     get typeName(): string { return "BrandUpPages.SelectItemTypeDialog"; }
 
     protected _onRenderContent() {
-        this.element?.classList.add("bp-dialog-select-content-type");
+        super._onRenderContent();
+        this.element!.classList.add("bp-dialog-select-content-type");
 
         this.setHeader("Выберите тип контента");
 
         this.__types.map((type, index) => {
             const itemElem = DOM.tag("a", { class: "item", href: "", "data-command": "select", "data-index": index }, type.title);
-            this.content?.appendChild(itemElem);
+            this.content!.appendChild(itemElem);
         });
 
         this.registerCommand("select", (context: CommandContext) => {

@@ -30,7 +30,7 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
         const container = DOM.tag("div", {class: "website-form-field"}, [
             DOM.tag("div", { class: "caption" }, [
                 DOM.tag("label", null, this.caption),
-                DOM.tag("a", { href: "", command: "localization" }, LanguageIcon)
+                DOM.tag("a", { href: "", command: "localization", class: this.provider.isTranslatable ? "translated" : "untranslatable" }, [LanguageIcon, "en"])
             ]),
             this.__valueElem.element,
             this.__errorsElem
@@ -75,11 +75,13 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
     }
 
     protected _setValue(value: any) {
-        this.__valueElem?.setValue(value);
+        if (!this.__valueElem) throw new Error(`value element for ${this} is not defined`);
+        this.__valueElem.setValue(value);
     }
 
     getValue() {
-        return this.__valueElem?.getValue();
+        if (!this.__valueElem) throw new Error(`value element for ${this} is not defined`);
+        return this.__valueElem.getValue();
     };
 
     protected _onChanged() {
@@ -89,8 +91,7 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
 
     destroy(): void {
         this.__valueElem?.destroy();
-        
-        this.element?.remove();
+
         super.destroy();
     }
 }

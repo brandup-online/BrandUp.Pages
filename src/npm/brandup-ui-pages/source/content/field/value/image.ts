@@ -79,11 +79,13 @@ export class ImageValue extends UIElement implements IFieldValueElement {
         this.element?.addEventListener("paste", (e: ClipboardEvent) => {
             e.preventDefault();
 
-            if (e.clipboardData?.files.length || -1 > 0) {
+            if (!e.clipboardData) throw new Error();
+
+            if (e.clipboardData.files.length || -1 > 0) {
                 this.__onChange(e.clipboardData!.files.item(0)!);
             }
-            else if (e.clipboardData?.types.indexOf("text/plain") || -1 >= 0) {
-                const url = e.clipboardData?.getData("text");
+            else if (e.clipboardData.types.indexOf("text/plain") || -1 >= 0) {
+                const url = e.clipboardData.getData("text");
                 if (url && url.toLocaleLowerCase().startsWith("http"))
                     this.__onChange(url);
             }

@@ -27,7 +27,9 @@ export class TextDesigner extends FieldDesigner<TextFieldProvider> {
 
         this.__onBlur = () => {
             if (this.__isChanged) {
-                this.provider.saveValue(this.element?.innerText || "");
+                if (!this.element) throw new Error("Text designer element is undefined");
+
+                this.provider.saveValue(this.element.innerText);
                 this.__refreshUI();
             }
         };
@@ -38,11 +40,13 @@ export class TextDesigner extends FieldDesigner<TextFieldProvider> {
         };
 
         this.__onPaste = (e: ClipboardEvent) => {
+            if (!e.clipboardData) return;
+            
             this.__isChanged = true;
 
             e.preventDefault();
 
-            const text = e.clipboardData?.getData("text/plain") || "";
+            const text = e.clipboardData.getData("text/plain");
             document.execCommand("insertText", false, this.provider.normalizeValue(text));
         };
 

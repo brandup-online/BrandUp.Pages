@@ -109,6 +109,8 @@ export class PageValue extends UIElement implements IFieldValueElement {
             if (this.__abortController) 
                 this.__abortController.abort();
 
+            this.__abortController = new AbortController();
+
             this.__searchTimeout = window.setTimeout(() => {
                 request({
                     url: `/brandup.pages/collection/search`,
@@ -117,7 +119,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
                         title: title
                     },
                     method: "GET",
-                }, this.__abortController?.signal)
+                }, this.__abortController!.signal)
                 .then((response: AjaxResponse<Array<PageCollectionModel>>) => {
                     switch (response.status) {
                         case 200:
