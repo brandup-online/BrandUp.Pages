@@ -1,0 +1,19 @@
+.form-field_value.text {
+    border-bottom: solid 1px #eee;
+    outline: none;
+    font-weight: 500;
+    padding: 7px 0 5px;
+    box-sizing: border-box;
+
+    &:focus {
+        border-bottom-color: #ddd;
+
+        & ~ .placeholder {
+            display: none;
+        }
+    }
+
+    &:hover{
+        border-bottom-color: #ddd;
+    }
+}

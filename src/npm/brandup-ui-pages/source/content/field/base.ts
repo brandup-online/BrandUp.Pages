@@ -3,6 +3,7 @@ import { FieldProvider, IFormField } from "../provider/base";
 import { DOM } from "@brandup/ui-dom";
 import { IFieldValueElement } from "../../typings/content";
 import LanguageIcon from "../../svg/new/language.svg";
+import defs from "../../content/defs";
 
 export abstract class FormField<TOptions> extends UIElement implements IFormField {
     readonly provider: FieldProvider<any, any>;
@@ -22,7 +23,7 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
     }
 
     render(ownElem: HTMLElement) {
-        this.__valueElem = this._renderValueElem();
+        this.__valueElem = this.renderValueElem();
 
         if (!this.__valueElem.element) return;
 
@@ -65,7 +66,13 @@ export abstract class FormField<TOptions> extends UIElement implements IFormFiel
         this._setValue(value);
     };
 
-    protected abstract _renderValueElem(): IFieldValueElement;
+    abstract renderValueElem(): IFieldValueElement;
+
+    static async getValueElem(provider: FieldProvider<any, any>): Promise<IFieldValueElement> {
+        const fildType = await defs.resolveFormField(provider.type.toLowerCase())
+        const field: FormField<any> = new fildType.default(provider.title, provider.options, provider);
+        return field.renderValueElem();
+    }
 
     protected _setValue(value: any) {
         this.__valueElem?.setValue(value);

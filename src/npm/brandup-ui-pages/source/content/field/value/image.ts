@@ -13,7 +13,7 @@ export class ImageValue extends UIElement implements IFieldValueElement {
     constructor(options: ImageFieldOptions) {
         super();
         
-        const valueElem = DOM.tag("div", { class: "value image", "tabindex": 0 }, [
+        const valueElem = DOM.tag("div", { class: "form-field_value image", "tabindex": 0 }, [
             DOM.tag("span", null, "Выберите или перетащите суда файл с изображением"),
             DOM.tag("button", { "data-command": "select-file" }, [
                 "Выбрать файл"

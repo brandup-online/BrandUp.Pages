@@ -14,7 +14,7 @@ export abstract class FieldProvider<TValue, TOptions> {
     private __value: TValue;
     private __errors: Array<string>;
     private __valueElem?: HTMLElement;
-    protected __isTranslatable: boolean = false;
+    readonly isTranslatable: boolean = false;
 
     designer?: IFieldDesigner;
     field?: IFormField;
@@ -57,7 +57,7 @@ export abstract class FieldProvider<TValue, TOptions> {
     }
 
     showLocalization() {
-        if (this.__isTranslatable) {
+        if (this.isTranslatable) {
             localizationContent(this);
         }
     }

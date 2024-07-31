@@ -27,7 +27,7 @@ export class PageValue extends UIElement implements IFieldValueElement {
 
         this.options = options;
         
-        const valueElem = DOM.tag("div", {class: "value pages"}, [
+        const valueElem = DOM.tag("div", {class: "form-field_value pages"}, [
             this.__inputElem = DOM.tag("input", { type: "text" }) as HTMLInputElement,
             this.__pagesValueElem = DOM.tag("div", { class: "pages-value", "data-command": "begin-input" }),
             DOM.tag("div", { class: "placeholder", "data-command": "begin-input" }, options.placeholder),

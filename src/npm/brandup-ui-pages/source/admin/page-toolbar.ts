@@ -160,11 +160,10 @@ export class PageToolbar extends UIElement {
         const languages = [
             ...languagesMock.map(lang => DOM.tag("button", {command: "set-language", class: lang.code === "en" ? "current" : undefined}, [ //TODO Привсваивать класс current выбранному языку
                 DOM.tag("div", { class: "code" }, lang.code),
-                DOM.tag("div", { class: "description" }, [
-                    lang.name,
-                    DOM.tag("span", null, lang.isMain ? "Основной язык" : `Прогресс ${lang.progress}%`)
+                DOM.tag("div", { class: "value" }, [
+                    lang.name, lang.isMain ? iconStar : null
                 ]),
-                lang.isMain ? iconStar : null
+                lang.progress + "%"
             ])),
         ]
 

@@ -4,26 +4,6 @@
     position: relative;
     line-height: 20px;
 
-    &:hover .value {
-        border-bottom-color: #ddd;
-    }
-
-    & .value {
-        border-bottom: solid 1px #eee;
-        outline: none;
-        font-weight: 500;
-        padding: 7px 0 5px;
-        box-sizing: border-box;
-
-        &:focus {
-            border-bottom-color: #ddd;
-
-            & ~ .placeholder {
-                display: none;
-            }
-        }
-    }
-
     & .placeholder {
         position: absolute;
         left: 0;
@@ -43,7 +23,7 @@
     }
 
     &.has-errors {
-        & .value {
+        & .form-field_value {
             border-bottom-color:@Error-Darkest;
         }
     }

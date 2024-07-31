@@ -6,6 +6,7 @@ import { IFieldValueElement } from "../../../typings/content";
 import { request, AjaxResponse } from "@brandup/ui-ajax";
 import { PageModel } from "../../../typings/page";
 import { HyperLinkValue } from "../../../content/provider/hyperlink";
+import "./styles/hyperlink.less"
 
 export class HyperlinkValue extends UIElement implements IFieldValueElement {
     private __typeElem?: HTMLElement;
@@ -25,10 +26,10 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
 
     get typeName(): string { return "BrandUpPages.Form.Field.Value.Hyperlink"; }
 
-    constructor(options: HyperLinkFieldFormOptions) {
+    constructor(options: HyperLinkFieldFormOptions | null) {
         super();
 
-        this.__type = options.valueType;
+        this.__type = options?.valueType || "Page";
 
         this.__inputElem = DOM.tag("div", { class: "input-value", "data-command": "begin-input" });
         this.__placeholderElem = DOM.tag("div", { class: "placeholder", "data-command": "begin-input" });
@@ -68,7 +69,7 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
             this.__inputElem.innerText = this.__urlValueInput!.value;
         });
         
-        const valueElem = DOM.tag("div", { class: "value hyperlink" });
+        const valueElem = DOM.tag("div", { class: "form-field_value hyperlink" });
         valueElem.appendChild(DOM.tag("div", { class: "value-type", "data-command": "open-types-menu" }, [
             this.__typeElem,
             iconArrow

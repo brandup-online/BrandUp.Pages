@@ -10,7 +10,7 @@ export default class PagesContent extends FormField<PagesFieldFormOptions> {
         this.element?.classList.add("pages");
     }
 
-    protected _renderValueElem() {
+    renderValueElem() {
         return new PageValue(this.options);
     }
 }

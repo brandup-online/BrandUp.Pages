@@ -11,7 +11,7 @@ export class Textbox extends Field<string, TextboxOptions> {
     constructor(name: string, errors: string[], options: TextboxOptions) {
         super(name, errors, options);
 
-        this.__valueElem = DOM.tag("div", { class: "value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
+        this.__valueElem = DOM.tag("div", { class: "form-field_value", "tabindex": 0, contenteditable: true }) as HTMLInputElement;
     }
 
     protected _onRender() {

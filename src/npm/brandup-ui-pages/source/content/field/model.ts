@@ -17,7 +17,7 @@ export default class ModelField extends FormField<ModelFieldOptions> {
         this.__valueElem.onChange((sourceIndex: number, destIndex: number) => this.provider.moveItem(sourceIndex, destIndex));
     }
 
-    protected _renderValueElem() {
+    renderValueElem() {
         if (this.options.isListValue) {
             return this.__renderListValue();
         }

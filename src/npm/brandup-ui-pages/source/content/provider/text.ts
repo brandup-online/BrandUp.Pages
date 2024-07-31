@@ -4,11 +4,8 @@ import { FieldProvider } from "./base";
 import { ContentFieldModel, FieldValueResult } from "../../typings/content";
 import { Content } from "../../content/content";
 
-export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {    
-    constructor(content: Content, model: ContentFieldModel) {
-        super(content, model);
-        this.__isTranslatable = true;
-    }
+export class TextFieldProvider extends FieldProvider<string, TextFieldOptions> {  
+    readonly isTranslatable: boolean = true;
 
     createDesigner() {
         return new TextDesigner(this);

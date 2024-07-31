@@ -5,7 +5,7 @@ import { HTMLValue } from "./value/html";
 export default class HtmlContent extends FormField<HtmlFieldFormOptions> {
     get typeName(): string { return "BrandUpPages.Form.Field.Html"; }
 
-    protected _renderValueElem() {
+    renderValueElem() {
         return new HTMLValue(this.options);
     }
 

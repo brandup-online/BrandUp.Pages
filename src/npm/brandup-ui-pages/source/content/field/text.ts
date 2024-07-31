@@ -9,7 +9,7 @@ export default class TextContent extends FormField<TextboxOptions> {
         this.element?.classList.add("text");
     }
 
-    protected _renderValueElem() {
+    renderValueElem() {
         return new TextBoxValue(this.options);
     }
 }

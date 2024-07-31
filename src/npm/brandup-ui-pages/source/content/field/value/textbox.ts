@@ -2,6 +2,7 @@ import { UIElement } from "@brandup/ui";
 import { DOM } from "@brandup/ui-dom";
 import { TextboxOptions } from "../../../form/textbox";
 import { IFieldValueElement } from "../../../typings/content";
+import "./styles/text.less"
 
 export class TextBoxValue extends UIElement implements IFieldValueElement {
     private __isChanged: boolean = false;
@@ -17,7 +18,7 @@ export class TextBoxValue extends UIElement implements IFieldValueElement {
         this.options = options;
         
         let placeholderElem;
-        const valueElem = DOM.tag("div", { class: "value text", "tabindex": 0, contenteditable: true },
+        const valueElem = DOM.tag("div", { class: "form-field_value text", "tabindex": 0, contenteditable: true },
             placeholderElem = DOM.tag("div", { class: "placeholder" }, options.placeholder)
         );
         placeholderElem.addEventListener("click", () => {

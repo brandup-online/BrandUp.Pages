@@ -6,14 +6,17 @@ import defs from "../../content/defs"
 import { FieldProvider, IFormField } from "../../content/provider/base";
 import { FormField } from "../../content/field/base";
 import { CommandContext } from "@brandup/ui";
+import { Toggler } from "./components/toggler";
+import { Breadcrumbs } from "./components/breadcrumbs";
 
 export class PageEditDialog extends Dialog<any> {
     private __formElem: HTMLFormElement;
-    private navElem?: HTMLElement;
     private __fieldsElem: HTMLElement;
     private __fields: { [key: string]: IFormField } = {};
     private __modelPath: string;
     private __content: Content;
+    private __toggler?: Toggler;
+    private __breadcrumbs?: Breadcrumbs;
 
     constructor(content: Content, modelPath?: string, options?: DialogOptions) {
         super(options);
@@ -31,7 +34,6 @@ export class PageEditDialog extends Dialog<any> {
     protected _onRenderContent() {
         this.element?.classList.add("bp-dialog-form");
 
-        this.content?.appendChild(this.__formElem);
         this.__formElem.appendChild(this.__fieldsElem);
 
         this.__formElem.addEventListener("submit", (e: Event) => {
@@ -39,44 +41,44 @@ export class PageEditDialog extends Dialog<any> {
             return false;
         });
 
-        this.setHeader("Контент страницы");
-
-        this.__renderForm();
-
         this.registerCommand("navigate", (context: CommandContext) => {
             const path = context.target.getAttribute("data-path");
             if (path === null || path === undefined) throw new Error("not found attribute data-path");
 
             this.navigate(path);
         });
+
+        this.setHeader("Контент страницы");
+
+        this.__renderForm();
     }
 
     private __renderForm() {
-        if (!this.navElem) {
-            this.navElem = DOM.tag("ol", { class: "nav" });
-            this.content?.insertAdjacentElement("afterbegin", this.navElem);
-        }
-        else {
-            DOM.empty(this.navElem);
-        }
+        if (!this.content) throw new Error("dialog content is not defined");
 
         // Breadcrumbs
-        let path = this.__content.path;
-        while (path || path === "") {
-           const content = this.__content.host.editor.navigate(path);
-           let title = content.typeTitle;
-           this.navElem.insertAdjacentElement("afterbegin", DOM.tag("li", path === this.__modelPath ? { class: "current" } : null, [
-               DOM.tag("a", { href: "", "data-command": "navigate", "data-path": path }, [
-                   DOM.tag("b", null, path || "root"),
-                   DOM.tag("div", null, [
-                       DOM.tag("span", null, title),
-                       DOM.tag("span", null, content.typeName),
-                   ]),
-               ]),
-           ]));
-
-           path = content.parentPath;
+        if (!this.__breadcrumbs) {
+            this.__breadcrumbs = new Breadcrumbs(this.__content.host.editor);
+            this.__breadcrumbs.on("navigate", (path) => this.navigate(path));
         }
+        if (!this.__breadcrumbs.element) throw new Error("Breadcrumbs render error");
+        this.__breadcrumbs.render(this.__content.path, this.__modelPath);
+        this.content.insertAdjacentElement("afterbegin", this.__breadcrumbs.element);
+
+        // Toggler
+        if (!this.__toggler) {
+            this.__toggler = new Toggler({
+                items: [{ value: "ru", content: ["RU", DOM.tag("span", null, "100%")] }, { value: "en", content: ["EN", DOM.tag("span", null, "50%")] }],
+                defaultValue: "en",
+            })
+            if (!this.__toggler.element) throw new Error("toggler creating error");
+            this.__toggler.on("change", (val: string) => {
+                // TODO переключение языка
+            })
+            this.content.appendChild(this.__toggler.element);
+        }
+
+        this.content.appendChild(this.__formElem);
         
         // Fields
         const fieldsArr: FieldProvider<any, any>[] = [];
@@ -103,7 +105,7 @@ export class PageEditDialog extends Dialog<any> {
             
             this.__fieldsElem.appendChild(containerElem);
             this.__fields[provider.name.toLowerCase()] = field;
-        }).catch((e) => console.log(e));
+        }).catch((e) => console.error(e));
     }
 
     navigate(modelPath: string) {
@@ -133,6 +135,7 @@ export class PageEditDialog extends Dialog<any> {
     }
 
     destroy() {
+        this.__toggler?.destroy();
         this.destroyFields();
         super.destroy();
     }

@@ -15,7 +15,7 @@ export class ComboBoxField extends Field<string | null, ComboBoxFieldOptions> {
     constructor(name: string, errors: string[], options: ComboBoxFieldOptions) {
         super(name, errors, options);
 
-        this.__valueElem = DOM.tag("div", { class: "value" }) as HTMLInputElement;
+        this.__valueElem = DOM.tag("div", { class: "form-field_value" }) as HTMLInputElement;
         this.__itemsElem = DOM.tag("ul");
     }
 

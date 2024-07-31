@@ -13,7 +13,7 @@ export default class ImageContent extends FormField<ImageFieldOptions> {
         this.element?.classList.add("image");
     }
 
-    protected _renderValueElem() {
+    renderValueElem() {
         return new ImageValue(this.options);
     }
 }

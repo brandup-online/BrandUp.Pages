@@ -3,6 +3,7 @@ import { DOM } from "@brandup/ui-dom";
 import { HtmlFieldFormOptions } from "../html";
 import { IFieldValueElement } from "../../../typings/content";
 import ContentEditor from "brandup-pages-ckeditor";
+import "./styles/html.less"
 
 export class HTMLValue extends UIElement implements IFieldValueElement {
     private __isChanged: boolean = false;
@@ -16,7 +17,7 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     constructor(options: HtmlFieldFormOptions) {
         super();
         
-        const valueElem = DOM.tag("div", { class: "value html" });
+        const valueElem = DOM.tag("div", { class: "form-field_value html" });
         if (options.placeholder)
             valueElem.setAttribute("data-placeholder", options.placeholder);
 
@@ -79,15 +80,14 @@ export class HTMLValue extends UIElement implements IFieldValueElement {
     }
 
     setValue(value: string) {
-        // console.log("🚀 ~ HTMLValue ~ setValue ~ value:", value)
-        // this.__editorPromise.then (()=> { // если editor еще не создался - ждем
-        //     if (this.__editor) {
-        //         this.__editor.data.set(value ? value : "");
-        //         this.__refreshUI();
-        //     }
-        //     else if (this.element)
-        //         this.element.innerHTML = value ? value : "";
-        // });
+        this.__editorPromise.then (()=> { // если editor еще не создался - ждем
+            if (this.__editor) {
+                this.__editor.data.set(value ? value : "");
+                this.__refreshUI();
+            }
+            else if (this.element)
+                this.element.innerHTML = value ? value : "";
+        });
     }
 
     getValue(): string {

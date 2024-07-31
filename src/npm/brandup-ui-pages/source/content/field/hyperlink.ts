@@ -1,5 +1,4 @@
-﻿import "./hyperlink.less";
-import { FormField } from "./base";
+﻿import { FormField } from "./base";
 import { HyperLinkType, HyperlinkValue } from "./value/hyperlink";
 
 export default class HyperLinkContent extends FormField<HyperLinkFieldFormOptions> {
@@ -10,7 +9,7 @@ export default class HyperLinkContent extends FormField<HyperLinkFieldFormOption
         this.element?.classList.add("hyperlink");
     }
 
-    protected _renderValueElem() {
+    renderValueElem() {
         return new HyperlinkValue(this.options);
     }
 }
