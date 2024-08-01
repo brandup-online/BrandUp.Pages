@@ -62,13 +62,13 @@ export class ContentEditor extends UIElement implements IContentHost {
         return editor;
     }
 
-    edit(container: HTMLElement) {
+    edit(container?: HTMLElement) {
         if (document.body.classList.contains("bp-state-design"))
             throw new Error("Content editor already started.");
         document.body.classList.add("bp-state-design");
         
         this.__contentElem = container;
-        this.__contentElem.classList.add("root-designer");
+        this.__contentElem?.classList.add("root-designer");
 
         return this.loadContent("")
             .then(() => {
