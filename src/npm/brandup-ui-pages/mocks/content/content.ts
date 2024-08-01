@@ -1,5 +1,5 @@
 import { Content } from "../../source/content/content";
-import { AjaxRequest } from "@brandup/ui-ajax";
+import { AjaxQueue, AjaxRequest } from "@brandup/ui-ajax";
 
 const editId = "77ace56a-0429-4258-a342-0e61159f082d";
 
