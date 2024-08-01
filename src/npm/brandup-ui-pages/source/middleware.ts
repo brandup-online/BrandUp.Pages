@@ -25,7 +25,7 @@ export class PagesMiddleware implements Middleware {
 
                 return next();
             })
-            .catch(error => console.log(error));
+            .catch(error => console.error(error));
         }
 
         return next();

@@ -8,22 +8,27 @@ const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog
 let currentDialog: Dialog<any> | null;
 document.body.appendChild(dialogsPanelElem);
 
-export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
-    protected headerElem?: HTMLElement | null;
-    protected headerTitleElem?: HTMLElement | null;
-    protected footerElem?: HTMLElement | null;
-    protected footerNotesElem?: HTMLElement | null;
-    protected contentElem?: HTMLElement | null;
-    private __errorElem?: HTMLElement | null;
-    private __parentDialog?: Dialog<any> | null;
-    private __childDialog?: Dialog<any> | null;
+interface IDialogElements {
+	headerElem: HTMLElement | null;
+    headerTitleElem: HTMLElement | null;
+    footerElem: HTMLElement | null;
+    footerNotesElem: HTMLElement | null;
+    contentElem: HTMLElement | null;
+}
 
-    constructor(options?: DialogOptions) {
-        super(options);
+export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
+    protected _elements?: IDialogElements;
+    private __errorElem?: HTMLElement;
+    private __parentDialog?: Dialog<any>;
+    private __childDialog?: Dialog<any>;
+
+    get content(): HTMLElement | null {
+        return this.elements.contentElem;
     }
 
-    get content(): HTMLElement | null | undefined {
-        return this.contentElem;
+    get elements(): IDialogElements {
+        if (!this._elements) throw new Error("Dialog Elements is not set");
+        return this._elements;
     }
 
     protected _getHtmlTemplate(): string {
@@ -35,30 +40,40 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
             '   <span class="notes"></span>' +
             '</div>';
     }
+
+    private __renderElements() {
+        if (!this.element) throw new Error("Dialog element is not set");
+
+        const headerElem = DOM.getByClass(this.element, "bp-dialog-header");
+        const contentElem = DOM.getByClass(this.element, "bp-dialog-content");
+        const footerElem = DOM.getByClass(this.element, "bp-dialog-footer");
+
+        let headerTitleElem = null;
+        let footerNotesElem = null;
+        if (headerElem)
+            headerTitleElem = DOM.getByClass(headerElem, "title");
+        if (footerElem)
+            footerNotesElem = DOM.getByClass(footerElem, "notes");
+
+        this._elements = { headerElem, contentElem, footerElem, headerTitleElem, footerNotesElem };
+    }
+
     protected _onRender() {
-        if (!this.element) return;
+        this.element?.classList.add("bp-dialog");        
 
-        this.element.classList.add("bp-dialog");
-
-        this.headerElem = DOM.getByClass(this.element, "bp-dialog-header");
-        this.contentElem = DOM.getByClass(this.element, "bp-dialog-content");
-        this.footerElem = DOM.getByClass(this.element, "bp-dialog-footer");
-        if (this.headerElem)
-            this.headerTitleElem = DOM.getByClass(this.headerElem, "title");
-        if (this.footerElem)
-            this.footerNotesElem = DOM.getByClass(this.footerElem, "notes");
+        this.__renderElements();
 
         if (this.options.header)
             this.setHeader(this.options.header);
         if (this.options.notes)
             this.setHeader(this.options.notes);
 
-        if (this.headerElem)
+        if (this.elements.headerElem)
             if (this.__parentDialog) {
-                this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
+                this.elements.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
             }
             else {
-                this.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }, iconClose));
+                this.elements.headerElem.insertAdjacentElement("beforeend", DOM.tag("a", { href: "", class: "button x", "data-command": "close" }, iconClose));
             }
 
         this.registerCommand("close", () => {
@@ -76,18 +91,18 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     }
 
     setHeader(html: string) {
-        if (this.headerTitleElem)
-            this.headerTitleElem.innerHTML = html ? html : "";
+        if (this.elements.headerTitleElem)
+            this.elements.headerTitleElem.innerHTML = html ? html : "";
     }
     setNotes(html: string) {
-        if (!this.footerNotesElem) return;
+        if (!this.elements.footerNotesElem) return;
 
         if (html) {
-            this.footerNotesElem.innerHTML = html;
+            this.elements.footerNotesElem.innerHTML = html;
             this.element?.classList.add("has-notes");
         }
         else {
-            this.footerNotesElem.innerHTML = "";
+            this.elements.footerNotesElem.innerHTML = "";
             this.element?.classList.remove("has-notes");
         }
     }
@@ -101,7 +116,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         const b = DOM.tag("button", { class: "button", "data-command": name }, title);
         if (isAccent)
             b.classList.add("accent");
-        this.footerElem?.appendChild(b);
+        this.elements.footerElem?.appendChild(b);
 
         this.element?.classList.add("has-actions");
     }
@@ -127,7 +142,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
 
         if (this.__errorElem) {
             this.__errorElem.remove();
-            this.__errorElem = null;
+            delete this.__errorElem;
         }
     }
 
@@ -170,7 +185,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     destroy() {
         if (this.__childDialog) {
             this.__childDialog.destroy();
-            this.__childDialog = null;
+            this.__childDialog = undefined;
         }
         
         if (!this.__parentDialog) {
@@ -182,8 +197,8 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
             currentDialog = this.__parentDialog;
             currentDialog.element?.classList.remove("hide");
             
-            this.__parentDialog.__childDialog = null;
-            this.__parentDialog = null;
+            this.__parentDialog.__childDialog = undefined;
+            this.__parentDialog = undefined;
         }
 
         super.destroy();

@@ -4,43 +4,58 @@ import { DOM } from "@brandup/ui-dom";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
 import "./image.less";
 
+interface IImageDesignerElements {
+    fileInputElem: HTMLInputElement;
+    menuElem: HTMLElement;
+    progressElem: HTMLElement;
+    button: HTMLElement;
+    textInput: HTMLInputElement;
+}
+
 export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
-    private __fileInputElem?: HTMLInputElement;
-    private __menuElem?: HTMLElement;
-    private __progressElem?: HTMLElement;
-    private __button?: HTMLElement;
-    private __textInput?: HTMLInputElement;
+    private __elements?: IImageDesignerElements;
     private __closeFunc: (e: MouseEvent) => void = () => {};
+
+    get elements(): IImageDesignerElements {
+        if (!this.__elements) throw "Image designer elements is not set";
+        return this.__elements;
+    }
 
     get typeName(): string { return "BrandUpPages.ImageDesigner"; }
 
     protected onRender(elem: HTMLElement) {
         elem.classList.add("image-designer");
-        
-        elem.appendChild(this.__menuElem = DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
+
+        const button = DOM.tag("button", { title: "Управление картинкой" }, iconUpload);
+        const textInput = DOM.tag("input", { type: "text" }) as HTMLInputElement;
+        const menuElem = DOM.tag("div", { class: "bp-elem image-designer-menu" }, [
             DOM.tag("ul", { class: "field-designer-popup" }, [
                 //DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "open-editor" }, "Редактор")),
                 //DOM.tag("li", { class: "split" }),
                 DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "upload-file" }, "Загрузить с компьютера"))
             ]),
-            this.__button = DOM.tag("button", { title: "Управление картинкой" }, iconUpload),
-            this.__textInput = DOM.tag("input", { type: "text" }) as HTMLInputElement
-        ]));
+            button, textInput
+        ])
+        
+        elem.appendChild(menuElem);
 
-        this.__fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement;
+        const fileInputElem = DOM.tag("input", { type: "file" }) as HTMLInputElement;
 
-        elem.appendChild(this.__progressElem = DOM.tag("div", { class: "bp-elem image-designer-progress" }));
+        const progressElem = DOM.tag("div", { class: "bp-elem image-designer-progress" })
+        elem.appendChild(progressElem);
 
-        this.__fileInputElem.addEventListener("change", () => {
-            if (!this.__fileInputElem?.files || this.__fileInputElem.files.length === 0)
+        this.__elements = { button, textInput, menuElem, fileInputElem, progressElem };
+
+        this.elements.fileInputElem.addEventListener("change", () => {
+            if (!this.elements.fileInputElem.files || this.elements.fileInputElem.files.length === 0)
                 return;
 
-            this.__uploadFile(this.__fileInputElem.files.item(0)!);
+            this.__uploadFile(this.elements.fileInputElem.files.item(0)!);
 
-            this.__textInput?.focus();
+            this.elements.textInput.focus();
         });
 
-        this.__textInput.addEventListener("paste", (e: ClipboardEvent) => {
+        this.elements.textInput.addEventListener("paste", (e: ClipboardEvent) => {
             e.preventDefault();
 
             if (!e.clipboardData) return;
@@ -54,7 +69,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
                     this.__uploadFile(url);
             }
 
-            this.__textInput?.focus();
+            this.elements.textInput.focus();
 
             elem.classList.remove("opened-menu");
             document.body.removeEventListener("click", this.__closeFunc, false);
@@ -66,7 +81,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
                 elem.classList.remove("opened-menu");
         };
 
-        this.__button.addEventListener("click", (e: MouseEvent) => {
+        this.elements.button.addEventListener("click", (e: MouseEvent) => {
             e.preventDefault();
             e.stopImmediatePropagation();
 
@@ -76,15 +91,15 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
             }
 
             document.body.addEventListener("click", this.__closeFunc, false);
-            this.__textInput?.focus();
+            this.elements.textInput.focus();
         });
 
         this.registerCommand("upload-file", () => {
             elem.classList.remove("opened-menu");
             document.body.removeEventListener("click", this.__closeFunc, false);
 
-            if (!this.__fileInputElem) throw new Error("File uploading error");
-            this.__fileInputElem.click();
+            if (!this.elements.fileInputElem) throw new Error("File uploading error");
+            this.elements.fileInputElem.click();
         });
 
         let dragleaveTime = 0;
@@ -115,7 +130,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
             else
                 e.dataTransfer.clearData();
 
-            this.__textInput?.focus();
+            this.elements.textInput.focus();
 
             return false;
         };
@@ -128,10 +143,6 @@ export class ImageDesigner extends FieldDesigner<ImageFieldProvider> {
 
     destroy() {
         this.element?.classList.remove("image-designer");
-
-        this.__menuElem?.remove();
-        this.__fileInputElem?.remove();
-        this.__progressElem?.remove();
 
         super.destroy();
     }
