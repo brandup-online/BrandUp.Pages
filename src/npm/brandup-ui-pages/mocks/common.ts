@@ -1,5 +1,6 @@
-import fetchMock, { MockParams } from "jest-fetch-mock"
-
-export const MockResponse = (response: any, options?: MockParams) => {
-    fetchMock.mockResponseOnce(JSON.stringify(response), options);
+export const MockResponse = (body?: any, init: ResponseInit = { headers: {"content-type": "application/json"} }) => {
+    /*@ts-ignore */
+    global.fetch = jest.fn(() => Promise.resolve(
+        new Response(JSON.stringify(body), init)
+    ));
 }
