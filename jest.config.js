@@ -1,8 +1,7 @@
 const config = {
 	rootDir: __dirname,
-	setupFilesAfterEnv: ['<rootDir>/src/npm/brandup-ui-pages/mocks/setup.jest.ts'],
 	testMatch: ["**/test/**/*.test.ts"],
-	testEnvironment: "jsdom",
+	testEnvironment: './FixJSDOMEnvironment.ts',
 
 	verbose: true,
 	transform: {
