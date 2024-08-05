@@ -140,7 +140,8 @@ export class HyperlinkValue extends UIElement implements IFieldValueElement {
         });
 
         this.registerCommand("select-type", (context: CommandContext) => {
-            const type = context.target.getAttribute("data-value") as HyperLinkType;
+            const type = context.target.getAttribute("data-value") as HyperLinkType | null;
+            if (!type) throw new Error("can not find attribute data-value");
 
             this.element?.classList.remove("opened-types");
             document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);

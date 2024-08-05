@@ -97,7 +97,7 @@ export class PageToolbar extends UIElement {
         const leftToolbar = DOM.tag("div", { class: "toolbar-menu left" });
 
         let websiteMenu: HTMLElement;
-        leftToolbar.appendChild(DOM.tag("div", { class: "separator-right" }, [
+        leftToolbar.appendChild(DOM.tag("div", null, [
             DOM.tag("button", { class: "bp-page-toolbar-button", command: "show-menu", title: "Меню сайта" }, iconList),
             websiteMenu = DOM.tag("menu", { class: "bp-page-toolbar-menu" }),
         ]));
@@ -108,6 +108,8 @@ export class PageToolbar extends UIElement {
 
         // Если страница динамическая
         if (this.isContentPage) {
+            (leftToolbar.firstChild as HTMLElement).classList.add("separator-right");
+
             const contentPage = <ContentPage>this.__page;
 
             websiteMenuItems.append(DOM.tag("button", { command: "bp-pages-child" }, [iconDown, DOM.tag("span", null, "Дочерние страницы")]));

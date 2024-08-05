@@ -226,7 +226,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
     }
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {
         const itemElem = elem.closest(".item[data-id]");
-        if (!itemElem)
+        if (!itemElem || !(itemElem as any)["_model_"])
             throw new Error("");
 
         return { id: itemElem.getAttribute("data-id")!, model: (itemElem as any)["_model_"] };
