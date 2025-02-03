@@ -30,7 +30,6 @@ namespace BrandUp.Pages
         /// <returns>Rendered html content.</returns>
         public static async Task<IHtmlContent> RenderContentAsync(this IHtmlHelper htmlHelper, ContentScope scope, string contentKey, Type contentType, Func<object, Task> defaultFactory = null)
         {
-            ArgumentNullException.ThrowIfNull(nameof(htmlHelper));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentKey));
             ArgumentException.ThrowIfNullOrWhiteSpace(nameof(contentType));
 

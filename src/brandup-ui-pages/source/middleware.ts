@@ -1,5 +1,5 @@
-﻿import { Middleware, NavigateContext } from "brandup-ui-app";
-import { Page, PageModel } from "brandup-ui-website";
+﻿import { Middleware, NavigateContext } from "@brandup/ui-app";
+import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 
 const UI = () => import("./ui");
 
@@ -15,12 +15,12 @@ export class PagesMiddleware extends Middleware {
     navigate(context: NavigateContext, next: () => void) {
         next();
 
-        this._showUI(context.items);
+        this._showUI(context.data);
     }
 
     private _showUI(items: { [key: string]: any }) {
         if (document.body.dataset.pagesAdmin) {
-            const page = items["page"] as Page<PageModel>;
+            const page = items["page"] as Page<WebsiteApplication, PageModel>;
             if (page) {
                 UI().then(t => {
                     this.__isEditing = t.default(page);
