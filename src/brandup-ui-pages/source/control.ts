@@ -1,5 +1,5 @@
-﻿import { UIElement } from "brandup-ui";
-import { Utility } from "brandup-ui-helpers";
+﻿import { UIElement } from "@brandup/ui";
+import { TypeHelper } from "@brandup/ui-helpers";
 
 export abstract class UIControl<TOptions = {}> extends UIElement {
     readonly options: TOptions = {} as TOptions;
@@ -25,17 +25,15 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
         this.setElement(element);
 
         this._onApplyDefaultOptions();
-        this._applyOptions(options);
+
+        if(options)
+            this.options = { ...this.options, ...options };
 
         this._onInitialize();
     }
 
     // Options
     protected _onApplyDefaultOptions() { return; }
-    protected _applyOptions<TOptions>(options: TOptions) {
-        if (options)
-            Utility.extend(this.options, options);
-    }
 
     // Render
     protected _getTagName(): string {
@@ -49,7 +47,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
             if (!this.__fragment)
                 throw new Error();
 
-            if (Utility.isString(container)) {
+            if (TypeHelper.isString(container)) {
                 container = document.getElementById((container as string).substr(1));
                 if (!container)
                     throw new Error();

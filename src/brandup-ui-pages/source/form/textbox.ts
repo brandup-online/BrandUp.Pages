@@ -1,5 +1,5 @@
 ﻿import { Field } from "./field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import "./textbox.less";
 
 export class Textbox extends Field<string, TextboxOptions> {

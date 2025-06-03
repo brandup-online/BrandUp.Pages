@@ -1,8 +1,8 @@
-﻿import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+﻿import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import iconArrow from "../../svg/combobox-arrow.svg";
 import { PageModel } from "../../typings/page";
 import "./hyperlink.less";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { FormField } from "./base";
 import { HyperlinkFieldProvider } from "../../content/provider/hyperlink";
 import { IContentField } from "../provider/base";
@@ -62,7 +62,7 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
             this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
                     url: `/brandup.pages/page/search`,
-                    urlParams: {
+                    query: {
                         title: title
                     },
                     method: "GET",
@@ -157,8 +157,8 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
                     throw "";
             }
         });
-        this.registerCommand("select-type", (elem: HTMLElement) => {
-            const type = elem.getAttribute("data-value") as HyperLinkType;
+        this.registerCommand("select-type", context => {
+            const type = context.target.getAttribute("data-value") as HyperLinkType;
 
             this.element.classList.remove("opened-types");
             document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
@@ -166,15 +166,15 @@ export class HyperLinkContent extends FormField<HyperLinkFieldFormValue, HyperLi
             this.__type = type;
             this.__refreshUI();
         });
-        this.registerCommand("select-page", (elem: HTMLElement) => {
+        this.registerCommand("select-page", context => {
             this.element.classList.remove("inputing");
             this.element.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
-            const pageId = elem.getAttribute("data-value");
+            const pageId = context.target.getAttribute("data-value");
             this.__pageValueInput.setAttribute("value-page-id", pageId);
-            this.__valueElem.innerText = elem.innerText;
-            this.__pageValueInput.value = elem.innerText;
+            this.__valueElem.innerText = context.target.innerText;
+            this.__pageValueInput.value = context.target.innerText;
 
             this.__refreshUI();
 

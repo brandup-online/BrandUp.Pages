@@ -1,4 +1,4 @@
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 import { TextDesigner } from "../designer/text";
 import { FieldProvider } from "./base";
 import { FieldValueResult } from "../../typings/content";

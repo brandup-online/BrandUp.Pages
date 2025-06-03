@@ -1,5 +1,5 @@
 ﻿import { Field } from "./field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import iconDelete from "../svg/toolbar-button-discard.svg";
 import "./string-array.less";
 
@@ -19,8 +19,8 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         this.__renderItems();
         this.__refreshUI();
 
-        this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest(".item");
+        this.registerCommand("item-delete", (context) => {
+            const itemElem = context.target.closest(".item");
             const index = parseInt(itemElem.getAttribute("data-index"));
 
             itemElem.remove();
@@ -169,7 +169,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
         for (let i = 0; i < this.__itemsElem.childElementCount; i++) {
             const elem = this.__itemsElem.children.item(i);
             elem.setAttribute("data-index", i.toString());
-            DOM.getElementByClass(elem, "index").innerText = `#${i + 1}`;
+            DOM.getByClass(elem, "index").innerText = `#${i + 1}`;
         }
     }
 

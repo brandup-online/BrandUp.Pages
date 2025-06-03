@@ -1,4 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "@brandup/ui-dom";
 import "./image.less";
 import { FormField } from "./base";
 import { ImageFieldProvider } from "../../content/provider/image";

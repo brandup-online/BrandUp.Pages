@@ -1,6 +1,6 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { AjaxQueue } from "brandup-ui-ajax";
-import { DOM } from "brandup-ui-dom";
+import { AjaxQueue } from "@brandup/ui-ajax";
+import { DOM } from "@brandup/ui-dom";
 import { ContentEditor } from "../../content/editor";
 import { Content } from "../../content/content";
 import "../dialog-form.less";
@@ -41,8 +41,8 @@ export class PageEditDialog extends Dialog<any> {
 
         this.__renderForm();
 
-        this.registerCommand("navigate", (elem: HTMLElement) => {
-            const path = elem.getAttribute("data-path");
+        this.registerCommand("navigate", context => {
+            const path = context.target.getAttribute("data-path");
             this.navigate(path);
         });
     }

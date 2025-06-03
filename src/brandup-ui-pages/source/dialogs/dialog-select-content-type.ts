@@ -1,5 +1,5 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import "./dialog-select-content-type.less";
 import { ContentTypeModel } from "../content/provider/model";
 
@@ -24,8 +24,8 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
             this.content.appendChild(itemElem);
         });
 
-        this.registerCommand("select", (elem: HTMLElement) => {
-            const index = parseInt(elem.getAttribute("data-index"));
+        this.registerCommand("select", context => {
+            const index = parseInt(context.target.getAttribute("data-index"));
             const type = this.__types[index];
 
             this.resolve(type);

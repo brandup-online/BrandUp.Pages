@@ -1,4 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "@brandup/ui-dom";
 import { UIControl } from "../control";
 import "./field.less";
 
@@ -17,12 +17,10 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
 
     protected _onRender() {
         this.element.classList.add("website-form-field");
-
-        this.defineEvent("changed", { bubbles: true, cancelable: false });
     }
 
     protected raiseChanged() {
-        this.raiseEvent("changed", {
+        this.trigger("changed", {
             field: this,
             value: this.getValue()
         });

@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { createPage } from "./create";
 import { createPageCollection } from "../collections/create";
 import { deletePage } from "./delete";
@@ -32,8 +32,8 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         this.setHeader("Страницы");
         this.setNotes("Просмотр и управление страницами.");
 
-        this.registerCommand("nav", (elem) => {
-            let pageId = elem.getAttribute("data-page-id");
+        this.registerCommand("nav", context => {
+            let pageId = context.target.getAttribute("data-page-id");
             this.__pageId = pageId;
             this.collectionId = null;
             this.refresh();
@@ -54,8 +54,8 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
                 this.loadItems();
             });
         });
-        this.registerCommand("select-collection", (elem) => {
-            let collectionId = elem.getAttribute("data-value");
+        this.registerCommand("select-collection", context => {
+            let collectionId = context.target.getAttribute("data-value");
             this.selectCollection(collectionId, true);
         });
         this.registerCommand("collection-sesttings", () => {
@@ -132,7 +132,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
                 const splitUrl = pagePath.url.split("/");
                 this.navElem.appendChild(DOM.tag("li", i === model.parents.length-1 ? { class: "current" } : null, [
                     DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, [
-                        DOM.tag("bolt", null, splitUrl[splitUrl.length-1] || "root"),
+                        DOM.tag(<"div">"bolt", null, splitUrl[splitUrl.length-1] || "root"),
                         DOM.tag("div", null, [
                             DOM.tag("span", null, pagePath.header),
                             DOM.tag("span", null, pagePath.type),

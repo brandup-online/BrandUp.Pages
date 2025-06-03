@@ -1,19 +1,20 @@
-﻿import { Middleware, NavigateContext } from "@brandup/ui-app";
+﻿import { Middleware, MiddlewareMethod, MiddlewareNext, NavigateContext } from "@brandup/ui-app";
 import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 
 const UI = () => import("./ui");
 
-export class PagesMiddleware extends Middleware {
+export class PagesMiddleware implements Middleware {
+    readonly name: string = "pages";
     private __isEditing: boolean = false;
 
-    start(context, next) {
-        next();
+    async start(context, next: MiddlewareNext) {
+        await next();
 
         this._showUI(context.items);
     }
 
-    navigate(context: NavigateContext, next: () => void) {
-        next();
+    async navigate(context: NavigateContext, next: MiddlewareNext) {
+        await next();
 
         this._showUI(context.data);
     }

@@ -1,9 +1,9 @@
 ﻿import { Field } from "../../form/field";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { PageCollectionModel } from "../../typings/page";
 import { IContentField } from "../provider/base";
 import "./pages.less";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
     private inputElem: HTMLInputElement;
@@ -39,7 +39,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
                     url: `/brandup.pages/collection/search`,
-                    urlParams: {
+                    query: {
                         pageType: this.options.pageType,
                         title: title
                     },
@@ -94,16 +94,16 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             document.body.addEventListener("mousedown", this.__closeMenuFunc, false);
         });
 
-        this.registerCommand("select", (elem: HTMLElement) => {
+        this.registerCommand("select", context => {
             this.element.classList.remove("inputing");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
-            const pageCollectionId = elem.getAttribute("data-value");
-            const pageUrl = elem.getAttribute("data-url");
+            const pageCollectionId = context.target.getAttribute("data-value");
+            const pageUrl = context.target.getAttribute("data-url");
 
             this.setValue({
                 id: pageCollectionId,
-                title: elem.innerText,
+                title: context.target.innerText,
                 pageUrl: pageUrl
             });
 

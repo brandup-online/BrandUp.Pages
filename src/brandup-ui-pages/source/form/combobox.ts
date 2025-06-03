@@ -1,5 +1,5 @@
 ﻿import { Field } from "./field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import iconArrow from "../svg/combobox-arrow.svg";
 import "./combobox.less";
 
@@ -30,10 +30,10 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
         let isFocused = false;
         let md = false;
-        this.addEventListener("focus", () => {
+        this.element.addEventListener("focus", () => {
             isFocused = true;
         });
-        this.addEventListener("blur", () => {
+        this.element.addEventListener("blur", () => {
             isFocused = false;
         });
 
@@ -46,13 +46,13 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
                 this.element.blur();
         });
 
-        this.registerCommand("select", (elem: HTMLElement) => {
+        this.registerCommand("select", context => {
             DOM.removeClass(this.__itemsElem, ".selected", "selected");
 
-            elem.classList.add("selected");
+            context.target.classList.add("selected");
 
-            this.__value = elem.getAttribute("data-value");
-            this.__valueElem.innerText = elem.innerText;
+            this.__value = context.target.getAttribute("data-value");
+            this.__valueElem.innerText = context.target.innerText;
 
             this.__refreshUI();
 

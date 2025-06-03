@@ -1,5 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
-import { Utility } from "brandup-ui-helpers";
+﻿import { DOM } from "@brandup/ui-dom";
 import { UIControl } from "../control";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";
@@ -39,11 +38,11 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     protected _onRender() {
         this.element.classList.add("bp-dialog");
 
-        this.headerElem = DOM.getElementByClass(this.element, "bp-dialog-header");
-        this.headerTitleElem = DOM.getElementByClass(this.headerElem, "title");
-        this.contentElem = DOM.getElementByClass(this.element, "bp-dialog-content");
-        this.footerElem = DOM.getElementByClass(this.element, "bp-dialog-footer");
-        this.footerNotesElem = DOM.getElementByClass(this.footerElem, "notes");
+        this.headerElem = DOM.getByClass(this.element, "bp-dialog-header");
+        this.headerTitleElem = DOM.getByClass(this.headerElem, "title");
+        this.contentElem = DOM.getByClass(this.element, "bp-dialog-content");
+        this.footerElem = DOM.getByClass(this.element, "bp-dialog-footer");
+        this.footerNotesElem = DOM.getByClass(this.footerElem, "notes");
 
         if (this.options.header)
             this.setHeader(this.options.header);
@@ -101,7 +100,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this.element.classList.add("has-error");
 
         const list = DOM.tag("ul");
-        if (Utility.isArray(message)) {
+        if (Array.isArray(message)) {
             for (let i = 0; i < message.length; i++) {
                 list.appendChild(DOM.tag("li", null, message[i]));
             }

@@ -1,4 +1,4 @@
-import { UIElement } from "brandup-ui";
+import { UIElement } from "@brandup/ui";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
@@ -6,11 +6,11 @@ import iconDown from "../svg/new/arrow-down.svg";
 import iconPublish from "../svg/new/upload.svg";
 import iconSeo from "../svg/new/increase.svg";
 import { listContentType } from "../dialogs/content-types/list";
-import { Page, PageModel } from "brandup-ui-website";
+import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
-import { DOM } from "brandup-ui-dom";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { DOM } from "@brandup/ui-dom";
+import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { ContentEditor } from "../content/editor";
 
 import iconList from "../svg/new/menu.svg";
@@ -21,7 +21,7 @@ import iconPlus from "../svg/new/plus.svg";
 const EDITID_QUERY_KEY = "editid";
 
 export class PageToolbar extends UIElement {
-    private __page: Page<PageModel>;
+    private __page: Page<WebsiteApplication, PageModel>;
     private __isDestroyed: boolean = false;
 
     readonly isContentPage: boolean;
@@ -36,13 +36,13 @@ export class PageToolbar extends UIElement {
     }
     get hasEditor(): boolean { return !!this.__editor; }
 
-    constructor(page: Page<PageModel>) {
+    constructor(page: Page<WebsiteApplication, PageModel>) {
         super();
 
         this.__page = page;
         this.isContentPage = page instanceof ContentPage;
 
-        const editId = page.nav.query[EDITID_QUERY_KEY];
+        const editId = page.context.query[EDITID_QUERY_KEY];
         if (editId) {
             this.__editor = ContentEditor.create(page.website, editId);
 
@@ -52,9 +52,9 @@ export class PageToolbar extends UIElement {
                     if (this.__isDestroyed)
                         return;
 
-                    delete page.nav.query[EDITID_QUERY_KEY];
+                    delete page.context.query[EDITID_QUERY_KEY];
 
-                    const editUrl = this.__page.website.buildUrl(page.nav.path, page.nav.query);
+                    const editUrl = this.__page.website.buildUrl(page.context.path, page.context.query);
                     if (!editContent || editContent.inPage)
                         this.__page.website.nav({ url: editUrl, replace: true });
                     else
@@ -132,9 +132,9 @@ export class PageToolbar extends UIElement {
     }
 
     private __initTollbarLogic() {
-        this.registerCommand("show-menu", (elem) => {
-            if (elem.classList.toggle("expanded"))
-                this.__openMenu(elem);
+        this.registerCommand("show-menu", (context) => {
+            if (context.target.classList.toggle("expanded"))
+                this.__openMenu(context.target);
             else
                 this.__closeMenu();
         });
@@ -172,38 +172,37 @@ export class PageToolbar extends UIElement {
         const published = this.__page.model.status?.toLowerCase() === "published";
 
         if (!published)
-            this.registerCommand("bp-publish", () => {
-                publishPage(this.__page.model.id).then(result => {
+            this.registerCommand("bp-publish", async () => {
+                await publishPage(this.__page.model.id).then(result => {
                     this.__page.website.nav({ url: result.url, replace: true });
                 });
             });
 
-        this.registerCommand("bp-pages", () => {
+        this.registerCommand("bp-pages", async () => {
             let parentPageId: string = null;
             if (this.isContentPage)
                 parentPageId = this.__page.model.parentPageId;
-            browserPage(parentPageId);
+            await browserPage(parentPageId);
         });
 
-        this.registerCommand("bp-pages-child", () => {
+        this.registerCommand("bp-pages-child", async () => {
             let parentPageId: string = null;
             if (this.isContentPage)
                 parentPageId = this.__page.model.id;
-            browserPage(parentPageId);
+            await browserPage(parentPageId);
         });
 
-        this.registerCommand("bp-content-types", () => {
+        this.registerCommand("bp-content-types", async () => {
             this.element.classList.remove("opened-menu");
-            listContentType();
+            await listContentType();
         });
 
-        this.registerCommand("bp-seo", () => {
-            seoPage(this.__page.model.id).then(() => {
-                this.__page.website.app.reload();
-            });
+        this.registerCommand("bp-seo", async () => {
+            await seoPage(this.__page.model.id);
+            await this.__page.website.reload();
         });
 
-        this.registerAsyncCommand("bp-content-edit", (context) => {
+        this.registerCommand("bp-content-edit", async (context) => {
             this.__closeMenu();
             
             const contentKey = context.target.dataset.contentKey;
@@ -211,28 +210,22 @@ export class PageToolbar extends UIElement {
             if (!contentKey || !contentType)
                 throw "Not set content edit parameters.";
 
-            ContentEditor.begin(this.__page, contentKey, contentType)
-                .then(result => {
-                    if (result.exist && !confirm("Continue editing?"))
-                        return ContentEditor.begin(this.__page, contentKey, contentType, true);
-                        
-                    return result;
-                })
-                .then(result => {
-                    const editUrl = this.__page.website.buildUrl(null, { editid: result.editId });
+            try {
+                const result = await ContentEditor.begin(this.__page, contentKey, contentType);
+                if (result.exist && !confirm("Continue editing?"))
+                    return await ContentEditor.begin(this.__page, contentKey, contentType, true);
 
-                    const contentLocation = findContent(contentKey)
-                    if (!contentLocation || contentLocation.inPage)
-                        this.__page.website.nav({ url: editUrl, replace: true });
-                    else
-                        window.location.replace(editUrl);
-                })
-                .catch(() => {
-                    console.log(`Unable to begin edit content by key "${contentKey}".`);
-                })
-                .finally(() => {
-                    context.complate();
-                });
+                const editUrl = this.__page.website.buildUrl(null, { editid: result.editId });
+
+                const contentLocation = findContent(contentKey)
+                if (!contentLocation || contentLocation.inPage)
+                    this.__page.website.nav({ url: editUrl, replace: true });
+                else
+                    window.location.replace(editUrl);
+            }
+            catch (reason) {
+                console.error(`Unable to begin edit content by key "${contentKey}".`, reason);
+            }
         });
     }
     

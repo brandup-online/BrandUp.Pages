@@ -1,11 +1,11 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { Field } from "../form/field";
 import { TextboxOptions, Textbox } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
 import { StringArrayFieldOptions, StringArrayField } from "../form/string-array";
 import { ValidationProblemDetails } from "../typings/page";
-import { AjaxQueue } from "brandup-ui-ajax";
+import { AjaxQueue } from "@brandup/ui-ajax";
 import "./dialog-form.less";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
@@ -54,7 +54,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response) => {
                 this.setLoading(false);
@@ -120,7 +120,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "POST",
             type: "JSON",
             data: this.getValues(),

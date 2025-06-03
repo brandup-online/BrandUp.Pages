@@ -1,4 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "@brandup/ui-dom";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
@@ -21,16 +21,16 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.element.appendChild(this.__itemsElem);
 
-        this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
+        this.registerCommand("item-settings", context => {
+            const itemElem = context.target.closest("[data-content-path-index]");
             const itemIndex = itemElem.getAttribute("data-content-path-index");
             let contentPath = this.provider.content.path;
             let modelPath = (contentPath ? contentPath + "." : "") + `${this.name}[${itemIndex}]`;
 
             this.provider.settingItem(modelPath);
         });
-        this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[data-content-path-index]");
+        this.registerCommand("item-delete", context => {
+            const itemElem = context.target.closest("[data-content-path-index]");
             const itemIndex = parseInt(itemElem.getAttribute("data-content-path-index"));
             const path = itemElem.getAttribute("data-content-path")
             this.provider.deleteItem(itemIndex, path);
@@ -150,7 +150,7 @@ export class ModelField extends FormField<ModelFieldValue, ModelFieldOptions, Mo
     private _refreshBlockIndexes() {
         this.eachItems((elem, index) => {
             elem.setAttribute("data-content-path-index", index.toString());
-            DOM.getElementByClass(elem, "index").innerText = `#${index + 1}`;
+            DOM.getByClass(elem, "index").innerText = `#${index + 1}`;
         });
     }
     private __addItem(itemType: string) {

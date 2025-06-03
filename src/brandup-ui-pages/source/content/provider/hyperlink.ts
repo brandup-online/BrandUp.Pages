@@ -1,4 +1,4 @@
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 import { FieldProvider } from "./base";
 import { FieldValueResult } from "../../typings/content";
 
@@ -18,7 +18,7 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
     changeValue(url: string) {
         this.request({
             url: `/brandup.pages/content/hyperlink/url`,
-            urlParams: { url },
+            query: { url },
             method: "POST",
             success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {
@@ -39,7 +39,7 @@ export class HyperlinkFieldProvider extends FieldProvider<HyperLinkValue, HyperL
     selectPage(pageId: string) {
         this.request({
             url: `/brandup.pages/content/hyperlink/page`,
-            urlParams: { pageId },
+            query: { pageId },
             method: "POST",
             success: (response: AjaxResponse<FieldValueResult>) => {
                 switch (response.status) {

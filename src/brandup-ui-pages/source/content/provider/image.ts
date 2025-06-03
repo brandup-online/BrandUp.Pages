@@ -1,6 +1,6 @@
 import { FieldProvider } from "./base";
 import { ImageDesigner } from "../designer/image";
-import { AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { AjaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { FieldValueResult } from "../../typings/content";
 
 export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFieldOptions> {
@@ -21,7 +21,7 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         if (value instanceof File) {
             requestOptions = {
                 url: `/brandup.pages/content/image`,
-                urlParams: {
+                query: {
                     fileName: value.name,
                     // width: width,
                     // height: height
@@ -32,7 +32,7 @@ export class ImageFieldProvider extends FieldProvider<ImageFieldValue, ImageFiel
         else if (typeof value === "string") {
             requestOptions = {
                 url: `/brandup.pages/content/image/url`,
-                urlParams: {
+                query: {
                     url: value,
                     // width: width,
                     // height: height

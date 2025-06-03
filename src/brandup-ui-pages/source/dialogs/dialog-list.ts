@@ -1,9 +1,9 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { ajaxRequest, AjaxQueue, AjaxResponse } from "brandup-ui-ajax";
+import { ajaxRequest, AjaxQueue, AjaxResponse } from "@brandup/ui-ajax";
 import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 import iconSort from "../svg/list-item-sort.svg";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
     protected __itemsElem: HTMLElement;
@@ -29,8 +29,8 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.content.appendChild(this.__itemsElem);
 
-        this.registerCommand("item-open-menu", (el: HTMLElement) => {
-            el.parentElement.parentElement.classList.add("opened-menu");
+        this.registerCommand("item-open-menu", context => {
+            context.target.parentElement.parentElement.classList.add("opened-menu");
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
@@ -104,7 +104,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
                         ajaxRequest({
                             url: url,
-                            urlParams: urlParams,
+                            query: urlParams,
                             method: "POST",
                             success: (response: AjaxResponse) => {
                                 this.setLoading(false);
@@ -140,7 +140,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response: AjaxResponse<TList>) => {
                 this.setLoading(false);
@@ -189,7 +189,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         ajaxRequest({
             url: url,
-            urlParams: urlParams,
+            query: urlParams,
             success: (response: AjaxResponse<Array<TItem>>) => {
                 this.setLoading(false);
 
@@ -203,21 +203,21 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         });
     }
     protected registerItemCommand(name: string, execute: (itemId: string, model: any, commandElem: HTMLElement) => void, canExecute?: (itemId: string, model: any, commandElem: HTMLElement) => boolean) {
-        this.registerCommand(name, (elem: HTMLElement) => {
-            const item = this._findItemIdFromElement(elem);
+        this.registerCommand(name, context => {
+            const item = this._findItemIdFromElement(context.target);
             if (item === null)
                 return;
 
-            execute(item.id, item.model, elem);
-        }, (elem: HTMLElement) => {
+            execute(item.id, item.model, context.target);
+        }, context => {
             if (!canExecute)
                 return true;
 
-            const item = this._findItemIdFromElement(elem);
+            const item = this._findItemIdFromElement(context.target);
             if (item === null)
                 return false;
 
-            return canExecute(item.id, item.model, elem);
+            return canExecute(item.id, item.model, context.target);
         });
     }
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {

@@ -3,7 +3,7 @@ import { createPageCollection } from "./create";
 import { deletePageCollection } from "./delete";
 import { updatePageCollection } from "./update";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { PageCollectionModel } from "../../typings/page";
 import { PagePathModel } from "../pages/browser";
 
@@ -44,8 +44,8 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
                 this.__isModified = true;
             });
         });
-        this.registerCommand("nav", (elem) => {
-            let pageId = elem.getAttribute("data-page-id");
+        this.registerCommand("nav", context => {
+            let pageId = context.target.getAttribute("data-page-id");
             this.pageId = pageId;
             this.refresh();
         });
@@ -80,7 +80,7 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
                 const splitUrl = pagePath.url.split("/");
                 this.navElem.appendChild(DOM.tag("li", i === model.parents.length-1 ? { class: "current" } : null, [
                     DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, [
-                        DOM.tag("bolt", null, splitUrl[splitUrl.length-1] || "root"),
+                        DOM.tag(<"div">"bolt", null, splitUrl[splitUrl.length-1] || "root"),
                         DOM.tag("div", null, [
                             DOM.tag("span", null, pagePath.header),
                             DOM.tag("span", null, pagePath.type),

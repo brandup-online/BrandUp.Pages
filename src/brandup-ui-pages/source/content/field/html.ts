@@ -1,4 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "@brandup/ui-dom";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 import { FormField } from "./base";

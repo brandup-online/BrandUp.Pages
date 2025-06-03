@@ -1,5 +1,5 @@
-﻿import { host } from "brandup-ui-website";
-import { ajaxRequest } from "brandup-ui-ajax";
+﻿import { host } from "@brandup/ui-website";
+import { ajaxRequest } from "@brandup/ui-ajax";
 import { PagesMiddleware } from "brandup-ui-pages";
 import "./styles.less";
 import { LayoutMiddleware } from "./middlewares/layout";

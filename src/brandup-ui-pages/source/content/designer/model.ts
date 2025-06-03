@@ -1,6 +1,6 @@
 ﻿import { FieldDesigner } from "./base";
 import { ModelFieldProvider } from "../provider/model";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import "./model.less";
 
 export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
@@ -10,7 +10,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
         elem.classList.add("content-designer");
         // this._refreshBlockIndexes();
 
-        this.registerCommand("item-add", (elem: HTMLElement) => {
+        this.registerCommand("item-add", context => {
             const position = elem.dataset.position ?? "last";
 
             let itemIndex: number = -1;
@@ -29,14 +29,14 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
 
         this.registerCommand("item-view", () => { return; });
 
-        this.registerCommand("item-settings", (elem: HTMLElement) => {
+        this.registerCommand("item-settings", context => {
             const itemElem = elem.closest("[data-content-path-index]");
             const contentPath = itemElem.getAttribute("data-content-path");
 
             this.provider.settingItem(contentPath);
         });
 
-        this.registerCommand("item-delete", (elem: HTMLElement) => {
+        this.registerCommand("item-delete", context => {
             const itemElem = elem.closest("[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
@@ -47,7 +47,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             this.provider.deleteItem(index, path);
         });
 
-        this.registerCommand("item-up", (elem: HTMLElement) => {
+        this.registerCommand("item-up", context => {
             const itemElem = elem.closest("[data-content-path-index]");
             const itemIndex = this.getItemIndex(itemElem);
             if (itemIndex <= 0)
@@ -62,7 +62,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             this.provider.itemUp(itemIndex, itemElem);
         });
 
-        this.registerCommand("item-down", (elem: HTMLElement) => {
+        this.registerCommand("item-down", context => {
             const itemElem = elem.closest("[data-content-path]");
             const itemIndex = this.getItemIndex(itemElem);
 
@@ -77,7 +77,7 @@ export class ModelDesigner extends FieldDesigner<ModelFieldProvider> {
             this.provider.itemDown(itemIndex, itemElem);
         });
 
-        this.registerCommand("item-refresh", (elem: HTMLElement) => {
+        this.registerCommand("item-refresh", context => {
             const itemElem = elem.closest("[data-content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
