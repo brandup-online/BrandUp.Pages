@@ -24,9 +24,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BrandUp.Extensions.Migrations" Version="9.0.1" />
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
-		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.18.1" />
+		<PackageReference Include="BrandUp.Extensions.Migrations" Version="9.0.2" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
+		<PackageReference Include="WebMarkupMin.AspNetCoreLatest" Version="2.19.0" />
 	</ItemGroup>
 
 	<ItemGroup>
