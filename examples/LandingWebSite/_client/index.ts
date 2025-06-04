@@ -5,32 +5,32 @@ import { LayoutMiddleware } from "./middlewares/layout";
 import "./styles.less";
 
 WEBSITE.run({
-    pages: {
-        "content": { factory: () => import("brandup-ui-pages/source/pages/content"), preload: true },
-        "about": { factory: () => import("./pages/about/index"), preload: true }
-    },
-    components: {
-        "BB1": { factory: () => import("./contents/BB1"), preload: true }
-    }
-}, (builder) => {
+        pages: {
+            "content": { factory: () => import("brandup-ui-pages/source/pages/content"), preload: true },
+            "about": { factory: () => import("./pages/about/index"), preload: true }
+        },
+        components: {
+            "BB1": { factory: () => import("./contents/BB1"), preload: true }
+        }
+    }, (builder) => {
         builder.useMiddleware(() => new LayoutMiddleware());
         builder.useMiddleware(() => new PagesMiddleware());
-    }, (app) => {
-        app.registerCommand("signin", () => {
+    })
+    .then(context => {
+        context.app.registerCommand("signin", () => {
             ajaxRequest({
-                url: app.uri("signin"),
+                url: context.app.buildUrl("signin"),
                 success: () => {
-                    app.reload();
+                    context.app.reload();
                 }
             })
         });
-
-        app.registerCommand("signout", () => {
+        context.app.registerCommand("signout", () => {
             ajaxRequest({
-                url: app.uri("signout"),
+                url: context.app.buildUrl("signout"),
                 success: () => {
-                    app.reload();
+                    context.app.reload();
                 }
             })
         });
-});
+    });

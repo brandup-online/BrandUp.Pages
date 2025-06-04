@@ -1,5 +1,4 @@
 ﻿import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
-import { DOM } from "@brandup/ui-dom";
 
 class AboutPage extends Page<WebsiteApplication, PageModel> {
     get typeName(): string { return "AboutPage" }
