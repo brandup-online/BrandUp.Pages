@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Filters
                         case "begin":
                             httpContext.Request.QueryString.Add("editid", "");
 
-                            context.Result = new PageRedirectResult("") { ReplaceUrl = true };
+                            context.Result = new PageRedirectResult("") { Replace = true };
                             break;
                         case "commit":
                             context.Result = new BadRequestResult();

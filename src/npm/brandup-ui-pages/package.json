@@ -35,15 +35,15 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.3"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@brandup/ui": "^1.0.2",
-    "@brandup/ui-ajax": "^1.0.2",
-    "@brandup/ui-app": "^1.0.2",
-    "@brandup/ui-dom": "^1.0.2",
-    "@brandup/ui-helpers": "^1.0.2",
-    "@brandup/ui-website": "^9.0.2",
+    "@brandup/ui": "^1.0.32",
+    "@brandup/ui-ajax": "^1.0.32",
+    "@brandup/ui-app": "^1.0.32",
+    "@brandup/ui-dom": "^1.0.32",
+    "@brandup/ui-helpers": "^1.0.32",
+    "@brandup/ui-website": "^9.0.27",
     "brandup-pages-ckeditor": "^1.0.15"
   },
   "scripts": {

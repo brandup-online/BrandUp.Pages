@@ -15,7 +15,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
         {
             ArgumentNullException.ThrowIfNull(dbContext);
 
-            files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages", DisableMD5 = false });
+            files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages" });
         }
 
         #region IFileRepository members
@@ -26,8 +26,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             var uploadOptions = new GridFSUploadOptions
             {
-                Metadata = MongoDbHelper.DictionaryToBsonDocument(fileDoc.Data),
-                DisableMD5 = false
+                Metadata = MongoDbHelper.DictionaryToBsonDocument(fileDoc.Data)
             };
 
             await files.UploadFromStreamAsync(fileDoc.Id, fileName, stream, uploadOptions, cancellationToken);

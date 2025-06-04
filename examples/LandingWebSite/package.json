@@ -5,26 +5,26 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "css-loader": "^6.11.0",
-    "less": "^4.2.0",
-    "less-loader": "^12.2.0",
-    "less-plugin-clean-css": "^1.5.1",
-    "mini-css-extract-plugin": "^2.9.0",
+    "less": "^4.3.0",
+    "less-loader": "^12.3.0",
+    "less-plugin-clean-css": "^1.6.0",
+    "mini-css-extract-plugin": "^2.9.2",
     "raw-loader": "^4.0.2",
     "style-loader": "^3.3.4",
     "svgo-loader": "^4.0.0",
-    "terser-webpack-plugin": "^5.3.10",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.5.3",
+    "terser-webpack-plugin": "^5.3.14",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
     "url-loader": "^4.1.1",
-    "webpack": "^5.93.0",
+    "webpack": "^5.99.9",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@brandup/ui": "^1.0.2",
-    "@brandup/ui-ajax": "^1.0.2",
-    "@brandup/ui-dom": "^1.0.2",
+    "@brandup/ui": "^1.0.32",
+    "@brandup/ui-ajax": "^1.0.32",
+    "@brandup/ui-dom": "^1.0.32",
     "@brandup/ui-pages": "file:../../src/npm/brandup-ui-pages",
-    "@brandup/ui-website": "^9.0.2"
+    "@brandup/ui-website": "^9.0.27"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
