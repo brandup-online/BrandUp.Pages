@@ -41,7 +41,7 @@
     "@brandup/ui-app": "^1.0.32",
     "@brandup/ui-dom": "^1.0.32",
     "@brandup/ui-helpers": "^1.0.32",
-    "@brandup/ui-website": "^10.0.3",
+    "@brandup/ui-website": "^10.0.4",
     "brandup-pages-ckeditor": "^1.0.15"
   },
   "scripts": {

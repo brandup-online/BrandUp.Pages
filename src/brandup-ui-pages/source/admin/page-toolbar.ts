@@ -42,7 +42,7 @@ export class PageToolbar extends UIElement {
         this.__page = page;
         this.isContentPage = page instanceof ContentPage;
 
-        const editId = page.context.query[EDITID_QUERY_KEY];
+        const editId = page.context.query.get(EDITID_QUERY_KEY);
         if (editId) {
             this.__editor = ContentEditor.create(page.website, editId);
 
@@ -52,7 +52,7 @@ export class PageToolbar extends UIElement {
                     if (this.__isDestroyed)
                         return;
 
-                    delete page.context.query[EDITID_QUERY_KEY];
+                    page.context.query.delete(EDITID_QUERY_KEY);
 
                     const editUrl = this.__page.website.buildUrl(page.context.path, page.context.query);
                     if (!editContent || editContent.inPage)

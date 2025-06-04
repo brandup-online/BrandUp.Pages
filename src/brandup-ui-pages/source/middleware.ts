@@ -9,10 +9,6 @@ export class PagesMiddleware implements Middleware {
 
     async start(context: StartContext, next: MiddlewareNext) {
         await next();
-
-        console.log(context);
-
-        this._showUI(context.data);
     }
 
     async navigate(context: NavigateContext, next: MiddlewareNext) {
@@ -24,7 +20,7 @@ export class PagesMiddleware implements Middleware {
     private _showUI(items: { [key: string]: any }) {
         console.log(items);
         if (document.body.dataset.pagesAdmin) {
-            const page = items["page"] as Page<WebsiteApplication, PageModel>;
+            const page = items.page as Page<WebsiteApplication, PageModel>;
             if (page) {
                 UI().then(t => {
                     this.__isEditing = t.default(page);
