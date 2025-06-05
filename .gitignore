@@ -333,11 +333,11 @@ ASALocalRun/
 package-lock.json
 .rpt2_cache
 
-/examples/LandingWebSite/_client/**/*.js
-/examples/LandingWebSite/_client/**/*.js.map
-/examples/LandingWebSite/_temp/files
-/examples/LandingWebSite/_temp/images
-/examples/LandingWebSite/wwwroot/dist
+/src/LandingWebSite/_client/**/*.js
+/src/LandingWebSite/_client/**/*.js.map
+/src/LandingWebSite/_temp/files
+/src/LandingWebSite/_temp/images
+/src/LandingWebSite/wwwroot/dist
 
-/src/brandup-ui-pages/**/*.js
-/src/brandup-ui-pages/**/*.js.map
+/npm/**/*.js
+/npm/**/*.js.map

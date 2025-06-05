@@ -13,9 +13,7 @@ namespace BrandUp.Pages.TagHelpers
         public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
         {
             if (string.Equals(context.TagName, "body", StringComparison.OrdinalIgnoreCase) && await accessProvider.CheckAccessAsync(ViewContext.HttpContext.RequestAborted))
-            {
                 output.Attributes.Add("data-pages-admin", "true");
-            }
         }
     }
 }

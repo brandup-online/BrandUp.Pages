@@ -16,7 +16,7 @@ namespace BrandUp.Pages.Content
         public override async Task OnDefaultFactoryAsync(string itemId, object content, CancellationToken cancellationToken)
         {
             if (!Guid.TryParse(itemId, out var pageId))
-                throw new ArgumentException();
+                throw new FormatException("Unable parse page ID as Guid.");
 
             var page = await pageService.FindPageByIdAsync(pageId, cancellationToken);
 

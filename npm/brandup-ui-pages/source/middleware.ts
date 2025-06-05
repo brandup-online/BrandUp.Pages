@@ -1,4 +1,4 @@
-﻿import { Middleware, MiddlewareMethod, MiddlewareNext, NavigateContext, StartContext } from "@brandup/ui-app";
+﻿import { Middleware, MiddlewareNext, NavigateContext, StartContext } from "@brandup/ui-app";
 import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 
 const UI = () => import("./ui");
@@ -7,7 +7,9 @@ export class PagesMiddleware implements Middleware {
     readonly name: string = "pages";
     private __isEditing: boolean = false;
 
-    async start(context: StartContext, next: MiddlewareNext) {
+    get isEditing(): boolean { return this.__isEditing; }
+
+    async start(_context: StartContext, next: MiddlewareNext) {
         await next();
     }
 
@@ -17,10 +19,9 @@ export class PagesMiddleware implements Middleware {
         this._showUI(context.data);
     }
 
-    private _showUI(items: { [key: string]: any }) {
-        console.log(items);
+    private _showUI(data: { [key: string]: any }) {
         if (document.body.dataset.pagesAdmin) {
-            const page = items.page as Page<WebsiteApplication, PageModel>;
+            const page = data.page as Page<WebsiteApplication, PageModel>;
             if (page) {
                 UI().then(t => {
                     this.__isEditing = t.default(page);

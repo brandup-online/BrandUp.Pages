@@ -6,56 +6,13 @@
     --ck-spacing-standard: 0 !important;
     --ck-font-size-tiny: 0 !important;
     --ck-z-default: 100 !important;
-    --ck-z-modal: calc( var(--ck-z-default) + 999 ) !important;
+    --ck-z-modal: calc(var(--ck-z-default) + 999) !important;
     --ck-inner-shadow: none !important;
 }
 
 body:has(.editor-toolbar) {
     & .app {
         padding-bottom: 76px;
-    }
-}
-
-.bp-elem {
-    font-family: @Font-Family;
-    font-size: @Font-Size;
-    line-height: @LineHeight;
-    color: @Text-Color;
-    font-weight: normal;
-    font-style: normal;
-    text-align: left;
-
-    & input,
-    & select,
-    & button {
-        font-family: @Font-Family;
-        font-size: @Font-Size;
-        color: @Text-Color;
-    }
-
-    & button {
-        box-sizing: border-box;
-        outline: none;
-        border: 1px solid transparent;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: @Main-Color;
-    }
-
-    & a {
-        color: @Link-Color;
-
-        &:hover {
-            color: @Link-Color-Hover;
-        }
-    }
-
-    & svg {
-        display: block;
-        fill: @Neutral-Darkest;
-        width: 24px;
     }
 }
 
@@ -110,7 +67,7 @@ body:has(.editor-toolbar) {
             }
         }
 
-        &:focus,&:active {
+        &:focus, &:active {
             background: none;
         }
     }
@@ -131,7 +88,7 @@ body:has(.editor-toolbar) {
             background: @Neutral-Medium;
             border: 1px solid @Neutral-Dark;
         }
-    
+
         &:active {
             background: @Neutral-Medium;
             color: @Neutral-Dark;
@@ -142,7 +99,7 @@ body:has(.editor-toolbar) {
         }
     }
 
-    &:hover,&:focus {
+    &:hover, &:focus {
         background: @Accent-Dark;
     }
 
@@ -162,8 +119,9 @@ body.bp-state-loading {
 }
 
 @keyframes bp-spinner {
-  to {transform: rotate(360deg);}
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-@import "./admin/page-toolbar.less";
 @import "./content/editor.less";

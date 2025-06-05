@@ -1,22 +1,23 @@
 import { UIElement } from "@brandup/ui";
+import { DOM } from "@brandup/ui-dom";
+import { request } from "@brandup/ui-ajax";
+import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import ContentPage from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
-import iconBack from "../svg/toolbar-button-back.svg";
-import iconDown from "../svg/new/arrow-down.svg";
-import iconPublish from "../svg/new/upload.svg";
-import iconSeo from "../svg/new/increase.svg";
 import { listContentType } from "../dialogs/content-types/list";
-import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
 import { publishPage } from "../dialogs/pages/publish";
 import { seoPage } from "../dialogs/pages/seo";
-import { DOM } from "@brandup/ui-dom";
-import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { ContentEditor } from "../content/editor";
+import "./page-toolbar.less";
 
 import iconList from "../svg/new/menu.svg";
 import iconEdit from "../svg/new/edit.svg";
 import iconMore from "../svg/new/more.svg";
 import iconPlus from "../svg/new/plus.svg";
+import iconBack from "../svg/toolbar-button-back.svg";
+import iconDown from "../svg/new/arrow-down.svg";
+import iconPublish from "../svg/new/upload.svg";
+import iconSeo from "../svg/new/increase.svg";
 
 const EDITID_QUERY_KEY = "editid";
 
@@ -26,17 +27,18 @@ export class PageToolbar extends UIElement {
 
     readonly isContentPage: boolean;
 
-    private __menuCloseFunc: (e: MouseEvent) => void;
-    private __menuExpandedElem: HTMLElement = null;
+    private __menuCloseFunc?: (e: MouseEvent) => void;
+    private __menuExpandedElem?: HTMLElement;
 
-    private __editor: ContentEditor = null;
-    
-    get typeName(): string {
-        return "BrandUpPages.PageToolbar";
-    }
+    private __editor?: ContentEditor;
+
+    get typeName(): string { return "BrandUpPages.PageToolbar"; }
     get hasEditor(): boolean { return !!this.__editor; }
 
     constructor(page: Page<WebsiteApplication, PageModel>) {
+        if (!page)
+            throw new Error('Page is not set.');
+
         super();
 
         this.__page = page;
@@ -81,7 +83,7 @@ export class PageToolbar extends UIElement {
                 websiteMenu = DOM.tag("menu", { class: "bp-page-toolbar-menu" }),
             ])
         ];
-        
+
         const pageContents = findContents();
         if (pageContents.length) {
             let contentsMenuElem: HTMLElement;
@@ -96,21 +98,21 @@ export class PageToolbar extends UIElement {
                 ]));
             })
         }
-        
+
         // Если страница динамическая
         if (this.isContentPage) {
             const contentPage = <ContentPage>this.__page;
 
             websiteMenuItems.append(DOM.tag("button", { command: "bp-pages-child" }, [iconDown, DOM.tag("span", null, "Дочерние страницы")]));
-            
+
             if (contentPage.model.parentPageId) {
                 websiteMenuItems.append(DOM.tag("button", { command: "bp-back" }, [iconBack, DOM.tag("span", null, "Перейти к родительской странице")]));
             }
 
             toolbarButtons.push(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button page-status " + contentPage.model.status.toLowerCase() }, [DOM.tag("span")])));
 
-            const pageMenuItems = [DOM.tag("button", { command: "bp-seo" }, [iconSeo, DOM.tag("span", null, "Индексирование страницы")]) ];
-            
+            const pageMenuItems = [DOM.tag("button", { command: "bp-seo" }, [iconSeo, DOM.tag("span", null, "Индексирование страницы")])];
+
             if (contentPage.model.status !== "Published") {
                 toolbarButtons.push(DOM.tag("div", null, DOM.tag("button", { class: "bp-page-toolbar-button", command: "bp-publish", title: "Опубликовать" }, iconPublish)));
                 pageMenuItems.push(DOM.tag("button", { command: "bp-pages" }, [iconPublish, DOM.tag("span", null, "Опубликовать страницу")]));
@@ -123,7 +125,7 @@ export class PageToolbar extends UIElement {
         }
         websiteMenu.append(websiteMenuItems);
 
-        const toolbarElem = DOM.tag("div", { class: "bp-elem bp-page-toolbar" }, toolbarButtons);
+        const toolbarElem = DOM.tag("div", { class: "bp-page-toolbar" }, toolbarButtons);
 
         document.body.appendChild(toolbarElem);
         this.setElement(toolbarElem);
@@ -138,7 +140,7 @@ export class PageToolbar extends UIElement {
             else
                 this.__closeMenu();
         });
-        
+
         this.__menuCloseFunc = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
             if (target.closest(`.bp-page-toolbar-menu`))
@@ -155,17 +157,13 @@ export class PageToolbar extends UIElement {
             }
         };
 
-        this.registerCommand("bp-back", () => {
-            let parentPageId: string = null;
+        this.registerCommand("bp-back", async () => {
+            let parentPageId: string | null = null;
             if (this.isContentPage)
                 parentPageId = this.__page.model.parentPageId;
             if (parentPageId) {
-                ajaxRequest({
-                    url: `/brandup.pages/page/${parentPageId}`,
-                    success: (response: AjaxResponse<PageModel>) => {
-                        this.__page.website.nav({ url: response.data.url });
-                    }
-                });
+                const response = await request({ url: `/brandup.pages/page/${parentPageId}` })
+                this.__page.website.nav({ url: response.data.url });
             }
         });
 
@@ -179,7 +177,7 @@ export class PageToolbar extends UIElement {
             });
 
         this.registerCommand("bp-pages", async () => {
-            let parentPageId: string = null;
+            let parentPageId: string;
             if (this.isContentPage)
                 parentPageId = this.__page.model.parentPageId;
             await browserPage(parentPageId);
@@ -204,7 +202,7 @@ export class PageToolbar extends UIElement {
 
         this.registerCommand("bp-content-edit", async (context) => {
             this.__closeMenu();
-            
+
             const contentKey = context.target.dataset.contentKey;
             const contentType = context.target.dataset.contentType;
             if (!contentKey || !contentType)
@@ -228,7 +226,7 @@ export class PageToolbar extends UIElement {
             }
         });
     }
-    
+
     private __openMenu(ownElem: HTMLElement) {
         document.body.addEventListener("click", this.__menuCloseFunc);
 
@@ -251,7 +249,7 @@ export class PageToolbar extends UIElement {
             this.__editor.destroy();
 
         this.__closeMenu();
-        
+
         this.element?.remove();
         document.body.classList.remove("bp-state-toolbars");
 
@@ -283,7 +281,7 @@ const contentInPage = (container: HTMLElement) => {
     return !!container.closest("#page-content");
 };
 
-const findContents = (): Array <ContentLocation> => {
+const findContents = (): Array<ContentLocation> => {
     const definitions = new Array<ContentLocation>();
 
     const contentRoots = DOM.queryElements(document.body, "[data-content-root]");

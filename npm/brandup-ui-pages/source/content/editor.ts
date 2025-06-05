@@ -25,7 +25,7 @@ export class ContentEditor extends UIElement implements IContentHost {
     private __error: (reason?: any) => void;
 
     get typeName(): string { return "BrandUpPages.Editor"; }
-    
+
     private constructor(website: WebsiteApplication, editId: string) {
         super();
 
@@ -33,7 +33,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         this.editId = editId;
         this.queue = new AjaxQueue();
     }
-    
+
     static begin(page: Page<WebsiteApplication, PageModel>, key: string, type: string, force: boolean = false) {
         return new Promise<{ editId: string, exist: boolean }>((resolve) => {
             page.website.request({
@@ -43,7 +43,7 @@ export class ContentEditor extends UIElement implements IContentHost {
                 success: (response: AjaxResponse<BeginContentEditResult>) => {
                     if (response.status !== 200)
                         throw "Error begin content edit.";
-                        
+
                     resolve({ editId: response.data.editId, exist: response.data.exist });
                 }
             });
@@ -59,7 +59,7 @@ export class ContentEditor extends UIElement implements IContentHost {
         if (document.body.classList.contains("bp-state-design"))
             throw "Content editor already started.";
         document.body.classList.add("bp-state-design");
-        
+
         this.__contentElem = container;
         this.__contentElem?.classList.add("root-designer");
 
@@ -67,14 +67,14 @@ export class ContentEditor extends UIElement implements IContentHost {
             .then(() => {
                 this.__renderToolbar();
                 this.__renderDesigner();
-                
+
                 return new Promise<EditResult>((resolve, reject) => {
                     this.__complate = resolve;
                     this.__error = reject;
                 });
             });
     }
-    
+
     // IContentHost members
     get editor(): ContentEditor { return this; }
     get isList(): boolean { return false; }
@@ -135,9 +135,9 @@ export class ContentEditor extends UIElement implements IContentHost {
             });
         });
     }
-    
+
     private __renderToolbar() {
-        const toolbarElem = DOM.tag("div", { class: "bp-elem editor-toolbar" }, [
+        const toolbarElem = DOM.tag("div", { class: "editor-toolbar" }, [
             DOM.tag("button", { class: "bp-button", command: "bp-commit", title: "Применить изменения" }, [saveIcon, "Сохранить"]),
             DOM.tag("button", { class: "bp-button secondary", command: "bp-discard", title: "Отменить изменения" }, [cancelIcon, "Отмена"]),
             DOM.tag("button", { class: "bp-button neutral right", command: "bp-content", title: "Показать контент" }, [editBlockIcon, "Контент"]),
@@ -189,7 +189,7 @@ export class ContentEditor extends UIElement implements IContentHost {
             });
         });
     }
-    
+
     private __renderDesigner() {
         if (!this.__contentElem)
             return;

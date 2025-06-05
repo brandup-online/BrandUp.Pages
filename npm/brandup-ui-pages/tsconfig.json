@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"target": "ESNext",
+		"sourceMap": true,
+		"strict": false,
+		"lib": [
+			"DOM",
+			"ESNext"
+		],
+		"esModuleInterop": true,
+		"noImplicitAny": false,
+		"noEmitOnError": true,
+		"baseUrl": "./source",
+		"outDir": "./out",
+		"declaration": false,
+		"declarationMap": false,
+		"removeComments": false,
+		"stripInternal": true,
+		"allowSyntheticDefaultImports": true
+	},
+	"include": [
+		"source",
+		"test"
+	],
+	"exclude": [
+		"node_modules",
+		"dist",
+		".vs",
+		".vscode"
+	],
+	"compileOnSave": false
+}

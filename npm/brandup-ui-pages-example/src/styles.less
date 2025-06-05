@@ -1,83 +1,36 @@
-﻿@Primary-Color: #FFC700;
+﻿@import "@brandup/ui-kit/source/adaptive.less";
+
+@Primary-Color: #FFC700;
 @Accent-Color: #FFC700;
-@Main-Color: #F6F6F6;
-@Text-Color: #33333C;
 
-@Border-Radius: 5px;
+:root {
+	--text-color: #33333C;
 
-@Font-Size: 15px;
-@Font-Family: 'Segoe UI', sans-serif;
-@LineHeight: 150%;
+	--link-color: #000;
+	--link-decoration: underline;
+	--hover--link-color: var(--link-color);
+	--hover--link-decoration: underline;
 
-@Link-Color: @Accent-Color;
-@Link-Color-Hover: @Accent-Color;
+	--app-top-height: 80px;
 
-@Header-Font-Family: 'Segoe UI', sans-serif;
+	.adaptive-tablet({
+		--content-padding-lr: 30px;
+	});
 
-@Content-MaxWidth: 1280px;
-@Content-MinWidth: 320px;
-@Content-Padding: 30px;
-
-html, body {
-	margin: 0;
-	padding: 0;
-	height: 100%;
-}
-
-body {
-	font-size: @Font-Size;
-	font-family: @Font-Family;
-	line-height: @LineHeight;
-	background: #fff;
-	touch-action: manipulation;
-	color: @Text-Color;
-}
-
-h1, h2, h3, h4, h5 {
-	font-family: @Header-Font-Family;
-	font-weight: 500;
-	padding: 0;
-	margin: 0;
-	line-height: @LineHeight;
-}
-
-h1 {
-	font-size: 30px;
-	line-height: 44px;
+	.adaptive-mobile({
+		--content-padding-lr: 15px;
+	});
 }
 
 a {
-	color: @Link-Color;
+	color: var(--link-color);
+	text-decoration: var(--link-decoration);
+	text-underline-offset: 4px;
 
-	&:hover {
-		color: @Link-Color-Hover;
-	}
-}
-
-svg {
-	display: block;
-}
-
-ul, ol {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-
-	& li {
-		padding: 0;
-		margin: 0;
-	}
-}
-
-.content-width {
-	max-width: @Content-MaxWidth;
-	min-width: @Content-MinWidth;
-	box-sizing: border-box;
-	padding: 0 @Content-Padding;
-	margin: 0 auto;
-
-	@media all and (max-width: 600px) {
-		padding: 0 @Content-Padding / 1.5;
+	&:hover,
+	&:focus {
+		color: var(--hover--link-color);
+		text-decoration: var(--hover--link-decoration);
 	}
 }
 
@@ -90,81 +43,57 @@ ul, ol {
 	flex-direction: column;
 	align-items: stretch;
 	justify-content: flex-start;
-	min-width: @Content-MinWidth;
+	min-width: var(--content-min-width);
 	overflow: hidden;
 	position: relative;
 	transition: transform ease 250ms;
 }
 
-nav.app-top {
+.app-top {
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
-	background: #000;
+	background: #222;
 	z-index: 100;
 
+	--text-color: #fff;
+	--link-color: #fff;
+	--link-decoration: none;
+	--hover--link-color: #fff;
+
+	--svg-fill: #fff;
+
 	& .content-width {
-		height: 80px;
+		height: var(--app-top-height);
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: center;
+		column-gap: 50px;
 	}
 
 	& a.logo {
-		color: #fff;
-		font-size: 28px;
-		line-height: 40px;
-		text-decoration: none;
+		font-size: 26px;
 		display: flex;
 		flex-flow: row nowrap;
 		align-items: center;
 		column-gap: 10px;
+		text-transform: uppercase;
+		text-decoration: none;
 
-		& svg {
-			width: 40px;
-			height: 40px;
-		}
-
-		& span {
-			text-transform: uppercase;
-		}
+		--svg-size: 40px;
 	}
 
 	& ul {
 		flex: 1 1 auto;
-		list-style: none;
-		padding: 0;
-		margin: 0;
 		display: flex;
 		flex-flow: row nowrap;
-		justify-content: flex-end;
 		align-items: center;
-		font-size: 16px;
-		line-height: 30px;
+		column-gap: 30px;
 
 		& li {
-			padding: 0;
-			margin: 0 0 0 30px;
-
 			&.menu {
 				display: none;
-			}
-		}
-
-		& a {
-			text-decoration: none;
-			color: #fff;
-
-			& svg {
-				display: block;
-				fill: #fff;
-				width: 26px;
-				height: 26px;
-			}
-
-			&:hover {
-				text-decoration: underline;
 			}
 		}
 
@@ -186,16 +115,16 @@ nav.app-top {
 	}
 }
 
-main.app-content {
-	margin-top: 80px;
+.app-content {
+	margin-top: var(--app-top-height);
 	flex: 1 1 auto;
 	width: 100%;
 	padding-top: 30px;
 	padding-bottom: 30px;
 
 	@media all and (max-width: 600px) {
-		padding-top: @Content-Padding / 1.5;
-		padding-bottom: @Content-Padding / 1.5;
+		padding-top: 20px;
+		padding-bottom: 20px;
 	}
 }
 
@@ -220,8 +149,7 @@ main.app-content {
 	}
 
 	& .content {
-		background: @Accent-Color;
-		color: @Text-Color;
+		background: #FFC700;
 		position: absolute;
 		top: 0;
 		left: 100%;
@@ -232,41 +160,16 @@ main.app-content {
 		display: flex;
 		flex-flow: column nowrap;
 		justify-content: flex-end;
+		row-gap: 15px;
 		box-sizing: border-box;
-		padding: @Content-Padding 0;
-		row-gap: @Content-Padding;
+		padding: 30px;
+
+		--link-decoration: none;
 
 		& ul {
-			list-style: none;
-			padding: 0 25px;
-			margin: 0;
-			width: 100%;
-			box-sizing: border-box;
-			overflow: auto;
-
-			& li {
-				padding: 8px 0;
-				margin: 0;
-
-				&.separator {
-					height: @Content-Padding / 4;
-					overflow: hidden;
-				}
-			}
-
-			& a {
-				text-decoration: none;
-				display: block;
-				color: @Text-Color;
-				font-size: 18px;
-				line-height: 24px;
-			}
-
-			&.site {
-				& a {
-					font-weight: 500;
-				}
-			}
+			display: flex;
+			flex-flow: column nowrap;
+			row-gap: 15px;
 		}
 	}
 }
@@ -280,7 +183,6 @@ main.app-content {
 	outline: none;
 	min-height: 44px;
 	border-radius: 5px;
-	color: @Text-Color;
 	text-decoration: none;
 	text-transform: uppercase;
 	font-weight: 500;
@@ -288,7 +190,6 @@ main.app-content {
 
 	&:hover,
 	&:focus {
-		color: @Text-Color;
 		background: darken(@Primary-Color, 4%);
 	}
 
@@ -310,8 +211,7 @@ main.app-content {
 	& ul.actions {
 		flex: 0 0 auto;
 
-		& li {
-		}
+		& li {}
 	}
 
 	& h1 {
@@ -341,7 +241,7 @@ main.app-content {
 .page-blocks {
 	display: flex;
 	flex-flow: column nowrap;
-	row-gap: @Content-Padding;
+	row-gap: 30px;
 }
 
 .block-text {
@@ -350,23 +250,14 @@ main.app-content {
 
 	& .text {
 		& h2 {
-			font-size: 24px;
-			font-weight: 500;
-			line-height: @LineHeight;
 			padding-bottom: 10px;
 		}
 
 		& h3 {
-			font-size: 20px;
-			font-weight: 500;
-			line-height: @LineHeight;
 			padding-bottom: 10px;
 		}
 
 		& h4 {
-			font-size: 16px;
-			font-weight: 500;
-			line-height: @LineHeight;
 			padding-bottom: 10px;
 		}
 
@@ -376,8 +267,7 @@ main.app-content {
 		}
 	}
 
-	&.tb1 {
-	}
+	&.tb1 {}
 
 	&.tb2 {
 		& .text {
@@ -386,7 +276,7 @@ main.app-content {
 	}
 
 	&.tb3 {
-		padding: @Content-Padding * 2 @Content-Padding @Content-Padding;
+		//padding: @Content-Padding * 2 @Content-Padding @Content-Padding;
 		color: #fff;
 		display: flex;
 		flex-flow: column nowrap;
@@ -418,7 +308,7 @@ main.app-content {
 				top: 0;
 				width: 100%;
 				height: 100%;
-				background: rgba(0,0,0,0.3);
+				background: rgba(0, 0, 0, 0.3);
 			}
 		}
 	}
@@ -470,7 +360,7 @@ main.app-content {
 					top: 0;
 					width: 100%;
 					height: 100%;
-					background: rgba(0,0,0,0.3);
+					background: rgba(0, 0, 0, 0.3);
 					transition: background ease 120ms;
 				}
 			}
@@ -486,7 +376,7 @@ main.app-content {
 
 			&:hover {
 				& i:after {
-					background: rgba(0,0,0,0.1);
+					background: rgba(0, 0, 0, 0.1);
 				}
 			}
 		}

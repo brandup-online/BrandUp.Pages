@@ -1,8 +1,8 @@
-﻿import { Middleware, MiddlewareMethod, NavigateContext } from "@brandup/ui-app";
+﻿import { Middleware, MiddlewareNext, NavigateContext, StartContext } from "@brandup/ui-app";
 export class LayoutMiddleware implements Middleware {
     readonly name: string = "layout";
 
-    async start(context, next) {
+    async start(context: StartContext, next: MiddlewareNext) {
         await next();
 
         context.app.registerCommand("toggle-app-menu", () => {
@@ -10,7 +10,7 @@ export class LayoutMiddleware implements Middleware {
         });
     }
 
-    async navigate(context: NavigateContext, next) {
+    async navigate(context: NavigateContext, next: MiddlewareNext) {
         await next();
 
         document.body.classList.remove("website-state-show-appmenu");
