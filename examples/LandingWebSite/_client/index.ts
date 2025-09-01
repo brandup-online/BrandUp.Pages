@@ -1,6 +1,6 @@
 ﻿import { WEBSITE } from "@brandup/ui-website";
 import { ajaxRequest } from "@brandup/ui-ajax";
-import { PagesMiddleware } from "brandup-ui-pages";
+import { pagesMiddleware } from "brandup-ui-pages";
 import "./styles.less";
 
 WEBSITE.run(
@@ -13,7 +13,7 @@ WEBSITE.run(
             "BB1": { factory: () => import("./contents/BB1") }
         }
     },
-    (builder) => builder.useMiddleware(() => new PagesMiddleware()))
+    (builder) => builder.useMiddleware(pagesMiddleware))
     .then((context) => {
         context.app.registerCommand("signin", () => {
             ajaxRequest({
