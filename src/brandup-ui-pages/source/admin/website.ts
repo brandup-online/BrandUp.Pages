@@ -1,5 +1,5 @@
 ﻿import { UIElement } from "@brandup/ui";
-import ContentPage from "../pages/content";
+import { ContentPage } from "../pages/content";
 import { browserPage } from "../dialogs/pages/browser";
 import iconBack from "../svg/toolbar-button-back.svg";
 import iconList from "../svg/toolbar-button-list.svg";

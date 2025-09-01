@@ -1,12 +1,12 @@
 ﻿import { WEBSITE } from "@brandup/ui-website";
 import { ajaxRequest } from "@brandup/ui-ajax";
-import { pagesMiddleware } from "brandup-ui-pages";
+import { ContentPage, pagesMiddleware } from "brandup-ui-pages";
 import "./styles.less";
 
 WEBSITE.run(
     {
         pages: {
-            "content": { factory: () => import("brandup-ui-pages/source/pages/content") },
+            "content": { factory: () => new Promise(resolve => resolve({ default: ContentPage })) },
             "about": { factory: () => import("./pages/about/index") }
         },
         components: {

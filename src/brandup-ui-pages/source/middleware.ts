@@ -1,7 +1,6 @@
 ﻿import { Middleware, MiddlewareNext, NavigateContext, StartContext } from "@brandup/ui-app";
 import { Page } from "@brandup/ui-website";
-import ContentPage from "./pages/content";
-import "./styles.less";
+import { ContentPage } from "./pages/content";
 
 export class PagesMiddleware implements Middleware {
     name: string = "Pages";
@@ -32,7 +31,7 @@ export class PagesMiddleware implements Middleware {
 
             if (page instanceof ContentPage) {
                 import("./admin/page").then(d => {
-                    page.onDestroy(new d.PageToolbar(page as ContentPage));
+                    page.onDestroy(new d.PageToolbar(page));
                 });
             }
         }

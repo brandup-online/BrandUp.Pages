@@ -1,5 +1,5 @@
 ﻿import { UIElement } from "@brandup/ui";
-import ContentPage from "../pages/content";
+import { ContentPage } from "../pages/content";
 import { PageDesigner } from "../content/designer/page";
 import { editPage } from "../dialogs/pages/edit";
 import { publishPage } from "../dialogs/pages/publish";

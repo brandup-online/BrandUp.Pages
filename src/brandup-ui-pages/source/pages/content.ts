@@ -1,6 +1,7 @@
 ﻿import { Page, PageModel, WebsiteApplication } from "@brandup/ui-website";
+import "../styles.less";
 
-class ContentPage extends Page<WebsiteApplication, ContentPageModel> {
+export class ContentPage extends Page<WebsiteApplication, ContentPageModel> {
     override get typeName(): string { return "BrandUp.ContentPage" }
 }
 
@@ -10,5 +11,3 @@ export interface ContentPageModel extends PageModel {
     editId: string;
     status: "Draft" | "Published";
 }
-
-export default ContentPage;
