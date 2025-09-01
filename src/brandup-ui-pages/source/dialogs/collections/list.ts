@@ -3,15 +3,15 @@ import { createPageCollection } from "./create";
 import { deletePageCollection } from "./delete";
 import { updatePageCollection } from "./update";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { PageCollectionModel } from "../../typings/models";
 
 export class PageCollectionListDialog extends ListDialog<PageCollectionListModel, PageCollectionModel> {
-    readonly pageId: string;
+    readonly pageId: string | null;
     private __isModified: boolean = false;
-    private navElem: HTMLElement;
+    private navElem?: HTMLElement;
 
-    constructor(pageId: string, options?: DialogOptions) {
+    constructor(pageId: string | null, options?: DialogOptions) {
         super(options);
 
         this.pageId = pageId;
@@ -19,43 +19,43 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
 
     get typeName(): string { return "BrandUpPages.PageCollectionListDialog"; }
 
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         super._onRenderContent();
 
         this.setHeader("Коллекции страниц");
         this.setNotes("Просмотр и управление коллекциями страниц.");
-        
+
         this.registerCommand("item-create", () => {
-            createPageCollection(this.pageId).then((createdItem: PageCollectionModel) => {
+            createPageCollection(this.pageId).then((_createdItem: PageCollectionModel) => {
                 this.loadItems();
                 this.__isModified = true;
             });
         });
-        this.registerItemCommand("item-update", (pageCollectionId: string, el: HTMLElement) => {
-            updatePageCollection(pageCollectionId).then((updatedItem: PageCollectionModel) => {
+        this.registerItemCommand("item-update", (pageCollectionId: string, _el: HTMLElement) => {
+            updatePageCollection(pageCollectionId).then((_updatedItem: PageCollectionModel) => {
                 this.loadItems();
                 this.__isModified = true;
             });
         });
-        this.registerItemCommand("item-delete", (pageCollectionId: string, el: HTMLElement) => {
-            deletePageCollection(pageCollectionId).then((deletedItem: PageCollectionModel) => {
+        this.registerItemCommand("item-delete", (pageCollectionId: string, _el: HTMLElement) => {
+            deletePageCollection(pageCollectionId).then((_deletedItem: PageCollectionModel) => {
                 this.loadItems();
                 this.__isModified = true;
             });
         });
     }
 
-    protected _onClose() {
+    protected override _onClose() {
         if (this.__isModified)
             this.resolve(null);
         else
             super._onClose();
     }
-    
+
     protected _buildUrl(): string {
         return `/brandup.pages/collection/list`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(urlParams: { [key: string]: string; }) {
         if (this.pageId)
             urlParams["pageId"] = this.pageId;
     }
@@ -79,9 +79,9 @@ export class PageCollectionListDialog extends ListDialog<PageCollectionListModel
         return item.id;
     }
     protected _renderItemContent(item: PageCollectionModel, contentElem: HTMLElement) {
-        contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("span", { }, item.title)));
+        contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("span", {}, item.title)));
     }
-    protected _renderItemMenu(item: PageCollectionModel, menuElem: HTMLElement) {
+    protected _renderItemMenu(_item: PageCollectionModel, menuElem: HTMLElement) {
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-update" }, "Редактировать")]));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Удалить")]));
     }
@@ -97,7 +97,7 @@ interface PageCollectionListModel {
     parents: Array<string>;
 }
 
-export var listPageCollection = (pageId: string) => {
+export var listPageCollection = (pageId: string | null) => {
     let dialog = new PageCollectionListDialog(pageId);
     return dialog.open();
 };

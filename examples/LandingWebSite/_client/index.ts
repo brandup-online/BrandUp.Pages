@@ -1,42 +1,43 @@
-﻿import { host } from "brandup-ui-website";
-import { ajaxRequest } from "brandup-ui-ajax";
+﻿import { WEBSITE } from "@brandup/ui-website";
+import { ajaxRequest } from "@brandup/ui-ajax";
 import { PagesMiddleware } from "brandup-ui-pages";
 import "./styles.less";
 
-host.start({
-    pageTypes: {
-        "content": () => import("brandup-ui-pages/source/pages/content"),
-        "about": () => import("./pages/about/index")
+WEBSITE.run(
+    {
+        pages: {
+            "content": { factory: () => import("brandup-ui-pages/source/pages/content") },
+            "about": { factory: () => import("./pages/about/index") }
+        },
+        components: {
+            "BB1": { factory: () => import("./contents/BB1") }
+        }
     },
-    scripts: {
-        "BB1": () => import("./contents/BB1")
-    }
-}, (builder) => {
-        builder.useMiddleware(new PagesMiddleware());
-    }, (app) => {
-        app.registerCommand("signin", () => {
+    (builder) => builder.useMiddleware(() => new PagesMiddleware()))
+    .then((context) => {
+        context.app.registerCommand("signin", () => {
             ajaxRequest({
-                url: app.uri("signin"),
+                url: context.app.buildUrl("signin"),
                 success: () => {
-                    app.reload();
+                    context.app.reload();
                 }
             })
         });
 
-        app.registerCommand("signout", () => {
+        context.app.registerCommand("signout", () => {
             ajaxRequest({
-                url: app.uri("signout"),
+                url: context.app.buildUrl("signout"),
                 success: () => {
-                    app.reload();
+                    context.app.reload();
                 }
             })
         });
 
-        app.registerCommand("toggle-app-menu", () => {
+        context.app.registerCommand("toggle-app-menu", () => {
             document.body.classList.toggle("website-state-show-appmenu");
         });
 
         window.addEventListener("pageNavigated", () => {
             document.body.classList.remove("website-state-show-appmenu");
         });
-});
+    });

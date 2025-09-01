@@ -1,6 +1,6 @@
 ﻿import { Textbox, TextboxOptions } from "../../form/textbox";
 import { IContentField, IContentForm } from "../../typings/content";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class TextContent extends Textbox implements IContentField {
     readonly form: IContentForm;
@@ -11,7 +11,7 @@ export class TextContent extends Textbox implements IContentField {
         this.form = form;
     }
 
-    protected _onChanged() {
+    protected override _onChanged() {
         super._onChanged();
 
         const value = this.getValue();
@@ -26,7 +26,7 @@ export class TextContent extends Textbox implements IContentField {
                     this.setValue(response.data);
                 }
                 else {
-                    this.setErrors([ "error" ]);
+                    this.setErrors(["error"]);
                 }
             }
         });

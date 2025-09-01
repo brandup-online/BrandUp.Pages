@@ -1,9 +1,9 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { PageCollectionModel } from "../../typings/models";
 import "./pages.less";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
     readonly form: IContentForm;
@@ -22,7 +22,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
     get typeName(): string { return "BrandUpPages.Form.Field.Pages"; }
 
-    protected _onRender() {
+    protected override _onRender() {
         super._onRender();
 
         this.element.classList.add("pages");
@@ -46,7 +46,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
                     url: `/brandup.pages/collection/search`,
-                    urlParams: {
+                    query: {
                         pageType: this.options.pageType,
                         title: title
                     },
@@ -101,22 +101,22 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             document.body.addEventListener("mousedown", this.__closeMenuFunc, false);
         });
 
-        this.registerCommand("select", (elem: HTMLElement) => {
+        this.registerCommand("select", (ctx) => {
             this.element.classList.remove("inputing");
             document.body.removeEventListener("click", this.__closeMenuFunc, false);
 
-            const pageCollectionId = elem.getAttribute("data-value");
-            const pageUrl = elem.getAttribute("data-url");
+            const pageCollectionId = ctx.target.getAttribute("data-value");
+            const pageUrl = ctx.target.getAttribute("data-url");
 
             this.setValue({
                 id: pageCollectionId,
-                title: elem.innerText,
+                title: ctx.target.innerText,
                 pageUrl: pageUrl
             });
 
             this.form.request(this, {
                 url: `/brandup.pages/content/pages`,
-                urlParams: { pageCollectionId: pageCollectionId },
+                query: { pageCollectionId: pageCollectionId },
                 method: "POST",
                 success: (response: AjaxResponse<PagesFieldFormValue>) => {
                     switch (response.status) {
@@ -160,7 +160,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             this.element.classList.remove("has-value");
     }
 
-    destroy() {
+    override destroy() {
         if (this.__searchRequest)
             this.__searchRequest.abort();
 

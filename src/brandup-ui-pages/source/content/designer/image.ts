@@ -1,9 +1,9 @@
 ﻿import { FieldDesigner } from "./base";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import "./image.less";
 import iconUpload from "../../svg/toolbar-button-picture.svg";
 import { ImageFieldOptions } from "../field/image";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     private __fileInputElem: HTMLInputElement;
@@ -126,7 +126,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         if (file instanceof File) {
             this.request({
                 url: `/brandup.pages/content/image`,
-                urlParams: {
+                query: {
                     fileName: file.name,
                     width: width,
                     height: height
@@ -151,7 +151,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
         else if (typeof file === "string") {
             this.request({
                 url: `/brandup.pages/content/image/url`,
-                urlParams: {
+                query: {
                     url: file,
                     width: width,
                     height: height

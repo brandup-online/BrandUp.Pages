@@ -1,10 +1,10 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
 
-export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements IContentField {
+export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements IContentField {
     readonly form: IContentForm;
     private __isChanged: boolean;
     private __value: HTMLElement;
@@ -18,7 +18,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
 
     get typeName(): string { return "BrandUpPages.Form.Field.Html"; }
 
-    protected _onRender() {
+    protected override _onRender() {
         super._onRender();
 
         this.element.classList.add("html");
@@ -112,7 +112,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions>  implements
         return value;
     }
 
-    destroy() {
+    override destroy() {
         this.__editor.destroy().then(() => {
             super.destroy();
         });

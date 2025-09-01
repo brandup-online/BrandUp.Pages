@@ -1,11 +1,11 @@
-﻿import { Page, PageModel } from "brandup-ui-website";
-import { DOM } from "brandup-ui-dom";
+﻿import { Page } from "@brandup/ui-website";
+import { DOM } from "@brandup/ui-dom";
 
-class AboutPage extends Page<PageModel> {
-    get typeName(): string { return "AboutPage" }
+class AboutPage extends Page {
+    override get typeName(): string { return "AboutPage" }
 
-    protected onRenderContent() {
-        super.onRenderContent();
+    protected override async onRenderContent() {
+        await super.onRenderContent();
 
         this.element.appendChild(DOM.tag("div", null, DOM.tag("a", { href: this.buildUrl({ param: "test1" }), class: "applink" }, "test1")));
         this.element.appendChild(DOM.tag("div", null, DOM.tag("a", { href: this.buildUrl({ param: "test2" }), class: "applink" }, "test2")));

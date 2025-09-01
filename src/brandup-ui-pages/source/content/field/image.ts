@@ -1,13 +1,12 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import "./image.less";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> implements IContentField {
     readonly form: IContentForm;
     private valueElem: HTMLElement;
-    private __isChanged = false;
     private __fileInputElem: HTMLInputElement;
     private __value: ImageFieldValue = null;
 
@@ -19,7 +18,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
 
     get typeName(): string { return "BrandUpPages.Form.Field.Image"; }
 
-    protected _onRender() {
+    protected override _onRender() {
         super._onRender();
 
         this.element.classList.add("image");
@@ -99,7 +98,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         if (file instanceof File) {
             this.form.request(this, {
                 url: `/brandup.pages/content/image`,
-                urlParams: { fileName: file.name },
+                query: { fileName: file.name },
                 method: "POST",
                 data: file,
                 success: (response: AjaxResponse<ImageFieldValue>) => {
@@ -121,7 +120,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
         else if (typeof file === "string") {
             this.form.request(this, {
                 url: `/brandup.pages/content/image/url`,
-                urlParams: { url: file },
+                query: { url: file },
                 method: "POST",
                 success: (response: AjaxResponse<ImageFieldValue>) => {
                     switch (response.status) {

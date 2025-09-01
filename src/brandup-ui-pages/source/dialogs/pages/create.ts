@@ -13,7 +13,7 @@ export class PageCreateDialog extends FormDialog<PageCreateForm, PageCreateValue
     }
 
     get typeName(): string { return "BrandUpPages.PageCreateDialog"; }
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         super._onRenderContent();
 
         this.setHeader("Параметры новой страницы");
@@ -24,7 +24,7 @@ export class PageCreateDialog extends FormDialog<PageCreateForm, PageCreateValue
     protected _buildUrl(): string {
         return `/brandup.pages/page/create`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(urlParams: { [key: string]: string; }) {
         urlParams["collectionId"] = this.collectionId;
     }
     protected _buildForm(model: PageCreateForm) {

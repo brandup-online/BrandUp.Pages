@@ -1,12 +1,12 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { ContentModel, ContentTypeModel } from "../../typings/models";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import "./model.less";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions> implements IContentField {
     readonly form: IContentForm;
@@ -21,7 +21,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
     get typeName(): string { return "BrandUpPages.Form.Field.Content"; }
 
-    protected _onRender() {
+    protected override _onRender() {
         super._onRender();
 
         this.element.classList.add("content");
@@ -29,8 +29,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.element.appendChild(this.__itemsElem);
 
-        this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
+        this.registerCommand("item-settings", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path-index]");
             const itemIndex = itemElem.getAttribute("content-path-index");
             let modelPath = `${this.name}[${itemIndex}]`;
 
@@ -43,8 +43,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             //    this.__refreshItem(itemElem);
             //});
         });
-        this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
+        this.registerCommand("item-delete", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path-index]");
             const itemIndex = parseInt(itemElem.getAttribute("content-path-index"));
 
             itemElem.remove();
@@ -52,7 +52,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
             this.form.request(this, {
                 url: '/brandup.pages/content/model',
-                urlParams: { itemIndex: itemIndex.toString() },
+                query: { itemIndex: itemIndex.toString() },
                 method: "DELETE",
                 success: () => { return; }
             });
@@ -108,7 +108,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
                         this.form.request(this, {
                             url: '/brandup.pages/content/model/move',
-                            urlParams: { itemIndex: sourceIndex, newIndex: destIndex },
+                            query: { itemIndex: sourceIndex, newIndex: destIndex },
                             method: "POST",
                             success: (response: AjaxResponse<ModelFieldFormValue>) => {
                                 if (response.status === 200) {
@@ -172,34 +172,37 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             f(itemElem, i);
         }
     }
+
     private _refreshBlockIndexes() {
         this.eachItems((elem, index) => {
             elem.setAttribute("content-path-index", index.toString());
-            DOM.getElementByClass(elem, "index").innerText = `#${index + 1}`;
+            DOM.getByClass(elem, "index").innerText = `#${index + 1}`;
         });
     }
-    private __refreshItem(elem: Element) {
-        const itemIndex = parseInt(elem.getAttribute("content-path-index"));
 
-        this.form.request(this, {
-            url: '/brandup.pages/content/model/data',
-            urlParams: { itemIndex: itemIndex.toString() },
-            method: "GET",
-            success: (response: AjaxResponse<ContentModel>) => {
-                if (response.status === 200) {
-                    this.__value.items[itemIndex] = response.data;
+    // private __refreshItem(elem: Element) {
+    //     const itemIndex = parseInt(elem.getAttribute("content-path-index"));
+    // 
+    //     this.form.request(this, {
+    //         url: '/brandup.pages/content/model/data',
+    //         query: { itemIndex: itemIndex.toString() },
+    //         method: "GET",
+    //         success: (response: AjaxResponse<ContentModel>) => {
+    //             if (response.status === 200) {
+    //                 this.__value.items[itemIndex] = response.data;
+    // 
+    //                 const newElem = this.__createItemElem(response.data, itemIndex);
+    //                 elem.insertAdjacentElement("afterend", newElem);
+    //                 elem.remove();
+    //             }
+    //         }
+    //     });
+    // }
 
-                    const newElem = this.__createItemElem(response.data, itemIndex);
-                    elem.insertAdjacentElement("afterend", newElem);
-                    elem.remove();
-                }
-            }
-        });
-    }
     private __addItem(itemType: string) {
         this.form.request(this, {
             url: '/brandup.pages/content/model',
-            urlParams: { itemType: itemType },
+            query: { itemType: itemType },
             method: "PUT",
             success: (response: AjaxResponse<ModelFieldFormValue>) => {
                 if (response.status === 200) {
@@ -208,17 +211,18 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             }
         });
     }
-    private __refreshItems() {
-        this.form.request(this, {
-            url: '/brandup.pages/content/model',
-            method: "GET",
-            success: (response: AjaxResponse<ModelFieldFormValue>) => {
-                if (response.status === 200) {
-                    this.setValue(response.data);
-                }
-            }
-        });
-    }
+
+    // private __refreshItems() {
+    //     this.form.request(this, {
+    //         url: '/brandup.pages/content/model',
+    //         method: "GET",
+    //         success: (response: AjaxResponse<ModelFieldFormValue>) => {
+    //             if (response.status === 200) {
+    //                 this.setValue(response.data);
+    //             }
+    //         }
+    //     });
+    // }
 }
 
 export interface ModelDesignerOptions {

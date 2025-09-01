@@ -1,18 +1,20 @@
 ﻿import { Field } from "./field";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import iconArrow from "../svg/combobox-arrow.svg";
 import "./combobox.less";
 
 export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
-    private __valueElem: HTMLElement;
-    private __itemsElem: HTMLElement;
-    private __value: string = null;
-    private __isChanged: boolean;
+    private __valueElem?: HTMLElement;
+    private __itemsElem?: HTMLElement;
+    private __value: string | null = null;
 
     get typeName(): string { return "BrandUpPages.Form.ComboBoxField"; }
 
-    protected _onRender() {
+    protected override _onRender() {
         super._onRender();
+
+        if (!this.element)
+            return;
 
         this.element.classList.add("combobox");
         this.element.setAttribute("tabindex", "0");
@@ -30,10 +32,10 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
         let isFocused = false;
         let md = false;
-        this.addEventListener("focus", () => {
+        this.element.addEventListener("focus", () => {
             isFocused = true;
         });
-        this.addEventListener("blur", () => {
+        this.element.addEventListener("blur", () => {
             isFocused = false;
         });
 
@@ -43,20 +45,23 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
 
         placeholderElem.addEventListener("mouseup", () => {
             if (md && isFocused)
-                this.element.blur();
+                this.element?.blur();
         });
 
-        this.registerCommand("select", (elem: HTMLElement) => {
+        this.registerCommand("select", (ctx) => {
+            if (!this.__valueElem)
+                return;
+
             DOM.removeClass(this.__itemsElem, ".selected", "selected");
 
-            elem.classList.add("selected");
+            ctx.target.classList.add("selected");
 
-            this.__value = elem.getAttribute("data-value");
-            this.__valueElem.innerText = elem.innerText;
+            this.__value = ctx.target.getAttribute("data-value");
+            this.__valueElem.innerText = ctx.target.innerText;
 
             this.__refreshUI();
 
-            this.element.blur();
+            this.element?.blur();
 
             this.raiseChanged();
         });
@@ -65,12 +70,14 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
     private __refreshUI() {
         const hasVal = this.hasValue();
         if (hasVal)
-            this.element.classList.add("has-value");
+            this.element?.classList.add("has-value");
         else
-            this.element.classList.remove("has-value");
+            this.element?.classList.remove("has-value");
     }
 
     addItem(item: ComboBoxItem) {
+        if (!this.__itemsElem)
+            return;
         this.__itemsElem.appendChild(DOM.tag("li", { "data-value": item.value, "data-command": "select" }, item.title));
     }
     addItems(items: Array<ComboBoxItem>) {
@@ -85,10 +92,13 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
         this.__value = null;
     }
 
-    getValue(): string {
+    getValue(): string | null {
         return this.__value;
     }
-    setValue(value: string) {
+    setValue(value: string | null) {
+        if (!this.__itemsElem || !this.__valueElem)
+            return;
+
         let text = "";
         if (value !== null) {
             const itemElem = DOM.queryElement(this.__itemsElem, `li[data-value="${value}"]`);

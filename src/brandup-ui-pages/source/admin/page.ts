@@ -1,4 +1,4 @@
-﻿import { UIElement } from "brandup-ui";
+﻿import { UIElement } from "@brandup/ui";
 import ContentPage from "../pages/content";
 import { PageDesigner } from "../content/designer/page";
 import { editPage } from "../dialogs/pages/edit";
@@ -10,8 +10,8 @@ import iconPublish from "../svg/toolbar-button-publish.svg";
 import iconSave from "../svg/toolbar-button-save.svg";
 import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
-import { DOM } from "brandup-ui-dom";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { DOM } from "@brandup/ui-dom";
+import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class PageToolbar extends UIElement {
     private __designer: PageDesigner;
@@ -33,7 +33,7 @@ export class PageToolbar extends UIElement {
 
             this.registerCommand("bp-content", () => {
                 editPage(page.model.editId).then(() => {
-                    page.website.app.reload();
+                    page.website.reload();
                 });
             });
             this.registerCommand("bp-commit", () => {
@@ -43,7 +43,7 @@ export class PageToolbar extends UIElement {
 
                 page.website.request({
                     url: "/brandup.pages/page/content/commit",
-                    urlParams: { editId: page.model.editId },
+                    query: { editId: page.model.editId },
                     method: "POST",
                     success: (response) => {
                         //cancelNav = false;
@@ -54,7 +54,7 @@ export class PageToolbar extends UIElement {
                         page.website.nav({ url: response.data, replace: true });
                         isLoading = false;
                     }
-                }, true);
+                });
             });
             this.registerCommand("bp-discard", () => {
                 if (isLoading)
@@ -63,7 +63,7 @@ export class PageToolbar extends UIElement {
 
                 page.website.request({
                     url: "/brandup.pages/page/content/discard",
-                    urlParams: { editId: page.model.editId },
+                    query: { editId: page.model.editId },
                     method: "POST",
                     success: (response) => {
                         //cancelNav = false;
@@ -100,7 +100,7 @@ export class PageToolbar extends UIElement {
 
                 page.website.request({
                     url: "/brandup.pages/page/content/begin",
-                    urlParams: { pageId: page.model.id },
+                    query: { pageId: page.model.id },
                     method: "POST",
                     success: (response: AjaxResponse<BeginPageEditResult>) => {
                         isLoading = false;
@@ -128,14 +128,14 @@ export class PageToolbar extends UIElement {
             });
             this.registerCommand("bp-seo", () => {
                 seoPage(page.model.id).then(() => {
-                    page.website.app.reload();
+                    page.website.reload();
                 })
             });
 
-            this.registerCommand("continue-edit", (elem: HTMLElement) => {
+            this.registerCommand("continue-edit", (ctx) => {
                 this.setPopup(null);
 
-                const url = elem.getAttribute("data-value");
+                const url = ctx.target.getAttribute("data-value");
                 page.website.nav({ url: url, replace: true });
             });
 
@@ -144,7 +144,7 @@ export class PageToolbar extends UIElement {
 
                 page.website.request({
                     url: "/brandup.pages/page/content/begin",
-                    urlParams: { pageId: page.model.id, force: "true" },
+                    query: { pageId: page.model.id, force: "true" },
                     method: "POST",
                     success: (response: AjaxResponse<BeginPageEditResult>) => {
                         isLoading = false;
@@ -187,7 +187,7 @@ export class PageToolbar extends UIElement {
         }
     }
 
-    destroy() {
+    override destroy() {
         if (this.__designer) {
             this.__designer.destroy();
             this.__designer = null;

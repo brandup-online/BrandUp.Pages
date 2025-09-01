@@ -1,9 +1,9 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { ajaxRequest, AjaxQueue, AjaxResponse } from "brandup-ui-ajax";
+import { ajaxRequest, AjaxQueue, AjaxResponse } from "@brandup/ui-ajax";
 import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 import iconSort from "../svg/list-item-sort.svg";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
     protected __itemsElem: HTMLElement;
@@ -29,8 +29,8 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         this.__itemsElem = DOM.tag("div", { class: "items" });
         this.content.appendChild(this.__itemsElem);
 
-        this.registerCommand("item-open-menu", (el: HTMLElement) => {
-            el.parentElement.parentElement.classList.add("opened-menu");
+        this.registerCommand("item-open-menu", (ctx) => {
+            ctx.target.parentElement.parentElement.classList.add("opened-menu");
         });
 
         this.__closeItemMenuFunc = (e: MouseEvent) => {
@@ -104,7 +104,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
                         ajaxRequest({
                             url: url,
-                            urlParams: urlParams,
+                            query: urlParams,
                             method: "POST",
                             success: (response: AjaxResponse) => {
                                 this.setLoading(false);
@@ -140,7 +140,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response: AjaxResponse<TList>) => {
                 this.setLoading(false);
@@ -189,7 +189,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
         ajaxRequest({
             url: url,
-            urlParams: urlParams,
+            query: urlParams,
             success: (response: AjaxResponse<Array<TItem>>) => {
                 this.setLoading(false);
 
@@ -203,21 +203,21 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         });
     }
     protected registerItemCommand(name: string, execute: (itemId: string, model: any, commandElem: HTMLElement) => void, canExecute?: (itemId: string, model: any, commandElem: HTMLElement) => boolean) {
-        this.registerCommand(name, (elem: HTMLElement) => {
-            const item = this._findItemIdFromElement(elem);
+        this.registerCommand(name, (ctx) => {
+            const item = this._findItemIdFromElement(ctx.target);
             if (item === null)
                 return;
 
-            execute(item.id, item.model, elem);
-        }, (elem: HTMLElement) => {
+            execute(item.id, item.model, ctx.target);
+        }, (ctx) => {
             if (!canExecute)
                 return true;
 
-            const item = this._findItemIdFromElement(elem);
+            const item = this._findItemIdFromElement(ctx.target);
             if (item === null)
                 return false;
 
-            return canExecute(item.id, item.model, elem);
+            return canExecute(item.id, item.model, ctx.target);
         });
     }
     protected _findItemIdFromElement(elem: HTMLElement): { id: string; model: any; } {
@@ -225,7 +225,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         if (!itemElem)
             return null;
 
-        return { id: itemElem.getAttribute("data-id"), model: itemElem["_model_"] };
+        return { id: itemElem.getAttribute("data-id"), model: (<any>itemElem)["_model_"] };
     }
 
     private __renderItems(items: Array<TItem>) {
@@ -237,7 +237,7 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
                 const itemId = this._getItemId(item);
                 const itemElem = DOM.tag("div", { class: "item", "data-id": itemId, "data-index": i.toString() });
 
-                itemElem["_model_"] = item;
+                (<any>itemElem)["_model_"] = item;
 
                 this.__renderItem(itemId, item, itemElem);
 
@@ -283,15 +283,15 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
 
     protected abstract _buildUrl(): string;
     protected _buildUrlParams(_urlParams: { [key: string]: string }) { }
-    protected abstract _buildList(model: TList);
+    protected abstract _buildList(model: TList): void;
     protected _allowLoadItems(): boolean { return true; }
     protected abstract _getItemId(item: TItem): string;
-    protected abstract _renderItemContent(item: TItem, contentElem: HTMLElement);
-    protected abstract _renderItemMenu(item: TItem, menuElem: HTMLElement);
-    protected abstract _renderEmpty(container: HTMLElement);
-    protected abstract _renderNewItem(containerElem: HTMLElement);
+    protected abstract _renderItemContent(item: TItem, contentElem: HTMLElement): void;
+    protected abstract _renderItemMenu(item: TItem, menuElem: HTMLElement): void;
+    protected abstract _renderEmpty(container: HTMLElement): void;
+    protected abstract _renderNewItem(containerElem: HTMLElement): void;
 
-    destroy() {
+    override destroy() {
         document.body.removeEventListener("mousedown", this.__closeItemMenuFunc);
 
         this.queue.destroy();

@@ -1,17 +1,33 @@
 {
   "compilerOptions": {
-    "module": "ES2020",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "target": "es6",
+    "target": "ESNext",
     "sourceMap": false,
     "strict": false,
-    "lib": [ "ES2020", "DOM" ],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "baseUrl": "./_client",
-    "noImplicitAny": false,
+    "outDir": "./_out",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
     "noEmitOnError": true,
-    "declaration": false,
-    "declarationMap": false
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "declarationMap": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
   },
+  "type": "module",
   "exclude": [
     "node_modules",
     "wwwroot",

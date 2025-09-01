@@ -1,10 +1,10 @@
-﻿import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "@brandup/ui-dom";
 import { UIControl } from "../control";
 import "./field.less";
 
 export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     readonly name: string;
-    private __errorsElem: HTMLElement;
+    private __errorsElem?: HTMLElement;
 
     constructor(name: string, options: TOptions) {
         super(options);
@@ -13,32 +13,39 @@ export abstract class Field<TValue, TOptions> extends UIControl<TOptions> {
     }
 
     protected _onRender() {
+        if (!this.element)
+            return;
+
         this.element.classList.add("website-form-field");
 
-        this.defineEvent("changed", { bubbles: true, cancelable: false });
+        //this.element.defineEvent("changed", { bubbles: true, cancelable: false });
     }
 
     protected raiseChanged() {
-        this.raiseEvent("changed", {
-            field: this,
-            value: this.getValue()
-        });
+        this.element.dispatchEvent(new CustomEvent("changed", {
+            detail: {
+                field: this,
+                value: this.getValue()
+            }
+        }));
     }
 
-    abstract getValue(): TValue;
-    abstract setValue(value: TValue);
+    abstract getValue(): TValue | null;
+    abstract setValue(value: TValue): void;
     abstract hasValue(): boolean;
 
     setErrors(errors: Array<string>) {
+        if (!this.element)
+            return;
+
         this.element.classList.remove("has-errors");
         if (this.__errorsElem) {
             this.__errorsElem.remove();
-            this.__errorsElem = null;
+            delete this.__errorsElem;
         }
 
-        if (!errors || errors.length === 0) {
+        if (!errors || errors.length === 0)
             return;
-        }
 
         this.element.classList.add("has-errors");
         this.__errorsElem = DOM.tag("ul", { class: "field-errors" });

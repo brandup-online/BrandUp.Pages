@@ -1,5 +1,5 @@
 ﻿import { DialogOptions, Dialog } from "../dialog";
-import { AjaxQueue, AjaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { AjaxQueue, AjaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { IContentForm, IContentField, PageContentForm } from "../../typings/content";
 import { TextContent } from "../../content/field/text";
 import { HtmlContent } from "../../content/field/html";
@@ -7,17 +7,16 @@ import { ImageContent } from "../../content/field/image";
 import { ModelField } from "../../content/field/model";
 import { HyperLinkContent } from "../../content/field/hyperlink";
 import { PagesContent } from "../../content/field/pages";
-import { ValidationProblemDetails } from "../../typings/models";
 import "../dialog-form.less";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
-    private __formElem: HTMLFormElement;
-    private navElem: HTMLElement;
-    private __fieldsElem: HTMLElement;
+    private __formElem?: HTMLFormElement;
+    private navElem?: HTMLElement;
+    private __fieldsElem?: HTMLElement;
     private __fields: { [key: string]: IContentField } = {};
     private __modelPath: string;
-    private __queue: AjaxQueue;
+    private __queue?: AjaxQueue;
     readonly editId: string;
 
     constructor(editId: string, modelPath?: string, options?: DialogOptions) {
@@ -29,9 +28,12 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
     get typeName(): string { return "BrandUpPages.PageEditDialog"; }
     get modelPath(): string { return this.__modelPath; }
-    get queue(): AjaxQueue { return this.__queue; }
+    get queue(): AjaxQueue | undefined { return this.__queue; }
 
     protected _onRenderContent() {
+        if (!this.element)
+            return;
+
         this.element.classList.add("bp-dialog-form");
 
         this.content.appendChild(this.__formElem = DOM.tag("form", { method: "POST", class: "nopad" }) as HTMLFormElement);
@@ -46,9 +48,10 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         this.__loadForm();
 
-        this.registerCommand("navigate", (elem: HTMLElement) => {
-            const path = elem.getAttribute("data-path");
-            this.navigate(path);
+        this.registerCommand("navigate", (ctx) => {
+            const path = ctx.target.getAttribute("data-path");
+            if (path !== null)
+                this.navigate(path);
         });
     }
     private __loadForm() {
@@ -68,10 +71,10 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         this.__queue.push({
             url: "/brandup.pages/page/content/form",
-            urlParams: { editId: this.editId, modelPath: this.__modelPath },
+            query: { editId: this.editId, modelPath: this.__modelPath },
             method: "GET",
             success: (response: AjaxResponse<PageContentForm>) => {
-                if (response.status !== 200) {
+                if (response.status !== 200 || !response.data) {
                     this.setError("Не удалось загрузить форму.");
                     return;
                 }
@@ -139,26 +142,26 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         this.setValues(model.values);
     }
 
-    private __applyModelState(state: ValidationProblemDetails) {
-        for (const key in this.__fields) {
-            const field = this.__fields[key];
-            field.setErrors(null);
-        }
-
-        if (state && state.errors) {
-            for (const key in state.errors) {
-                if (key === "")
-                    continue;
-
-                const field = this.getField(key);
-                field.setErrors(state.errors[key]);
-            }
-        }
-
-        if (state && state.errors && state.errors.hasOwnProperty("")) {
-            alert(state.errors[""]);
-        }
-    }
+    // private __applyModelState(state: ValidationProblemDetails) {
+    //     for (const key in this.__fields) {
+    //         const field = this.__fields[key];
+    //         field.setErrors(null);
+    //     }
+    // 
+    //     if (state && state.errors) {
+    //         for (const key in state.errors) {
+    //             if (key === "")
+    //                 continue;
+    // 
+    //             const field = this.getField(key);
+    //             field.setErrors(state.errors[key]);
+    //         }
+    //     }
+    // 
+    //     if (state && state.errors && state.errors.hasOwnProperty("")) {
+    //         alert(state.errors[""]);
+    //     }
+    // }
 
     navigate(modelPath: string) {
         this.__modelPath = modelPath ? modelPath : "";
@@ -166,14 +169,14 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         this.__loadForm();
     }
     request(field: IContentField, options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
+        if (!options.query)
+            options.query = {};
 
-        options.urlParams["editId"] = this.editId;
-        options.urlParams["path"] = this.modelPath;
-        options.urlParams["field"] = field.name;
+        options.query["editId"] = this.editId;
+        options.query["path"] = this.modelPath;
+        options.query["field"] = field.name;
 
-        this.__queue.push(options);
+        this.__queue?.push(options);
     }
 
     validate(): boolean {
@@ -202,16 +205,16 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
 
         field.render(containerElem);
 
-        this.__fieldsElem.appendChild(containerElem);
+        this.__fieldsElem?.appendChild(containerElem);
         this.__fields[field.name.toLowerCase()] = field;
     }
 
-    protected _onClose() {
+    protected override _onClose() {
         this.resolve(null);
     }
 
-    destroy() {
-        this.__queue.destroy();
+    override destroy() {
+        this.__queue?.destroy();
 
         for (const fieldName in this.__fields) {
             const field = this.__fields[fieldName];

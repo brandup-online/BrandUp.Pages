@@ -4,9 +4,9 @@ import { ComboBoxItem } from "../../form/combobox";
 import { PageCollectionModel, PageModel } from "../../typings/models";
 
 export class PageCollectionCreateDialog extends FormDialog<PageCollectionCreateForm, PageCollectionCreateValues, PageCollectionModel> {
-    readonly pageId: string;
+    readonly pageId: string | null;
 
-    constructor(pageId: string, options?: DialogOptions) {
+    constructor(pageId: string | null, options?: DialogOptions) {
         super(options);
 
         this.pageId = pageId;
@@ -20,7 +20,7 @@ export class PageCollectionCreateDialog extends FormDialog<PageCollectionCreateF
     protected _buildUrl(): string {
         return `/brandup.pages/collection/create`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(urlParams: { [key: string]: string; }) {
         if (this.pageId)
             urlParams["pageId"] = this.pageId;
     }
@@ -45,7 +45,7 @@ interface PageCollectionCreateValues {
     sort: string;
 }
 
-export var createPageCollection = (pageId: string) => {
+export var createPageCollection = (pageId: string | null) => {
     let dialog = new PageCollectionCreateDialog(pageId);
     return dialog.open();
 };

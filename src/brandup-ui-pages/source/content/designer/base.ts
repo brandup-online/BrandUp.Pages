@@ -1,5 +1,5 @@
-﻿import { UIElement } from "brandup-ui";
-import { AjaxRequest } from "brandup-ui-ajax";
+﻿import { UIElement } from "@brandup/ui";
+import { AjaxRequest } from "@brandup/ui-ajax";
 import { IContentFieldDesigner, IPageDesigner } from "../../typings/content";
 import "./base.less";
 
@@ -28,14 +28,14 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         this.onRender(elem);
     }
 
-    protected abstract onRender(elem: HTMLElement);
+    protected abstract onRender(elem: HTMLElement): void;
     request(options: AjaxRequest) {
-        if (!options.urlParams)
-            options.urlParams = {};
+        if (!options.query)
+            options.query = {};
 
-        options.urlParams["editId"] = this.page.editId;
-        options.urlParams["path"] = this.path;
-        options.urlParams["field"] = this.name;
+        options.query["editId"] = this.page.editId;
+        options.query["path"] = this.path;
+        options.query["field"] = this.name;
 
         this.page.queue.push(options);
     }

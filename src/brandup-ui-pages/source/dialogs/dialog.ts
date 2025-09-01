@@ -1,5 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
-import { Utility } from "brandup-ui-helpers";
+﻿import { DOM } from "@brandup/ui-dom";
 import { UIControl } from "../control";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";
@@ -27,7 +26,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         return this.contentElem;
     }
 
-    protected _getHtmlTemplate(): string {
+    protected override _getHtmlTemplate(): string {
         return '<div class="bp-dialog-header">' +
             '    <span class="title"></span>' +
             '</div>' +
@@ -39,11 +38,11 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     protected _onRender() {
         this.element.classList.add("bp-dialog");
 
-        this.headerElem = DOM.getElementByClass(this.element, "bp-dialog-header");
-        this.headerTitleElem = DOM.getElementByClass(this.headerElem, "title");
-        this.contentElem = DOM.getElementByClass(this.element, "bp-dialog-content");
-        this.footerElem = DOM.getElementByClass(this.element, "bp-dialog-footer");
-        this.footerNotesElem = DOM.getElementByClass(this.footerElem, "notes");
+        this.headerElem = DOM.getByClass(this.element, "bp-dialog-header");
+        this.headerTitleElem = DOM.getByClass(this.headerElem, "title");
+        this.contentElem = DOM.getByClass(this.element, "bp-dialog-content");
+        this.footerElem = DOM.getByClass(this.element, "bp-dialog-footer");
+        this.footerNotesElem = DOM.getByClass(this.footerElem, "notes");
 
         if (this.options.header)
             this.setHeader(this.options.header);
@@ -64,7 +63,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this._onRenderContent();
     }
 
-    protected abstract _onRenderContent();
+    protected abstract _onRenderContent(): void;
     protected _onClose() {
         this.destroy();
     }
@@ -101,7 +100,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this.element.classList.add("has-error");
 
         const list = DOM.tag("ul");
-        if (Utility.isArray(message)) {
+        if (Array.isArray(message)) {
             for (let i = 0; i < message.length; i++) {
                 list.appendChild(DOM.tag("li", null, message[i]));
             }
@@ -122,7 +121,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         }
     }
 
-    private __resolve: (value: TResult) => void;
+    private __resolve: (value: TResult | null) => void;
     private __reject: (reason: any) => void;
 
     open(): Promise<TResult> {
@@ -145,7 +144,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         });
     }
 
-    protected resolve(value: TResult) {
+    protected resolve(value: TResult | null) {
         if (this.__resolve)
             this.__resolve(value);
 
@@ -158,7 +157,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         this.destroy();
     }
 
-    destroy() {
+    override destroy() {
         if (this.__childDialog) {
             this.__childDialog.destroy();
             this.__childDialog = null;

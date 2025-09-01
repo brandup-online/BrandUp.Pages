@@ -1,10 +1,10 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import iconArrow from "../../svg/combobox-arrow.svg";
 import { PageModel } from "../../typings/models";
 import "./hyperlink.less";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> implements IContentField {
     readonly form: IContentForm;
@@ -29,7 +29,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
     get typeName(): string { return "BrandUpPages.Form.Field.HyperLink"; }
 
-    protected _onRender() {
+    protected override _onRender() {
         super._onRender();
 
         this.element.classList.add("hyperlink");
@@ -47,7 +47,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
             this.form.request(this, {
                 url: `/brandup.pages/content/hyperlink/url`,
-                urlParams: {
+                query: {
                     url: this.__urlValueInput.value
                 },
                 method: "POST",
@@ -84,7 +84,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
                     url: `/brandup.pages/page/search`,
-                    urlParams: {
+                    query: {
                         title: title
                     },
                     method: "GET",
@@ -179,8 +179,8 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                     throw "";
             }
         });
-        this.registerCommand("select-type", (elem: HTMLElement) => {
-            const type = elem.getAttribute("data-value") as HyperLinkType;
+        this.registerCommand("select-type", (ctx) => {
+            const type = ctx.target.getAttribute("data-value") as HyperLinkType;
 
             this.element.classList.remove("opened-types");
             document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
@@ -188,21 +188,21 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.__type = type;
             this.__refreshUI();
         });
-        this.registerCommand("select-page", (elem: HTMLElement) => {
+        this.registerCommand("select-page", (ctx) => {
             this.element.classList.remove("inputing");
             this.element.classList.remove("opened-pages");
             document.body.removeEventListener("click", this.__closePageMenuFunc, false);
 
-            const pageId = elem.getAttribute("data-value");
+            const pageId = ctx.target.getAttribute("data-value");
             this.__pageValueInput.setAttribute("value-page-id", pageId);
-            this.__valueElem.innerText = elem.innerText;
-            this.__pageValueInput.value = elem.innerText;
+            this.__valueElem.innerText = ctx.target.innerText;
+            this.__pageValueInput.value = ctx.target.innerText;
 
             this.__refreshUI();
 
             this.form.request(this, {
                 url: `/brandup.pages/content/hyperlink/page`,
-                urlParams: {
+                query: {
                     pageId: pageId
                 },
                 method: "POST",
@@ -287,7 +287,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         }
     }
 
-    destroy() {
+    override destroy() {
         if (this.__searchRequest)
             this.__searchRequest.abort();
 

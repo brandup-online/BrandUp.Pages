@@ -1,10 +1,10 @@
 ﻿import { FieldDesigner } from "./base";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { editPage } from "../../dialogs/pages/edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { ContentTypeModel } from "../../typings/models";
 import "./model.less";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse, QueryData } from "@brandup/ui-ajax";
 
 export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     get typeName(): string { return "BrandUpPages.ModelDesigner"; }
@@ -12,13 +12,13 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     protected onRender(elem: HTMLElement) {
         elem.classList.add("content-designer");
 
-        this.registerCommand("item-add", (elem: HTMLElement) => {
-            const itemType = elem.getAttribute("data-item-type");
+        this.registerCommand("item-add", (ctx) => {
+            const itemType = ctx.target.getAttribute("data-item-type");
             let itemIndex = -1;
 
             if (this.options.isListValue) {
-                if (elem.parentElement.hasAttribute("content-path-index"))
-                    itemIndex = parseInt(elem.parentElement.getAttribute("content-path-index")) + 1;
+                if (ctx.target.parentElement.hasAttribute("content-path-index"))
+                    itemIndex = parseInt(ctx.target.parentElement.getAttribute("content-path-index")) + 1;
                 else
                     itemIndex = this.countItems();
             }
@@ -32,8 +32,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                 this.addItem(itemType, itemIndex);
         });
         this.registerCommand("item-view", () => { return; });
-        this.registerCommand("item-settings", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path]");
+        this.registerCommand("item-settings", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path]");
             const contentPath = itemElem.getAttribute("content-path");
 
             editPage(this.page.editId, contentPath).then(() => {
@@ -42,8 +42,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                 this.__refreshItem(itemElem);
             });
         });
-        this.registerCommand("item-delete", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
+        this.registerCommand("item-delete", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path-index]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");
@@ -56,13 +56,13 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 
             this.request({
                 url: '/brandup.pages/content/model',
-                urlParams: { itemIndex: itemIndex },
+                query: { itemIndex: itemIndex },
                 method: "DELETE",
                 success: () => itemElem.classList.remove("processing")
             });
         });
-        this.registerCommand("item-up", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
+        this.registerCommand("item-up", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path-index]");
             const itemIndex = itemElem.getAttribute("content-path-index");
             if (parseInt(itemIndex) <= 0)
                 return;
@@ -77,13 +77,13 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 
             this.request({
                 url: '/brandup.pages/content/model/up',
-                urlParams: { itemIndex: itemIndex },
+                query: { itemIndex: itemIndex },
                 method: "POST",
                 success: () => itemElem.classList.remove("processing")
             });
         });
-        this.registerCommand("item-down", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path-index]");
+        this.registerCommand("item-down", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path-index]");
             const itemIndex = itemElem.getAttribute("content-path-index");
 
             if (parseInt(itemIndex) >= DOM.queryElements(this.element, "* > [content-path-index]").length - 1)
@@ -99,13 +99,13 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 
             this.request({
                 url: '/brandup.pages/content/model/down',
-                urlParams: { itemIndex: itemIndex },
+                query: { itemIndex: itemIndex },
                 method: "POST",
                 success: () => itemElem.classList.remove("processing")
             });
         });
-        this.registerCommand("item-refresh", (elem: HTMLElement) => {
-            const itemElem = elem.closest("[content-path]");
+        this.registerCommand("item-refresh", (ctx) => {
+            const itemElem = ctx.target.closest("[content-path]");
             if (itemElem.classList.contains("processing"))
                 return;
             itemElem.classList.add("processing");
@@ -145,18 +145,18 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     protected _renderBlocks() {
         this.eachItems((elem) => { this._renderBlock(elem); });
     }
-    protected _renderBlock(itemElem: Element) { }
+    protected _renderBlock(_itemElem: Element) { }
     protected _refreshBlockIndexes() {
         this.eachItems((elem, index) => { elem.setAttribute("content-path-index", index.toString()); });
     }
     private __refreshItem(elem: Element) {
-        const urlParams = {};
+        const urlParams: QueryData = {};
         if (this.options.isListValue)
-            urlParams["itemIndex"] = elem.getAttribute("content-path-index");
+            urlParams["itemIndex"] = elem.getAttribute("content-path-index") ?? "";
 
         this.request({
             url: '/brandup.pages/content/model/view',
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response: AjaxResponse<string>) => {
                 if (response.status === 200) {
@@ -186,7 +186,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
     addItem(itemType: string, index: number) {
         this.request({
             url: '/brandup.pages/content/model',
-            urlParams: {
+            query: {
                 itemType: itemType,
                 itemIndex: index.toString()
             },
@@ -195,7 +195,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                 if (response.status === 200) {
                     this.request({
                         url: '/brandup.pages/content/model/view',
-                        urlParams: { itemIndex: index.toString() },
+                        query: { itemIndex: index.toString() },
                         method: "GET",
                         success: (response: AjaxResponse<string>) => {
                             if (response.status === 200) {

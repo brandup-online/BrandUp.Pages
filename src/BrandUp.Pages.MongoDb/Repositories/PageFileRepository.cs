@@ -5,55 +5,54 @@ using MongoDB.Driver.GridFS;
 
 namespace BrandUp.Pages.MongoDb.Repositories
 {
-	public class PageFileRepository : IFileRepository
-	{
-		private readonly FileBucket files;
+    public class PageFileRepository : IFileRepository
+    {
+        private readonly FileBucket files;
 
-		public PageFileRepository(IPagesDbContext dbContext)
-		{
-			if (dbContext == null)
-				throw new ArgumentNullException(nameof(dbContext));
+        public PageFileRepository(IPagesDbContext dbContext)
+        {
+            if (dbContext == null)
+                throw new ArgumentNullException(nameof(dbContext));
 
-			files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages", DisableMD5 = false });
-		}
+            files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages" });
+        }
 
-		public async Task<IFile> UploadFileAsync(Guid pageId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
-		{
-			var fileDoc = new PageFileDocument(pageId, fileName, contentType);
+        public async Task<IFile> UploadFileAsync(Guid pageId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
+        {
+            var fileDoc = new PageFileDocument(pageId, fileName, contentType);
 
-			var uploadOptions = new GridFSUploadOptions
-			{
-				Metadata = MongoDbHelper.DictionaryToBsonDocument(fileDoc.Data),
-				DisableMD5 = false
-			};
+            var uploadOptions = new GridFSUploadOptions
+            {
+                Metadata = MongoDbHelper.DictionaryToBsonDocument(fileDoc.Data)
+            };
 
-			await files.UploadFromStreamAsync(fileDoc.Id, fileName, stream, uploadOptions, cancellationToken);
+            await files.UploadFromStreamAsync(fileDoc.Id, fileName, stream, uploadOptions, cancellationToken);
 
-			return fileDoc;
-		}
-		public async Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
-		{
-			var filter = Builders<GridFSFileInfo<Guid>>.Filter.Eq(info => info.Id, fileId);
-			var cursor = await files.FindAsync(filter, cancellationToken: cancellationToken);
+            return fileDoc;
+        }
+        public async Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            var filter = Builders<GridFSFileInfo<Guid>>.Filter.Eq(info => info.Id, fileId);
+            var cursor = await files.FindAsync(filter, cancellationToken: cancellationToken);
 
-			var fileInfo = await cursor.SingleOrDefaultAsync(cancellationToken);
-			if (fileInfo == null)
-				return null;
+            var fileInfo = await cursor.SingleOrDefaultAsync(cancellationToken);
+            if (fileInfo == null)
+                return null;
 
-			return new PageFileDocument(fileInfo);
-		}
-		public async Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
-		{
-			return await files.OpenDownloadStreamAsync(fileId, cancellationToken: cancellationToken);
-		}
-		public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
-		{
-			return files.DeleteAsync(fileId, cancellationToken);
-		}
+            return new PageFileDocument(fileInfo);
+        }
+        public async Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            return await files.OpenDownloadStreamAsync(fileId, cancellationToken: cancellationToken);
+        }
+        public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
+        {
+            return files.DeleteAsync(fileId, cancellationToken);
+        }
 
-		class FileBucket : GridFSBucket<Guid>
-		{
-			public FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : base(database, options) { }
-		}
-	}
+        class FileBucket : GridFSBucket<Guid>
+        {
+            public FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : base(database, options) { }
+        }
+    }
 }

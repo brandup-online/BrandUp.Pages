@@ -1,11 +1,11 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { Field } from "../form/field";
 import { TextboxOptions, Textbox } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";
 import { StringArrayFieldOptions, StringArrayField } from "../form/string-array";
 import { ValidationProblemDetails } from "../typings/models";
-import { AjaxQueue } from "brandup-ui-ajax";
+import { AjaxQueue } from "@brandup/ui-ajax";
 import "./dialog-form.less";
 
 export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TResult> extends Dialog<TResult> {
@@ -54,7 +54,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response) => {
                 this.setLoading(false);
@@ -80,7 +80,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
             }
         });
     }
-    private __changeValue(field: Field<any, any>) {
+    private __changeValue(_field: Field<any, any>) {
         //var urlParams: { [key: string]: string; } = {
         //    field: field.name
         //};
@@ -120,7 +120,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
         this.queue.push({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "POST",
             type: "JSON",
             data: this.getValues(),
@@ -222,10 +222,10 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
 
     protected abstract _getSaveButtonTitle(): string;
     protected abstract _buildUrl(): string;
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) { }
-    protected abstract _buildForm(model: TForm);
+    protected _buildUrlParams(_urlParams: { [key: string]: string; }) { }
+    protected abstract _buildForm(model: TForm): void;
 
-    destroy() {
+    override destroy() {
         this.queue.destroy();
 
         super.destroy();

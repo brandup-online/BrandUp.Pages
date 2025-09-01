@@ -1,7 +1,7 @@
 ﻿import { FieldDesigner } from "./base";
 import ContentEditor from "brandup-pages-ckeditor";
 import "./html.less";
-import { AjaxResponse } from "brandup-ui-ajax";
+import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     private __isChanged: boolean;
@@ -66,7 +66,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
 
         this.page.queue.push({
             url: '/brandup.pages/content/html',
-            urlParams: {
+            query: {
                 editId: this.page.editId,
                 path: this.path,
                 field: this.name
@@ -97,7 +97,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
         return value;
     }
 
-    destroy() {
+    override destroy() {
         this.__editor.destroy().then(() => {
             super.destroy();
         });

@@ -1,5 +1,4 @@
-﻿import { UIElement } from "brandup-ui";
-import { Utility } from "brandup-ui-helpers";
+﻿import { UIElement } from "@brandup/ui";
 
 export abstract class UIControl<TOptions = {}> extends UIElement {
     readonly options: TOptions = {} as TOptions;
@@ -34,7 +33,7 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
     protected _onApplyDefaultOptions() { return; }
     protected _applyOptions<TOptions>(options: TOptions) {
         if (options)
-            Utility.extend(this.options, options);
+            (<any>this)["options"] = { ...this.options, ...options };
     }
 
     // Render
@@ -49,8 +48,8 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
             if (!this.__fragment)
                 throw new Error();
 
-            if (Utility.isString(container)) {
-                container = document.getElementById((container as string).substr(1));
+            if (typeof container === "string") {
+                container = document.getElementById(container.substring(1));
                 if (!container)
                     throw new Error();
             }
@@ -69,7 +68,8 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
 
         return this;
     }
-    destroy() {
+
+    override destroy() {
         if (!this.isInject && this.element)
             this.element.remove();
 
@@ -77,5 +77,5 @@ export abstract class UIControl<TOptions = {}> extends UIElement {
     }
 
     protected _onInitialize() { return; }
-    protected abstract _onRender();
+    protected abstract _onRender(): void;
 }

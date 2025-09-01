@@ -1,36 +1,40 @@
 ﻿using BrandUp.Pages.Identity;
+using BrandUp.Website;
 using BrandUp.Website.Pages;
 
 namespace LandingWebSite.Pages
 {
-	public class PageEvents : IPageEvents
-	{
-		readonly IAccessProvider pageAccessProvider;
+    public class PageEvents(IAccessProvider pageAccessProvider) : IPageEvents
+    {
+        readonly IAccessProvider pageAccessProvider = pageAccessProvider ?? throw new ArgumentNullException(nameof(pageAccessProvider));
 
-		public PageEvents(IAccessProvider pageAccessProvider)
-		{
-			this.pageAccessProvider = pageAccessProvider ?? throw new ArgumentNullException(nameof(pageAccessProvider));
-		}
+        public async Task PageClientBuildAsync(PageClientBuildContext context)
+        {
+            var enableAdmin = await pageAccessProvider.CheckAccessAsync(context.CancellationToken);
+            context.ClientData.Add("enableAdministration", enableAdmin);
+        }
 
-		public Task PageClientBuildAsync(PageClientBuildContext context)
-		{
-			return Task.CompletedTask;
-		}
+        public async Task PageClientNavigationAsync(PageClientNavidationContext context)
+        {
+            await Task.CompletedTask;
+        }
 
-		public async Task PageClientNavigationAsync(PageClientNavidationContext context)
-		{
-			var enableAdmin = await pageAccessProvider.CheckAccessAsync(context.CancellationToken);
-			context.ClientData.Add("enableAdministration", enableAdmin);
-		}
+        public async Task PageRenderAsync(PageRenderContext context)
+        {
+            context.TagName = "main";
 
-		public Task PageRenderAsync(PageRenderContext context)
-		{
-			return Task.CompletedTask;
-		}
+            context.Attributes.Add("role", "main");
 
-		public Task PageRequestAsync(PageRequestContext context)
-		{
-			return Task.CompletedTask;
-		}
-	}
+            context.Attributes
+                .AddCssClass("content-width")
+                .AddCssClass("app-content");
+
+            await Task.CompletedTask;
+        }
+
+        public Task PageRequestAsync(PageRequestContext context)
+        {
+            return Task.CompletedTask;
+        }
+    }
 }

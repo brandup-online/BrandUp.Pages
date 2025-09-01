@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { createPage } from "./create";
 import { createPageCollection } from "../collections/create";
 import { deletePage } from "./delete";
@@ -9,13 +9,13 @@ import { PageModel, PageCollectionModel } from "../../typings/models";
 import iconClose from "../../svg/list-item-add.svg";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
-    private __pageId: string;
-    private collectionId: string = null;
-    private navElem: HTMLElement;
-    private tabsElem: HTMLElement;
-    private __createCollElem: HTMLElement;
+    private __pageId: string | null;
+    private collectionId: string | null = null;
+    private navElem?: HTMLElement;
+    private tabsElem?: HTMLElement;
+    private __createCollElem?: HTMLElement;
 
-    constructor(pageId: string, options?: DialogOptions) {
+    constructor(pageId: string | null, options?: DialogOptions) {
         super(options);
 
         this.__pageId = pageId;
@@ -23,17 +23,17 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         this.setSorting(true);
     }
 
-    get pageId(): string { return this.__pageId; }
+    get pageId(): string | null { return this.__pageId; }
     get typeName(): string { return "BrandUpPages.PageBrowserDialog"; }
 
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         super._onRenderContent();
 
         this.setHeader("Страницы");
         this.setNotes("Просмотр и управление страницами.");
 
-        this.registerCommand("nav", (elem) => {
-            let pageId = elem.getAttribute("data-page-id");
+        this.registerCommand("nav", (ctx) => {
+            let pageId = ctx.target.getAttribute("data-page-id");
             this.__pageId = pageId;
             this.collectionId = null;
             this.refresh();
@@ -42,20 +42,20 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             if (!this.collectionId)
                 return;
 
-            createPage(this.collectionId).then((createdItem: PageModel) => {
+            createPage(this.collectionId).then((_createdItem: PageModel) => {
                 this.loadItems();
             });
         });
-        this.registerItemCommand("item-open", (itemId: string, model: PageModel) => {
+        this.registerItemCommand("item-open", (_itemId: string, model: PageModel) => {
             location.href = model.url;
         });
         this.registerItemCommand("item-delete", (itemId: string) => {
-            deletePage(itemId).then((deletedItem: PageModel) => {
+            deletePage(itemId).then((_deletedItem: PageModel) => {
                 this.loadItems();
             });
         });
-        this.registerCommand("select-collection", (elem) => {
-            let collectionId = elem.getAttribute("data-value");
+        this.registerCommand("select-collection", (ctx) => {
+            let collectionId = ctx.target.getAttribute("data-value");
             this.selectCollection(collectionId, true);
         });
         this.registerCommand("collection-sesttings", () => {
@@ -70,7 +70,10 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         });
     }
 
-    private selectCollection(collectionId: string, needLoad: boolean) {
+    private selectCollection(collectionId: string | null, needLoad: boolean) {
+        if (!this.tabsElem)
+            return;
+
         if (this.collectionId)
             DOM.removeClass(this.tabsElem, "a[data-value]", "selected");
 
@@ -96,22 +99,22 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             this.loadItems();
     }
 
-    protected _allowLoadItems(): boolean {
+    protected override _allowLoadItems(): boolean {
         return this.collectionId ? true : false;
     }
     protected _buildUrl(): string {
         return `/brandup.pages/page/list`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(urlParams: { [key: string]: string; }) {
         if (this.__pageId)
             urlParams["pageId"] = this.__pageId;
 
-        urlParams["collectionId"] = this.collectionId;
+        urlParams["collectionId"] = this.collectionId ?? "";
     }
     protected _buildList(model: PageListModel) {
         if (this.__createCollElem) {
             this.__createCollElem.remove();
-            this.__createCollElem = null;
+            delete this.__createCollElem;
         }
 
         if (!this.tabsElem) {
@@ -126,11 +129,11 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             DOM.empty(this.navElem);
         }
 
-        this.navElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav" }, "root")));
+        this.navElem?.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav" }, "root")));
         if (model.parents && model.parents.length) {
             for (let i = 0; i < model.parents.length; i++) {
                 let pagePath = model.parents[i];
-                this.navElem.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, pagePath.header)));
+                this.navElem?.appendChild(DOM.tag("li", null, DOM.tag("a", { href: "", "data-command": "nav", "data-page-id": pagePath.id }, pagePath.header)));
             }
         }
 
@@ -167,7 +170,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
         ]));
         contentElem.appendChild(DOM.tag("div", { class: `status ${item.status.toLowerCase()}` }, item.status));
     }
-    protected _renderItemMenu(item: PageModel, menuElem: HTMLElement) {
+    protected _renderItemMenu(_item: PageModel, menuElem: HTMLElement) {
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-open" }, "Открыть")]));
         menuElem.appendChild(DOM.tag("li", { class: "split" }));
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-delete" }, "Удалить")]));

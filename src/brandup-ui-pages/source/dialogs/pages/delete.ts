@@ -13,7 +13,7 @@ export class PageDeleteDialog extends DeleteDialog<PageModel> {
 
     get typeName(): string { return "BrandUpPages.PageDeleteDialog"; }
 
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         this.setHeader("Удаление страницы");
 
         super._onRenderContent();
@@ -24,7 +24,7 @@ export class PageDeleteDialog extends DeleteDialog<PageModel> {
     protected _buildUrl(): string {
         return `/brandup.pages/page/${this.pageId}`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(_urlParams: { [key: string]: string; }) {
     }
 }
 

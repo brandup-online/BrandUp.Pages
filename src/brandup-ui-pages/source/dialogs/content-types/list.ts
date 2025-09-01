@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 
 export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, ContentTypeItemModel> {
     private __isModified: boolean = false;
@@ -15,7 +15,7 @@ export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, Cont
 
     get typeName(): string { return "BrandUpPages.PageCollectionListDialog"; }
 
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         super._onRenderContent();
 
         this.setHeader("Типы контента");
@@ -26,24 +26,24 @@ export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, Cont
             this.refresh();
         });
 
-        this.registerCommand("nav2", (elem: HTMLElement) => {
-            let name = elem.getAttribute("data-value");
+        this.registerCommand("nav2", (ctx) => {
+            let name = ctx.target.getAttribute("data-value");
             this.baseContentType = name ? name : null;
             this.refresh();
         });
     }
 
-    protected _onClose() {
+    protected override _onClose() {
         if (this.__isModified)
             this.resolve(null);
         else
             super._onClose();
     }
-    
+
     protected _buildUrl(): string {
         return `/brandup.pages/content-type/list`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(urlParams: { [key: string]: string; }) {
         if (this.baseContentType)
             urlParams["baseType"] = this.baseContentType;
     }
@@ -69,13 +69,13 @@ export class ContentTypeListDialog extends ListDialog<ContentTypeListModel, Cont
     protected _renderItemContent(item: ContentTypeItemModel, contentElem: HTMLElement) {
         contentElem.appendChild(DOM.tag("div", { class: "title" }, DOM.tag("a", { href: "", "data-command": "nav" }, item.title)));
     }
-    protected _renderItemMenu(item: ContentTypeItemModel, menuElem: HTMLElement) {
+    protected _renderItemMenu(_item: ContentTypeItemModel, menuElem: HTMLElement) {
         menuElem.appendChild(DOM.tag("li", null, [DOM.tag("a", { href: "", "data-command": "item-templates" }, "Шаблоны данных")]));
     }
     protected _renderEmpty(container: HTMLElement) {
         container.innerText = "Типов контента не найдено";
     }
-    protected _renderNewItem(containerElem: HTMLElement) {
+    protected _renderNewItem(_containerElem: HTMLElement) {
     }
 }
 

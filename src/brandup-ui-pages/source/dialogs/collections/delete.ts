@@ -13,7 +13,7 @@ class PageCollectionDeleteDialog extends DeleteDialog<PageCollectionModel> {
 
     get typeName(): string { return "BrandUpPages.PageCollectionDeleteDialog"; }
 
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         this.setHeader("Удаление коллекции страниц");
 
         super._onRenderContent();
@@ -24,7 +24,7 @@ class PageCollectionDeleteDialog extends DeleteDialog<PageCollectionModel> {
     protected _buildUrl(): string {
         return `/brandup.pages/collection/${this.collectionId}`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected _buildUrlParams(_urlParams: { [key: string]: string; }) {
     }
 }
 

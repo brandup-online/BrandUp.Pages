@@ -1,7 +1,7 @@
 ﻿import { Dialog } from "./dialog";
-import { DOM } from "brandup-ui-dom";
+import { DOM } from "@brandup/ui-dom";
 import { Result } from "../typings/models";
-import { ajaxRequest, AjaxResponse } from "brandup-ui-ajax";
+import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import "./dialog-delete.less";
 
 export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
@@ -31,7 +31,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
         this.setLoading(true);
         ajaxRequest({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "GET",
             success: (response: AjaxResponse<TItem>) => {
                 this.setLoading(false);
@@ -61,7 +61,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
 
         ajaxRequest({
             url: this._buildUrl(),
-            urlParams: urlParams,
+            query: urlParams,
             method: "DELETE",
             success: (response) => {
                 this.setLoading(false);
@@ -96,5 +96,5 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
 
     protected abstract _getText(): string;
     protected abstract _buildUrl(): string;
-    protected abstract _buildUrlParams(urlParams: { [key: string]: string });
+    protected abstract _buildUrlParams(urlParams: { [key: string]: string }): void;
 }

@@ -1,4 +1,4 @@
-﻿import { DOM } from "brandup-ui-dom";
+﻿import { DOM } from "@brandup/ui-dom";
 import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../../typings/content";
 import { TextDesigner } from "./text";
 import { HtmlDesigner } from "./html";
@@ -7,7 +7,7 @@ import { ImageDesigner } from "./image";
 import { PageBlocksDesigner } from "./page-blocks";
 import ContentPage from "../../pages/content";
 import "./page.less";
-import { AjaxQueue } from "brandup-ui-ajax";
+import { AjaxQueue } from "@brandup/ui-ajax";
 
 export class PageDesigner implements IPageDesigner {
     readonly page: ContentPage;
@@ -96,7 +96,7 @@ export class PageDesigner implements IPageDesigner {
             this.__fields[fieldDesigner.fullPath] = fieldDesigner;
         }
 
-        this.page.refreshScripts();
+        this.page.renderComponents();
     }
 
     destroy() {

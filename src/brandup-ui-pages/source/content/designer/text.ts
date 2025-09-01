@@ -32,6 +32,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
             }
 
             this.__refreshUI();
+
+            return true;
         });
         elem.addEventListener("keyup", () => {
             this.__isChanged = true;

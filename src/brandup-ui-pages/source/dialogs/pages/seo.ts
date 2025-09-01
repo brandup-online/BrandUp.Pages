@@ -13,7 +13,7 @@ export class PageSeoDialog extends FormDialog<PageSeoForm, PageSeoValues, PageMo
     }
 
     get typeName(): string { return "BrandUpPages.PageSeoDialog"; }
-    protected _onRenderContent() {
+    protected override _onRenderContent() {
         super._onRenderContent();
 
         this.setHeader("Параметры SEO");
@@ -24,12 +24,12 @@ export class PageSeoDialog extends FormDialog<PageSeoForm, PageSeoValues, PageMo
     protected _buildUrl(): string {
         return `/brandup.pages/page/seo`;
     }
-    protected _buildUrlParams(urlParams: { [key: string]: string; }) {
+    protected override _buildUrlParams(urlParams: { [key: string]: string; }) {
         urlParams["pageId"] = this.pageId;
     }
-    protected _buildForm(model: PageSeoForm) {
-        this.addTextBox("Title", "Заголовок страницы", { });
-        this.addTextBox("Description", "Описание страницы", { });
+    protected _buildForm(_model: PageSeoForm) {
+        this.addTextBox("Title", "Заголовок страницы", {});
+        this.addTextBox("Description", "Описание страницы", {});
         this.addStringArray("Keywords", "Ключевые слова", { placeholder: "Введите ключевое слово" });
     }
 }

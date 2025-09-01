@@ -1,33 +1,33 @@
-﻿import { AjaxQueue, AjaxRequest } from "brandup-ui-ajax";
+﻿import { AjaxQueue, AjaxRequest } from "@brandup/ui-ajax";
 
 export interface IContentForm {
     editId: string;
     modelPath: string;
-    queue: AjaxQueue;
+    queue: AjaxQueue | undefined;
 
-    request(field: IContentField, options: AjaxRequest);
-    navigate(modelPath: string);
+    request(field: IContentField, options: AjaxRequest): void;
+    navigate(modelPath: string): void;
     getField(name: string): IContentField;
 }
 
 export interface IContentField {
     form: IContentForm;
     name: string;
-    
-    setValue(value: any);
+
+    setValue(value: any): void;
     hasValue(): boolean;
-    setErrors(errors: Array<string>);
-    render(containr: HTMLElement);
-    destroy();
+    setErrors(errors: Array<string> | null): void;
+    render(containr: HTMLElement): void;
+    destroy(): void;
 }
 
 export interface IPageDesigner {
     editId: string;
     queue: AjaxQueue;
-    render();
-    accentField(field: IContentFieldDesigner);
-    clearAccent();
-    destroy();
+    render(): void;
+    accentField(field: IContentFieldDesigner): void;
+    clearAccent(): void;
+    destroy(): void;
 }
 
 export interface IContentFieldDesigner {
@@ -36,9 +36,9 @@ export interface IContentFieldDesigner {
     path: string;
     name: string;
     fullPath: string;
-    
+
     hasValue(): boolean;
-    destroy();
+    destroy(): void;
 }
 
 export interface PageContentForm {
