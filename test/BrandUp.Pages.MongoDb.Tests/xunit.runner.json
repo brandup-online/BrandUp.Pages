@@ -1,6 +1,6 @@
 {
-  "shadowCopy": true,
-  "maxParallelThreads": 1,
-  "parallelizeAssembly": false,
-  "parallelizeTestCollections": false
+  "shadowCopy": false,
+  "maxParallelThreads": 2,
+  "parallelizeTestCollections": true,
+  "parallelizeAssembly": true
 }

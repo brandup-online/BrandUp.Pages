@@ -12,12 +12,11 @@
 
 	<ItemGroup>
 	  <Content Include="xunit.runner.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BrandUp.MongoDB.Testing" Version="8.0.9" />
 		<PackageReference Include="BrandUp.MongoDB.Testing.Mongo2Go" Version="8.0.9" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.8" />
