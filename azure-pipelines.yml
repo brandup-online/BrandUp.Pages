@@ -48,6 +48,7 @@ stages:
             displayName: "print variables"
 
           - checkout: self
+            fetchDepth: 1
             clean: true
             persistCredentials: true
 
@@ -114,6 +115,7 @@ stages:
             displayName: "print variables"
 
           - checkout: self
+            fetchDepth: 1
             clean: true
             persistCredentials: true
 
@@ -165,6 +167,7 @@ stages:
         condition: succeeded()
         steps:
           - checkout: self
+            fetchDepth: 1
             clean: true
             persistCredentials: true
 
