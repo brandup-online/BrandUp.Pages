@@ -23,13 +23,14 @@
   },
   "license": "Apache-2.0",
   "version": "1.0.0",
-  "main": "./source/index.ts",
-  "types": "./source/index.ts",
+  "main": "source/index.ts",
+  "types": "source/index.ts",
   "files": [
     "source"
   ],
   "devDependencies": {
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "less": "^4.3.0"
   },
   "dependencies": {
     "@brandup/ui": "^1.0.37",
