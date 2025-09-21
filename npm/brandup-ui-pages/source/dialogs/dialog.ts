@@ -5,7 +5,7 @@ import iconClose from "../svg/dialog-close.svg";
 import "./dialog.less";
 
 const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog-panel" });
-let currentDialog: Dialog = null;
+let currentDialog: Dialog | null = null;
 document.body.appendChild(dialogsPanelElem);
 
 export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
