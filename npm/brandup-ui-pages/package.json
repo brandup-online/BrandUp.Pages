@@ -26,7 +26,9 @@
   "main": "source/index.ts",
   "types": "source/index.ts",
   "files": [
-    "source"
+    "source",
+    "tsconfig.json",
+    "README.md"
   ],
   "devDependencies": {
     "typescript": "^5.9.2",

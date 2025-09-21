@@ -4,7 +4,7 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanCSSPlugin = require("less-plugin-clean-css");
 const TerserPlugin = require("terser-webpack-plugin");
-const bundleOutputDir = './wwwroot/dist';
+const bundleOutputDir = '../../src/LandingWebSite/wwwroot/dist';
 
 const lessLoaderOptions = { webpackImporter: true, lessOptions: { math: 'always', plugins: [new CleanCSSPlugin({ advanced: false })] } };
 var splitChunks = {
@@ -35,7 +35,7 @@ module.exports = (env) => {
 
     return [{
         entry: {
-            app: path.resolve(__dirname, '_client', 'index.ts')
+            app: path.resolve(__dirname, 'source', 'index.ts')
         },
         resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx', '.less'] },
         output: {

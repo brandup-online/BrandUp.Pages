@@ -1,210 +1,223 @@
 trigger:
-  - master
+    - master
 
 resources:
-  - repo: self
+    - repo: self
 
 variables:
-  - group: public-npm
-  - group: public-nuget
-  - name: vmImageName
-    value: "ubuntu-latest"
-  - name: restore-projects
-    value: "**/*.csproj"
-  - name: test-projects
-    value: "**/*[Tt]ests/*.csproj"
-  - name: buildPlatform
-    value: "Any CPU"
-  - name: buildConfiguration
-    value: "Release"
-  - name: envName
-    value: "brandup-pages"
-  - name: version-major
-    value: "8"
-  - name: version-minor
-    value: "0"
+    - group: public-npm
+    - group: public-nuget
+    - name: vmImageName
+      value: "ubuntu-latest"
+    - name: restore-projects
+      value: "**/*.csproj"
+    - name: test-projects
+      value: "**/*[Tt]ests/*.csproj"
+    - name: buildPlatform
+      value: "Any CPU"
+    - name: buildConfiguration
+      value: "Release"
+    - name: envName
+      value: "brandup-pages"
+    - name: version-major
+      value: "8"
+    - name: version-minor
+      value: "0"
 
 name: $(version-major).$(version-minor).$(rev:r)
 
 pool:
-  # vmImage: $(vmImageName)
-  name: Test
+    # vmImage: $(vmImageName)
+    name: Test
 
 stages:
-  - stage: Build
-    displayName: Build stage
-    jobs:
-      - job: BuildNet
-        displayName: Build NET
-        pool:
-          # vmImage: $(vmImageName)
-          name: Test
-          workspace:
-            clean: all
-        steps:
-          - script: |
-              echo "Hello, world!"
-              echo "build number - $(Build.BuildNumber)"
-            displayName: "print variables"
+    - stage: Build
+      displayName: Build stage
+      jobs:
+          - job: BuildNet
+            displayName: Build NET
+            pool:
+                # vmImage: $(vmImageName)
+                name: Test
+                workspace:
+                    clean: all
+            steps:
+                - script: |
+                      echo "Hello, world!"
+                      echo "build number - $(Build.BuildNumber)"
+                  displayName: "print variables"
 
-          - checkout: self
-            fetchDepth: 1
-            clean: true
-            persistCredentials: true
+                - checkout: self
+                  fetchDepth: 1
+                  clean: true
+                  persistCredentials: true
 
-          - task: UseDotNet@2
-            displayName: "use dotnet 9.x"
-            inputs:
-              packageType: "sdk"
-              version: "9.x"
+                - task: UseDotNet@2
+                  displayName: "use dotnet 9.x"
+                  inputs:
+                      packageType: "sdk"
+                      version: "9.x"
 
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet restore"
-            inputs:
-              command: "restore"
-              projects: $(restore-projects)
-              feedRestore: "BrandUp"
-
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet build"
-            inputs:
-              command: "build"
-              projects: $(restore-projects)
-              arguments: --configuration $(buildConfiguration) /p:Version=$(Build.BuildNumber) /p:FileVersion=$(Build.BuildNumber)
-
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet test"
-            inputs:
-              command: test
-              projects: $(test-projects)
-              arguments: --configuration $(buildConfiguration) --collect "Code coverage"
-              failTaskOnFailedTests: true
-              publishTestResults: true
-              testRunTitle: "solution tests"
-
-          - task: PublishTestResults@2
-            enabled: false
-            displayName: "publish test/coverage results"
-            condition: succeededOrFailed()
-            inputs:
-              testRunner: VSTest
-              testResultsFiles: "$(Agent.TempDirectory)/**/*.trx"
-
-          - task: DotNetCoreCLI@2
-            displayName: "dotnet pack"
-            inputs:
-              command: pack
-              packagesToPack: "src/*/*.csproj"
-              versioningScheme: byBuildNumber
-              packDirectory: $(Build.ArtifactStagingDirectory)
-
-          - publish: $(build.artifactstagingdirectory)
-            displayName: publish artifact
-            condition: succeededOrFailed()
-            artifact: net
-
-      - job: BuildNpm
-        displayName: Build NPM
-        dependsOn: [BuildNet]
-        pool:
-          vmImage: $(vmImageName)
-        steps:
-          - script: |
-              echo "Hello, world!"
-              echo "build number - $(Build.BuildNumber)"
-            displayName: "print variables"
-
-          - checkout: self
-            fetchDepth: 1
-            clean: true
-            persistCredentials: true
-
-          - task: Npm@1
-            displayName: "npm install"
-            inputs:
-              command: "install"
-              workingDir: "src/brandup-ui-pages"
-
-          - task: Npm@1
-            displayName: "npm update"
-            inputs:
-              command: custom
-              customCommand: update --save
-              workingDir: "src/brandup-ui-pages"
-
-          - task: Npm@1
-            displayName: "npm build"
-            inputs:
-              command: custom
-              customCommand: "run build"
-              workingDir: "src/brandup-ui-pages"
-
-          - task: Npm@1
-            displayName: "npm set version"
-            inputs:
-              command: custom
-              customCommand: 'version "$(Build.BuildNumber)" --no-git-tag-version'
-              workingDir: "src/brandup-ui-pages"
-
-          - task: CopyFiles@2
-            displayName: "npm copy to artifact"
-            inputs:
-              SourceFolder: "src/brandup-ui-pages"
-              Contents: |
-                source/**
-                package.json
-                README.md
-              TargetFolder: "$(Build.ArtifactStagingDirectory)/brandup-ui-pages/"
-
-          - publish: $(build.artifactstagingdirectory)
-            displayName: publish artifact
-            condition: succeededOrFailed()
-            artifact: npm
-
-      - job: GitTag
-        displayName: Add git tag
-        dependsOn: [BuildNet, BuildNpm]
-        condition: succeeded()
-        steps:
-          - checkout: self
-            fetchDepth: 1
-            clean: true
-            persistCredentials: true
-
-          - powershell: |
-              git config --global user.name "AzureDevOps Agent"
-              git tag "$(Build.BuildNumber)" --force
-              git push origin "$(Build.BuildNumber)" --force
-              Write-Output "Tagging $(Build.Repository.Name) with $(Build.BuildNumber)"
-            displayName: set git tag
-
-  - stage: Production
-    displayName: Deploy stage
-    dependsOn: Build
-    jobs:
-      - deployment: Production
-        condition: succeeded()
-        displayName: Production
-        pool:
-          vmImage: $(vmImageName)
-        environment: $(envName)
-        strategy:
-          runOnce:
-            deploy:
-              steps:
                 - task: DotNetCoreCLI@2
-                  displayName: "publish nuget"
+                  displayName: "dotnet restore"
                   inputs:
-                    command: custom
-                    custom: nuget
-                    arguments: >
-                      push $(Pipeline.Workspace)/net/*.nupkg
-                      -s $(nuget-api-url)
-                      -k $(nuget-api-key)
+                      command: "restore"
+                      projects: $(restore-projects)
+                      feedRestore: "BrandUp"
 
-                - task: Npm@1
-                  displayName: "publish npm"
+                - task: DotNetCoreCLI@2
+                  displayName: "dotnet build"
                   inputs:
-                    command: publish
-                    workingDir: "$(Pipeline.Workspace)/npm/brandup-ui-pages/"
-                    publishEndpoint: "$(publish-npm-credentials)"
+                      command: "build"
+                      projects: $(restore-projects)
+                      arguments: --configuration $(buildConfiguration) /p:Version=$(Build.BuildNumber) /p:FileVersion=$(Build.BuildNumber)
+
+                - task: DotNetCoreCLI@2
+                  displayName: "dotnet test"
+                  inputs:
+                      command: test
+                      projects: $(test-projects)
+                      arguments: --configuration $(buildConfiguration) --collect "Code coverage"
+                      failTaskOnFailedTests: true
+                      publishTestResults: true
+                      testRunTitle: "solution tests"
+
+                - task: PublishTestResults@2
+                  enabled: false
+                  displayName: "publish test/coverage results"
+                  condition: succeededOrFailed()
+                  inputs:
+                      testRunner: VSTest
+                      testResultsFiles: "$(Agent.TempDirectory)/**/*.trx"
+
+                - task: DotNetCoreCLI@2
+                  displayName: "dotnet pack"
+                  inputs:
+                      command: pack
+                      packagesToPack: "src/*/*.csproj"
+                      versioningScheme: byBuildNumber
+                      packDirectory: $(Build.ArtifactStagingDirectory)
+
+                - publish: $(build.artifactstagingdirectory)
+                  displayName: publish artifact
+                  condition: succeededOrFailed()
+                  artifact: net
+
+          - job: BuildNpm
+            displayName: Build NPM
+            dependsOn: [BuildNet]
+            pool:
+                vmImage: $(vmImageName)
+            steps:
+                - script: |
+                      echo "Hello, world!"
+                      echo "build number - $(Build.BuildNumber)"
+                  displayName: "print variables"
+
+                - checkout: self
+                  fetchDepth: 1
+                  clean: true
+                  persistCredentials: true
+
+                - task: NodeTool@0
+                  displayName: use node 22.x
+                  inputs:
+                      versionSpec: 22.x
+                      checkLatest: true
+
+                - task: "Npm@1"
+                  displayName: "npm install"
+                  inputs:
+                      command: "custom"
+                      customCommand: "run i"
+
+                - task: "Npm@1"
+                  displayName: "packages npm build"
+                  inputs:
+                      command: "custom"
+                      customCommand: "run build"
+
+                - task: "Npm@1"
+                  displayName: "packages npm test"
+                  inputs:
+                      command: "custom"
+                      customCommand: "run test"
+
+                - task: "Npm@1"
+                  displayName: "packages npm version"
+                  inputs:
+                      command: "custom"
+                      customCommand: "run npm:version $(Build.BuildNumber)"
+
+                - task: "Npm@1"
+                  displayName: "packages npm cleanup"
+                  inputs:
+                      command: "custom"
+                      customCommand: "run npm:cleanup"
+
+                - task: "Npm@1"
+                  displayName: "packages npm pack"
+                  inputs:
+                      command: custom
+                      customCommand: "run npm:pack --pack-destination $(Build.ArtifactStagingDirectory)"
+
+                - publish: $(Build.ArtifactStagingDirectory)
+                  displayName: publish artifact
+                  condition: succeededOrFailed()
+                  artifact: npm
+
+          - job: GitTag
+            displayName: Add git tag
+            dependsOn: [BuildNet, BuildNpm]
+            condition: succeeded()
+            steps:
+                - checkout: self
+                  fetchDepth: 1
+                  clean: true
+                  persistCredentials: true
+
+                - powershell: |
+                      git config --global user.name "AzureDevOps Agent"
+                      git tag "$(Build.BuildNumber)" --force
+                      git push origin "$(Build.BuildNumber)" --force
+                      Write-Output "Tagging $(Build.Repository.Name) with $(Build.BuildNumber)"
+                  displayName: set git tag
+
+    - stage: Production
+      displayName: Deploy stage
+      dependsOn: Build
+      jobs:
+          - deployment: Production
+            condition: succeeded()
+            displayName: Production
+            pool:
+                vmImage: $(vmImageName)
+            environment: $(envName)
+            strategy:
+                runOnce:
+                    deploy:
+                        steps:
+                            - task: ExtractFiles@1
+                              displayName: "unzip brandup-ui-pages"
+                              inputs:
+                                  archiveFilePatterns: "$(Pipeline.Workspace)/npm/brandup-ui-pages-$(Build.BuildNumber).tgz"
+                                  destinationFolder: "$(Pipeline.Workspace)/npmout/brandup-ui-pages"
+                                  cleanDestinationFolder: true
+                                  overwriteExistingFiles: true
+
+                            - task: Npm@1
+                              displayName: "publish brandup-ui-pages"
+                              inputs:
+                                  command: publish
+                                  workingDir: "$(Pipeline.Workspace)/npmout/brandup-ui-pages/package"
+                                  publishEndpoint: "$(publish-npm-credentials)"
+
+                            - task: DotNetCoreCLI@2
+                              displayName: "publish nuget"
+                              inputs:
+                                  command: custom
+                                  custom: nuget
+                                  arguments: >
+                                      push $(Pipeline.Workspace)/net/*.nupkg
+                                      -s $(nuget-api-url)
+                                      -k $(nuget-api-key)

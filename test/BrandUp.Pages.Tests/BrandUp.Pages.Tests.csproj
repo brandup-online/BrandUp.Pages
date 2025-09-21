@@ -27,8 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\examples\LandingWebSite\LandingWebSite.csproj" />
 		<ProjectReference Include="..\..\src\BrandUp.Pages.Testing\BrandUp.Pages.Testing.csproj" />
+		<ProjectReference Include="..\..\src\LandingWebSite\LandingWebSite.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
