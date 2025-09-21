@@ -6,7 +6,14 @@ const CleanCSSPlugin = require("less-plugin-clean-css");
 const TerserPlugin = require("terser-webpack-plugin");
 const bundleOutputDir = '../../src/LandingWebSite/wwwroot/dist';
 
-const lessLoaderOptions = { webpackImporter: true, lessOptions: { math: 'always', plugins: [new CleanCSSPlugin({ advanced: false })] } };
+const lessLoaderOptions = {
+    webpackImporter: true,
+    lessOptions: {
+        math: 'always',
+        plugins: [new CleanCSSPlugin({ advanced: false })]
+    }
+};
+
 var splitChunks = {
     cacheGroups: {
         vendors: {
@@ -29,15 +36,18 @@ var splitChunks = {
 
 module.exports = (env) => {
     const isDevBuild = process.env.NODE_ENV !== "production";
-
     console.log(`NODE_ENV: "${process.env.NODE_ENV}"`);
     console.log(`isDevBuild: ${isDevBuild}`);
 
     return [{
+        mode: isDevBuild ? "development" : "production",
         entry: {
             app: path.resolve(__dirname, 'source', 'index.ts')
         },
-        resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx', '.less'] },
+        resolve: {
+            extensions: ['.js', '.jsx', '.ts', '.tsx', '.less'],
+            modules: [path.resolve(__dirname, 'node_modules')]
+        },
         output: {
             path: path.join(__dirname, bundleOutputDir),
             filename: '[name].js',
@@ -97,11 +107,12 @@ module.exports = (env) => {
                         format: {
                             comments: false
                         },
+                        sourceMap: false
                     },
                     extractComments: false
                 })
             ],
-            removeAvailableModules: true,
+            removeAvailableModules: false,
             removeEmptyChunks: true,
             providedExports: false,
             usedExports: false

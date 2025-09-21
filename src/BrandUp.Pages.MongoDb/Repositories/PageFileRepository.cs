@@ -1,5 +1,6 @@
 ﻿using BrandUp.Pages.Files;
 using BrandUp.Pages.MongoDb.Documents;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 
@@ -11,10 +12,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public PageFileRepository(IPagesDbContext dbContext)
         {
-            if (dbContext == null)
-                throw new ArgumentNullException(nameof(dbContext));
+            ArgumentNullException.ThrowIfNull(dbContext);
 
-            files = new FileBucket(dbContext.Database, new GridFSBucketOptions { BucketName = "BrandUpPages" });
+            var options = new GridFSBucketOptions { BucketName = "BrandUpPages" };
+            files = new FileBucket(dbContext.Database, options);
         }
 
         public async Task<IFile> UploadFileAsync(Guid pageId, string fileName, string contentType, Stream stream, CancellationToken cancellationToken = default)
@@ -26,13 +27,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 Metadata = MongoDbHelper.DictionaryToBsonDocument(fileDoc.Data)
             };
 
-            await files.UploadFromStreamAsync(fileDoc.Id, fileName, stream, uploadOptions, cancellationToken);
+            await files.UploadFromStreamAsync(GuidConverter.ToBytes(fileDoc.Id, GuidRepresentation.Standard), fileName, stream, uploadOptions, cancellationToken);
 
             return fileDoc;
         }
+
         public async Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
-            var filter = Builders<GridFSFileInfo<Guid>>.Filter.Eq(info => info.Id, fileId);
+            var filter = Builders<GridFSFileInfo<byte[]>>.Filter.Eq(info => info.Id, GuidConverter.ToBytes(fileId, GuidRepresentation.Standard));
             var cursor = await files.FindAsync(filter, cancellationToken: cancellationToken);
 
             var fileInfo = await cursor.SingleOrDefaultAsync(cancellationToken);
@@ -41,18 +43,19 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return new PageFileDocument(fileInfo);
         }
+
         public async Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
-            return await files.OpenDownloadStreamAsync(fileId, cancellationToken: cancellationToken);
-        }
-        public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
-        {
-            return files.DeleteAsync(fileId, cancellationToken);
+            return await files.OpenDownloadStreamAsync(GuidConverter.ToBytes(fileId, GuidRepresentation.Standard), cancellationToken: cancellationToken);
         }
 
-        class FileBucket : GridFSBucket<Guid>
+        public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
-            public FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : base(database, options) { }
+            return files.DeleteAsync(GuidConverter.ToBytes(fileId, GuidRepresentation.Standard), cancellationToken);
+        }
+
+        class FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : GridFSBucket<byte[]>(database, options)
+        {
         }
     }
 }

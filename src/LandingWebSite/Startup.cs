@@ -25,6 +25,8 @@ namespace LandingWebSite
 
         public void ConfigureServices(IServiceCollection services)
         {
+            //BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.CSharpLegacy));
+
             #region Web
 
             services.AddRazorPages().AddApplicationPart(typeof(BrandUp.Pages.ContentPageModel).Assembly);

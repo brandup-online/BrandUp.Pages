@@ -22,7 +22,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
     "url-loader": "^4.1.1",
-    "webpack": "^5.101.3",
+    "webpack": "5.100.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
@@ -30,7 +30,8 @@
     "@brandup/ui-ajax": "^1.0.37",
     "@brandup/ui-dom": "^1.0.37",
     "@brandup/ui-website": "^10.0.20",
-    "brandup-ui-pages": "file:../brandup-ui-pages"
+    "brandup-ui-pages": "file:../brandup-ui-pages",
+    "brandup-pages-ckeditor": "^2.0.8"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --config webpack.config.js",
