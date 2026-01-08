@@ -4,46 +4,48 @@ using Microsoft.AspNetCore.TestHost;
 
 namespace BrandUp.Pages.Tests
 {
-	public class UnitTest1 : IClassFixture<CustomWebApplicationFactory>
-	{
-		private readonly CustomWebApplicationFactory factory;
+    public class UnitTest1 : IClassFixture<CustomWebApplicationFactory>
+    {
+        private readonly CustomWebApplicationFactory factory;
 
-		public UnitTest1(CustomWebApplicationFactory factory)
-		{
-			this.factory = factory;
-		}
+        public UnitTest1(CustomWebApplicationFactory factory)
+        {
+            this.factory = factory;
+        }
 
-		//[Fact]
-		//public async Task Test1()
-		//{
-		//    using (var client = factory.CreateClient())
-		//    {
-		//        var response = await client.GetAsync("/");
+        //[Fact]
+        //public async Task Test1()
+        //{
+        //    using (var client = factory.CreateClient())
+        //    {
+        //        var response = await client.GetAsync("/");
 
-		//        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-		//    }
-		//}
+        //        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        //    }
+        //}
 
-		//[Fact]
-		//public void Test2()
-		//{
-		//    using (var client = factory.CreateClient())
-		//    {
-		//        using (var scope = factory.Server.Host.Services.CreateScope())
-		//        {
-		//            var viewLocator = scope.ServiceProvider.GetRequiredService<Views.IViewLocator>();
-		//        }
-		//    }
-		//}
-	}
+        //[Fact]
+        //public void Test2()
+        //{
+        //    using (var client = factory.CreateClient())
+        //    {
+        //        using (var scope = factory.Server.Host.Services.CreateScope())
+        //        {
+        //            var viewLocator = scope.ServiceProvider.GetRequiredService<Views.IViewLocator>();
+        //        }
+        //    }
+        //}
+    }
 
-	public class CustomWebApplicationFactory : WebApplicationFactory<LandingWebSite.Startup>
-	{
-		protected override void ConfigureWebHost(IWebHostBuilder builder)
-		{
-			builder.ConfigureTestServices(services =>
-			{
-			});
-		}
-	}
+    public class CustomWebApplicationFactory : WebApplicationFactory<LandingWebSite.Program>
+    {
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            builder.ConfigureTestServices(services =>
+            {
+            });
+
+            builder.UseEnvironment("Development");
+        }
+    }
 }
