@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BrandUp.Website" Version="10.0.22" />
+		<PackageReference Include="BrandUp.Website" Version="10.0.23" />
 	</ItemGroup>
 
 	<ItemGroup>

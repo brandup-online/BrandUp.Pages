@@ -21,9 +21,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BrandUp.Website.Abstractions" Version="10.0.22" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.1" />
+		<PackageReference Include="BrandUp.Website.Abstractions" Version="10.0.23" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>

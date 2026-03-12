@@ -19,7 +19,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
         #region IAsyncLifetime members
 
-        async Task IAsyncLifetime.InitializeAsync()
+        async ValueTask IAsyncLifetime.InitializeAsync()
         {
             var services = new ServiceCollection();
 
@@ -52,7 +52,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
             serviceScope = serviceProvider.CreateScope();
         }
-        async Task IAsyncLifetime.DisposeAsync()
+        async ValueTask IAsyncDisposable.DisposeAsync()
         {
             await mongoDbInstance.CleanUpAsync();
 
@@ -76,7 +76,7 @@ namespace BrandUp.Pages.MongoDb.Tests
 
         #region IAsyncLifetime members
 
-        async Task IAsyncLifetime.InitializeAsync()
+        async ValueTask IAsyncLifetime.InitializeAsync()
         {
             runner = MongoDbRunner.Start(singleNodeReplSet: true);
             client = new MongoClient(runner.ConnectionString);
@@ -84,11 +84,11 @@ namespace BrandUp.Pages.MongoDb.Tests
             systemDatabaseNames = await (await client.ListDatabaseNamesAsync()).ToListAsync();
         }
 
-        Task IAsyncLifetime.DisposeAsync()
+        ValueTask IAsyncDisposable.DisposeAsync()
         {
             runner?.Dispose();
 
-            return Task.CompletedTask;
+            return ValueTask.CompletedTask;
         }
 
         #endregion

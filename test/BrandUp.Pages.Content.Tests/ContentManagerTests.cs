@@ -1,61 +1,41 @@
 ﻿using BrandUp.Pages.Content.Builder;
-using BrandUp.Pages.ContentModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BrandUp.Pages.Content
 {
-	public class ContentManagerTests
-	{
-		private readonly IContentMetadataManager metadataManager;
+    public class ContentManagerTests
+    {
+        #region Test methods
 
-		public ContentManagerTests()
-		{
-			var contentTypeResolver = new Infrastructure.AssemblyContentTypeLocator(new System.Reflection.Assembly[] { typeof(TestPageContent).Assembly });
+        [Fact]
+        public async Task GetContentAsync()
+        {
+            var services = new ServiceCollection();
 
-			metadataManager = new ContentMetadataManager(contentTypeResolver);
-		}
+            services.AddContent()
+                .AddContentTypesFromAssemblies(typeof(PageContent).Assembly)
+                .AddManager<PageEntry, PageContent>();
 
-		#region Test methods
+            using var serviceProvider = services.BuildServiceProvider();
+            var contentManager = serviceProvider.GetRequiredService<IContentManager<PageEntry, PageContent>>();
 
-		[Fact]
-		public async Task GetContentAsync()
-		{
-			var services = new ServiceCollection();
+            var page = new PageEntry("test");
 
-			services.AddContent()
-				.AddContentTypesFromAssemblies(typeof(PageContent).Assembly)
-				.AddManager<PageEntry, PageContent>();
+            await contentManager.CreateContentAsync<PageContent>(page, TestContext.Current.CancellationToken);
 
-			using (var serviceProvider = services.BuildServiceProvider())
-			{
-				var contentManager = serviceProvider.GetRequiredService<IContentManager<PageEntry, PageContent>>();
+            var pageContent = await contentManager.GetContentAsync(page, TestContext.Current.CancellationToken);
 
-				var page = new PageEntry("test");
+            Assert.Equal(page, pageContent.Entry);
+        }
 
-				await contentManager.CreateContentAsync<PageContent>(page);
+        #endregion
+    }
 
-				var pageContent = await contentManager.GetContentAsync(page);
+    public class PageEntry(string entryId) : IContentEntry
+    {
+        public string EntryId { get; } = entryId ?? throw new ArgumentNullException(nameof(entryId));
+    }
 
-				Assert.Equal(page, pageContent.Entry);
-			}
-		}
-
-		#endregion
-	}
-
-	public class PageEntry : IContentEntry
-	{
-		public string EntryId { get; }
-
-		public PageEntry(string entryId)
-		{
-			EntryId = entryId ?? throw new ArgumentNullException(nameof(entryId));
-		}
-	}
-
-	[ContentType]
-	public class PageContent
-	{
-
-	}
+    [ContentType]
+    public class PageContent { }
 }

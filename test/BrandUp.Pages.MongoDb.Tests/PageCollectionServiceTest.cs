@@ -38,8 +38,8 @@ namespace BrandUp.Pages.MongoDb.Tests
             var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.IsSuccess);
 
-            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
-            await pageService.PublishPageAsync(page, "test");
+            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test", TestContext.Current.CancellationToken);
+            await pageService.PublishPageAsync(page, "test", TestContext.Current.CancellationToken);
 
             createCollectionResult = await pageCollectionService.CreateCollectionAsync(page, "test2", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.IsSuccess);
@@ -63,7 +63,7 @@ namespace BrandUp.Pages.MongoDb.Tests
             var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.IsSuccess);
 
-            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
+            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test", TestContext.Current.CancellationToken);
 
             createCollectionResult = await pageCollectionService.CreateCollectionAsync(page, "test2", pageContentType.Name, PageSortMode.FirstOld);
             Assert.False(createCollectionResult.IsSuccess);
@@ -88,7 +88,6 @@ namespace BrandUp.Pages.MongoDb.Tests
         public async Task ListCollections_Root_Empty()
         {
             var pageCollectionService = Services.GetRequiredService<IPageCollectionService>();
-            var pageMetadataManager = Services.GetRequiredService<IPageMetadataManager>();
 
             var collections = await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
             Assert.Empty(collections);
@@ -121,8 +120,8 @@ namespace BrandUp.Pages.MongoDb.Tests
             var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.IsSuccess);
 
-            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
-            await pageService.PublishPageAsync(page, "test");
+            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test", TestContext.Current.CancellationToken);
+            await pageService.PublishPageAsync(page, "test", TestContext.Current.CancellationToken);
 
             var collections = await pageCollectionService.ListCollectionsAsync(page);
             Assert.Empty(collections);
@@ -139,8 +138,8 @@ namespace BrandUp.Pages.MongoDb.Tests
             var createCollectionResult = await pageCollectionService.CreateCollectionAsync(websiteContext.Website.Id, "test", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.IsSuccess);
 
-            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test");
-            await pageService.PublishPageAsync(page, "test");
+            var page = await pageService.CreatePageAsync(createCollectionResult.Data, pageContentType.Name, "test", TestContext.Current.CancellationToken);
+            await pageService.PublishPageAsync(page, "test", TestContext.Current.CancellationToken);
 
             createCollectionResult = await pageCollectionService.CreateCollectionAsync(page, "test2", pageContentType.Name, PageSortMode.FirstOld);
             Assert.True(createCollectionResult.IsSuccess);
