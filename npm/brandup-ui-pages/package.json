@@ -31,17 +31,17 @@
     "README.md"
   ],
   "devDependencies": {
-    "less": "^4.6.3",
+    "less": "^4.6.4",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@brandup/ui": "^1.0.41",
-    "@brandup/ui-ajax": "^1.0.41",
-    "@brandup/ui-app": "^1.0.41",
-    "@brandup/ui-dom": "^1.0.41",
-    "@brandup/ui-helpers": "^1.0.41",
-    "@brandup/ui-website": "^10.0.23",
-    "brandup-pages-ckeditor": "^1.0.12"
+    "@brandup/ui": "^1.0.42",
+    "@brandup/ui-ajax": "^1.0.42",
+    "@brandup/ui-app": "^1.0.42",
+    "@brandup/ui-dom": "^1.0.42",
+    "@brandup/ui-helpers": "^1.0.42",
+    "@brandup/ui-website": "^10.0.24",
+    "brandup-pages-ckeditor": "^1.0.15"
   },
   "scripts": {
     "build": "tsc"
