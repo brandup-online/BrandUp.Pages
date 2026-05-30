@@ -86,6 +86,8 @@ namespace BrandUp.Pages.Controllers
 
 		protected override Task<PageCollectionModel> OnGetItemModelAsync(IPageCollection item)
 			=> item.ToViewModelAsync(pageService, pageLinkGenerator);
+		protected override async Task<IEnumerable<PageCollectionModel>> OnGetItemModelsAsync(IEnumerable<IPageCollection> items)
+			=> await items.ToViewModelsAsync(pageService, pageLinkGenerator);
 
 		#endregion
 	}

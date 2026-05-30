@@ -23,8 +23,13 @@ namespace BrandUp.Pages.Controllers
 			return Ok(formModel);
 		}
 		[HttpGet, Route("item")]
-		public async Task<IActionResult> GetItemsAsync()
+		public async Task<IActionResult> GetItemsAsync([FromQuery] int offset = 0, [FromQuery] int limit = 50)
 		{
+			if (offset < 0)
+				offset = 0;
+			if (limit <= 0 || limit > 200)
+				limit = 50;
+
 			await OnInitializeAsync();
 
 			if (!ModelState.IsValid)
@@ -32,18 +37,14 @@ namespace BrandUp.Pages.Controllers
 
 			var result = new List<TItemModel>();
 
-			var items = await OnGetItemsAsync(0, 50);
+			var items = await OnGetItemsAsync(offset, limit);
 			if (items == null)
 			{
 				AddErrors();
 				return ValidationProblem();
 			}
 
-			foreach (var item in items)
-			{
-				var itemModel = await OnGetItemModelAsync(item);
-				result.Add(itemModel);
-			}
+			result.AddRange(await OnGetItemModelsAsync(items));
 
 			return Ok(result);
 		}
@@ -94,6 +95,15 @@ namespace BrandUp.Pages.Controllers
 		protected abstract Task<IEnumerable<TItem>> OnGetItemsAsync(int offset, int limit);
 		protected abstract Task<TItem> OnGetItemAsync(TId id);
 		protected abstract Task<TItemModel> OnGetItemModelAsync(TItem item);
+		// Маппинг всего списка одним вызовом — точка расширения для батч-загрузки (без N+1).
+		// По умолчанию — поэлементно через OnGetItemModelAsync.
+		protected virtual async Task<IEnumerable<TItemModel>> OnGetItemModelsAsync(IEnumerable<TItem> items)
+		{
+			var result = new List<TItemModel>();
+			foreach (var item in items)
+				result.Add(await OnGetItemModelAsync(item));
+			return result;
+		}
 		protected virtual Task OnSortAsync(TItem sourceItem, TItem destItem, ListItemSortPosition position)
 		{
 			return Task.CompletedTask;

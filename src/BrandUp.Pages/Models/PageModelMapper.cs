@@ -23,12 +23,41 @@ namespace BrandUp.Pages.Models
 
 		public static async Task<PageCollectionModel> ToViewModelAsync(this IPageCollection pageCollection, IPageService pageService, IPageLinkGenerator pageLinkGenerator)
 		{
-			var pageUrl = "/";
+			IPage page = null;
 			if (pageCollection.PageId.HasValue)
+				page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
+
+			return await pageCollection.ToViewModelAsync(page, pageLinkGenerator);
+		}
+
+		/// <summary>
+		/// Маппинг списка коллекций без N+1: страницы-владельцы загружаются по уникальным
+		/// идентификаторам (для коллекций одной страницы это, как правило, один запрос).
+		/// </summary>
+		public static async Task<List<PageCollectionModel>> ToViewModelsAsync(this IEnumerable<IPageCollection> pageCollections, IPageService pageService, IPageLinkGenerator pageLinkGenerator)
+		{
+			var collections = pageCollections as IReadOnlyCollection<IPageCollection> ?? pageCollections.ToList();
+
+			var pageCache = new Dictionary<Guid, IPage>();
+			foreach (var pageId in collections.Where(it => it.PageId.HasValue).Select(it => it.PageId.Value).Distinct())
+				pageCache[pageId] = await pageService.FindPageByIdAsync(pageId);
+
+			var result = new List<PageCollectionModel>(collections.Count);
+			foreach (var pageCollection in collections)
 			{
-				var page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
-				pageUrl = await pageLinkGenerator.GetPathAsync(page);
+				IPage page = null;
+				if (pageCollection.PageId.HasValue)
+					pageCache.TryGetValue(pageCollection.PageId.Value, out page);
+
+				result.Add(await pageCollection.ToViewModelAsync(page, pageLinkGenerator));
 			}
+
+			return result;
+		}
+
+		static async Task<PageCollectionModel> ToViewModelAsync(this IPageCollection pageCollection, IPage page, IPageLinkGenerator pageLinkGenerator)
+		{
+			var pageUrl = page != null ? await pageLinkGenerator.GetPathAsync(page) : "/";
 
 			return new PageCollectionModel
 			{

@@ -23,7 +23,7 @@ namespace BrandUp.Pages.Controllers
 		{
 			var page = await pageService.FindPageByIdAsync(pageId);
 			if (page == null)
-				return BadRequest();
+				return NotFound();
 
 			var result = new Models.BeginPageEditResult();
 
@@ -52,11 +52,11 @@ namespace BrandUp.Pages.Controllers
 		{
 			var editSession = await pageContentService.FindEditByIdAsync(editId);
 			if (editSession == null)
-				return BadRequest();
+				return NotFound();
 
 			var page = await pageService.FindPageByIdAsync(editSession.PageId);
 			if (page == null)
-				return BadRequest();
+				return NotFound();
 
 			if (modelPath == null)
 				modelPath = string.Empty;
@@ -116,23 +116,21 @@ namespace BrandUp.Pages.Controllers
 		}
 
 		[HttpGet("changeType")]
-		public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] IContentMetadataManager contentMetadataManager, [FromServices] Views.IViewLocator viewLocator)
+		public async Task<IActionResult> ChangeModelTypeAsync([FromQuery] Guid editId, [FromQuery] string modelPath, [FromQuery] string modelType, [FromServices] IContentMetadataManager contentMetadataManager)
 		{
 			if (modelType == null)
 				return BadRequest();
 
 			var editSession = await pageContentService.FindEditByIdAsync(editId);
 			if (editSession == null)
-				return BadRequest();
+				return NotFound();
 
 			var page = await pageService.FindPageByIdAsync(editSession.PageId);
 			if (page == null)
-				return BadRequest();
+				return NotFound();
 
 			if (modelPath == null)
 				modelPath = string.Empty;
-
-			var newModelType = contentMetadataManager.GetMetadata(modelType);
 
 			var pageContent = await pageContentService.GetContentAsync(editSession);
 			var pageContentExplorer = ContentExplorer.Create(contentMetadataManager, pageContent);
@@ -143,10 +141,9 @@ namespace BrandUp.Pages.Controllers
 
 			contentExplorer.Field.ChangeType(contentExplorer.Model, modelType);
 
-			var newItem = newModelType.CreateModelInstance();
-			var view = viewLocator.FindView(newModelType.ModelType);
-			if (view != null && view.DefaultModelData != null)
-				newItem = newModelType.ConvertDictionaryToContentModel(view.DefaultModelData);
+			// Сохраняем изменённую модель: ChangeType мутирует граф модели в pageContentExplorer.Model,
+			// иначе изменение теряется при завершении запроса. SetContentAsync сам сериализует модель.
+			await pageContentService.SetContentAsync(editSession, pageContentExplorer.Model);
 
 			return Ok();
 		}
@@ -156,11 +153,11 @@ namespace BrandUp.Pages.Controllers
 		{
 			var editSession = await pageContentService.FindEditByIdAsync(editId);
 			if (editSession == null)
-				return BadRequest();
+				return NotFound();
 
 			var page = await pageService.FindPageByIdAsync(editSession.PageId);
 			if (page == null)
-				return BadRequest();
+				return NotFound();
 
 			await pageContentService.CommitEditAsync(editSession);
 
@@ -172,11 +169,11 @@ namespace BrandUp.Pages.Controllers
 		{
 			var editSession = await pageContentService.FindEditByIdAsync(editId);
 			if (editSession == null)
-				return BadRequest();
+				return NotFound();
 
 			var page = await pageService.FindPageByIdAsync(editSession.PageId);
 			if (page == null)
-				return BadRequest();
+				return NotFound();
 
 			await pageContentService.DiscardEditAsync(editSession);
 

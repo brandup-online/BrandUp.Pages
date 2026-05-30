@@ -57,14 +57,12 @@ namespace BrandUp.Pages.Controllers
 		[HttpGet, Route("brandup.pages/collection", Name = "BrandUp.Pages.Collection.Items")]
 		public async Task<IActionResult> ListAsync([FromQuery] Guid? pageId)
 		{
-			var result = new List<Models.PageCollectionModel>();
-
 			IEnumerable<IPageCollection> collections;
 			if (pageId.HasValue)
 			{
 				var page = await pageService.FindPageByIdAsync(pageId.Value);
 				if (page == null)
-					return BadRequest();
+					return NotFound();
 				collections = await pageCollectionService.ListCollectionsAsync(page);
 			}
 			else
@@ -72,8 +70,7 @@ namespace BrandUp.Pages.Controllers
 				collections = await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
 			}
 
-			foreach (var pageCollection in collections)
-				result.Add(await GetItemModelAsync(pageCollection));
+			var result = await collections.ToViewModelsAsync(pageService, pageLinkGenerator);
 
 			return Ok(result);
 		}
@@ -84,11 +81,9 @@ namespace BrandUp.Pages.Controllers
 			if (pageType == null)
 				return BadRequest();
 
-			var result = new List<Models.PageCollectionModel>();
-
 			var collections = await pageCollectionService.FindCollectionsAsync(websiteContext.Website.Id, pageType, title, true);
-			foreach (var pageCollection in collections)
-				result.Add(await GetItemModelAsync(pageCollection));
+
+			var result = await collections.ToViewModelsAsync(pageService, pageLinkGenerator);
 
 			return Ok(result);
 		}

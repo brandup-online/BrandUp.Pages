@@ -71,8 +71,8 @@ namespace BrandUp.Pages.Controllers
 				collections = await pageCollectionService.ListCollectionsAsync(page);
 			else
 				collections = await pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
-			foreach (var collection in collections)
-				listModel.Collections.Add(await GetPageCollectionModelAsync(collection));
+
+			listModel.Collections.AddRange(await collections.ToViewModelsAsync(pageService, pageLinkGenerator));
 		}
 
 		protected override Guid ParseId(string value)
@@ -120,8 +120,6 @@ namespace BrandUp.Pages.Controllers
 
 		#endregion
 
-		private Task<PageCollectionModel> GetPageCollectionModelAsync(IPageCollection pageCollection)
-			=> pageCollection.ToViewModelAsync(pageService, pageLinkGenerator);
 		private async Task<PagePathModel> GetPathModelAsync(IPage page)
 		{
 			return new PagePathModel
