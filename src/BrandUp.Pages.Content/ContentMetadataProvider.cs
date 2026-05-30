@@ -58,7 +58,7 @@ namespace BrandUp.Pages.Content
 		public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
 		public IEnumerable<FieldProviderAttribute> Fields => fields;
 		public bool IsAbstract => ModelType.IsAbstract;
-		public bool IsDefinedTitleField => Title != null;
+		public bool IsDefinedTitleField => titleField != null;
 
 		#endregion
 

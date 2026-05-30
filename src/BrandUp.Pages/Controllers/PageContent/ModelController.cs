@@ -16,7 +16,8 @@ namespace BrandUp.Pages.Controllers
 			var contentTypes = Field.ContentMetadata.GetDerivedMetadataWithHierarhy(true);
 			foreach (var contentType in contentTypes)
 			{
-				if (!contentType.IsAbstract)
+				// Абстрактные типы нельзя инстанцировать (AddAsync вызывает CreateModelInstance) — пропускаем их.
+				if (contentType.IsAbstract)
 					continue;
 
 				result.Add(new Models.ContentTypeModel

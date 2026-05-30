@@ -7,7 +7,7 @@ namespace BrandUp.Pages.Url
 	{
 		private readonly PagesOptions options;
 		private readonly char[] TrimChars = new char[] { ' ', '/', '-', '_' };
-		private static readonly Regex ValidationRegex = new Regex(@"^([\d\w\\_\\-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+		private static readonly Regex ValidationRegex = new Regex(@"^([\w-]+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 		public PageUrlHelper(IOptions<PagesOptions> options)
 		{
@@ -66,7 +66,7 @@ namespace BrandUp.Pages.Url
 			if (normalizedUrlPath == string.Empty)
 				return normalizedUrlPathName;
 
-			return string.Concat(normalizedUrlPath, "/", urlPathName);
+			return string.Concat(normalizedUrlPath, "/", normalizedUrlPathName);
 		}
 
 		#endregion

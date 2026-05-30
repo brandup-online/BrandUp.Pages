@@ -25,8 +25,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
         public async Task<IPage> CreatePageAsync(string websiteId, Guid сollectionId, string typeName, string pageHeader, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
         {
-            if (websiteId == null)
-                throw new ArgumentNullException(nameof(websiteId));
+            ArgumentNullException.ThrowIfNull(websiteId);
 
             var pageId = Guid.NewGuid();
             websiteId = websiteId.ToLower();
@@ -88,16 +87,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
-        public async Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+        public async Task<IPage> FindPageByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default)
         {
-            if (webSiteId == null)
-                throw new ArgumentNullException(nameof(webSiteId));
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            ArgumentNullException.ThrowIfNull(websiteId);
+            ArgumentNullException.ThrowIfNull(path);
 
-            webSiteId = webSiteId.ToLower();
+            websiteId = websiteId.ToLower();
 
-            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == webSiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == websiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
             if (urlDocument == null)
                 return null;
             if (!urlDocument.PageId.HasValue)
@@ -107,12 +104,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
-        public async Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+        public async Task<PageUrlResult> FindUrlByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default)
         {
-            if (path == null)
-                throw new ArgumentNullException(nameof(path));
+            ArgumentNullException.ThrowIfNull(websiteId);
+            ArgumentNullException.ThrowIfNull(path);
 
-            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == webSiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            websiteId = websiteId?.ToLower();
+
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == websiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
             if (urlDocument == null)
                 return null;
             if (urlDocument.PageId.HasValue)
@@ -158,6 +157,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task<IEnumerable<IPage>> GetPublishedPagesAsync(string websiteId, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(websiteId);
+
             var filters = new List<FilterDefinition<PageDocument>>
             {
                 Builders<PageDocument>.Filter.Eq(it => it.WebsiteId, websiteId),
@@ -171,10 +172,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return cursor.ToEnumerable(cancellationToken);
         }
-        public async Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<IPage>> SearchPagesAsync(string websiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
+            ArgumentNullException.ThrowIfNull(websiteId);
+
+            websiteId = websiteId.ToLower();
+
             var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.And(
-                    Builders<PageDocument>.Filter.Eq(it => it.WebsiteId, webSiteId),
+                    Builders<PageDocument>.Filter.Eq(it => it.WebsiteId, websiteId),
                     Builders<PageDocument>.Filter.Text(title, new TextSearchOptions { CaseSensitive = false })
                 ));
 

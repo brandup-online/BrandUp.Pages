@@ -79,7 +79,6 @@ namespace BrandUp.Pages.Content.Serialization
 			if (jsonData == null)
 				throw new ArgumentNullException(nameof(jsonData));
 
-			using var stringReader = new StringReader(jsonData);
 			ReadOnlySpan<byte> jsonUtf8 = System.Text.Encoding.UTF8.GetBytes(jsonData);
 			var jsonReader = new Utf8JsonReader(jsonUtf8);
 
@@ -93,8 +92,20 @@ namespace BrandUp.Pages.Content.Serialization
 			if (stream == null)
 				throw new ArgumentNullException(nameof(stream));
 
-			using var stringReader = new StreamReader(stream);
-			return DeserializeFromString(stringReader.ReadToEnd());
+			// Читаем байты потока напрямую, без промежуточной строки и повторной UTF-8 перекодировки.
+			byte[] jsonUtf8;
+			using (var memoryStream = new MemoryStream())
+			{
+				stream.CopyTo(memoryStream);
+				jsonUtf8 = memoryStream.ToArray();
+			}
+
+			var jsonReader = new Utf8JsonReader(jsonUtf8);
+
+			if (!jsonReader.Read())
+				return null;
+
+			return ReadDictionary(ref jsonReader);
 		}
 		private static IDictionary<string, object> ReadDictionary(ref Utf8JsonReader reader)
 		{
@@ -130,6 +141,18 @@ namespace BrandUp.Pages.Content.Serialization
 							break;
 						}
 					case JsonTokenType.Number:
+						{
+							if (fieldName == null)
+								throw new InvalidOperationException();
+
+							// Сохраняем числовой тип, иначе после round-trip числа стали бы строками.
+							if (reader.TryGetInt64(out var longValue))
+								dictionary.Add(fieldName, longValue);
+							else
+								dictionary.Add(fieldName, reader.GetDouble());
+
+							break;
+						}
 					case JsonTokenType.String:
 						{
 							if (fieldName == null)

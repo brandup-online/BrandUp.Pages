@@ -38,7 +38,7 @@ namespace BrandUp.Pages.Views
 
 			var contentView = viewLocator.FindView(contentContext.Explorer.Metadata.ModelType);
 			if (contentView == null)
-				throw new InvalidOperationException($"Couldn't find content view {contentView.Name}");
+				throw new InvalidOperationException($"Couldn't find content view for content type {contentContext.Explorer.Metadata.ModelType.FullName}");
 
 			var viewEngineResult = viewEngine.GetView("~/", contentView.Name, false);
 			if (!viewEngineResult.Success)
@@ -56,8 +56,6 @@ namespace BrandUp.Pages.Views
 
 			using (var contentOutput = new StringWriter())
 			{
-				var http = contentContext.Services.GetRequiredService<IHttpContextAccessor>();
-
 				var viewContext = new ViewContext
 				{
 					HttpContext = httpContextAccessor.HttpContext,
