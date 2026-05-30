@@ -151,9 +151,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
                     .Limit(options.Pagination.Limit);
             }
 
-            var cursor = await findDefinition.ToCursorAsync(cancellationToken);
-
-            return cursor.ToEnumerable(cancellationToken);
+            // Материализуем результат: ленивый cursor.ToEnumerable() переживает метод,
+            // держит серверный курсор открытым и не допускает повторного перечисления.
+            return await findDefinition.ToListAsync(cancellationToken);
         }
         public async Task<IEnumerable<IPage>> GetPublishedPagesAsync(string websiteId, CancellationToken cancellationToken = default)
         {
@@ -168,9 +168,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var findDefinition = pageDocuments.Find(Builders<PageDocument>.Filter.And(filters));
             findDefinition = findDefinition.SortBy(it => it.CreatedDate);
 
-            var cursor = await findDefinition.ToCursorAsync(cancellationToken);
-
-            return cursor.ToEnumerable(cancellationToken);
+            return await findDefinition.ToListAsync(cancellationToken);
         }
         public async Task<IEnumerable<IPage>> SearchPagesAsync(string websiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default)
         {
@@ -189,9 +187,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 findDefinition = findDefinition.Limit(pagination.Limit);
             }
 
-            var cursor = await findDefinition.ToCursorAsync(cancellationToken);
-
-            return cursor.ToEnumerable(cancellationToken);
+            return await findDefinition.ToListAsync(cancellationToken);
         }
         public async Task<bool> HasPagesAsync(Guid сollectionId, CancellationToken cancellationToken = default)
         {
@@ -267,6 +263,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
             }
             catch (Exception)
             {
+                // Откатываем версию в памяти: иначе после сбоя объект будет нести версию,
+                // которой нет в БД, и повторная попытка с этим же объектом никогда не пройдёт.
+                pageDocument.Version = curVersion;
+
                 await session.AbortTransactionAsync(cancellationToken);
 
                 throw;
@@ -319,6 +319,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
             }
             catch (Exception)
             {
+                // Откатываем версию в памяти, чтобы повторная попытка с этим же объектом была возможна.
+                pageDocument.Version = curVersion;
+
                 await session.AbortTransactionAsync(cancellationToken);
 
                 throw;
@@ -377,7 +380,9 @@ namespace BrandUp.Pages.MongoDb.Repositories
         }
         public async Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
         {
-            var pages = await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { CustomSorting = true, IncludeDrafts = true }, cancellationToken);
+            // Материализуем курсор до открытия транзакции: ленивое перечисление внутри сессии
+            // приводит к одновременному использованию соединения курсором и update-операциями.
+            var pages = (await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { CustomSorting = true, IncludeDrafts = true }, cancellationToken)).ToList();
 
             using var session = await pageDocuments.Database.Client.StartSessionAsync(cancellationToken: cancellationToken);
             session.StartTransaction();

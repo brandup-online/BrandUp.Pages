@@ -91,7 +91,11 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
 			var updateResult = await documents.ReplaceOneAsync(it => it.Id == collection.Id && it.Version == curVersion, collectionDocument, cancellationToken: cancellationToken);
 			if (updateResult.MatchedCount != 1)
+			{
+				// Откатываем версию в памяти, иначе повторная попытка с этим же объектом не пройдёт.
+				collectionDocument.Version = curVersion;
 				throw new InvalidOperationException();
+			}
 		}
 
 		public async Task DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default)
@@ -102,7 +106,10 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
 			var deleteResult = await documents.DeleteOneAsync(it => it.Id == collection.Id && it.Version == curVersion, cancellationToken: cancellationToken);
 			if (deleteResult.DeletedCount != 1)
+			{
+				collectionDocument.Version = curVersion;
 				throw new InvalidOperationException();
+			}
 		}
 	}
 }
