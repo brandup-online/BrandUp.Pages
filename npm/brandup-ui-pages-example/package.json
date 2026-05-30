@@ -29,7 +29,7 @@
     "@brandup/ui": "^1.0.44",
     "@brandup/ui-ajax": "^1.0.44",
     "@brandup/ui-dom": "^1.0.44",
-    "@brandup/ui-website": "^10.0.28",
+    "@brandup/ui-website": "^10.0.29",
     "@brandup/ui-pages": "file:../brandup-ui-pages",
     "brandup-pages-ckeditor": "^3.0.1"
   },
