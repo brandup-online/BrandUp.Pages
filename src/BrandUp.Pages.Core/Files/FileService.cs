@@ -40,6 +40,9 @@ namespace BrandUp.Pages.Files
 		}
 		public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
 		{
+			if (fileId == Guid.Empty)
+				throw new ArgumentException("Value cannot be empty.", nameof(fileId));
+
 			return repository.DeleteFileAsync(fileId, cancellationToken);
 		}
 		public string GetFileExtension(IFile file)

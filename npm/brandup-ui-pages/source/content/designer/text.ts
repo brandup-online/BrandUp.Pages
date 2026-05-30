@@ -1,5 +1,6 @@
 ﻿import { FieldDesigner } from "./base";
 import { TextboxOptions } from "../../form/textbox";
+import { textToHtml } from "../../utils/html";
 import "./text.less";
 
 export class TextDesigner extends FieldDesigner<TextboxOptions> {
@@ -64,10 +65,8 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
     }
     setValue(value: string) {
         value = this.normalizeValue(value);
-        if (value && this.options.allowMultiline)
-            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
 
-        this.element.innerHTML = value ? value : "";
+        this.element.innerHTML = textToHtml(value, this.options.allowMultiline);
 
         this.__refreshUI();
     }

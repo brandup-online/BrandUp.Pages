@@ -66,9 +66,16 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return await files.OpenDownloadStreamAsync(fileId, cancellationToken: cancellationToken);
         }
 
-        public Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
+        public async Task DeleteFileAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
-            return files.DeleteAsync(fileId, cancellationToken);
+            try
+            {
+                await files.DeleteAsync(fileId, cancellationToken);
+            }
+            catch (GridFSFileNotFoundException)
+            {
+                // Файл уже удалён — делаем операцию идемпотентной.
+            }
         }
 
         class FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : GridFSBucket<Guid>(database, options)

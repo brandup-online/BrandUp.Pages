@@ -1,5 +1,6 @@
 ﻿import { Field } from "./field";
 import { DOM } from "@brandup/ui-dom";
+import { textToHtml } from "../utils/html";
 import "./textbox.less";
 
 export class Textbox extends Field<string, TextboxOptions> {
@@ -81,11 +82,9 @@ export class Textbox extends Field<string, TextboxOptions> {
     }
     setValue(value: string) {
         value = this.normalizeValue(value);
-        if (value && this.options.allowMultiline) {
-            value = value.replace(/(?:\r\n|\r|\n)/g, "<br />");
-        }
+
         if (this.__valueElem)
-            this.__valueElem.innerHTML = value ? value : "";
+            this.__valueElem.innerHTML = textToHtml(value, this.options.allowMultiline);
 
         this.__refreshUI();
     }

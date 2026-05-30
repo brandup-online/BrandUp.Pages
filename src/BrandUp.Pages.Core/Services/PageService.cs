@@ -37,37 +37,15 @@ namespace BrandUp.Pages.Services
 			if (collection == null)
 				throw new ArgumentNullException(nameof(collection));
 
-			var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
 			var pageMetadata = pageMetadataManager.GetMetadata(pageContent.GetType());
-
-			if (!pageMetadata.AllowCreateModel)
-				throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
-			if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
-				throw new ArgumentException($"Тип страницы {pageMetadata.Name} не подходит для коллекции {collection.Title} ({collection.Id}).");
+			EnsurePageTypeForCollection(pageMetadata, collection);
 
 			var pageContentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(pageContent);
 			var pageHeader = pageMetadata.GetPageHeader(pageContent);
 
 			var page = await pageRepositiry.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
-			if (collection.CustomSorting)
-			{
-				switch (collection.SortMode)
-				{
-					case PageSortMode.FirstNew:
-						{
-							await UpPagePositionAsync(page, null, cancellationToken);
-							break;
-						}
-					case PageSortMode.FirstOld:
-						{
-							await DownPagePositionAsync(page, null, cancellationToken);
-							break;
-						}
-					default:
-						throw new Exception();
-				}
-			}
+			await ApplyCustomSortingAsync(collection, page, cancellationToken);
 
 			return page;
 		}
@@ -79,13 +57,8 @@ namespace BrandUp.Pages.Services
 			if (pageType == null)
 				pageType = collection.PageTypeName;
 
-			var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
 			var pageMetadata = pageMetadataManager.GetMetadata(pageType);
-
-			if (!pageMetadata.AllowCreateModel)
-				throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
-			if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
-				throw new ArgumentException($"Тип страницы {pageType} не подходит для коллекции {collection.Title} ({collection.Id}).");
+			EnsurePageTypeForCollection(pageMetadata, collection);
 
 			var pageContent = pageMetadata.CreatePageModel();
 
@@ -96,26 +69,39 @@ namespace BrandUp.Pages.Services
 
 			var page = await pageRepositiry.CreatePageAsync(collection.WebsiteId, collection.Id, pageMetadata.Name, pageHeader, pageContentData, cancellationToken);
 
-			if (collection.CustomSorting)
-			{
-				switch (collection.SortMode)
-				{
-					case PageSortMode.FirstNew:
-						{
-							await UpPagePositionAsync(page, null, cancellationToken);
-							break;
-						}
-					case PageSortMode.FirstOld:
-						{
-							await DownPagePositionAsync(page, null, cancellationToken);
-							break;
-						}
-					default:
-						throw new Exception();
-				}
-			}
+			await ApplyCustomSortingAsync(collection, page, cancellationToken);
 
 			return page;
+		}
+
+		// Проверяет, что тип страницы можно создать и он подходит для коллекции.
+		void EnsurePageTypeForCollection(PageMetadataProvider pageMetadata, IPageCollection collection)
+		{
+			var basePageMetadata = pageMetadataManager.GetMetadata(collection.PageTypeName);
+
+			if (!pageMetadata.AllowCreateModel)
+				throw new InvalidOperationException($"Нельзя создать страницу с типом {pageMetadata.Name}, так как её тип контент является абстрактным.");
+			if (!pageMetadata.IsInheritedOrEqual(basePageMetadata))
+				throw new ArgumentException($"Тип страницы {pageMetadata.Name} не подходит для коллекции {collection.Title} ({collection.Id}).");
+		}
+
+		// Для коллекций с ручной сортировкой ставит новую страницу в начало/конец согласно SortMode.
+		async Task ApplyCustomSortingAsync(IPageCollection collection, IPage page, CancellationToken cancellationToken)
+		{
+			if (!collection.CustomSorting)
+				return;
+
+			switch (collection.SortMode)
+			{
+				case PageSortMode.FirstNew:
+					await UpPagePositionAsync(page, null, cancellationToken);
+					break;
+				case PageSortMode.FirstOld:
+					await DownPagePositionAsync(page, null, cancellationToken);
+					break;
+				default:
+					throw new InvalidOperationException($"Недопустимый режим сортировки коллекции: {collection.SortMode}.");
+			}
 		}
 		public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
