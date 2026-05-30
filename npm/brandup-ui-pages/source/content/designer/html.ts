@@ -32,7 +32,7 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
             this.__isChanged = false;
         });
         this.element.addEventListener("blur", () => {
-            if (this.__isChanged) {
+            if (this.__isChanged && this.__editor) {
                 this.__editor.model.document.differ.reset();
                 this._onChanged();
             }
@@ -42,10 +42,16 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     getValue(): string {
+        if (!this.__editor)
+            return null;
+
         const data = this.__editor.data.get();
         return data ? data : null;
     }
     setValue(value: string) {
+        if (!this.__editor)
+            return;
+
         this.__editor.data.set(value ? value : "");
 
         this.__refreshUI();
@@ -53,6 +59,9 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     hasValue(): boolean {
         const value = this.normalizeValue(this.element.innerText);
         if (!value)
+            return false;
+
+        if (!this.__editor)
             return false;
 
         const val = this.__editor.model.hasContent(this.__editor.model.document.getRoot(), { ignoreWhitespaces: true });
@@ -98,11 +107,13 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
     }
 
     override destroy() {
-        this.__editor.destroy().then(() => {
+        if (this.__editor) {
+            const editor = this.__editor;
+            this.__editor = null;
+            editor.destroy().finally(() => super.destroy());
+        }
+        else
             super.destroy();
-        });
-
-        super.destroy();
     }
 }
 

@@ -180,8 +180,8 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             if (pagination != null)
             {
-                findDefinition.Skip(pagination.Skip);
-                findDefinition.Limit(pagination.Limit);
+                findDefinition = findDefinition.Skip(pagination.Skip);
+                findDefinition = findDefinition.Limit(pagination.Limit);
             }
 
             var cursor = await findDefinition.ToCursorAsync(cancellationToken);
