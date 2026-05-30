@@ -1,6 +1,6 @@
 {
 	"version": "1.0.0",
-	"name": "brandup-ui-kit-root",
+	"name": "brandup-ui-pages-root",
 	"private": true,
 	"devDependencies": {
 		"@babel/core": "^7.29.7",

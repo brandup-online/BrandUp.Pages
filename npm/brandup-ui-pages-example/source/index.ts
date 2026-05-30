@@ -1,6 +1,6 @@
 ﻿import { WEBSITE } from "@brandup/ui-website";
 import { ajaxRequest } from "@brandup/ui-ajax";
-import { ContentPage, pagesMiddleware } from "brandup-ui-pages";
+import { ContentPage, pagesMiddleware } from "@brandup/ui-pages";
 import "./styles.less";
 
 WEBSITE.run(
