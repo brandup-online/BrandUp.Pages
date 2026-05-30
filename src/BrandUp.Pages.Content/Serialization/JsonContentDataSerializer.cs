@@ -92,20 +92,11 @@ namespace BrandUp.Pages.Content.Serialization
 			if (stream == null)
 				throw new ArgumentNullException(nameof(stream));
 
-			// Читаем байты потока напрямую, без промежуточной строки и повторной UTF-8 перекодировки.
-			byte[] jsonUtf8;
-			using (var memoryStream = new MemoryStream())
-			{
-				stream.CopyTo(memoryStream);
-				jsonUtf8 = memoryStream.ToArray();
-			}
-
-			var jsonReader = new Utf8JsonReader(jsonUtf8);
-
-			if (!jsonReader.Read())
-				return null;
-
-			return ReadDictionary(ref jsonReader);
+			// Читаем через StreamReader: он определяет кодировку по BOM и заменяет невалидные байты,
+			// а не падает на них (файлы default-данных могут быть не в UTF-8). DeserializeFromString
+			// затем приводит к корректному UTF-8 для Utf8JsonReader.
+			using var stringReader = new StreamReader(stream, detectEncodingFromByteOrderMarks: true);
+			return DeserializeFromString(stringReader.ReadToEnd());
 		}
 		private static IDictionary<string, object> ReadDictionary(ref Utf8JsonReader reader)
 		{
