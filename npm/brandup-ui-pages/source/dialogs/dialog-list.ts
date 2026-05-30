@@ -85,9 +85,6 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
                             destPosition = "after";
                         }
 
-                        console.log(`Source: ${sourceIndex}; Dest: ${destIndex}; Position: ${destPosition}`);
-                        console.log(`Source: ${sourceId}; Dest: ${destId}; Position: ${destPosition}`);
-
                         this.__refreshIndexes();
 
                         const urlParams: { [key: string]: string } = {

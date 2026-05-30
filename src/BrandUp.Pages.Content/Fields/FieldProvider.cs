@@ -1,13 +1,9 @@
-﻿using System.Reflection;
-
-namespace BrandUp.Pages.Content.Fields
+﻿namespace BrandUp.Pages.Content.Fields
 {
 	[AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
 	public abstract class FieldProviderAttribute : Attribute, IFieldProvider
 	{
 		const string TypeValueSuffiks = "Attribute";
-		static readonly Type IEquatableType = typeof(IEquatable<>);
-		MethodInfo equalMethodInfo = null;
 		IModelBinding modelBinding;
 
 		#region Properties
@@ -118,9 +114,6 @@ namespace BrandUp.Pages.Content.Fields
 
 			if (ReferenceEquals(left, right))
 				return true;
-
-			if (equalMethodInfo != null)
-				return (bool)equalMethodInfo.Invoke(left, new object[] { right });
 
 			return left.Equals(right);
 		}

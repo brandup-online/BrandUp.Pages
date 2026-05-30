@@ -108,7 +108,7 @@ export class TextDesigner extends FieldDesigner<TextboxOptions> {
         value = value.trim();
 
         if (!this.options.allowMultiline)
-            value = value.replace("\n\r", " ");
+            value = value.replace(/\r?\n/g, " ");
 
         return value;
     }

@@ -27,14 +27,14 @@ namespace BrandUp.Pages.Files
 		public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
 		{
 			if (fileId == Guid.Empty)
-				throw new ArgumentException();
+				throw new ArgumentException("Value cannot be empty.", nameof(fileId));
 
 			return repository.FindFileByIdAsync(fileId, cancellationToken);
 		}
 		public Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
 		{
 			if (fileId == Guid.Empty)
-				throw new ArgumentException();
+				throw new ArgumentException("Value cannot be empty.", nameof(fileId));
 
 			return repository.ReadFileAsync(fileId, cancellationToken);
 		}

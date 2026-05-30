@@ -112,8 +112,6 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             if (elem) {
                 const destIndex = parseInt(elem.getAttribute("data-index") ?? "0");
                 if (destIndex !== sourceIndex) {
-                    console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
-
                     const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {
@@ -127,8 +125,6 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
                         this.__items.splice(destIndex, 0, removed[0]);
 
                         this.__refreshIndexes();
-
-                        console.log(this.__items);
                     }
                 }
             }

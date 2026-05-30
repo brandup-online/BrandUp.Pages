@@ -96,8 +96,6 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             if (elem) {
                 const destIndex = elem.getAttribute("content-path-index");
                 if (destIndex !== sourceIndex) {
-                    console.log(`Source: ${sourceIndex}; Dest: ${destIndex}`);
-
                     const sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
                     if (sourceElem) {
                         if (destIndex < sourceIndex) {

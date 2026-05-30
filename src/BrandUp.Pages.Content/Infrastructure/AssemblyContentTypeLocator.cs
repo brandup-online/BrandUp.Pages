@@ -4,7 +4,7 @@ namespace BrandUp.Pages.Content.Infrastructure
 {
 	public class AssemblyContentTypeLocator : IContentTypeLocator
 	{
-		readonly IList<TypeInfo> types = new List<TypeInfo>();
+		readonly HashSet<TypeInfo> types = [];
 
 		public AssemblyContentTypeLocator(Assembly[] assemblies)
 		{
@@ -17,7 +17,7 @@ namespace BrandUp.Pages.Content.Infrastructure
 				{
 					var typeInfo = type.GetTypeInfo();
 
-					if (!ContentMetadataManager.TypeIsContent(typeInfo) || types.Contains(typeInfo))
+					if (!ContentMetadataManager.TypeIsContent(typeInfo))
 						continue;
 
 					types.Add(typeInfo);
