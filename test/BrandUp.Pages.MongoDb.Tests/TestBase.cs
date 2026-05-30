@@ -2,9 +2,9 @@
 using BrandUp.MongoDB;
 using BrandUp.Pages.Builder;
 using BrandUp.Pages.MongoDb.Tests.ContentModels;
+using BrandUp.MongoDB.Testing;
 using BrandUp.Website;
 using Microsoft.Extensions.DependencyInjection;
-using Mongo2Go;
 using MongoDB.Driver;
 
 namespace BrandUp.Pages.MongoDb.Tests
@@ -68,27 +68,31 @@ namespace BrandUp.Pages.MongoDb.Tests
 
     public class MongoDbInstance : IMongoDbClientFactory, IAsyncLifetime
     {
-        MongoDbRunner runner;
-        MongoClient client;
+        ServiceProvider serviceProvider;
+        IMongoDbClientFactory factory;
+        IMongoClient client;
         List<string> systemDatabaseNames;
 
-        public MongoClient Client => client;
+        public IMongoClient Client => client;
 
         #region IAsyncLifetime members
 
         async ValueTask IAsyncLifetime.InitializeAsync()
         {
-            runner = MongoDbRunner.Start(singleNodeReplSet: true);
-            client = new MongoClient(runner.ConnectionString);
+            var services = new ServiceCollection();
+            services.AddEphemeralMongoDb();
+
+            serviceProvider = services.BuildServiceProvider();
+
+            factory = serviceProvider.GetRequiredService<IMongoDbClientFactory>();
+            client = factory.ResolveClient();
 
             systemDatabaseNames = await (await client.ListDatabaseNamesAsync()).ToListAsync();
         }
 
-        ValueTask IAsyncDisposable.DisposeAsync()
+        async ValueTask IAsyncDisposable.DisposeAsync()
         {
-            runner?.Dispose();
-
-            return ValueTask.CompletedTask;
+            await serviceProvider.DisposeAsync();
         }
 
         #endregion
