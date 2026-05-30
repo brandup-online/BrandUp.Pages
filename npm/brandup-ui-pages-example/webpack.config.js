@@ -96,6 +96,7 @@ module.exports = (env) => {
             ]
         },
         optimization: {
+            runtimeChunk: 'single',
             splitChunks: splitChunks,
             minimize: !isDevBuild,
             minimizer: [
