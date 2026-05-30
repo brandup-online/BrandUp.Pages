@@ -32,16 +32,16 @@
   ],
   "devDependencies": {
     "less": "^4.6.4",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@brandup/ui": "^1.0.42",
-    "@brandup/ui-ajax": "^1.0.42",
-    "@brandup/ui-app": "^1.0.42",
-    "@brandup/ui-dom": "^1.0.42",
-    "@brandup/ui-helpers": "^1.0.42",
-    "@brandup/ui-website": "^10.0.24",
-    "brandup-pages-ckeditor": "^1.0.15"
+    "@brandup/ui": "^1.0.44",
+    "@brandup/ui-ajax": "^1.0.44",
+    "@brandup/ui-app": "^1.0.44",
+    "@brandup/ui-dom": "^1.0.44",
+    "@brandup/ui-helpers": "^1.0.44",
+    "@brandup/ui-website": "^10.0.28",
+    "brandup-pages-ckeditor": "^2.0.9"
   },
   "scripts": {
     "build": "tsc"

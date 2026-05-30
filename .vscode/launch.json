@@ -1,0 +1,22 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Run LandingWebSite (+ client watch)",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "watch-and-build",
+			"program": "${workspaceFolder}/src/LandingWebSite/bin/Debug/net10.0/LandingWebSite.dll",
+			"args": [],
+			"cwd": "${workspaceFolder}/src/LandingWebSite",
+			"stopAtEntry": false,
+			"env": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"serverReadyAction": {
+				"action": "openExternally",
+				"pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+			}
+		}
+	]
+}

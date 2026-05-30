@@ -337,3 +337,4 @@ ASALocalRun/
 
 package-lock.json
 /npm/*/out
+.claude/

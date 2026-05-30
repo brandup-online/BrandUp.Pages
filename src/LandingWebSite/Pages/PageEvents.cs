@@ -14,7 +14,7 @@ namespace LandingWebSite.Pages
             context.ClientData.Add("enableAdministration", enableAdmin);
         }
 
-        public async Task PageClientNavigationAsync(PageClientNavidationContext context)
+        public async Task PageClientNavigationAsync(PageClientNavigationContext context)
         {
             await Task.CompletedTask;
         }

@@ -1,0 +1,60 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "watch-client",
+			"type": "shell",
+			"command": "npm run watch",
+			"options": {
+				"cwd": "${workspaceFolder}/npm/brandup-ui-pages-example"
+			},
+			"isBackground": true,
+			"presentation": {
+				"group": "run-landing",
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"problemMatcher": {
+				"owner": "webpack",
+				"source": "webpack",
+				"fileLocation": "absolute",
+				"pattern": {
+					"regexp": "^(ERROR) in (.*)$",
+					"severity": 1,
+					"file": 2,
+					"message": 1
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "(NODE_ENV:|webpack \\S+ building|asset)",
+					"endsPattern": "(webpack \\S+ compiled|compiled successfully|compiled with)"
+				}
+			}
+		},
+		{
+			"label": "build-LandingWebSite",
+			"type": "process",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"${workspaceFolder}/src/LandingWebSite/LandingWebSite.csproj",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"presentation": {
+				"group": "run-landing",
+				"reveal": "silent",
+				"panel": "dedicated"
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "watch-and-build",
+			"dependsOrder": "sequence",
+			"dependsOn": [
+				"watch-client",
+				"build-LandingWebSite"
+			]
+		}
+	]
+}
