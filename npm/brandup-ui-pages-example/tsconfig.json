@@ -9,8 +9,8 @@
       "ESNext",
       "DOM"
     ],
-    "rootDir": "./_client",
-    "outDir": "./_out",
+    "rootDir": "./source",
+    "outDir": "./out",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "noImplicitAny": true,
