@@ -7,19 +7,19 @@ const plugins = [
 			useESModules: true
 		}
 	]
-];
+]; // '@babel/plugin-transform-runtime'
 
 module.exports = {
-  presets: [
-    [
-		"@babel/preset-env", {
-			useBuiltIns: "usage",
-			corejs: "3.37.1",
-			debug: false,
-			modules: "commonjs",
-    	}
+	presets: [
+		[
+			"@babel/preset-env", {
+				useBuiltIns: "usage",
+				corejs: "3.37.1",
+				// targets берётся из .browserslistrc (единый источник истины)
+				debug: false
+			}
+		],
+		"@babel/preset-typescript"
 	],
-	"@babel/preset-typescript"
-  ],
-  plugins: plugins
+	plugins: plugins
 };
