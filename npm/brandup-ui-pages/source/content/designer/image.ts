@@ -9,6 +9,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
     private __fileInputElem: HTMLInputElement;
     private __button: HTMLElement;
     private __closeFunc: (e: MouseEvent) => void;
+    private __dragleaveTimeout = 0;
 
     get typeName(): string { return "BrandUpPages.ImageDesigner"; }
     protected onRender(elem: HTMLElement) {
@@ -33,6 +34,9 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
                 return;
 
             this.__uploadFile(this.__fileInputElem.files.item(0));
+
+            // Сбрасываем value, иначе повторный выбор того же файла не вызовет change.
+            this.__fileInputElem.value = "";
 
             textInput.focus();
         });
@@ -80,14 +84,13 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             this.__fileInputElem.click();
         });
 
-        let dragleaveTime = 0;
         elem.ondragover = () => {
-            clearTimeout(dragleaveTime);
+            clearTimeout(this.__dragleaveTimeout);
             elem.classList.add("draging");
             return false;
         };
         elem.ondragleave = () => {
-            dragleaveTime = window.setTimeout(() => { elem.classList.remove("draging"); }, 50);
+            this.__dragleaveTimeout = window.setTimeout(() => { elem.classList.remove("draging"); }, 50);
             return false;
         };
         elem.ondrop = (e: DragEvent) => {
@@ -97,7 +100,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
             elem.classList.remove("draging");
 
             const file = e.dataTransfer.files.item(0);
-            if (!file.type)
+            if (!file || !file.type)
                 return false;
 
             this.__uploadFile(file);
@@ -111,6 +114,13 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
 
             return false;
         };
+    }
+
+    override destroy() {
+        document.body.removeEventListener("click", this.__closeFunc, false);
+        clearTimeout(this.__dragleaveTimeout);
+
+        super.destroy();
     }
 
     hasValue(): boolean {

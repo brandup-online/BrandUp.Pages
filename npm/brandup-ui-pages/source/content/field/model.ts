@@ -63,7 +63,8 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             }
             else {
                 selectContentType(this.options.itemTypes).then((type) => {
-                    this.__addItem(type.name);
+                    if (type)
+                        this.__addItem(type.name);
                 });
             }
         });
@@ -139,6 +140,14 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
     private __renderItems() {
         DOM.empty(this.__itemsElem);
+
+        if (!this.__value || !this.__value.items) {
+            this.__itemsElem.appendChild(DOM.tag("div", { class: "item new" }, [
+                DOM.tag("div", { class: "index" }, "#1"),
+                DOM.tag("a", { href: "", class: "title", "data-command": "item-add" }, this.options.addText ? this.options.addText : "Добавить")
+            ]));
+            return;
+        }
 
         let i = 0
         for (i = 0; i < this.__value.items.length; i++) {

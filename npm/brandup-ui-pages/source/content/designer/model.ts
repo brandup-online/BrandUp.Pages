@@ -25,7 +25,8 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 
             if (!itemType) {
                 selectContentType(this.options.itemTypes).then((type) => {
-                    this.addItem(type.name, itemIndex);
+                    if (type)
+                        this.addItem(type.name, itemIndex);
                 });
             }
             else

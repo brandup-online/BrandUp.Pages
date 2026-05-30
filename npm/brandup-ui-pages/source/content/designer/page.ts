@@ -23,6 +23,8 @@ export class PageDesigner implements IPageDesigner {
 
         this.queue = new AjaxQueue();
         this.__rootElem = DOM.queryElement(document.body, "[content-root]");
+        if (!this.__rootElem)
+            throw new Error("PageDesigner: не найден корневой элемент контента [content-root].");
         this.__rootElem.classList.add("page-designer");
 
         this.render();
@@ -104,6 +106,8 @@ export class PageDesigner implements IPageDesigner {
             this.__fields[key].destroy();
         }
         this.__fields = null;
+
+        this.queue.destroy();
 
         document.body.classList.remove("bp-state-design");
     }

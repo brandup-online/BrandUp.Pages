@@ -47,7 +47,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
         if (this.options.header)
             this.setHeader(this.options.header);
         if (this.options.notes)
-            this.setHeader(this.options.notes);
+            this.setNotes(this.options.notes);
 
         if (this.__parentDialog) {
             this.headerElem.insertAdjacentElement("afterbegin", DOM.tag("a", { href: "", class: "button back", "data-command": "close" }, iconBack));
@@ -123,6 +123,7 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
 
     private __resolve: (value: TResult | null) => void;
     private __reject: (reason: any) => void;
+    private __isSettled = false;
 
     open(): Promise<TResult> {
         if (currentDialog) {
@@ -145,19 +146,28 @@ export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     }
 
     protected resolve(value: TResult | null) {
-        if (this.__resolve)
-            this.__resolve(value);
+        this.__settle(() => this.__resolve?.(value));
 
         this.destroy();
     }
     protected reject(reason: any) {
-        if (this.__reject)
-            this.__reject(reason);
+        this.__settle(() => this.__reject?.(reason));
 
         this.destroy();
     }
+    private __settle(action: () => void) {
+        if (this.__isSettled)
+            return;
+
+        this.__isSettled = true;
+        action();
+    }
 
     override destroy() {
+        // Если диалог закрыт напрямую (X / закрытие родителя), промис open() всё равно
+        // нужно разрешить значением null, иначе await/then на нём зависнут навсегда.
+        this.__settle(() => this.__resolve?.(null));
+
         if (this.__childDialog) {
             this.__childDialog.destroy();
             this.__childDialog = null;

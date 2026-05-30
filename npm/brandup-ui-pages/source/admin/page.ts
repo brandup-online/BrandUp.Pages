@@ -85,7 +85,8 @@ export class PageToolbar extends UIElement {
 
                 this.registerCommand("bp-publish", () => {
                     publishPage(page.model.id).then(result => {
-                        page.website.nav({ url: result.url, replace: true });
+                        if (result)
+                            page.website.nav({ url: result.url, replace: true });
                     });
                 });
             }
@@ -108,7 +109,7 @@ export class PageToolbar extends UIElement {
                         if (response.status !== 200)
                             throw "";
 
-                        if (response.data.currentDate) {
+                        if (response.data && response.data.currentDate) {
                             const popup = DOM.tag("div", { class: "bp-toolbar-popup" }, [
                                 DOM.tag("div", { class: "text" }, "Ранее вы не завершили редактирование этой страницы."),
                                 DOM.tag("div", { class: "buttons" }, [

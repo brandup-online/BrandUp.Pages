@@ -38,6 +38,9 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
 
             this.__uploadFile(this.__fileInputElem.files.item(0));
 
+            // Сбрасываем value, иначе повторный выбор того же файла не вызовет change.
+            this.__fileInputElem.value = "";
+
             this.valueElem.focus();
         });
 
@@ -58,7 +61,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
             this.valueElem.classList.remove("draging");
 
             const file = e.dataTransfer.files.item(0);
-            if (!file.type)
+            if (!file || !file.type)
                 return false;
 
             this.__uploadFile(file);
