@@ -28,31 +28,35 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements 
         if (this.options.placeholder)
             this.__value.setAttribute("data-placeholder", this.options.placeholder);
 
-        ContentEditor.create(this.__value, { placeholder: this.options.placeholder })
+        ContentEditor.create(this.__value, { placeholder: this.options.placeholder, language: "ru", blockToolbarEnabled: true })
             .then(editor => {
                 this.__editor = editor;
 
-                editor.model.document.on('change', () => {
-                    if (editor.model.document.differ.hasDataChanges())
-                        this.__isChanged = true;
+                // change:data срабатывает на любое изменение данных, включая форматирование
+                // (атрибуты вроде bold/italic), которое обычный change + hasDataChanges может пропустить.
+                editor.model.document.on('change:data', () => {
+                    this.__isChanged = true;
+
+                    this.__refreshUI();
+                });
+
+                // Сохраняем по потере фокуса редактором через focusTracker, а не по нативному blur
+                // редактируемой области: focusTracker считает редактор в фокусе, пока фокус внутри
+                // его UI (включая тулбары). Иначе клик по кнопке форматирования вызывает blur области
+                // ДО применения формата, и изменение форматирования не сохраняется.
+                editor.ui.focusTracker.on('change:isFocused', (_evt, _name, isFocused) => {
+                    if (isFocused)
+                        this.__isChanged = false;
+                    else if (this.__isChanged) {
+                        editor.model.document.differ.reset();
+                        this._onChanged();
+                    }
 
                     this.__refreshUI();
                 });
 
                 this.__refreshUI();
             });
-
-        this.__value.addEventListener("focus", () => {
-            this.__isChanged = false;
-        });
-        this.__value.addEventListener("blur", () => {
-            if (this.__isChanged && this.__editor) {
-                this.__editor.model.document.differ.reset();
-                this._onChanged();
-            }
-
-            this.__refreshUI();
-        });
     }
 
     getValue(): string {

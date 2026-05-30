@@ -30,7 +30,7 @@
     "@brandup/ui-ajax": "^1.0.44",
     "@brandup/ui-dom": "^1.0.44",
     "@brandup/ui-website": "^10.0.28",
-    "brandup-pages-ckeditor": "^2.0.9",
+    "brandup-pages-ckeditor": "^3.0.1",
     "brandup-ui-pages": "file:../brandup-ui-pages"
   },
   "scripts": {
