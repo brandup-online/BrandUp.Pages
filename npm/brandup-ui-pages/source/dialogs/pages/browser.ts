@@ -7,17 +7,20 @@ import { deletePage } from "./delete";
 import { listPageCollection } from "../collections/list";
 import { PageModel, PageCollectionModel } from "../../typings/models";
 import iconClose from "../../svg/list-item-add.svg";
+import { WebsiteApplication } from "@brandup/ui-website";
 
 export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
+    readonly website: WebsiteApplication;
     private __pageId: string | null;
     private collectionId: string | null = null;
     private navElem?: HTMLElement;
     private tabsElem?: HTMLElement;
     private __createCollElem?: HTMLElement;
 
-    constructor(pageId: string | null, options?: DialogOptions) {
+    constructor(website: WebsiteApplication, pageId: string | null, options?: DialogOptions) {
         super(options);
 
+        this.website = website;
         this.__pageId = pageId;
 
         this.setSorting(true);
@@ -47,7 +50,7 @@ export class PageBrowserDialog extends ListDialog<PageListModel, PageModel> {
             });
         });
         this.registerItemCommand("item-open", (_itemId: string, model: PageModel) => {
-            location.href = model.url;
+            this.website.nav(model.url);
         });
         this.registerItemCommand("item-delete", (itemId: string) => {
             deletePage(itemId).then((_deletedItem: PageModel) => {
@@ -194,7 +197,7 @@ interface PagePathModel {
     url: string;
 }
 
-export var browserPage = (pageId: string) => {
-    let dialog = new PageBrowserDialog(pageId);
+export var browserPage = (website: WebsiteApplication, pageId: string) => {
+    let dialog = new PageBrowserDialog(website, pageId);
     return dialog.open();
 };

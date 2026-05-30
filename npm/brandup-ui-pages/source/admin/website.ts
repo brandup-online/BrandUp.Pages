@@ -63,14 +63,14 @@ export class WebSiteToolbar extends UIElement {
             let parentPageId: string = null;
             if (isContentPage)
                 parentPageId = page.model.parentPageId;
-            browserPage(parentPageId);
+            browserPage(page.website, parentPageId);
         });
 
         this.registerCommand("bp-pages-child", () => {
             let parentPageId: string = null;
             if (isContentPage)
                 parentPageId = page.model.id;
-            browserPage(parentPageId);
+            browserPage(page.website, parentPageId);
         });
 
         this.registerCommand("bp-website", () => {

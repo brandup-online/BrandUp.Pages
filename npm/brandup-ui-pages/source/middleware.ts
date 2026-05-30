@@ -1,6 +1,7 @@
 ﻿import { Middleware, MiddlewareNext, NavigateContext, StartContext } from "@brandup/ui-app";
 import { Page } from "@brandup/ui-website";
 import { ContentPage } from "./pages/content";
+import { closeDialogTree } from "./dialogs/dialog";
 
 export class PagesMiddleware implements Middleware {
     name: string = "Pages";
@@ -12,6 +13,8 @@ export class PagesMiddleware implements Middleware {
     }
 
     async navigate(context: NavigateContext, next: MiddlewareNext) {
+        closeDialogTree();
+
         await next();
 
         this._showUI(context.data);

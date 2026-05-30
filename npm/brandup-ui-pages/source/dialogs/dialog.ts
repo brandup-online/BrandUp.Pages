@@ -8,6 +8,13 @@ const dialogsPanelElem: HTMLElement = DOM.tag("div", { class: "bp-elem bp-dialog
 let currentDialog: Dialog | null = null;
 document.body.appendChild(dialogsPanelElem);
 
+export const closeDialogTree = () => {
+    if (!currentDialog)
+        return;
+
+    currentDialog.destroy();
+}
+
 export abstract class Dialog<TResult = {}> extends UIControl<DialogOptions> {
     protected headerElem: HTMLElement;
     protected headerTitleElem: HTMLElement;
