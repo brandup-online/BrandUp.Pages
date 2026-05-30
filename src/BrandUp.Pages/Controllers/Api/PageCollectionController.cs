@@ -1,4 +1,5 @@
 ﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Models;
 using BrandUp.Website;
 using Microsoft.AspNetCore.Mvc;
 
@@ -108,27 +109,8 @@ namespace BrandUp.Pages.Controllers
 
 		#region Helper methods
 
-		private async Task<Models.PageCollectionModel> GetItemModelAsync(IPageCollection pageCollection)
-		{
-			string pageUrl = "/";
-			if (pageCollection.PageId.HasValue)
-			{
-				IPage page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
-				pageUrl = await pageLinkGenerator.GetPathAsync(page);
-			}
-
-			return new Models.PageCollectionModel
-			{
-				Id = pageCollection.Id,
-				CreatedDate = pageCollection.CreatedDate,
-				PageId = pageCollection.PageId,
-				Title = pageCollection.Title,
-				PageType = pageCollection.PageTypeName,
-				Sort = pageCollection.SortMode,
-				CustomSorting = pageCollection.CustomSorting,
-				PageUrl = pageUrl
-			};
-		}
+		private Task<Models.PageCollectionModel> GetItemModelAsync(IPageCollection pageCollection)
+			=> pageCollection.ToViewModelAsync(pageService, pageLinkGenerator);
 		private IActionResult WithResult(Result result)
 		{
 			if (result == null)

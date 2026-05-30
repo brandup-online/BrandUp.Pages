@@ -84,27 +84,8 @@ namespace BrandUp.Pages.Controllers
 			return pageCollectionService.FindCollectiondByIdAsync(id);
 		}
 
-		protected override async Task<PageCollectionModel> OnGetItemModelAsync(IPageCollection item)
-		{
-			string pageUrl = "/";
-			if (item.PageId.HasValue)
-			{
-				IPage page = await pageService.FindPageByIdAsync(item.PageId.Value);
-				pageUrl = await pageLinkGenerator.GetPathAsync(page);
-			}
-
-			return new PageCollectionModel
-			{
-				Id = item.Id,
-				CreatedDate = item.CreatedDate,
-				PageId = item.PageId,
-				Title = item.Title,
-				PageType = item.PageTypeName,
-				Sort = item.SortMode,
-				CustomSorting = item.CustomSorting,
-				PageUrl = pageUrl
-			};
-		}
+		protected override Task<PageCollectionModel> OnGetItemModelAsync(IPageCollection item)
+			=> item.ToViewModelAsync(pageService, pageLinkGenerator);
 
 		#endregion
 	}

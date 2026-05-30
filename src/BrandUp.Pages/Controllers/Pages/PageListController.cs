@@ -102,17 +102,8 @@ namespace BrandUp.Pages.Controllers
 			return pageService.FindPageByIdAsync(id);
 		}
 
-		protected override async Task<PageModel> OnGetItemModelAsync(IPage item)
-		{
-			return new PageModel
-			{
-				Id = item.Id,
-				CreatedDate = item.CreatedDate,
-				Title = item.Header,
-				Status = item.IsPublished ? PageStatus.Published : PageStatus.Draft,
-				Url = await pageLinkGenerator.GetPathAsync(item)
-			};
-		}
+		protected override Task<PageModel> OnGetItemModelAsync(IPage item)
+			=> item.ToViewModelAsync(pageLinkGenerator);
 
 		protected override async Task OnSortAsync(IPage sourceItem, IPage destItem, ListItemSortPosition position)
 		{
@@ -129,27 +120,8 @@ namespace BrandUp.Pages.Controllers
 
 		#endregion
 
-		private async Task<PageCollectionModel> GetPageCollectionModelAsync(IPageCollection pageCollection)
-		{
-			string pageUrl = "/";
-			if (pageCollection.PageId.HasValue)
-			{
-				IPage page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
-				pageUrl = await pageLinkGenerator.GetPathAsync(page);
-			}
-
-			return new PageCollectionModel
-			{
-				Id = pageCollection.Id,
-				CreatedDate = pageCollection.CreatedDate,
-				PageId = pageCollection.PageId,
-				Title = pageCollection.Title,
-				PageType = pageCollection.PageTypeName,
-				Sort = pageCollection.SortMode,
-				CustomSorting = pageCollection.CustomSorting,
-				PageUrl = pageUrl
-			};
-		}
+		private Task<PageCollectionModel> GetPageCollectionModelAsync(IPageCollection pageCollection)
+			=> pageCollection.ToViewModelAsync(pageService, pageLinkGenerator);
 		private async Task<PagePathModel> GetPathModelAsync(IPage page)
 		{
 			return new PagePathModel
