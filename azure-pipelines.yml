@@ -37,8 +37,7 @@ stages:
       - job: BuildNet
         displayName: Build NET
         pool:
-          # vmImage: $(vmImageName)
-          name: Test
+          vmImage: $(vmImageName)
           workspace:
             clean: all
         steps:
