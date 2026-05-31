@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using BrandUp.Pages.Files;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,15 +16,15 @@ namespace BrandUp.Pages.Content.Fields
 			if (valueType != ImageValueType)
 				throw new InvalidOperationException();
 		}
-		public override bool HasValue(object value)
+		public override bool HasValue(object? value)
 		{
 			if (!base.HasValue(value))
 				return false;
 
-			var img = (ImageValue)value;
+			var img = (ImageValue)value!;
 			return img.HasValue;
 		}
-		public override object ParseValue(string strValue)
+		public override object? ParseValue(string strValue)
 		{
 			if (string.IsNullOrEmpty(strValue))
 				return null;
@@ -34,24 +34,24 @@ namespace BrandUp.Pages.Content.Fields
 
 			return value;
 		}
-		public override object ConvetValueToData(object value)
+		public override object? ConvetValueToData(object? value)
 		{
-			var img = (ImageValue)value;
+			var img = (ImageValue)value!;
 			return img.ToString();
 		}
-		public override object ConvetValueFromData(object value)
+		public override object? ConvetValueFromData(object? value)
 		{
-			if (!ImageValue.TryParse((string)value, out ImageValue imageValue))
+			if (!ImageValue.TryParse((string)value!, out ImageValue imageValue))
 				throw new InvalidOperationException();
 			return imageValue;
 		}
-		public override async Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+		public override async Task<object?> GetFormValueAsync(object? modelValue, IServiceProvider services)
 		{
-			ImageFieldFormValue formValue = null;
+			ImageFieldFormValue? formValue = null;
 
 			if (HasValue(modelValue))
 			{
-				var imageValue = (ImageValue)modelValue;
+				var imageValue = (ImageValue)modelValue!;
 
 				var fileUrlGenerator = services.GetRequiredService<IFileUrlGenerator>();
 				var previewUrl = await fileUrlGenerator.GetImageUrlAsync(imageValue, 600, 500);
@@ -74,8 +74,8 @@ namespace BrandUp.Pages.Content.Fields
 	{
 		[JsonConverter(typeof(JsonStringEnumConverter))]
 		public ImageValueType ValueType { get; set; }
-		public string Value { get; set; }
-		public string PreviewUrl { get; set; }
+		public string Value { get; set; } = null!;
+		public string PreviewUrl { get; set; } = null!;
 	}
 
 	public interface IImageField : IFieldProvider

@@ -21,14 +21,14 @@
 		Task SetPageDescriptionAsync(IPage page, string description, CancellationToken cancellationToken = default);
 		Task<string[]> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default);
 		Task SetPageKeywordsAsync(IPage page, string[] keywords, CancellationToken cancellationToken = default);
-		Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default);
-		Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default);
+		Task UpPagePositionAsync(IPage page, IPage? beforePage, CancellationToken cancellationToken = default);
+		Task DownPagePositionAsync(IPage page, IPage? afterPage, CancellationToken cancellationToken = default);
 	}
 
 	public class PageUrlResult
 	{
 		public Guid? PageId { get; }
-		public PageUrlRedirect Redirect { get; }
+		public PageUrlRedirect? Redirect { get; }
 
 		public PageUrlResult(Guid pageId)
 		{

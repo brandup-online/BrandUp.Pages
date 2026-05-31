@@ -3,7 +3,7 @@
 	public interface IPageMetadataManager
 	{
 		IEnumerable<PageMetadataProvider> MetadataProviders { get; }
-		PageMetadataProvider FindPageMetadataByContentType(Type contentType);
-		PageMetadataProvider FindPageMetadataByName(string name);
+		PageMetadataProvider? FindPageMetadataByContentType(Type contentType);
+		PageMetadataProvider? FindPageMetadataByName(string name);
 	}
 }

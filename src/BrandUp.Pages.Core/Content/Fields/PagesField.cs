@@ -6,13 +6,13 @@ namespace BrandUp.Pages.Content.Fields
 {
 	public class PagesAttribute : FieldProviderAttribute, IPagesField
 	{
-		private ConstructorInfo valueConstructor;
+		private ConstructorInfo valueConstructor = null!;
 
-		public string Placeholder { get; set; }
+		public string? Placeholder { get; set; }
 
 		#region IPagesField members
 
-		public Type PageModelType { get; private set; }
+		public Type PageModelType { get; private set; } = null!;
 		public IPageCollectionReference CreateValue(Guid collectionId)
 		{
 			return (IPageCollectionReference)valueConstructor.Invoke(new object[] { collectionId });
@@ -28,38 +28,38 @@ namespace BrandUp.Pages.Content.Fields
 			if (!valueType.IsGenericType || valueType.GetGenericTypeDefinition() != typeof(PageCollectionReference<>))
 				throw new InvalidOperationException();
 
-			valueConstructor = valueType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(Guid) }, null);
+			valueConstructor = valueType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[] { typeof(Guid) }, null)!;
 			if (valueConstructor == null)
 				throw new InvalidOperationException();
 
 			PageModelType = valueType.GenericTypeArguments[0];
 		}
 
-		public override bool HasValue(object value)
+		public override bool HasValue(object? value)
 		{
 			if (!base.HasValue(value))
 				return false;
 
-			var colRef = (IPageCollectionReference)value;
+			var colRef = (IPageCollectionReference)value!;
 			if (colRef.CollectionId == Guid.Empty)
 				return false;
 			return true;
 		}
 
-		public override object ParseValue(string strValue)
+		public override object? ParseValue(string strValue)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override object ConvetValueToData(object value)
+		public override object? ConvetValueToData(object? value)
 		{
-			var img = (IPageCollectionReference)value;
+			var img = (IPageCollectionReference)value!;
 			return img.CollectionId.ToString();
 		}
 
-		public override object ConvetValueFromData(object value)
+		public override object? ConvetValueFromData(object? value)
 		{
-			var collectionId = Guid.Parse((string)value);
+			var collectionId = Guid.Parse((string)value!);
 			return valueConstructor.Invoke(new object[] { collectionId });
 		}
 
@@ -78,14 +78,14 @@ namespace BrandUp.Pages.Content.Fields
 			};
 		}
 
-		public override async Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+		public override async Task<object?> GetFormValueAsync(object? modelValue, IServiceProvider services)
 		{
 			if (!HasValue(modelValue))
 				return null;
 
 			var pageCollectionService = services.GetRequiredService<IPageCollectionService>();
 
-			var value = (IPageCollectionReference)modelValue;
+			var value = (IPageCollectionReference)modelValue!;
 			var pageCollection = await pageCollectionService.FindCollectiondByIdAsync(value.CollectionId);
 			if (pageCollection == null)
 				return null;
@@ -117,14 +117,14 @@ namespace BrandUp.Pages.Content.Fields
 
 	public class PagesFieldFormOptions
 	{
-		public string Placeholder { get; set; }
-		public string PageType { get; set; }
+		public string? Placeholder { get; set; }
+		public string PageType { get; set; } = null!;
 	}
 
 	public class PagesFieldFormValue
 	{
 		public Guid Id { get; set; }
-		public string Title { get; set; }
-		public string PageUrl { get; set; }
+		public string Title { get; set; } = null!;
+		public string PageUrl { get; set; } = null!;
 	}
 }

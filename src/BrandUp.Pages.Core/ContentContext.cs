@@ -33,7 +33,7 @@ namespace BrandUp.Pages
 			IsDesigner = parent.IsDesigner;
 		}
 
-		public ContentContext Navigate(string path)
+		public ContentContext? Navigate(string path)
 		{
 			var explorer = Explorer.Navigate(path);
 			if (explorer == null)

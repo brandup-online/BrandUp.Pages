@@ -31,7 +31,7 @@
 
 		public bool IsSuccess { get; protected set; }
 		public IEnumerable<string> Errors => errors;
-		public TData Data { get; private set; }
+		public TData Data { get; private set; } = default!;
 
 		protected Result() { }
 

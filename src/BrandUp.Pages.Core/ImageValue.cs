@@ -70,7 +70,7 @@
 
 		#region Object members
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			if (!(obj is ImageValue))
 				return false;

@@ -11,15 +11,15 @@ namespace BrandUp.Pages.Metadata
 		public ContentMetadataProvider ContentMetadata { get; }
 		public string Name => ContentMetadata.Name;
 		public string Title => ContentMetadata.Title;
-		public string Description => ContentMetadata.Description;
+		public string? Description => ContentMetadata.Description;
 		public Type ContentType => ContentMetadata.ModelType;
-		public PageMetadataProvider ParentMetadata { get; }
+		public PageMetadataProvider? ParentMetadata { get; }
 		public IEnumerable<PageMetadataProvider> DerivedTypes => derivedTypes;
 		public bool AllowCreateModel => !ContentMetadata.IsAbstract;
 
 		#endregion
 
-		internal PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider parentPageMetadata)
+		internal PageMetadataProvider(ContentMetadataProvider contentMetadata, PageMetadataProvider? parentPageMetadata)
 		{
 			ContentMetadata = contentMetadata;
 			ParentMetadata = parentPageMetadata;
@@ -67,9 +67,9 @@ namespace BrandUp.Pages.Metadata
 
 		#region IEquatable members
 
-		public bool Equals(PageMetadataProvider other)
+		public bool Equals(PageMetadataProvider? other)
 		{
-			if (other == null || !(other is PageMetadataProvider))
+			if (other == null)
 				return false;
 
 			return ContentType == other.ContentType;
@@ -83,7 +83,7 @@ namespace BrandUp.Pages.Metadata
 		{
 			return Name;
 		}
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return Equals(obj as PageMetadataProvider);
 		}

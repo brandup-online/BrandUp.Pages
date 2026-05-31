@@ -15,7 +15,7 @@ namespace BrandUp.Pages.Interfaces
 		Task<IPageCollection> FindCollectiondByIdAsync(Guid id);
 		Task<IEnumerable<IPageCollection>> ListCollectionsAsync(string webSiteId);
 		Task<IEnumerable<IPageCollection>> ListCollectionsAsync(IPage page);
-		Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string pageTypeName, string title = null, bool includeDerivedTypes = true);
+		Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string pageTypeName, string? title = null, bool includeDerivedTypes = true);
 		Task<Result> UpdateCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
 		Task<Result> DeleteCollectionAsync(IPageCollection collection, CancellationToken cancellationToken = default);
 		Task<List<PageMetadataProvider>> GetPageTypesAsync(IPageCollection collection);

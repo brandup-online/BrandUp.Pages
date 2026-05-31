@@ -54,7 +54,7 @@ namespace BrandUp.Pages.Services
 			return repositiry.ListCollectionsAsync(page.WebsiteId, page.Id);
 		}
 
-		public Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string pageTypeName, string title = null, bool includeDerivedTypes = true)
+		public Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string pageTypeName, string? title = null, bool includeDerivedTypes = true)
 		{
 			if (pageTypeName == null)
 				throw new ArgumentNullException(nameof(pageTypeName));

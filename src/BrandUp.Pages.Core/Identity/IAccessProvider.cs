@@ -2,7 +2,7 @@
 {
 	public interface IAccessProvider
 	{
-		Task<string> GetUserIdAsync(CancellationToken cancellationToken = default);
+		Task<string?> GetUserIdAsync(CancellationToken cancellationToken = default);
 		Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default);
 	}
 
@@ -13,9 +13,9 @@
 			return Task.FromResult(false);
 		}
 
-		public Task<string> GetUserIdAsync(CancellationToken cancellationToken = default)
+		public Task<string?> GetUserIdAsync(CancellationToken cancellationToken = default)
 		{
-			return Task.FromResult<string>(null);
+			return Task.FromResult<string?>(null);
 		}
 	}
 }

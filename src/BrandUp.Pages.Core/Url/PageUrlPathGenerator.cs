@@ -5,7 +5,7 @@ namespace BrandUp.Pages.Url
 {
 	public interface IPageUrlPathGenerator
 	{
-		Task<string> GenerateAsync(IPage page);
+		Task<string?> GenerateAsync(IPage page);
 	}
 
 	public class PageUrlPathGenerator : IPageUrlPathGenerator
@@ -15,14 +15,14 @@ namespace BrandUp.Pages.Url
 		private static readonly char[] TrimChars = new char[] { '-' };
 		private static readonly Regex NormalizeRegex = new Regex(@"(?<1>[-]{2,})", RegexOptions.IgnoreCase | RegexOptions.Compiled | RegexOptions.Singleline);
 
-		public Task<string> GenerateAsync(IPage page)
+		public Task<string?> GenerateAsync(IPage page)
 		{
 			if (page == null)
 				throw new System.ArgumentNullException(nameof(page));
 
 			var input = page.Header;
 			if (input == null)
-				return Task.FromResult<string>(null);
+				return Task.FromResult<string?>(null);
 
 			var result = TranslitRegex.Replace(input, match =>
 			{
@@ -64,7 +64,7 @@ namespace BrandUp.Pages.Url
 					return match.Value;
 			});
 
-			return Task.FromResult(result);
+			return Task.FromResult<string?>(result);
 		}
 	}
 }

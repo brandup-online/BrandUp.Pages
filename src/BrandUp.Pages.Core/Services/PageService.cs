@@ -49,7 +49,7 @@ namespace BrandUp.Pages.Services
 
 			return page;
 		}
-		public async Task<IPage> CreatePageAsync(IPageCollection collection, string pageType = null, string pageHeader = null, CancellationToken cancellationToken = default)
+		public async Task<IPage> CreatePageAsync(IPageCollection collection, string? pageType = null, string? pageHeader = null, CancellationToken cancellationToken = default)
 		{
 			if (collection == null)
 				throw new ArgumentNullException(nameof(collection));
@@ -99,6 +99,7 @@ namespace BrandUp.Pages.Services
 				case PageSortMode.FirstOld:
 					await DownPagePositionAsync(page, null, cancellationToken);
 					break;
+
 				default:
 					throw new InvalidOperationException($"Недопустимый режим сортировки коллекции: {collection.SortMode}.");
 			}
@@ -299,16 +300,16 @@ namespace BrandUp.Pages.Services
 
 			await pageRepositiry.UpdatePageAsync(page, cancellationToken);
 		}
-		public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
+		public Task UpPagePositionAsync(IPage page, IPage? beforePage, CancellationToken cancellationToken = default)
 		{
 			return pageRepositiry.UpPagePositionAsync(page, beforePage, cancellationToken);
 		}
-		public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
+		public Task DownPagePositionAsync(IPage page, IPage? afterPage, CancellationToken cancellationToken = default)
 		{
 			return pageRepositiry.DownPagePositionAsync(page, afterPage, cancellationToken);
 		}
 
-		private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string header = null)
+		private void ApplyDefaultDataToContentModel(PageMetadataProvider pageMetadataProvider, object contentModel, string? header = null)
 		{
 			if (string.IsNullOrEmpty(header) && !string.IsNullOrEmpty(options.DefaultPageHeader))
 				pageMetadataProvider.SetPageHeader(contentModel, options.DefaultPageHeader);

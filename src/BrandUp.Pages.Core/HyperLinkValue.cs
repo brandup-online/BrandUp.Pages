@@ -5,7 +5,7 @@
 		public HyperLinkType ValueType { get; }
 		public string Value { get; }
 		public bool HasValue => Value != null;
-		public Uri Url
+		public Uri? Url
 		{
 			get
 			{
@@ -74,7 +74,7 @@
 					}
 				case HyperLinkType.Url:
 					{
-						if (!Uri.TryCreate(temp[1], UriKind.RelativeOrAbsolute, out Uri uri))
+						if (!Uri.TryCreate(temp[1], UriKind.RelativeOrAbsolute, out Uri? uri))
 							return false;
 
 						hyperLink = new HyperLinkValue(uri);
@@ -98,7 +98,7 @@
 
 		#region Object members
 
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			if (!(obj is HyperLinkValue))
 				return false;

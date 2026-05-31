@@ -21,7 +21,7 @@ namespace BrandUp.Pages.Metadata
 		#region IPageMetadataManager members
 
 		public IEnumerable<PageMetadataProvider> MetadataProviders => metadataProviders;
-		public PageMetadataProvider FindPageMetadataByContentType(Type contentType)
+		public PageMetadataProvider? FindPageMetadataByContentType(Type contentType)
 		{
 			if (contentType == null)
 				throw new ArgumentNullException(nameof(contentType));
@@ -31,7 +31,7 @@ namespace BrandUp.Pages.Metadata
 
 			return metadataProviders[index];
 		}
-		public PageMetadataProvider FindPageMetadataByName(string name)
+		public PageMetadataProvider? FindPageMetadataByName(string name)
 		{
 			if (name == null)
 				throw new ArgumentNullException(nameof(name));
@@ -46,7 +46,7 @@ namespace BrandUp.Pages.Metadata
 
 		#region Helpers
 
-		private bool TryRegisterPageType(ContentMetadataProvider contentMetadata, out PageMetadataProvider pageMetadataProvider)
+		private bool TryRegisterPageType(ContentMetadataProvider contentMetadata, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out PageMetadataProvider pageMetadataProvider)
 		{
 			if (TryGetPageMetadataByContentType(contentMetadata.ModelType, out pageMetadataProvider))
 				return true;
@@ -64,14 +64,14 @@ namespace BrandUp.Pages.Metadata
 				return false;
 			}
 
-			PageMetadataProvider parentPageMetadata = null;
+			PageMetadataProvider? parentPageMetadata = null;
 			if (contentMetadata.BaseMetadata != null)
 				TryRegisterPageType(contentMetadata.BaseMetadata, out parentPageMetadata);
 
 			pageMetadataProvider = AddPageType(contentMetadata, pageAttribute, parentPageMetadata);
 			return true;
 		}
-		private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider parentPageMetadata)
+		private PageMetadataProvider AddPageType(ContentMetadataProvider contentMetadataProvider, PageContentAttribute pageAttribute, PageMetadataProvider? parentPageMetadata)
 		{
 			if (!contentMetadataProvider.IsDefinedTitleField)
 				throw new InvalidOperationException("Тип контента не может быть контентом страницы, так как для него не определено поле заголовка.");
@@ -86,7 +86,7 @@ namespace BrandUp.Pages.Metadata
 
 			return pageMetadata;
 		}
-		private bool TryGetPageMetadataByContentType(Type contentType, out PageMetadataProvider pageMetadataProvider)
+		private bool TryGetPageMetadataByContentType(Type contentType, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out PageMetadataProvider pageMetadataProvider)
 		{
 			if (!typeObjectTypes.TryGetValue(contentType, out int index))
 			{
