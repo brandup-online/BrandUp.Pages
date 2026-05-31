@@ -67,11 +67,11 @@ export abstract class ListDialog<TList, TItem> extends Dialog {
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
             const target = e.target as Element;
             const sourceId = e.dataTransfer.getData("data-id");
-            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
+            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"), 10);
             const elem = target.closest("[data-index]");
             if (elem) {
                 const destId = elem.getAttribute("data-id");
-                const destIndex = parseInt(elem.getAttribute("data-index"));
+                const destIndex = parseInt(elem.getAttribute("data-index"), 10);
                 if (destIndex !== sourceIndex) {
                     const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                     if (sourceElem) {

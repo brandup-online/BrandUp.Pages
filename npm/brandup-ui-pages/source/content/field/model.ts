@@ -45,7 +45,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
         this.registerCommand("item-delete", (ctx) => {
             const itemElem = ctx.target.closest("[content-path-index]");
-            const itemIndex = parseInt(itemElem.getAttribute("content-path-index"));
+            const itemIndex = parseInt(itemElem.getAttribute("content-path-index"), 10);
 
             itemElem.remove();
             this._refreshBlockIndexes();

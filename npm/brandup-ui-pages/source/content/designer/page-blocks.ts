@@ -45,7 +45,7 @@ export class PageBlocksDesigner extends ModelDesigner {
         var type = blockElem.getAttribute("content-type");
 
         if (this.options.isListValue) {
-            let index = parseInt(blockElem.getAttribute("content-path-index"));
+            let index = parseInt(blockElem.getAttribute("content-path-index"), 10);
             type = '<i>#' + (index + 1) + '</i>' + type;
         }
 

@@ -58,7 +58,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
                             break;
                         default:
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
                     }
                 }
             });
@@ -72,14 +72,18 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.__pageValueInput = DOM.tag("input", { type: "text", class: "page" }) as HTMLInputElement;
         this.__pageValueInput.addEventListener("keyup", () => {
             const title = this.__pageValueInput.value;
-            if (!title || title.length < 3)
-                return;
 
             if (this.__searchTimeout)
                 clearTimeout(this.__searchTimeout);
 
             if (this.__searchRequest)
                 this.__searchRequest.abort();
+
+            if (!title || title.length < 3) {
+                DOM.empty(this.__searchElem);
+                this.__searchElem.appendChild(DOM.tag("li", { class: "text" }, "Начните вводить название страницы или её url."));
+                return;
+            }
 
             this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
@@ -105,7 +109,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
                                 break;
                             default:
-                                throw "";
+                                throw new Error("Unexpected server response status: " + response.status);
                         }
                     }
                 });
@@ -176,7 +180,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                     this.__urlValueInput.focus();
                     break;
                 default:
-                    throw "";
+                    throw new Error("Unknown hyperlink type: " + this.__type);
             }
         });
         this.registerCommand("select-type", (ctx) => {
@@ -213,7 +217,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
 
                             break;
                         default:
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
                     }
                 }
             });
@@ -222,7 +226,15 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.__refreshUI();
     }
 
-    getValue(): HyperLinkFieldFormValue { throw "Not implemented"; }
+    getValue(): HyperLinkFieldFormValue | null {
+        if (!this.hasValue())
+            return null;
+
+        if (this.__type === "Page")
+            return { valueType: "Page", value: this.__pageValueInput.getAttribute("value-page-id") ?? "", pageTitle: this.__pageValueInput.value };
+
+        return { valueType: "Url", value: this.__urlValueInput.value };
+    }
     setValue(value: HyperLinkFieldFormValue) {
         if (value) {
             this.__type = value.valueType;
@@ -240,7 +252,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                     break;
                 }
                 default:
-                    throw "";
+                    throw new Error("Unknown hyperlink value type: " + value.valueType);
             }
         }
 
@@ -255,7 +267,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                 return this.__urlValueInput.value ? true : false;
             }
             default:
-                throw "";
+                throw new Error("Unknown hyperlink type: " + this.__type);
         }
     }
 
@@ -283,7 +295,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                 break;
             }
             default:
-                throw "";
+                throw new Error("Unknown hyperlink type: " + this.__type);
         }
     }
 

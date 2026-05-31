@@ -13,6 +13,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
     private __searchTimeout: number;
     private __searchRequest: XMLHttpRequest;
     private __closeMenuFunc: (e: MouseEvent) => void;
+    private __value: PagesFieldFormValue | null = null;
 
     constructor(form: IContentForm, name: string, options: PagesFieldFormOptions) {
         super(name, options);
@@ -34,14 +35,18 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
         this.inputElem.addEventListener("keyup", () => {
             const title = this.inputElem.value;
-            if (!title || title.length < 3)
-                return;
 
             if (this.__searchTimeout)
                 clearTimeout(this.__searchTimeout);
 
             if (this.__searchRequest)
                 this.__searchRequest.abort();
+
+            if (!title || title.length < 3) {
+                DOM.empty(this.searchElem);
+                this.searchElem.appendChild(DOM.tag("li", { class: "text" }, "Начните вводить название коллекции страниц."));
+                return;
+            }
 
             this.__searchTimeout = window.setTimeout(() => {
                 this.__searchRequest = ajaxRequest({
@@ -69,7 +74,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
                                 break;
                             default:
-                                throw "";
+                                throw new Error("Unexpected server response status: " + response.status);
                         }
                     }
                 });
@@ -125,7 +130,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
                             break;
                         default:
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
                     }
                 }
             });
@@ -134,8 +139,12 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
         this.__refreshUI();
     }
 
-    getValue(): PagesFieldFormValue { throw new Error("Method not implemented."); }
+    getValue(): PagesFieldFormValue | null {
+        return this.__value;
+    }
     setValue(value: PagesFieldFormValue) {
+        this.__value = value ?? null;
+
         if (!value) {
             this.inputElem.removeAttribute("value-collection-id");
             this.inputElem.value = "";

@@ -113,7 +113,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
 
                             break;
                         default:
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
                     }
                 }
             });
@@ -134,7 +134,7 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
 
                             break;
                         default:
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
                     }
                 }
             });

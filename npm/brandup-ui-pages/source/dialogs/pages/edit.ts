@@ -134,7 +134,7 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
                     break;
                 }
                 default: {
-                    throw "";
+                    throw new Error("Unknown content field type: " + fieldModel.type);
                 }
             }
         }

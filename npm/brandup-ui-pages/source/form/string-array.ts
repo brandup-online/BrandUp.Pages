@@ -26,7 +26,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             if (!itemElem)
                 return;
 
-            const index = parseInt(itemElem.getAttribute("data-index") ?? "0");
+            const index = parseInt(itemElem.getAttribute("data-index") ?? "0", 10);
 
             itemElem.remove();
             this.__items.splice(index, 1);
@@ -40,7 +40,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             if (!elem || !this.__itemsElem)
                 return;
 
-            const index = parseInt(elem.getAttribute("data-index") ?? "0");
+            const index = parseInt(elem.getAttribute("data-index") ?? "0", 10);
             const value = this.normalizeValue(t.value);
             if (value) {
                 elem.classList.add("has-value");
@@ -62,7 +62,7 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
             const elem = t.closest(".item");
             if (!elem)
                 return;
-            const index = parseInt(elem.getAttribute("data-index") ?? "0");
+            const index = parseInt(elem.getAttribute("data-index") ?? "0", 10);
             const value = this.normalizeValue(t.value);
 
             if (!value) {
@@ -107,10 +107,10 @@ export class StringArrayField extends Field<Array<string>, StringArrayFieldOptio
                 return false;
 
             const target = e.target as Element;
-            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"));
+            const sourceIndex = parseInt(e.dataTransfer.getData("data-index"), 10);
             const elem = target.closest("[data-index]");
             if (elem) {
-                const destIndex = parseInt(elem.getAttribute("data-index") ?? "0");
+                const destIndex = parseInt(elem.getAttribute("data-index") ?? "0", 10);
                 if (destIndex !== sourceIndex) {
                     const sourceElem = DOM.queryElement(this.__itemsElem, `[data-index="${sourceIndex}"]`);
                     if (sourceElem) {

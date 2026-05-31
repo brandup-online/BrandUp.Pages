@@ -46,7 +46,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
                         break;
                     }
                     default:
-                        throw "";
+                        throw new Error("Unexpected server response status: " + response.status);
                 }
             }
         });
@@ -76,7 +76,7 @@ export abstract class DeleteDialog<TItem> extends Dialog<TItem> {
                         return;
                     }
                     default:
-                        throw "";
+                        throw new Error("Unexpected server response status: " + response.status);
                 }
             }
         });

@@ -18,7 +18,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
 
             if (this.options.isListValue) {
                 if (ctx.target.parentElement.hasAttribute("content-path-index"))
-                    itemIndex = parseInt(ctx.target.parentElement.getAttribute("content-path-index")) + 1;
+                    itemIndex = parseInt(ctx.target.parentElement.getAttribute("content-path-index"), 10) + 1;
                 else
                     itemIndex = this.countItems();
             }
@@ -65,7 +65,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
         this.registerCommand("item-up", (ctx) => {
             const itemElem = ctx.target.closest("[content-path-index]");
             const itemIndex = itemElem.getAttribute("content-path-index");
-            if (parseInt(itemIndex) <= 0)
+            if (parseInt(itemIndex, 10) <= 0)
                 return;
 
             if (itemElem.classList.contains("processing"))
@@ -87,7 +87,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             const itemElem = ctx.target.closest("[content-path-index]");
             const itemIndex = itemElem.getAttribute("content-path-index");
 
-            if (parseInt(itemIndex) >= DOM.queryElements(this.element, "* > [content-path-index]").length - 1)
+            if (parseInt(itemIndex, 10) >= DOM.queryElements(this.element, "* > [content-path-index]").length - 1)
                 return;
 
             if (itemElem.classList.contains("processing"))
@@ -161,9 +161,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
             method: "GET",
             success: (response: AjaxResponse<string>) => {
                 if (response.status === 200) {
-                    const fragment = document.createDocumentFragment();
                     const container = DOM.tag("div", null, response.data);
-                    fragment.appendChild(container);
 
                     const newElem = DOM.queryElement(container, "[content-path]");
                     elem.insertAdjacentElement("afterend", newElem);
@@ -200,9 +198,7 @@ export class ModelDesigner extends FieldDesigner<ModelDesignerOptions> {
                         method: "GET",
                         success: (response: AjaxResponse<string>) => {
                             if (response.status === 200) {
-                                const fragment = document.createDocumentFragment();
                                 const container = DOM.tag("div", null, response.data);
-                                fragment.appendChild(container);
                                 const newElem = DOM.queryElement(container, "[content-path]");
 
                                 if (this.options.isListValue) {

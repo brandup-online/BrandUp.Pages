@@ -49,7 +49,7 @@ export class PageToolbar extends UIElement {
                         //cancelNav = false;
 
                         if (response.status !== 200)
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
 
                         page.website.nav({ url: response.data, replace: true });
                         isLoading = false;
@@ -69,7 +69,7 @@ export class PageToolbar extends UIElement {
                         //cancelNav = false;
 
                         if (response.status !== 200)
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
 
                         page.website.nav({ url: response.data, replace: true });
                         isLoading = false;
@@ -107,7 +107,7 @@ export class PageToolbar extends UIElement {
                         isLoading = false;
 
                         if (response.status !== 200)
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
 
                         if (response.data && response.data.currentDate) {
                             const popup = DOM.tag("div", { class: "bp-toolbar-popup" }, [
@@ -151,7 +151,7 @@ export class PageToolbar extends UIElement {
                         isLoading = false;
 
                         if (response.status !== 200)
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
 
                         page.website.nav({ url: response.data.url, replace: true });
                     }

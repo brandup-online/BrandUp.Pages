@@ -29,7 +29,7 @@ export class SelectContentTypeDialog extends Dialog<ContentTypeModel> {
             if (!indexStr)
                 return;
 
-            const type = this.__types[parseInt(indexStr)];
+            const type = this.__types[parseInt(indexStr, 10)];
             if (!type)
                 return;
 

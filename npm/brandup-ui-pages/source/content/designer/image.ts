@@ -151,7 +151,7 @@ export class ImageDesigner extends FieldDesigner<ImageFieldOptions> {
 
                             break;
                         default:
-                            throw "";
+                            throw new Error("Unexpected server response status: " + response.status);
                     }
                 }
             });

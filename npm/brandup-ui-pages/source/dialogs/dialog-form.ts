@@ -75,7 +75,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
                         break;
                     }
                     default:
-                        throw "";
+                        throw new Error("Unexpected server response status: " + response.status);
                 }
             }
         });
@@ -138,7 +138,7 @@ export abstract class FormDialog<TForm extends FormModel<TValues>, TValues, TRes
                         break;
                     }
                     default:
-                        throw "";
+                        throw new Error("Unexpected server response status: " + response.status);
                 }
             }
         });

@@ -103,20 +103,22 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
         if (!this.__itemsElem || !this.__valueElem)
             return;
 
+        // Всегда снимаем выделение с прежнего пункта, иначе при смене значения
+        // класс "selected" остаётся на нескольких элементах.
+        DOM.removeClass(this.__itemsElem, ".selected", "selected");
+
         let text = "";
+        let resolvedValue: string | null = null;
         if (value !== null) {
             const itemElem = DOM.queryElement(this.__itemsElem, `li[data-value="${value}"]`);
-            if (!itemElem) {
-                this.setValue(null);
-                return;
+            if (itemElem) {
+                text = itemElem.innerText;
+                itemElem.classList.add("selected");
+                resolvedValue = value;
             }
-            text = itemElem.innerText;
-            itemElem.classList.add("selected");
         }
-        else
-            DOM.removeClass(this.__itemsElem, ".selected", "selected");
 
-        this.__value = value;
+        this.__value = resolvedValue;
         this.__valueElem.innerText = text;
 
         this.__refreshUI();

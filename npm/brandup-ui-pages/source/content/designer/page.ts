@@ -34,7 +34,7 @@ export class PageDesigner implements IPageDesigner {
 
     accentField(field: IContentFieldDesigner) {
         if (this.__accentedField)
-            throw "";
+            throw new Error("Another field is already accented.");
 
         this.__rootElem.classList.add("accented");
 
