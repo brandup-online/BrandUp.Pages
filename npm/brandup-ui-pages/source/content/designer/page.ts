@@ -69,32 +69,12 @@ export class PageDesigner implements IPageDesigner {
 
             const designerName = fieldElem.getAttribute("content-designer");
             const fieldModel: ContentFieldModel = JSON.parse(fieldElem.getAttribute("content-field-model"));
-            let fieldDesigner: IContentFieldDesigner;
-            switch (designerName.toLowerCase()) {
-                case "text": {
-                    fieldDesigner = new TextDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "html": {
-                    fieldDesigner = new HtmlDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "image": {
-                    fieldDesigner = new ImageDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "model": {
-                    fieldDesigner = new ModelDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                case "page-blocks": {
-                    fieldDesigner = new PageBlocksDesigner(this, fieldElem, fieldModel.options);
-                    break;
-                }
-                default:
-                    continue;
-            }
 
+            const factory = DESIGNER_FACTORIES[designerName.toLowerCase()];
+            if (!factory)
+                continue;
+
+            const fieldDesigner = factory(this, fieldElem, fieldModel.options);
             this.__fields[fieldDesigner.fullPath] = fieldDesigner;
         }
 
@@ -112,3 +92,14 @@ export class PageDesigner implements IPageDesigner {
         document.body.classList.remove("bp-state-design");
     }
 }
+
+type DesignerFactory = (page: PageDesigner, elem: HTMLElement, options: any) => IContentFieldDesigner;
+
+// Реестр designer'ов полей по имени — вместо switch при рендеринге.
+const DESIGNER_FACTORIES: { [name: string]: DesignerFactory } = {
+    "text": (page, elem, options) => new TextDesigner(page, elem, options),
+    "html": (page, elem, options) => new HtmlDesigner(page, elem, options),
+    "image": (page, elem, options) => new ImageDesigner(page, elem, options),
+    "model": (page, elem, options) => new ModelDesigner(page, elem, options),
+    "page-blocks": (page, elem, options) => new PageBlocksDesigner(page, elem, options),
+};

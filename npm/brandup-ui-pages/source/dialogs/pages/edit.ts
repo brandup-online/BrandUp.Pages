@@ -108,35 +108,11 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         for (let i = 0; i < model.fields.length; i++) {
             const fieldModel = model.fields[i];
 
-            switch (fieldModel.type.toLowerCase()) {
-                case "text": {
-                    this.addField(fieldModel.title, new TextContent(this, fieldModel.name, fieldModel.options));
-                    break;
-                }
-                case "html": {
-                    this.addField(fieldModel.title, new HtmlContent(this, fieldModel.name, fieldModel.options));
-                    break;
-                }
-                case "image": {
-                    this.addField(fieldModel.title, new ImageContent(this, fieldModel.name, fieldModel.options));
-                    break;
-                }
-                case "model": {
-                    this.addField(fieldModel.title, new ModelField(this, fieldModel.name, fieldModel.options));
-                    break;
-                }
-                case "hyperlink": {
-                    this.addField(fieldModel.title, new HyperLinkContent(this, fieldModel.name, fieldModel.options));
-                    break;
-                }
-                case "pages": {
-                    this.addField(fieldModel.title, new PagesContent(this, fieldModel.name, fieldModel.options));
-                    break;
-                }
-                default: {
-                    throw new Error("Unknown content field type: " + fieldModel.type);
-                }
-            }
+            const factory = FIELD_FACTORIES[fieldModel.type.toLowerCase()];
+            if (!factory)
+                throw new Error("Unknown content field type: " + fieldModel.type);
+
+            this.addField(fieldModel.title, factory(this, fieldModel.name, fieldModel.options));
         }
 
         this.setValues(model.values);
@@ -224,6 +200,18 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
         super.destroy();
     }
 }
+
+type FieldFactory = (form: IContentForm, name: string, options: any) => IContentField;
+
+// Реестр полей контента по типу — вместо switch при построении формы.
+const FIELD_FACTORIES: { [type: string]: FieldFactory } = {
+    "text": (form, name, options) => new TextContent(form, name, options),
+    "html": (form, name, options) => new HtmlContent(form, name, options),
+    "image": (form, name, options) => new ImageContent(form, name, options),
+    "model": (form, name, options) => new ModelField(form, name, options),
+    "hyperlink": (form, name, options) => new HyperLinkContent(form, name, options),
+    "pages": (form, name, options) => new PagesContent(form, name, options),
+};
 
 export const editPage = (editId: string, modelPath?: string) => {
     const dialog = new PageEditDialog(editId, modelPath);
