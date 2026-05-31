@@ -80,13 +80,13 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             const t = e.target as Element;
             if (!t.closest(".pages") && this.element) {
                 this.element.classList.remove("inputing");
-                document.body.removeEventListener("click", this.__closeMenuFunc, false);
+                document.body.removeEventListener("mousedown", this.__closeMenuFunc, false);
             }
         };
 
         this.registerCommand("begin-input", () => {
             if (!this.element.classList.toggle("inputing")) {
-                document.body.removeEventListener("click", this.__closeMenuFunc, false);
+                document.body.removeEventListener("mousedown", this.__closeMenuFunc, false);
                 return;
             }
 
@@ -103,7 +103,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
 
         this.registerCommand("select", (ctx) => {
             this.element.classList.remove("inputing");
-            document.body.removeEventListener("click", this.__closeMenuFunc, false);
+            document.body.removeEventListener("mousedown", this.__closeMenuFunc, false);
 
             const pageCollectionId = ctx.target.getAttribute("data-value");
             const pageUrl = ctx.target.getAttribute("data-url");
@@ -165,7 +165,7 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
             this.__searchRequest.abort();
 
         window.clearTimeout(this.__searchTimeout);
-        document.body.removeEventListener("click", this.__closeMenuFunc, false);
+        document.body.removeEventListener("mousedown", this.__closeMenuFunc, false);
 
         super.destroy();
     }

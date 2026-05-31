@@ -87,9 +87,13 @@ export class ComboBoxField extends Field<string, ComboBoxFieldOptions> {
         }
     }
     clearItems() {
-        DOM.empty(this.__valueElem);
+        DOM.empty(this.__itemsElem);
 
         this.__value = null;
+        if (this.__valueElem)
+            this.__valueElem.innerText = "";
+
+        this.__refreshUI();
     }
 
     getValue(): string | null {

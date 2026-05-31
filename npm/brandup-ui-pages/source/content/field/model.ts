@@ -91,10 +91,12 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
         });
         this.__itemsElem.addEventListener("drop", (e: DragEvent) => {
             const target = e.target as Element;
-            const sourceIndex = e.dataTransfer.getData("content-path-index");
+            const sourceIndexValue = e.dataTransfer.getData("content-path-index");
+            const sourceIndex = parseInt(sourceIndexValue, 10);
             const elem = target.closest("[content-path-index]");
             if (elem) {
-                const destIndex = elem.getAttribute("content-path-index");
+                const destIndexValue = elem.getAttribute("content-path-index");
+                const destIndex = parseInt(destIndexValue, 10);
                 if (destIndex !== sourceIndex) {
                     const sourceElem = DOM.queryElement(this.__itemsElem, `[content-path-index="${sourceIndex}"]`);
                     if (sourceElem) {
@@ -107,7 +109,7 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
 
                         this.form.request(this, {
                             url: '/brandup.pages/content/model/move',
-                            query: { itemIndex: sourceIndex, newIndex: destIndex },
+                            query: { itemIndex: sourceIndexValue, newIndex: destIndexValue },
                             method: "POST",
                             success: (response: AjaxResponse<ModelFieldFormValue>) => {
                                 if (response.status === 200) {

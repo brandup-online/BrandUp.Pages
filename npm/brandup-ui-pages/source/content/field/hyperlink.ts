@@ -126,7 +126,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             const t = e.target as Element;
             if (!t.closest(".hyperlink-menu") && this.element) {
                 this.element.classList.remove("opened-types");
-                document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+                document.body.removeEventListener("mousedown", this.__closeTypeMenuFunc, false);
             }
         };
         this.__closePageMenuFunc = (e: MouseEvent) => {
@@ -134,21 +134,21 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             if (!t.closest(".hyperlink") && this.element) {
                 this.element.classList.remove("inputing");
                 this.element.classList.remove("opened-pages");
-                document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+                document.body.removeEventListener("mousedown", this.__closePageMenuFunc, false);
             }
         };
 
         this.registerCommand("open-types-menu", () => {
             if (this.element.classList.contains("opened-types")) {
                 this.element.classList.remove("opened-types");
-                document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+                document.body.removeEventListener("mousedown", this.__closeTypeMenuFunc, false);
                 return;
             }
 
             if (this.element.classList.contains("opened-pages")) {
                 this.element.classList.remove("inputing");
                 this.element.classList.remove("opened-pages");
-                document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+                document.body.removeEventListener("mousedown", this.__closePageMenuFunc, false);
             }
 
             this.element.classList.add("opened-types")
@@ -160,7 +160,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             switch (this.__type) {
                 case "Page":
                     if (!this.element.classList.toggle("opened-pages")) {
-                        document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+                        document.body.removeEventListener("mousedown", this.__closePageMenuFunc, false);
                         return;
                     }
 
@@ -183,7 +183,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             const type = ctx.target.getAttribute("data-value") as HyperLinkType;
 
             this.element.classList.remove("opened-types");
-            document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
+            document.body.removeEventListener("mousedown", this.__closeTypeMenuFunc, false);
 
             this.__type = type;
             this.__refreshUI();
@@ -191,7 +191,7 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
         this.registerCommand("select-page", (ctx) => {
             this.element.classList.remove("inputing");
             this.element.classList.remove("opened-pages");
-            document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+            document.body.removeEventListener("mousedown", this.__closePageMenuFunc, false);
 
             const pageId = ctx.target.getAttribute("data-value");
             this.__pageValueInput.setAttribute("value-page-id", pageId);
@@ -292,8 +292,8 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
             this.__searchRequest.abort();
 
         window.clearTimeout(this.__searchTimeout);
-        document.body.removeEventListener("click", this.__closeTypeMenuFunc, false);
-        document.body.removeEventListener("click", this.__closePageMenuFunc, false);
+        document.body.removeEventListener("mousedown", this.__closeTypeMenuFunc, false);
+        document.body.removeEventListener("mousedown", this.__closePageMenuFunc, false);
 
         super.destroy();
     }
