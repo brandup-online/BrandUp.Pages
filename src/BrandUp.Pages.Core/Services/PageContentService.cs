@@ -1,4 +1,4 @@
-﻿using BrandUp.Pages.Interfaces;
+using BrandUp.Pages.Interfaces;
 
 namespace BrandUp.Pages.Services
 {
@@ -26,11 +26,11 @@ namespace BrandUp.Pages.Services
 
 			return await editSessionRepository.CreateEditAsync(page, editorId, cancellationToken);
 		}
-		public Task<IPageEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
+		public Task<IPageEdit?> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
 			return editSessionRepository.FindEditByIdAsync(id, cancellationToken);
 		}
-		public async Task<IPageEdit> FindEditByUserAsync(IPage page, CancellationToken cancellationToken = default)
+		public async Task<IPageEdit?> FindEditByUserAsync(IPage page, CancellationToken cancellationToken = default)
 		{
 			var userId = await GetEditorIdAsync(cancellationToken);
 

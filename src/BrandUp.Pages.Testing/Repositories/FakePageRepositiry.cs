@@ -34,28 +34,28 @@ namespace BrandUp.Pages.Repositories
 
 			return Task.FromResult<IPage>(page);
 		}
-		public Task<IPage> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+		public Task<IPage?> FindPageByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
 		{
 			if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
-				return Task.FromResult<IPage>(null);
+				return Task.FromResult<IPage?>(null);
 
 			var page = pages[index];
 
-			return Task.FromResult<IPage>(page);
+			return Task.FromResult<IPage?>(page);
 		}
-		public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
+		public Task<IPage?> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
 			if (!pageIds.TryGetValue(id, out int index))
-				return Task.FromResult<IPage>(null);
+				return Task.FromResult<IPage?>(null);
 
 			var page = pages[index];
 
-			return Task.FromResult<IPage>(page);
+			return Task.FromResult<IPage?>(page);
 		}
-		public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+		public Task<PageUrlResult?> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
 		{
 			if (!pagePaths.TryGetValue(webSiteId.ToLower() + ":" + path.ToLower(), out int index))
-				return Task.FromResult<PageUrlResult>(null);
+				return Task.FromResult<PageUrlResult?>(null);
 
 			var page = pages[index];
 
@@ -82,15 +82,15 @@ namespace BrandUp.Pages.Repositories
 
 			return Task.FromResult<IEnumerable<IPage>>(result.OfType<IPage>().ToArray());
 		}
-		public Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
+		public Task<IDictionary<string, object>?> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
 		{
 			if (!pageIds.TryGetValue(pageId, out int index))
 				throw new InvalidOperationException();
 
-			if (!pageContents.TryGetValue(index, out IDictionary<string, object> contentData))
+			if (!pageContents.TryGetValue(index, out IDictionary<string, object>? contentData))
 				throw new InvalidOperationException();
 
-			return Task.FromResult(contentData);
+			return Task.FromResult<IDictionary<string, object>?>(contentData);
 		}
 		public Task SetContentAsync(Guid pageId, string title, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
 		{
@@ -147,44 +147,44 @@ namespace BrandUp.Pages.Repositories
 
 			return Task.CompletedTask;
 		}
-		public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
+		public Task<string?> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
 		{
 			var p = (Page)page;
 			return Task.FromResult(p.SeoTitle);
 		}
-		public Task SetPageTitleAsync(IPage page, string title, CancellationToken cancellationToken = default)
+		public Task SetPageTitleAsync(IPage page, string? title, CancellationToken cancellationToken = default)
 		{
 			var p = (Page)page;
 			p.SeoTitle = title;
 			return Task.CompletedTask;
 		}
-		public Task<string> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default)
+		public Task<string?> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default)
 		{
 			var p = (Page)page;
 			return Task.FromResult(p.SeoDescription);
 		}
-		public Task SetPageDescriptionAsync(IPage page, string description, CancellationToken cancellationToken = default)
+		public Task SetPageDescriptionAsync(IPage page, string? description, CancellationToken cancellationToken = default)
 		{
 			var p = (Page)page;
 			p.SeoDescription = description;
 			return Task.CompletedTask;
 		}
-		public Task<string[]> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default)
+		public Task<string[]?> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default)
 		{
 			var p = (Page)page;
 			return Task.FromResult(p.SeoKeywords);
 		}
-		public Task SetPageKeywordsAsync(IPage page, string[] keywords, CancellationToken cancellationToken = default)
+		public Task SetPageKeywordsAsync(IPage page, string[]? keywords, CancellationToken cancellationToken = default)
 		{
 			var p = (Page)page;
 			p.SeoKeywords = keywords;
 			return Task.CompletedTask;
 		}
-		public Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
+		public Task UpPagePositionAsync(IPage page, IPage? beforePage, CancellationToken cancellationToken = default)
 		{
 			throw new NotImplementedException();
 		}
-		public Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
+		public Task DownPagePositionAsync(IPage page, IPage? afterPage, CancellationToken cancellationToken = default)
 		{
 			throw new NotImplementedException();
 		}
@@ -196,14 +196,14 @@ namespace BrandUp.Pages.Repositories
 			public string WebsiteId { get; set; }
 			public string TypeName { get; }
 			public Guid OwnCollectionId { get; }
-			public string UrlPath { get; set; }
-			public string Header { get; set; }
+			public string UrlPath { get; set; } = null!;
+			public string Header { get; set; } = null!;
 			public int ContentVersion { get; set; } = 1;
 			public bool IsPublished => Status == PageStatus.Published;
 			public PageStatus Status { get; set; }
-			public string SeoTitle { get; set; }
-			public string SeoDescription { get; set; }
-			public string[] SeoKeywords { get; set; }
+			public string? SeoTitle { get; set; }
+			public string? SeoDescription { get; set; }
+			public string[]? SeoKeywords { get; set; }
 
 			public Page(Guid id, string webSiteId, string typeName, Guid collectionId)
 			{

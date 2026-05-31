@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Services
 			return Result<IPageCollection>.Success(collection);
 		}
 
-		public Task<IPageCollection> FindCollectiondByIdAsync(Guid id)
+		public Task<IPageCollection?> FindCollectiondByIdAsync(Guid id)
 		{
 			return repositiry.FindCollectiondByIdAsync(id);
 		}

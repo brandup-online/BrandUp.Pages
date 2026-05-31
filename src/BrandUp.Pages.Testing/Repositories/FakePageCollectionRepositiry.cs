@@ -32,12 +32,12 @@ namespace BrandUp.Pages.Repositories
 
 			return Task.FromResult<IPageCollection>(pageCollection);
 		}
-		public Task<IPageCollection> FindCollectiondByIdAsync(Guid id)
+		public Task<IPageCollection?> FindCollectiondByIdAsync(Guid id)
 		{
 			if (!collectionIds.TryGetValue(id, out int index))
-				return Task.FromResult<IPageCollection>(null);
+				return Task.FromResult<IPageCollection?>(null);
 
-			return Task.FromResult<IPageCollection>(collections[index]);
+			return Task.FromResult<IPageCollection?>(collections[index]);
 		}
 		public Task<IEnumerable<IPageCollection>> ListCollectionsAsync(string webSiteId, Guid? pageId)
 		{
@@ -65,7 +65,7 @@ namespace BrandUp.Pages.Repositories
 
 			return Task.CompletedTask;
 		}
-		public Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string title)
+		public Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string? title)
 		{
 			var result = new List<IPageCollection>();
 

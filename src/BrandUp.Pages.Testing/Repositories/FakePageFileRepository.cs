@@ -36,15 +36,15 @@ namespace BrandUp.Pages.Repositories
 			return Task.FromResult<IFile>(file);
 		}
 
-		public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
+		public Task<IFile?> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
 		{
-			files.TryGetValue(fileId, out MemoryFile file);
-			return Task.FromResult<IFile>(file);
+			files.TryGetValue(fileId, out MemoryFile? file);
+			return Task.FromResult<IFile?>(file);
 		}
 
 		public Task<Stream> ReadFileAsync(Guid fileId, CancellationToken cancellationToken = default)
 		{
-			if (!files.TryGetValue(fileId, out MemoryFile file))
+			if (!files.TryGetValue(fileId, out MemoryFile? file))
 				throw new Exception();
 
 			return Task.FromResult<Stream>(new MemoryStream(file.Data));
@@ -61,9 +61,9 @@ namespace BrandUp.Pages.Repositories
 		private class MemoryFile : IFile
 		{
 			public Guid Id { get; set; }
-			public string Name { get; set; }
-			public string ContentType { get; set; }
-			public byte[] Data { get; set; }
+			public string Name { get; set; } = null!;
+			public string ContentType { get; set; } = null!;
+			public byte[] Data { get; set; } = null!;
 			public long Size => Data.Length;
 			public Guid PageId { get; set; }
 		}

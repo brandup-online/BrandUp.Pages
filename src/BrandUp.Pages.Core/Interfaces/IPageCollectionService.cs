@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Interfaces
 		/// Создание коллекции страниц для страницы.
 		/// </summary>
 		Task<Result<IPageCollection>> CreateCollectionAsync(IPage page, string title, string pageTypeName, PageSortMode sortMode);
-		Task<IPageCollection> FindCollectiondByIdAsync(Guid id);
+		Task<IPageCollection?> FindCollectiondByIdAsync(Guid id);
 		Task<IEnumerable<IPageCollection>> ListCollectionsAsync(string webSiteId);
 		Task<IEnumerable<IPageCollection>> ListCollectionsAsync(IPage page);
 		Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string pageTypeName, string? title = null, bool includeDerivedTypes = true);

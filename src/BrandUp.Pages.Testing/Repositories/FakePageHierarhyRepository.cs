@@ -17,14 +17,14 @@ namespace BrandUp.Pages.Repositories
 		{
 			if (pageId.HasValue)
 			{
-				if (!collectionsByPages.TryGetValue(pageId.Value, out IList<IPageCollection> pageCollectionsByPages))
+				if (!collectionsByPages.TryGetValue(pageId.Value, out IList<IPageCollection>? pageCollectionsByPages))
 					throw new InvalidOperationException();
 
 				pageCollectionsByPages.Add(pageCollection);
 			}
 			else
 			{
-				if (!collectionsByWebSites.TryGetValue(pageCollection.WebsiteId, out IList<IPageCollection> pageCollectionsByWebsites))
+				if (!collectionsByWebSites.TryGetValue(pageCollection.WebsiteId, out IList<IPageCollection>? pageCollectionsByWebsites))
 					collectionsByWebSites.Add(pageCollection.WebsiteId, pageCollectionsByWebsites = new List<IPageCollection>());
 
 				pageCollectionsByWebsites.Add(pageCollection);
@@ -34,7 +34,7 @@ namespace BrandUp.Pages.Repositories
 		}
 		public IEnumerable<IPageCollection> OnGetCollections(string webSiteId, Guid? pageId)
 		{
-			IList<IPageCollection> pageCollections;
+			IList<IPageCollection>? pageCollections;
 
 			if (pageId.HasValue)
 			{
@@ -61,7 +61,7 @@ namespace BrandUp.Pages.Repositories
 
 		public void OnAddPage(IPage page)
 		{
-			if (!pagesByCollections.TryGetValue(page.OwnCollectionId, out IList<IPage> pagesByCollection))
+			if (!pagesByCollections.TryGetValue(page.OwnCollectionId, out IList<IPage>? pagesByCollection))
 				throw new InvalidOperationException();
 			pagesByCollection.Add(page);
 
@@ -69,13 +69,13 @@ namespace BrandUp.Pages.Repositories
 		}
 		public IEnumerable<IPage> OnGetPages(Guid ownCollectionId)
 		{
-			if (!pagesByCollections.TryGetValue(ownCollectionId, out IList<IPage> pages))
+			if (!pagesByCollections.TryGetValue(ownCollectionId, out IList<IPage>? pages))
 				throw new ArgumentException();
 			return pages;
 		}
 		public void OnRemovePage(IPage page)
 		{
-			if (!pagesByCollections.TryGetValue(page.OwnCollectionId, out IList<IPage> pages))
+			if (!pagesByCollections.TryGetValue(page.OwnCollectionId, out IList<IPage>? pages))
 				throw new InvalidOperationException();
 			if (!pages.Remove(page))
 				throw new InvalidOperationException();
@@ -84,7 +84,7 @@ namespace BrandUp.Pages.Repositories
 		}
 		public bool HasPages(Guid ownCollectionId)
 		{
-			if (!pagesByCollections.TryGetValue(ownCollectionId, out IList<IPage> pages))
+			if (!pagesByCollections.TryGetValue(ownCollectionId, out IList<IPage>? pages))
 				throw new ArgumentException();
 			return pages.Count > 0;
 		}

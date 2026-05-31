@@ -2,7 +2,7 @@
 {
 	public interface IViewLocator
 	{
-		ContentView FindView(Type contentType);
+		ContentView? FindView(Type contentType);
 	}
 
 	public class ContentView
