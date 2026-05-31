@@ -10,16 +10,16 @@ namespace BrandUp.Pages.Content
 
 		public const string ContentTypeNameDataKey = "_type";
 		public static readonly string[] ContentTypePrefixes = new string[] { "Content", "Model" };
-		readonly ConstructorInfo modelConstructor = null;
+		readonly ConstructorInfo? modelConstructor = null;
 		readonly List<ContentMetadataProvider> derivedContents = new List<ContentMetadataProvider>();
 		readonly List<FieldProviderAttribute> fields = new List<FieldProviderAttribute>();
 		readonly Dictionary<string, int> fieldNames = new Dictionary<string, int>();
-		ITextField titleField;
-		readonly List<PropertyInfo> injectProperties;
+		ITextField? titleField;
+		readonly List<PropertyInfo> injectProperties = [];
 
 		#endregion
 
-		internal ContentMetadataProvider(ContentMetadataManager metadataManager, Type modelType, ContentMetadataProvider baseMetadata)
+		internal ContentMetadataProvider(ContentMetadataManager metadataManager, Type modelType, ContentMetadataProvider? baseMetadata)
 		{
 			Manager = metadataManager;
 			ModelType = modelType;
@@ -35,7 +35,6 @@ namespace BrandUp.Pages.Content
 				if (modelConstructor == null)
 					throw new InvalidOperationException($"Тип модели контента \"{modelType}\" не содержит публичный конструктор без параметров.");
 
-				injectProperties = new List<PropertyInfo>();
 				InitializeInjectProperties();
 			}
 
@@ -53,8 +52,8 @@ namespace BrandUp.Pages.Content
 		public Type ModelType { get; }
 		public string Name { get; }
 		public string Title { get; }
-		public string Description { get; }
-		public ContentMetadataProvider BaseMetadata { get; }
+		public string? Description { get; }
+		public ContentMetadataProvider? BaseMetadata { get; }
 		public IEnumerable<ContentMetadataProvider> DerivedContents => derivedContents;
 		public IEnumerable<FieldProviderAttribute> Fields => fields;
 		public bool IsAbstract => ModelType.IsAbstract;
@@ -149,14 +148,14 @@ namespace BrandUp.Pages.Content
 			fields.Add(field);
 		}
 		[System.Diagnostics.DebuggerStepThrough]
-		public bool TryGetField(string fieldName, out IFieldProvider field)
+		public bool TryGetField(string fieldName, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out IFieldProvider field)
 		{
 			if (fieldName == null)
 				throw new ArgumentNullException(nameof(fieldName));
 
 			if (!fieldNames.TryGetValue(fieldName.ToLower(), out int index))
 			{
-				field = null;
+				field = null!;
 				return false;
 			}
 			field = fields[index];
@@ -168,7 +167,7 @@ namespace BrandUp.Pages.Content
 			if (modelConstructor == null)
 				throw new InvalidOperationException($"Content type {Name} is abstract.");
 
-			return modelConstructor.Invoke(new object[0]);
+			return modelConstructor.Invoke(new object[0])!;
 		}
 		public void ApplyInjections(object model, IServiceProvider serviceProvider, bool injectInnerModels)
 		{
@@ -197,16 +196,16 @@ namespace BrandUp.Pages.Content
 
 					if (field.IsListValue)
 					{
-						var list = (IList)fieldValue;
+						var list = (IList)fieldValue!;
 						foreach (var item in list)
 						{
-							var fieldValueContentMetadata = Manager.GetMetadata(item.GetType());
+							var fieldValueContentMetadata = Manager.GetMetadata(item!.GetType());
 							fieldValueContentMetadata.ApplyInjections(item, serviceProvider, injectInnerModels);
 						}
 					}
 					else
 					{
-						var fieldValueContentMetadata = Manager.GetMetadata(fieldValue.GetType());
+						var fieldValueContentMetadata = Manager.GetMetadata(fieldValue!.GetType());
 						fieldValueContentMetadata.ApplyInjections(fieldValue, serviceProvider, injectInnerModels);
 					}
 				}
@@ -240,7 +239,7 @@ namespace BrandUp.Pages.Content
 					continue;
 
 				var dataValue = field.ConvetValueToData(fieldValue);
-				result.Add(field.JsonPropertyName, dataValue);
+				result.Add(field.JsonPropertyName, dataValue!);
 			}
 
 			return result;
@@ -250,17 +249,17 @@ namespace BrandUp.Pages.Content
 			if (dictionary == null)
 				throw new ArgumentNullException(nameof(dictionary));
 
-			if (dictionary.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
+			if (dictionary.TryGetValue(ContentTypeNameDataKey, out object? contentTypeNameValue))
 			{
-				var contentTypeName = (string)contentTypeNameValue;
+				var contentTypeName = (string)contentTypeNameValue!;
 				if (string.Compare(contentTypeName, Name, true) != 0)
 				{
-					if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider deriverMetadata))
+					if (!Manager.TryGetMetadata(contentTypeName, out ContentMetadataProvider? deriverMetadata))
 						throw new InvalidOperationException($"Не найден тип контента с именем {contentTypeName}.");
-					if (!deriverMetadata.ModelType.IsSubclassOf(ModelType))
+					if (!deriverMetadata!.ModelType.IsSubclassOf(ModelType))
 						throw new InvalidOperationException();
 
-					return deriverMetadata.ConvertDictionaryToContentModel(dictionary);
+					return deriverMetadata!.ConvertDictionaryToContentModel(dictionary);
 				}
 			}
 			else if (ModelType.IsAbstract)
@@ -270,7 +269,7 @@ namespace BrandUp.Pages.Content
 
 			foreach (var kv in dictionary)
 			{
-				if (!TryGetField(kv.Key, out IFieldProvider field))
+				if (!TryGetField(kv.Key, out IFieldProvider? field))
 					continue;
 
 				var dataValue = kv.Value;
@@ -287,16 +286,16 @@ namespace BrandUp.Pages.Content
 			if (contentModel == null)
 				throw new ArgumentNullException(nameof(contentModel));
 
-			if (data.TryGetValue(ContentTypeNameDataKey, out object contentTypeNameValue))
+			if (data.TryGetValue(ContentTypeNameDataKey, out object? contentTypeNameValue))
 			{
-				var contentTypeName = (string)contentTypeNameValue;
+				var contentTypeName = (string)contentTypeNameValue!;
 				if (string.Compare(contentTypeName, Name, true) != 0)
 					throw new InvalidOperationException();
 			}
 
 			foreach (var kv in data)
 			{
-				if (!TryGetField(kv.Key, out IFieldProvider field))
+				if (!TryGetField(kv.Key, out IFieldProvider? field))
 					continue;
 
 				var dataValue = kv.Value;
@@ -326,7 +325,7 @@ namespace BrandUp.Pages.Content
 		}
 		public bool IsInheritedOrEqual(Type baseModelType)
 		{
-			return this == baseModelType || IsInherited(baseModelType);
+			return (Type?)this == baseModelType || IsInherited(baseModelType);
 		}
 		public string GetContentTitle(object contentModel)
 		{
@@ -334,7 +333,7 @@ namespace BrandUp.Pages.Content
 				throw new ArgumentNullException(nameof(contentModel));
 
 			if (titleField != null)
-				return (string)titleField.GetModelValue(contentModel);
+				return (string)titleField.GetModelValue(contentModel)!;
 			return Title;
 		}
 		public void SetContentTitle(object contentModel, string title)
@@ -344,7 +343,7 @@ namespace BrandUp.Pages.Content
 			if (!IsDefinedTitleField)
 				throw new InvalidOperationException($"Title field is not defined by content type {Name}.");
 
-			titleField.SetModelValue(contentModel, title);
+			titleField!.SetModelValue(contentModel, title);
 		}
 
 		#endregion
@@ -366,9 +365,9 @@ namespace BrandUp.Pages.Content
 
 		#region IEquatable members
 
-		public bool Equals(ContentMetadataProvider other)
+		public bool Equals(ContentMetadataProvider? other)
 		{
-			if (other == null || !(other is ContentMetadataProvider))
+			if (other == null)
 				return false;
 
 			return ModelType == other.ModelType;
@@ -382,7 +381,7 @@ namespace BrandUp.Pages.Content
 		{
 			return ModelType.GetHashCode();
 		}
-		public override bool Equals(object obj)
+		public override bool Equals(object? obj)
 		{
 			return Equals(obj as ContentMetadataProvider);
 		}
@@ -395,7 +394,7 @@ namespace BrandUp.Pages.Content
 
 		#region Operators
 
-		public static bool operator ==(ContentMetadataProvider x, ContentMetadataProvider y)
+		public static bool operator ==(ContentMetadataProvider? x, ContentMetadataProvider? y)
 		{
 			var xIsNull = Equals(x, null);
 			var yIsNull = Equals(y, null);
@@ -406,15 +405,15 @@ namespace BrandUp.Pages.Content
 			if (xIsNull || yIsNull)
 				return false;
 
-			return x.Equals(y);
+			return x!.Equals(y);
 		}
 
-		public static bool operator !=(ContentMetadataProvider x, ContentMetadataProvider y)
+		public static bool operator !=(ContentMetadataProvider? x, ContentMetadataProvider? y)
 		{
 			return !(x == y);
 		}
 
-		public static implicit operator Type(ContentMetadataProvider metadataProvider)
+		public static implicit operator Type?(ContentMetadataProvider? metadataProvider)
 		{
 			if (metadataProvider == null)
 				return null;

@@ -15,13 +15,13 @@ namespace BrandUp.Pages.Content
 				throw new ArgumentNullException(nameof(contentLocator));
 
 			foreach (var contentModelType in contentLocator.ContentTypes)
-				TryRegisterContentType(contentModelType, out ContentMetadataProvider typeMetadata);
+				TryRegisterContentType(contentModelType, out _);
 
 			foreach (var metadata in metadataProviders)
 				metadata.InitializeFields();
 		}
 
-		private bool TryRegisterContentType(Type modelType, out ContentMetadataProvider contentMetadata)
+		private bool TryRegisterContentType(Type modelType, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out ContentMetadataProvider contentMetadata)
 		{
 			if (TryGetMetadata(modelType, out contentMetadata))
 				return true;
@@ -29,7 +29,7 @@ namespace BrandUp.Pages.Content
 			if (!TypeIsContent(modelType.GetTypeInfo()))
 				return false;
 
-			ContentMetadataProvider baseMetadata = null;
+			ContentMetadataProvider? baseMetadata = null;
 			if (modelType.BaseType != null)
 				TryRegisterContentType(modelType.BaseType, out baseMetadata);
 
@@ -73,7 +73,7 @@ namespace BrandUp.Pages.Content
 
 			if (!contentTypes.TryGetValue(contentType, out int index))
 			{
-				metadata = null;
+				metadata = null!;
 				return false;
 			}
 
@@ -87,7 +87,7 @@ namespace BrandUp.Pages.Content
 
 			if (!contentNames.TryGetValue(contentTypeName.ToLower(), out int index))
 			{
-				metadata = null;
+				metadata = null!;
 				return false;
 			}
 
@@ -99,7 +99,7 @@ namespace BrandUp.Pages.Content
 			if (dictionary == null)
 				throw new ArgumentNullException(nameof(dictionary));
 
-			if (!dictionary.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object contentTypeNameValue))
+			if (!dictionary.TryGetValue(ContentMetadataProvider.ContentTypeNameDataKey, out object? contentTypeNameValue))
 				throw new InvalidOperationException();
 
 			var contentTypeName = (string)contentTypeNameValue;
@@ -117,8 +117,8 @@ namespace BrandUp.Pages.Content
 		IEnumerable<ContentMetadataProvider> MetadataProviders { get; }
 		bool IsRegisterdContentType(Type contentType);
 		ContentMetadataProvider GetMetadata(Type contentType);
-		bool TryGetMetadata(Type contentType, out ContentMetadataProvider metadata);
-		bool TryGetMetadata(string contentTypeName, out ContentMetadataProvider metadata);
+		bool TryGetMetadata(Type contentType, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out ContentMetadataProvider metadata);
+		bool TryGetMetadata(string contentTypeName, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out ContentMetadataProvider metadata);
 		object ConvertDictionaryToContentModel(IDictionary<string, object> dictionary);
 	}
 }

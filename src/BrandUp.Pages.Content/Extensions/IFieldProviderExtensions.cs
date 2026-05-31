@@ -5,18 +5,18 @@
 		public static T GetModelValue<T>(this IFieldProvider fieldProvider, object model)
 		{
 			var value = fieldProvider.GetModelValue(model);
-			return (T)value;
+			return (T)value!;
 		}
 
-		public static bool TryGetModelValue<T>(this IFieldProvider fieldProvider, object model, out T value)
+		public static bool TryGetModelValue<T>(this IFieldProvider fieldProvider, object model, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out T value)
 		{
-			if (!fieldProvider.TryGetModelValue(model, out object val))
+			if (!fieldProvider.TryGetModelValue(model, out object? val))
 			{
 				value = default;
 				return false;
 			}
 
-			value = (T)val;
+			value = (T)val!;
 			return true;
 		}
 	}

@@ -7,8 +7,8 @@ namespace BrandUp.Pages.Content.Fields
         MemberInfo Member { get; }
         string Name { get; }
         Type ValueType { get; }
-        object GetValue(object obj);
-        void SetValue(object obj, object value);
+        object? GetValue(object obj);
+        void SetValue(object obj, object? value);
     }
 
     internal class FieldModelBinding(FieldInfo field) : IModelBinding
@@ -16,11 +16,11 @@ namespace BrandUp.Pages.Content.Fields
         public MemberInfo Member => @field;
         public string Name => @field.Name;
         public Type ValueType => @field.FieldType;
-        public object GetValue(object obj)
+        public object? GetValue(object obj)
         {
             return field.GetValue(obj);
         }
-        public void SetValue(object obj, object value)
+        public void SetValue(object obj, object? value)
         {
             field.SetValue(obj, value);
         }
@@ -31,11 +31,11 @@ namespace BrandUp.Pages.Content.Fields
         public MemberInfo Member => property;
         public string Name => property.Name;
         public Type ValueType => property.PropertyType;
-        public object GetValue(object obj)
+        public object? GetValue(object obj)
         {
             return property.GetValue(obj);
         }
-        public void SetValue(object obj, object value)
+        public void SetValue(object obj, object? value)
         {
             property.SetValue(obj, value);
         }

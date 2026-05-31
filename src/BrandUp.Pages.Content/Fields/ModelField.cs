@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 
 namespace BrandUp.Pages.Content.Fields
@@ -7,15 +7,15 @@ namespace BrandUp.Pages.Content.Fields
 	{
 		private static readonly Type ListInterfaceType = typeof(IList);
 		private static readonly Type ListGenericTypeDefinition = typeof(List<>);
-		private ConstructorInfo listConstructor;
+		private ConstructorInfo listConstructor = null!;
 
-		public string AddText { get; set; }
+		public string? AddText { get; set; }
 
 		#region  IModelField members
 
-		public ContentMetadataProvider ValueContentMetadata { get; private set; }
+		public ContentMetadataProvider ValueContentMetadata { get; private set; } = null!;
 		public bool IsListValue { get; private set; }
-		public object Navigate(object value, int index)
+		public object? Navigate(object? value, int index)
 		{
 			if (IsListValue)
 			{
@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Content.Fields
 			else
 				return value;
 		}
-		public object ChangeType(object value, string newTypeName)
+		public object? ChangeType(object value, string newTypeName)
 		{
 			return null;
 		}
@@ -50,7 +50,7 @@ namespace BrandUp.Pages.Content.Fields
 				if (!valueType.IsGenericType || valueType.GetGenericTypeDefinition() != ListGenericTypeDefinition)
 					throw new InvalidOperationException();
 
-				listConstructor = valueType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[0], null);
+				listConstructor = valueType.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, new Type[0], null)!;
 				if (listConstructor == null)
 					throw new InvalidOperationException();
 
@@ -62,41 +62,41 @@ namespace BrandUp.Pages.Content.Fields
 			if (!ContentMetadataManager.TypeIsContent(contentType.GetTypeInfo()))
 				throw new InvalidOperationException();
 
-			if (!ContentMetadata.Manager.TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata))
+			if (!ContentMetadata.Manager.TryGetMetadata(contentType, out ContentMetadataProvider? contentMetadata))
 				throw new InvalidOperationException();
 			ValueContentMetadata = contentMetadata;
 		}
-		public override bool HasValue(object value)
+		public override bool HasValue(object? value)
 		{
 			if (!base.HasValue(value))
 				return false;
 
 			if (IsListValue)
 			{
-				var list = (IList)value;
+				var list = (IList)value!;
 				return list.Count > 0;
 			}
 
 			return true;
 		}
-		public override object ConvetValueToData(object value)
+		public override object? ConvetValueToData(object? value)
 		{
 			if (IsListValue)
 			{
-				var list = (IList)value;
+				var list = (IList)value!;
 				var result = new List<IDictionary<string, object>>();
 				foreach (var item in list)
-					result.Add(ValueContentMetadata.ConvertContentModelToDictionary(item));
+					result.Add(ValueContentMetadata.ConvertContentModelToDictionary(item!));
 				return result;
 			}
 			else
-				return ValueContentMetadata.ConvertContentModelToDictionary(value);
+				return ValueContentMetadata.ConvertContentModelToDictionary(value!);
 		}
-		public override object ConvetValueFromData(object value)
+		public override object? ConvetValueFromData(object? value)
 		{
 			if (IsListValue)
 			{
-				var dataList = (IEnumerable<IDictionary<string, object>>)value;
+				var dataList = (IEnumerable<IDictionary<string, object>>)value!;
 				var result = CreateListValue();
 				foreach (var itemData in dataList)
 				{
@@ -106,9 +106,9 @@ namespace BrandUp.Pages.Content.Fields
 				return result;
 			}
 			else
-				return ValueContentMetadata.ConvertDictionaryToContentModel((IDictionary<string, object>)value);
+				return ValueContentMetadata.ConvertDictionaryToContentModel((IDictionary<string, object>)value!);
 		}
-		public override object ParseValue(string strValue)
+		public override object? ParseValue(string strValue)
 		{
 			throw new NotImplementedException();
 		}
@@ -135,7 +135,7 @@ namespace BrandUp.Pages.Content.Fields
 
 			return options;
 		}
-		public override Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+		public override Task<object?> GetFormValueAsync(object? modelValue, IServiceProvider services)
 		{
 			var formValue = new ModelFieldFormValue
 			{
@@ -146,12 +146,12 @@ namespace BrandUp.Pages.Content.Fields
 			{
 				if (IsListValue)
 				{
-					var list = (IList)modelValue;
+					var list = (IList)modelValue!;
 					if (list.Count > 0)
 					{
 						foreach (var item in list)
 						{
-							var itemMetadata = ContentMetadata.Manager.GetMetadata(item.GetType());
+							var itemMetadata = ContentMetadata.Manager.GetMetadata(item!.GetType());
 							formValue.Items.Add(new ContentItem
 							{
 								Title = itemMetadata.GetContentTitle(item),
@@ -179,7 +179,7 @@ namespace BrandUp.Pages.Content.Fields
 				}
 			}
 
-			return Task.FromResult<object>(formValue);
+			return Task.FromResult<object?>(formValue);
 		}
 
 		#endregion
@@ -197,33 +197,33 @@ namespace BrandUp.Pages.Content.Fields
 	public interface IModelField : IFieldProvider
 	{
 		bool IsListValue { get; }
-		object Navigate(object value, int index);
+		object? Navigate(object? value, int index);
 		ContentMetadataProvider ValueContentMetadata { get; }
-		object ChangeType(object value, string newTypeName);
+		object? ChangeType(object value, string newTypeName);
 	}
 
 	public class ModelFieldFormOptions
 	{
 		public bool IsListValue { get; set; }
-		public string AddText { get; set; }
-		public ContentItemType ItemType { get; set; }
-		public List<ContentItemType> ItemTypes { get; set; }
+		public string? AddText { get; set; }
+		public ContentItemType? ItemType { get; set; }
+		public List<ContentItemType> ItemTypes { get; set; } = [];
 	}
 
 	public class ModelFieldFormValue
 	{
-		public List<ContentItem> Items { get; set; }
+		public List<ContentItem> Items { get; set; } = [];
 	}
 
 	public class ContentItemType
 	{
-		public string Name { get; set; }
-		public string Title { get; set; }
+		public string Name { get; set; } = null!;
+		public string Title { get; set; } = null!;
 	}
 
 	public class ContentItem
 	{
-		public string Title { get; set; }
-		public ContentItemType Type { get; set; }
+		public string Title { get; set; } = null!;
+		public ContentItemType Type { get; set; } = null!;
 	}
 }

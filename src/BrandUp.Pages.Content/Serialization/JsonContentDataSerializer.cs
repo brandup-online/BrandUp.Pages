@@ -74,7 +74,7 @@ namespace BrandUp.Pages.Content.Serialization
 			writer.WriteEndArray();
 		}
 
-		public static IDictionary<string, object> DeserializeFromString(string jsonData)
+		public static IDictionary<string, object>? DeserializeFromString(string jsonData)
 		{
 			if (jsonData == null)
 				throw new ArgumentNullException(nameof(jsonData));
@@ -87,7 +87,7 @@ namespace BrandUp.Pages.Content.Serialization
 
 			return ReadDictionary(ref jsonReader);
 		}
-		public static IDictionary<string, object> DeserializeFromStream(Stream stream)
+		public static IDictionary<string, object>? DeserializeFromStream(Stream stream)
 		{
 			if (stream == null)
 				throw new ArgumentNullException(nameof(stream));
@@ -102,7 +102,7 @@ namespace BrandUp.Pages.Content.Serialization
 		{
 			var dictionary = new SortedDictionary<string, object>();
 
-			string fieldName = null;
+			string? fieldName = null;
 			while (reader.Read())
 			{
 				switch (reader.TokenType)
@@ -117,7 +117,7 @@ namespace BrandUp.Pages.Content.Serialization
 							if (fieldName == null)
 								throw new InvalidOperationException();
 
-							dictionary.Add(fieldName, null);
+							dictionary.Add(fieldName, null!);
 
 							break;
 						}
@@ -149,7 +149,7 @@ namespace BrandUp.Pages.Content.Serialization
 							if (fieldName == null)
 								throw new InvalidOperationException();
 
-							dictionary.Add(fieldName, reader.GetString());
+							dictionary.Add(fieldName, reader.GetString()!);
 
 							break;
 						}

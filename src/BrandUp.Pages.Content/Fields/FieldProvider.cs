@@ -4,12 +4,12 @@
 	public abstract class FieldProviderAttribute : Attribute, IFieldProvider
 	{
 		const string TypeValueSuffiks = "Attribute";
-		IModelBinding modelBinding;
+		IModelBinding modelBinding = null!;
 
 		#region Properties
 
-		internal string JsonPropertyName { get; private set; }
-		public string DisplayBeforeField { get; set; }
+		internal string JsonPropertyName { get; private set; } = null!;
+		public string? DisplayBeforeField { get; set; }
 
 		#endregion
 
@@ -51,29 +51,29 @@
 
 		#region IFieldProvider members
 
-		public ContentMetadataProvider ContentMetadata { get; private set; }
+		public ContentMetadataProvider ContentMetadata { get; private set; } = null!;
 		public IModelBinding Binding => modelBinding;
-		public string Type { get; private set; }
-		public string Name { get; private set; }
-		public string Title { get; set; }
+		public string Type { get; private set; } = null!;
+		public string Name { get; private set; } = null!;
+		public string Title { get; set; } = null!;
 		public bool IsRequired { get; set; } = false;
-		public Type ValueType { get; private set; }
+		public Type ValueType { get; private set; } = null!;
 		public bool AllowNull { get; private set; }
 
 		[System.Diagnostics.DebuggerStepThrough]
-		public virtual bool HasValue(object value)
+		public virtual bool HasValue(object? value)
 		{
 			return value != null;
 		}
 		[System.Diagnostics.DebuggerStepThrough]
-		public object GetModelValue(object model)
+		public object? GetModelValue(object model)
 		{
 			if (model == null)
 				throw new ArgumentNullException(nameof(model));
 
 			return modelBinding.GetValue(model);
 		}
-		public bool TryGetModelValue(object model, out object value)
+		public bool TryGetModelValue(object model, out object? value)
 		{
 			var val = GetModelValue(model);
 			if (!HasValue(val))
@@ -86,7 +86,7 @@
 			return true;
 		}
 		[System.Diagnostics.DebuggerStepThrough]
-		public void SetModelValue(object model, object value)
+		public void SetModelValue(object model, object? value)
 		{
 			if (model == null)
 				throw new ArgumentNullException(nameof(model));
@@ -94,7 +94,7 @@
 			modelBinding.SetValue(model, value);
 		}
 		[System.Diagnostics.DebuggerStepThrough]
-		public virtual bool CompareValues(object left, object right)
+		public virtual bool CompareValues(object? left, object? right)
 		{
 			var leftIsNull = left == null;
 			var rightIsNull = right == null;
@@ -109,7 +109,7 @@
 			if (leftIsNull && rightIsNull)
 				return true;
 
-			if (left.GetType() != right.GetType())
+			if (left!.GetType() != right!.GetType())
 				return false;
 
 			if (ReferenceEquals(left, right))
@@ -117,23 +117,23 @@
 
 			return left.Equals(right);
 		}
-		public virtual object ConvetValueToData(object value)
+		public virtual object? ConvetValueToData(object? value)
 		{
 			return value;
 		}
-		public virtual object ConvetValueFromData(object value)
+		public virtual object? ConvetValueFromData(object? value)
 		{
 			return value;
 		}
-		public virtual Task<object> GetFormValueAsync(object modelValue, IServiceProvider services)
+		public virtual Task<object?> GetFormValueAsync(object? modelValue, IServiceProvider services)
 		{
 			return Task.FromResult(modelValue);
 		}
-		public virtual object GetFormOptions(IServiceProvider services)
+		public virtual object? GetFormOptions(IServiceProvider services)
 		{
 			return null;
 		}
-		public abstract object ParseValue(string strValue);
+		public abstract object? ParseValue(string strValue);
 
 		#endregion
 

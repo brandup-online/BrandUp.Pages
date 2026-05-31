@@ -34,7 +34,7 @@
 
 			return ContentProvider<TEntry>.Create(entry, model, services);
 		}
-		public async Task<ContentProvider<TEntry>> GetContentAsync(TEntry entry, CancellationToken cancellationToken = default)
+		public async Task<ContentProvider<TEntry>?> GetContentAsync(TEntry entry, CancellationToken cancellationToken = default)
 		{
 			if (entry == null)
 				throw new ArgumentNullException(nameof(entry));
@@ -43,7 +43,7 @@
 			if (contentData == null)
 				return null;
 
-			var model = contentMetadataManager.ConvertDictionaryToContentModel(contentData);
+			var model = contentMetadataManager.ConvertDictionaryToContentModel(contentData!);
 
 			contentMetadataManager.ApplyInjections(model, services, true);
 
@@ -69,7 +69,7 @@
 	{
 		Task<ContentProvider<TEntry>> CreateContentAsync<TCustomModel>(TEntry entry, CancellationToken cancellationToken = default)
 			where TCustomModel : TModel;
-		Task<ContentProvider<TEntry>> GetContentAsync(TEntry entry, CancellationToken cancellationToken = default);
+		Task<ContentProvider<TEntry>?> GetContentAsync(TEntry entry, CancellationToken cancellationToken = default);
 		Task SetContentAsync(ContentProvider<TEntry> contentProvider, CancellationToken cancellationToken = default);
 	}
 
@@ -79,14 +79,14 @@
 		private readonly List<IDictionary<string, object>> datas = new List<IDictionary<string, object>>();
 		private readonly Dictionary<string, int> ids = new Dictionary<string, int>();
 
-		public Task<IDictionary<string, object>> GetContentDataAsync(TEntry entry, CancellationToken cancellationToken = default)
+		public Task<IDictionary<string, object>?> GetContentDataAsync(TEntry entry, CancellationToken cancellationToken = default)
 		{
 			var id = entry.EntryId.ToLower();
 
 			if (!ids.TryGetValue(id, out int index))
-				return Task.FromResult<IDictionary<string, object>>(null);
+				return Task.FromResult<IDictionary<string, object>?>(null);
 
-			return Task.FromResult(datas[index]);
+			return Task.FromResult<IDictionary<string, object>?>(datas[index]);
 		}
 		public Task SetContentAsync(TEntry entry, IDictionary<string, object> data, CancellationToken cancellationToken = default)
 		{
@@ -111,7 +111,7 @@
 	public interface IContentStore<TEntry>
 		where TEntry : class, IContentEntry
 	{
-		Task<IDictionary<string, object>> GetContentDataAsync(TEntry entry, CancellationToken cancellationToken = default);
+		Task<IDictionary<string, object>?> GetContentDataAsync(TEntry entry, CancellationToken cancellationToken = default);
 		Task SetContentAsync(TEntry entry, IDictionary<string, object> data, CancellationToken cancellationToken = default);
 	}
 

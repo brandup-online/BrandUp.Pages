@@ -15,10 +15,10 @@
 					yield return childDerivedContentMetadata;
 			}
 		}
-		public static bool TryGetField<TField>(this ContentMetadataProvider contentMetadata, string fieldName, out TField field)
+		public static bool TryGetField<TField>(this ContentMetadataProvider contentMetadata, string fieldName, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TField field)
 			where TField : class, Fields.IFieldProvider
 		{
-			if (!contentMetadata.TryGetField(fieldName, out Fields.IFieldProvider f))
+			if (!contentMetadata.TryGetField(fieldName, out Fields.IFieldProvider? f))
 			{
 				field = null;
 				return false;

@@ -4,7 +4,7 @@
 	{
 		#region IHtmlField members
 
-		public string Placeholder { get; set; }
+		public string? Placeholder { get; set; }
 
 		#endregion
 
@@ -17,7 +17,7 @@
 				throw new InvalidOperationException();
 		}
 
-		public override object ParseValue(string strValue)
+		public override object? ParseValue(string strValue)
 		{
 			if (string.IsNullOrEmpty(strValue))
 				return null;
@@ -30,12 +30,12 @@
 				Placeholder = Placeholder
 			};
 		}
-		public override bool HasValue(object value)
+		public override bool HasValue(object? value)
 		{
 			if (!base.HasValue(value))
 				return false;
 
-			return !string.IsNullOrEmpty((string)value);
+			return !string.IsNullOrEmpty((string)value!);
 		}
 
 		#endregion
@@ -43,11 +43,11 @@
 
 	public class HtmlFieldFormOptions
 	{
-		public string Placeholder { get; set; }
+		public string? Placeholder { get; set; }
 	}
 
 	public interface IHtmlField : IFieldProvider
 	{
-		string Placeholder { get; }
+		string? Placeholder { get; }
 	}
 }

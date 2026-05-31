@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Content
 		public const char IndexStart = '[';
 		public const char IndexEnd = ']';
 		public static readonly char[] IndexTrimChars = new char[] { IndexStart, IndexEnd };
-		readonly ContentExplorer rootExplorer;
+		readonly ContentExplorer? rootExplorer;
 		readonly string name;
 
 		#endregion
@@ -18,13 +18,13 @@ namespace BrandUp.Pages.Content
 		#region Properties
 
 		public ContentMetadataProvider Metadata { get; }
-		public IModelField Field { get; }
+		public IModelField? Field { get; }
 		public object Model { get; }
 		public string ModelPath { get; }
-		public string FieldPath { get; }
+		public string? FieldPath { get; }
 		public string Title => Metadata.GetContentTitle(Model);
-		public ContentExplorer Root => rootExplorer;
-		public ContentExplorer Parent { get; }
+		public ContentExplorer? Root => rootExplorer;
+		public ContentExplorer? Parent { get; }
 		public int Index { get; } = -1;
 		public bool IsRoot => Field == null;
 
@@ -69,18 +69,18 @@ namespace BrandUp.Pages.Content
 			var contentMetadata = metadataManager.GetMetadata(model.GetType());
 			return new ContentExplorer(model, contentMetadata);
 		}
-		public static ContentExplorer Create(IContentMetadataManager metadataManager, object model, string modelPath)
+		public static ContentExplorer? Create(IContentMetadataManager metadataManager, object model, string modelPath)
 		{
 			var explorer = Create(metadataManager, model);
 			return explorer.Navigate(modelPath);
 		}
 
-		public ContentExplorer Navigate(string modelPath)
+		public ContentExplorer? Navigate(string modelPath)
 		{
 			if (modelPath == null)
 				throw new ArgumentNullException(nameof(modelPath));
 
-			ContentExplorer navExplorer = this;
+			ContentExplorer? navExplorer = this;
 
 			while (modelPath != string.Empty)
 			{
@@ -95,7 +95,7 @@ namespace BrandUp.Pages.Content
 
 		#region Helper methods
 
-		private static bool VisitField(ref ContentExplorer parentExplorer, string fieldName)
+		private static bool VisitField(ref ContentExplorer? parentExplorer, string fieldName)
 		{
 			var charIndex = fieldName.IndexOf(IndexStart);
 			var itemIndex = -1;
@@ -105,15 +105,15 @@ namespace BrandUp.Pages.Content
 				fieldName = fieldName.Substring(0, charIndex);
 			}
 
-			var parentModel = parentExplorer.Model;
+			var parentModel = parentExplorer!.Model;
 
-			if (!parentExplorer.Metadata.TryGetField(fieldName, out FieldProviderAttribute field))
+			if (!parentExplorer.Metadata.TryGetField(fieldName, out IFieldProvider? field))
 				throw new InvalidOperationException(string.Format("Не найдено поле {0}.", fieldName));
 
 			if (!(field is IModelField modelField))
 				throw new InvalidOperationException($"Поле {fieldName} не является полем модели.");
 
-			var fieldValue = field.GetModelValue(parentModel);
+			var fieldValue = modelField.GetModelValue(parentModel);
 			var contentModel = modelField.Navigate(fieldValue, itemIndex);
 
 			if (contentModel == null)

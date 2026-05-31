@@ -33,7 +33,7 @@ namespace BrandUp.Pages.Content
 		{
 			return new ContentProvider<TEntry>(entry, model, services);
 		}
-		public ContentProvider<TEntry> Navigate(string modelPath)
+		public ContentProvider<TEntry>? Navigate(string modelPath)
 		{
 			var explorer = Explorer.Navigate(modelPath);
 			if (explorer == null)
