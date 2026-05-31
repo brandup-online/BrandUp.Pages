@@ -11,12 +11,12 @@ namespace BrandUp.Pages.MongoDb.Documents
 		[BsonDateTimeOptions(Representation = BsonType.DateTime)]
 		public DateTime CreatedDate { get; set; }
 		[BsonRequired]
-		public string WebsiteId { get; set; }
+		public string WebsiteId { get; set; } = null!;
 		[BsonRequired]
-		public string Path { get; set; }
+		public string Path { get; set; } = null!;
 		[BsonRepresentation(BsonType.String)]
 		public Guid? PageId { get; set; }
-		public UrlRedirectDocument Redirect { get; set; }
+		public UrlRedirectDocument? Redirect { get; set; }
 	}
 
 	public class UrlRedirectDocument
@@ -24,6 +24,6 @@ namespace BrandUp.Pages.MongoDb.Documents
 		[BsonRequired]
 		public bool IsPermament { get; set; }
 		[BsonRequired]
-		public string Path { get; set; }
+		public string Path { get; set; } = null!;
 	}
 }

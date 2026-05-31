@@ -31,9 +31,9 @@ namespace BrandUp.Pages.MongoDb.Documents
         public class Metadata
         {
             [BsonElement("contentType")]
-            public string ContentType { get; set; }
+            public string ContentType { get; set; } = null!;
             [BsonElement("fileName")]
-            public string FileName { get; set; }
+            public string FileName { get; set; } = null!;
             [BsonElement("pageId")]
             [BsonGuidRepresentation(GuidRepresentation.CSharpLegacy)]
             public Guid PageId { get; set; }

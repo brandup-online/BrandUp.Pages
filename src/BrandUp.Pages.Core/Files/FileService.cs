@@ -24,7 +24,7 @@ namespace BrandUp.Pages.Files
 
 			return repository.UploadFileAsync(page.Id, fileName, contentType, stream, cancellationToken);
 		}
-		public Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
+		public Task<IFile?> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
 		{
 			if (fileId == Guid.Empty)
 				throw new ArgumentException("Value cannot be empty.", nameof(fileId));

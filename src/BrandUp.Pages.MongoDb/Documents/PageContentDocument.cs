@@ -11,6 +11,6 @@ namespace BrandUp.Pages.MongoDb.Documents
 		[BsonRequired, BsonRepresentation(BsonType.String)]
 		public Guid PageId { get; set; }
 		[BsonRequired]
-		public BsonDocument Data { get; set; }
+		public BsonDocument Data { get; set; } = null!;
 	}
 }

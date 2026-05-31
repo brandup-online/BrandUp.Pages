@@ -57,7 +57,7 @@ namespace BrandUp.Pages.MongoDb._migrations
 			var collectionIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.OwnCollectionId);
 			var statusIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.Status);
 			var urlIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebsiteId).Ascending(it => it.UrlPath);
-			var textIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebsiteId).Text(it => it.Header).Text(it => it.Seo.Title).Text(it => it.Seo.Description).Text(it => it.UrlPath);
+			var textIndex = Builders<PageDocument>.IndexKeys.Ascending(it => it.WebsiteId).Text(it => it.Header).Text(it => it.Seo!.Title).Text(it => it.Seo!.Description).Text(it => it.UrlPath);
 
 			await ApplyIndexes(dbContext.Pages, new CreateIndexModel<PageDocument>[] {
 				new CreateIndexModel<PageDocument>(versionIndex, new CreateIndexOptions { Name = "Version" }),

@@ -60,7 +60,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 				return await (await documents.FindAsync(it => it.WebsiteId == webSiteId && it.PageId == null)).ToListAsync();
 		}
 
-		public async Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string title = null)
+		public async Task<IEnumerable<IPageCollection>> FindCollectionsAsync(string webSiteId, string[] pageTypeNames, string? title = null)
 		{
 			if (webSiteId == null)
 				throw new ArgumentNullException(nameof(webSiteId));

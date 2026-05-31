@@ -8,18 +8,18 @@ namespace BrandUp.Pages.MongoDb.Documents
 	public class PageDocument : Document, IPage
 	{
 		[BsonRequired]
-		public string WebsiteId { get; set; }
+		public string WebsiteId { get; set; } = null!;
 		[BsonRequired]
-		public string TypeName { get; set; }
+		public string TypeName { get; set; } = null!;
 		[BsonRequired, BsonRepresentation(BsonType.String)]
 		public Guid OwnCollectionId { get; set; }
 		[BsonRequired]
-		public string UrlPath { get; set; }
+		public string UrlPath { get; set; } = null!;
 		[BsonRequired]
-		public string Header { get; set; }
+		public string Header { get; set; } = null!;
 		[BsonRequired, BsonRepresentation(BsonType.String)]
 		public PageStatus Status { get; set; }
-		public PageSeoDocument Seo { get; set; }
+		public PageSeoDocument? Seo { get; set; }
 		public bool IsPublished { get => Status == PageStatus.Published; }
 		public int Order { get; set; }
 	}
@@ -32,8 +32,8 @@ namespace BrandUp.Pages.MongoDb.Documents
 
 	public class PageSeoDocument
 	{
-		public string Title { get; set; }
-		public string Description { get; set; }
-		public string[] Keywords { get; set; }
+		public string? Title { get; set; }
+		public string? Description { get; set; }
+		public string[]? Keywords { get; set; }
 	}
 }

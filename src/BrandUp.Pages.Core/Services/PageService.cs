@@ -104,11 +104,11 @@ namespace BrandUp.Pages.Services
 					throw new InvalidOperationException($"Недопустимый режим сортировки коллекции: {collection.SortMode}.");
 			}
 		}
-		public Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
+		public Task<IPage?> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
 			return pageRepositiry.FindPageByIdAsync(id, cancellationToken);
 		}
-		public Task<IPage> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default)
+		public Task<IPage?> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default)
 		{
 			if (webSiteId == null)
 				throw new ArgumentNullException(nameof(webSiteId));
@@ -121,7 +121,7 @@ namespace BrandUp.Pages.Services
 
 			return pageRepositiry.FindPageByPathAsync(webSiteId, pagePath, cancellationToken);
 		}
-		public Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
+		public Task<PageUrlResult?> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default)
 		{
 			if (webSiteId == null)
 				throw new ArgumentNullException(nameof(webSiteId));
@@ -134,7 +134,7 @@ namespace BrandUp.Pages.Services
 
 			return pageRepositiry.FindUrlByPathAsync(webSiteId, path, cancellationToken);
 		}
-		public Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default)
+		public Task<IPage?> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default)
 		{
 			if (webSiteId == null)
 				throw new ArgumentNullException(nameof(webSiteId));
@@ -234,6 +234,8 @@ namespace BrandUp.Pages.Services
 			if (collection.PageId.HasValue)
 			{
 				var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value, cancellationToken);
+				if (parentPage == null)
+					return Result.Failed("Родительская страница не найдена.");
 				if (!parentPage.IsPublished)
 					return Result.Failed("Нельзя опубликовать страницу, если родительская страница не опубликована.");
 				urlPath = pageUrlHelper.ExtendUrlPath(parentPage.UrlPath, urlPath);

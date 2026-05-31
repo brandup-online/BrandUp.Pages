@@ -95,7 +95,8 @@ namespace BrandUp.Pages.Content.Fields
 			{
 				var pageService = services.GetRequiredService<IPageService>();
 				var page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
-				pageUrl = page.UrlPath;
+				if (page != null)
+					pageUrl = page.UrlPath;
 			}
 
 			return new PagesFieldFormValue

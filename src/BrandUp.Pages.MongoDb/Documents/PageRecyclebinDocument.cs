@@ -7,17 +7,17 @@ namespace BrandUp.Pages.MongoDb.Documents
 	public class PageRecyclebinDocument : Document
 	{
 		[BsonRequired]
-		public string WebsiteId { get; set; }
+		public string WebsiteId { get; set; } = null!;
 		[BsonRequired]
-		public string TypeName { get; set; }
+		public string TypeName { get; set; } = null!;
 		[BsonRequired, BsonRepresentation(BsonType.String)]
 		public Guid OwnCollectionId { get; set; }
 		[BsonRequired]
-		public string UrlPath { get; set; }
+		public string UrlPath { get; set; } = null!;
 		[BsonRequired]
-		public string Header { get; set; }
+		public string Header { get; set; } = null!;
 		[BsonRequired, BsonRepresentation(BsonType.String)]
 		public PageStatus Status { get; set; }
-		public BsonDocument Content { get; set; }
+		public BsonDocument Content { get; set; } = null!;
 	}
 }

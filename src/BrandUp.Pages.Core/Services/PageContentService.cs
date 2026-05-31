@@ -41,9 +41,11 @@ namespace BrandUp.Pages.Services
 			if (editSession == null)
 				throw new ArgumentNullException(nameof(editSession));
 
-			var page = await pageService.FindPageByIdAsync(editSession.PageId);
+			var page = await pageService.FindPageByIdAsync(editSession.PageId)
+				?? throw new InvalidOperationException("Страница сессии редактирования не найдена.");
 			var pageMetadataProvider = await pageService.GetPageTypeAsync(page);
-			var pageContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken);
+			var pageContentData = await editSessionRepository.GetContentAsync(editSession, cancellationToken)
+				?? throw new InvalidOperationException("Контент сессии редактирования не найден.");
 
 			return pageMetadataProvider.ContentMetadata.ConvertDictionaryToContentModel(pageContentData);
 		}
@@ -52,7 +54,8 @@ namespace BrandUp.Pages.Services
 			if (editSession == null)
 				throw new ArgumentNullException(nameof(editSession));
 
-			var page = await pageService.FindPageByIdAsync(editSession.PageId);
+			var page = await pageService.FindPageByIdAsync(editSession.PageId)
+				?? throw new InvalidOperationException("Страница сессии редактирования не найдена.");
 			var pageMetadata = await pageService.GetPageTypeAsync(page);
 
 			var contentData = pageMetadata.ContentMetadata.ConvertContentModelToDictionary(content);
@@ -64,9 +67,11 @@ namespace BrandUp.Pages.Services
 			if (editSession == null)
 				throw new ArgumentNullException(nameof(editSession));
 
-			var page = await pageService.FindPageByIdAsync(editSession.PageId);
+			var page = await pageService.FindPageByIdAsync(editSession.PageId)
+				?? throw new InvalidOperationException("Страница сессии редактирования не найдена.");
 			var pageMetadata = await pageService.GetPageTypeAsync(page);
-			var newContentData = await editSessionRepository.GetContentAsync(editSession);
+			var newContentData = await editSessionRepository.GetContentAsync(editSession)
+				?? throw new InvalidOperationException("Контент сессии редактирования не найден.");
 			var pageContentModel = pageMetadata.ContentMetadata.ConvertDictionaryToContentModel(newContentData);
 
 			await pageService.SetPageContentAsync(page, pageContentModel);

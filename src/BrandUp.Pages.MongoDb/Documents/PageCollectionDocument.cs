@@ -8,11 +8,11 @@ namespace BrandUp.Pages.MongoDb.Documents
 	public class PageCollectionDocument : Document, IPageCollection
 	{
 		[BsonRequired]
-		public string WebsiteId { get; set; }
+		public string WebsiteId { get; set; } = null!;
 		[BsonRequired]
-		public string Title { get; set; }
+		public string Title { get; set; } = null!;
 		[BsonRequired]
-		public string PageTypeName { get; set; }
+		public string PageTypeName { get; set; } = null!;
 		[BsonRequired, BsonRepresentation(BsonType.String)]
 		public PageSortMode SortMode { get; set; }
 		[BsonIgnoreIfNull, BsonRepresentation(BsonType.String)]

@@ -41,7 +41,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             return fileDoc;
         }
 
-        public async Task<IFile> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
+        public async Task<IFile?> FindFileByIdAsync(Guid fileId, CancellationToken cancellationToken = default)
         {
             var filter = Builders<GridFSFileInfo<Guid>>.Filter.Eq(info => info.Id, fileId);
             var cursor = await files.FindAsync(filter, cancellationToken: cancellationToken);
@@ -78,7 +78,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             }
         }
 
-        class FileBucket(IMongoDatabase database, GridFSBucketOptions options = null) : GridFSBucket<Guid>(database, options)
+        class FileBucket(IMongoDatabase database, GridFSBucketOptions? options = null) : GridFSBucket<Guid>(database, options)
         {
         }
     }

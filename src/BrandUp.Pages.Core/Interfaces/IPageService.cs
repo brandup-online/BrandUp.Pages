@@ -6,10 +6,10 @@ namespace BrandUp.Pages.Interfaces
 	{
 		Task<IPage> CreatePageAsync(IPageCollection collection, object pageContent, CancellationToken cancellationToken = default);
 		Task<IPage> CreatePageAsync(IPageCollection collection, string? pageType = null, string? pageHeader = null, CancellationToken cancellationToken = default);
-		Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
-		Task<IPage> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default);
-		Task<PageUrlResult> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
-		Task<IPage> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default);
+		Task<IPage?> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default);
+		Task<IPage?> FindPageByPathAsync(string webSiteId, string pagePath, CancellationToken cancellationToken = default);
+		Task<PageUrlResult?> FindUrlByPathAsync(string webSiteId, string path, CancellationToken cancellationToken = default);
+		Task<IPage?> GetDefaultPageAsync(string webSiteId, CancellationToken cancellationToken = default);
 		Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default);
 		Task<IEnumerable<IPage>> GetPublishedPagesAsync(string webSiteId, CancellationToken cancellationToken = default);
 		Task<IEnumerable<IPage>> SearchPagesAsync(string webSiteId, string title, PagePaginationOptions pagination, CancellationToken cancellationToken = default);
@@ -27,9 +27,9 @@ namespace BrandUp.Pages.Interfaces
 
 	public class PageSeoOptions
 	{
-		public string Title { get; set; } = null!;
-		public string Description { get; set; } = null!;
-		public string[] Keywords { get; set; } = null!;
+		public string? Title { get; set; }
+		public string? Description { get; set; }
+		public string[]? Keywords { get; set; }
 	}
 
 	public interface IPage

@@ -69,7 +69,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 			return await cursor.FirstOrDefaultAsync(cancellationToken);
 		}
 
-		public async Task<IDictionary<string, object>> GetContentAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
+		public async Task<IDictionary<string, object>?> GetContentAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)
 		{
 			var document = await (await documents.FindAsync(it => it.Id == pageEdit.Id, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
 			if (document == null)

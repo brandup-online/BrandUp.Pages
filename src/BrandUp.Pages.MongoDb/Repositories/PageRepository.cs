@@ -81,20 +81,20 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return pageDocument;
         }
-        public async Task<IPage> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<IPage?> FindPageByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var cursor = await pageDocuments.Find(it => it.Id == id).ToCursorAsync(cancellationToken);
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
-        public async Task<IPage> FindPageByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default)
+        public async Task<IPage?> FindPageByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(path);
 
-            websiteId = websiteId.ToLower();
+            var siteId = websiteId.ToLower();
 
-            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == websiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == siteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
             if (urlDocument == null)
                 return null;
             if (!urlDocument.PageId.HasValue)
@@ -104,18 +104,21 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return await cursor.FirstOrDefaultAsync(cancellationToken);
         }
-        public async Task<PageUrlResult> FindUrlByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default)
+        public async Task<PageUrlResult?> FindUrlByPathAsync(string websiteId, string path, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(websiteId);
             ArgumentNullException.ThrowIfNull(path);
 
-            websiteId = websiteId?.ToLower();
+            var siteId = websiteId.ToLower();
 
-            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == websiteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
+            var urlDocument = await (await urlDocuments.FindAsync(it => it.WebsiteId == siteId && it.Path == path, cancellationToken: cancellationToken)).SingleOrDefaultAsync(cancellationToken);
             if (urlDocument == null)
                 return null;
             if (urlDocument.PageId.HasValue)
                 return new PageUrlResult(urlDocument.PageId.Value);
+
+            if (urlDocument.Redirect == null)
+                return null;
 
             return new PageUrlResult(new PageUrlRedirect(urlDocument.Redirect.Path, urlDocument.Redirect.IsPermament));
         }
@@ -194,7 +197,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
             var count = await pageDocuments.CountDocumentsAsync(it => it.OwnCollectionId == сollectionId, cancellationToken: cancellationToken);
             return count > 0;
         }
-        public async Task<IDictionary<string, object>> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
+        public async Task<IDictionary<string, object>?> GetContentAsync(Guid pageId, CancellationToken cancellationToken = default)
         {
             var pageDocument = await (await contentDocuments.FindAsync(it => it.PageId == pageId, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);
             if (pageDocument == null)
@@ -336,12 +339,12 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return Task.CompletedTask;
         }
-        public Task<string> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
+        public Task<string?> GetPageTitleAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             return Task.FromResult(pageDocument.Seo?.Title);
         }
-        public Task SetPageTitleAsync(IPage page, string title, CancellationToken cancellationToken = default)
+        public Task SetPageTitleAsync(IPage page, string? title, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             pageDocument.Seo ??= new PageSeoDocument();
@@ -350,12 +353,12 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return Task.CompletedTask;
         }
-        public Task<string> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default)
+        public Task<string?> GetPageDescriptionAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             return Task.FromResult(pageDocument.Seo?.Description);
         }
-        public Task SetPageDescriptionAsync(IPage page, string description, CancellationToken cancellationToken = default)
+        public Task SetPageDescriptionAsync(IPage page, string? description, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             pageDocument.Seo ??= new PageSeoDocument();
@@ -364,12 +367,12 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return Task.CompletedTask;
         }
-        public Task<string[]> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default)
+        public Task<string[]?> GetPageKeywordsAsync(IPage page, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             return Task.FromResult(pageDocument.Seo?.Keywords);
         }
-        public Task SetPageKeywordsAsync(IPage page, string[] keywords, CancellationToken cancellationToken = default)
+        public Task SetPageKeywordsAsync(IPage page, string[]? keywords, CancellationToken cancellationToken = default)
         {
             var pageDocument = (PageDocument)page;
             pageDocument.Seo ??= new PageSeoDocument();
@@ -378,7 +381,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
             return Task.CompletedTask;
         }
-        public async Task UpPagePositionAsync(IPage page, IPage beforePage, CancellationToken cancellationToken = default)
+        public async Task UpPagePositionAsync(IPage page, IPage? beforePage, CancellationToken cancellationToken = default)
         {
             // Материализуем курсор до открытия транзакции: ленивое перечисление внутри сессии
             // приводит к одновременному использованию соединения курсором и update-операциями.
@@ -427,7 +430,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
                 throw;
             }
         }
-        public async Task DownPagePositionAsync(IPage page, IPage afterPage, CancellationToken cancellationToken = default)
+        public async Task DownPagePositionAsync(IPage page, IPage? afterPage, CancellationToken cancellationToken = default)
         {
             var pages = (await GetPagesAsync(new GetPagesOptions(page.OwnCollectionId) { CustomSorting = true, IncludeDrafts = true }, cancellationToken)).ToList();
 
