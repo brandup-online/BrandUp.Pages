@@ -8,7 +8,7 @@ namespace LandingWebSite.Contents.BannerBlock
 	public class BB1 : BannerBlockContent
 	{
 		[Model]
-		public List<BB1_ItemBase> Banners { get; set; }
+		public List<BB1_ItemBase> Banners { get; set; } = [];
 	}
 
 	[ContentType]
@@ -18,10 +18,10 @@ namespace LandingWebSite.Contents.BannerBlock
 		public ImageValue Image { get; set; }
 
 		[Text(IsRequired = true), Title]
-		public string Header { get; set; }
+		public string Header { get; set; } = null!;
 
 		[Text(AllowMultiline = true)]
-		public string SubHeader { get; set; }
+		public string? SubHeader { get; set; }
 
 		[HyperLink]
 		public HyperLinkValue Link { get; set; }

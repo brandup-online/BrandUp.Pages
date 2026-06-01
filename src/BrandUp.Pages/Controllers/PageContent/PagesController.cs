@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Controllers
 		[HttpPost]
 		public async Task<IActionResult> PostAsync([FromQuery] Guid? pageCollectionId = null)
 		{
-			object newValue;
+			object? newValue;
 			if (pageCollectionId.HasValue)
 				newValue = Field.CreateValue(pageCollectionId.Value);
 			else

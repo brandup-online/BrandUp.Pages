@@ -55,14 +55,14 @@ namespace BrandUp.Pages.MongoDb.Repositories
 			};
 		}
 
-		public async Task<IPageEdit> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
+		public async Task<IPageEdit?> FindEditByIdAsync(Guid id, CancellationToken cancellationToken = default)
 		{
 			var cursor = await documents.Find(it => it.Id == id).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
 
 			return await cursor.FirstOrDefaultAsync(cancellationToken);
 		}
 
-		public async Task<IPageEdit> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
+		public async Task<IPageEdit?> FindEditByUserAsync(IPage page, string userId, CancellationToken cancellationToken = default)
 		{
 			var cursor = await documents.Find(it => it.PageId == page.Id && it.UserId == userId).Project(ProjectionExpression).ToCursorAsync(cancellationToken);
 

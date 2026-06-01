@@ -139,7 +139,7 @@ namespace BrandUp.Pages.Controllers
 			if (contentExplorer == null)
 				return BadRequest();
 
-			contentExplorer.Field.ChangeType(contentExplorer.Model, modelType);
+			contentExplorer.Field!.ChangeType(contentExplorer.Model, modelType);
 
 			// Сохраняем изменённую модель: ChangeType мутирует граф модели в pageContentExplorer.Model,
 			// иначе изменение теряется при завершении запроса. SetContentAsync сам сериализует модель.

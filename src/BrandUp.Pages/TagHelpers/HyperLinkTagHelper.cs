@@ -16,7 +16,7 @@ namespace BrandUp.Pages.TagHelpers
 		private readonly HtmlEncoder htmlEncoder;
 
 		[HtmlAttributeName("content-link")]
-		public override ModelExpression FieldName { get; set; }
+		public override ModelExpression FieldName { get; set; } = null!;
 
 		public HyperLinkTagHelper(IPageLinkGenerator pageLinkGenerator, IPageService pageService, HtmlEncoder htmlEncoder)
 		{
@@ -30,7 +30,7 @@ namespace BrandUp.Pages.TagHelpers
 			var value = Field.GetModelValue(Content);
 			if (Field.HasValue(value))
 			{
-				var hyperLinkValue = (HyperLinkValue)value;
+				var hyperLinkValue = (HyperLinkValue)value!;
 
 				string url;
 				switch (hyperLinkValue.ValueType)

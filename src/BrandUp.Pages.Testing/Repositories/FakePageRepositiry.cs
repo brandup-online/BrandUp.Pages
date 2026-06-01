@@ -59,7 +59,7 @@ namespace BrandUp.Pages.Repositories
 
 			var page = pages[index];
 
-			return Task.FromResult(new PageUrlResult(page.Id));
+			return Task.FromResult<PageUrlResult?>(new PageUrlResult(page.Id));
 		}
 		public Task<IEnumerable<IPage>> GetPagesAsync(GetPagesOptions options, CancellationToken cancellationToken = default)
 		{

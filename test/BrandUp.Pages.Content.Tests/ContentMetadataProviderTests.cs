@@ -37,11 +37,11 @@ namespace BrandUp.Pages.Content
         {
             var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
             var fieldName = "Title";
-            var result = contentMetadata.TryGetField(fieldName, out Fields.FieldProviderAttribute field);
+            var result = contentMetadata.TryGetField<Fields.FieldProviderAttribute>(fieldName, out var field);
 
             Assert.True(result);
             Assert.NotNull(field);
-            Assert.Equal(fieldName, field.Name);
+            Assert.Equal(fieldName, field!.Name);
             Assert.Equal("Название", field.Title);
         }
 
@@ -49,7 +49,7 @@ namespace BrandUp.Pages.Content
         public void TryGetField_name_is_lowercase()
         {
             var contentMetadata = metadataManager.GetMetadata<TestPageContent>();
-            var result = contentMetadata.TryGetField("title", out Fields.FieldProviderAttribute field);
+            var result = contentMetadata.TryGetField<Fields.FieldProviderAttribute>("title", out var field);
 
             Assert.True(result);
             Assert.NotNull(field);
@@ -172,7 +172,7 @@ namespace BrandUp.Pages.Content
         public void Implicit_Type()
         {
             var contentMetadata = metadataManager.GetMetadata<ArticlePage>();
-            var type = (Type)contentMetadata;
+            var type = (Type?)contentMetadata;
 
             Assert.True(contentMetadata == typeof(ArticlePage));
             Assert.Equal(typeof(ArticlePage), type);
@@ -181,8 +181,8 @@ namespace BrandUp.Pages.Content
         [Fact]
         public void Implicit_Null_Type()
         {
-            ContentMetadataProvider contentMetadata = null;
-            var type = (Type)contentMetadata;
+            ContentMetadataProvider? contentMetadata = null;
+            var type = (Type?)contentMetadata;
 
             Assert.Null(type);
         }
@@ -201,8 +201,8 @@ namespace BrandUp.Pages.Content
                     contentMetadata.ApplyInjections(page, serviceScope.ServiceProvider, false);
 
                     Assert.NotNull(page.Service);
-                    Assert.Null(page.Header.Service);
-                    Assert.Null(page.Headers[0].Service);
+                    Assert.Null(page.Header!.Service);
+                    Assert.Null(page.Headers![0].Service);
                 }
             }
         }
@@ -221,8 +221,8 @@ namespace BrandUp.Pages.Content
                     contentMetadata.ApplyInjections(page, serviceScope.ServiceProvider, true);
 
                     Assert.NotNull(page.Service);
-                    Assert.NotNull(page.Header.Service);
-                    Assert.NotNull(page.Headers[0].Service);
+                    Assert.NotNull(page.Header!.Service);
+                    Assert.NotNull(page.Headers![0].Service);
                 }
             }
         }

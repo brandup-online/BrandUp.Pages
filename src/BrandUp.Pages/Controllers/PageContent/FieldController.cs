@@ -11,13 +11,13 @@ namespace BrandUp.Pages.Controllers
     public abstract class FieldController<TField> : Controller, IAsyncActionFilter
         where TField : class, IFieldProvider
     {
-        private IPageService pageService;
-        private IPageContentService pageEditingService;
-        private IPage page;
-        private IPageEdit editSession;
-        private ContentContext contentContext;
-        private TField @field;
-        private ContentContext rootContentContext;
+        private IPageService pageService = null!;
+        private IPageContentService pageEditingService = null!;
+        private IPage page = null!;
+        private IPageEdit editSession = null!;
+        private ContentContext contentContext = null!;
+        private TField @field = null!;
+        private ContentContext rootContentContext = null!;
 
         public IPage Page => page;
         public IPageEdit ContentEdit => editSession;
@@ -37,47 +37,61 @@ namespace BrandUp.Pages.Controllers
                 return;
             }
 
-            editSession = await pageEditingService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
-            if (editSession == null)
+            var loadedEdit = await pageEditingService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
+            if (loadedEdit == null)
             {
                 context.Result = BadRequest();
                 return;
             }
+            editSession = loadedEdit;
 
-            page = await pageService.FindPageByIdAsync(editSession.PageId);
-            if (page == null)
+            var loadedPage = await pageService.FindPageByIdAsync(editSession.PageId);
+            if (loadedPage == null)
             {
                 context.Result = BadRequest();
                 return;
             }
+            page = loadedPage;
 
             var content = await pageEditingService.GetContentAsync(editSession, HttpContext.RequestAborted);
+            if (content == null)
+            {
+                context.Result = BadRequest();
+                return;
+            }
 
             rootContentContext = new ContentContext(page, content, HttpContext.RequestServices, true);
 
             string modelPath = string.Empty;
             if (Request.Query.TryGetValue("path", out Microsoft.Extensions.Primitives.StringValues pathValue))
-                modelPath = pathValue[0];
+                modelPath = pathValue[0] ?? string.Empty;
 
-            contentContext = rootContentContext.Navigate(modelPath);
-            if (contentContext == null)
+            var navContext = rootContentContext.Navigate(modelPath);
+            if (navContext == null)
             {
                 context.Result = BadRequest();
                 return;
             }
+            contentContext = navContext;
 
             if (!Request.Query.TryGetValue("field", out Microsoft.Extensions.Primitives.StringValues fieldNameValue))
             {
                 context.Result = BadRequest();
                 return;
             }
-            string fieldName = fieldNameValue[0];
-
-            if (!contentContext.Explorer.Metadata.TryGetField(fieldName, out field))
+            string? fieldName = fieldNameValue[0];
+            if (fieldName == null)
             {
                 context.Result = BadRequest();
                 return;
             }
+
+            if (!contentContext.Explorer.Metadata.TryGetField<TField>(fieldName, out var foundField))
+            {
+                context.Result = BadRequest();
+                return;
+            }
+            @field = foundField;
 
             await next();
         }

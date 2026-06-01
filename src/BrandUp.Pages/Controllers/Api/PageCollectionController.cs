@@ -76,7 +76,7 @@ namespace BrandUp.Pages.Controllers
 		}
 
 		[HttpGet, Route("brandup.pages/collection/search", Name = "BrandUp.Pages.Collection.Search")]
-		public async Task<IActionResult> SearchAsync([FromQuery] string pageType, [FromQuery] string title = null)
+		public async Task<IActionResult> SearchAsync([FromQuery] string pageType, [FromQuery] string? title = null)
 		{
 			if (pageType == null)
 				return BadRequest();

@@ -11,13 +11,13 @@ namespace BrandUp.Pages.MongoDb.Tests.ContentModels
 		public const string ContentTypeTitle = "Test page";
 
 		[Title, Text(Title = "Название страницы", IsRequired = true, AllowMultiline = false, Placeholder = "Укажите название")]
-		public string Title { get; set; }
+		public string Title { get; set; } = null!;
 
 		[Model(Title = "Шапка страницы")]
-		public PageHeaderContent Header { get; set; }
+		public PageHeaderContent? Header { get; set; }
 
 		[Model(Title = "Шапки страницы")]
-		public List<PageHeaderContent> Headers { get; set; }
+		public List<PageHeaderContent>? Headers { get; set; }
 
 		[Pages(Title = "Pages")]
 		public PageCollectionReference<TestPageContent> Pages { get; set; }
@@ -26,7 +26,7 @@ namespace BrandUp.Pages.MongoDb.Tests.ContentModels
 		{
 			return Create(title, null, null);
 		}
-		public static TestPageContent Create(string title, PageHeaderContent header, IEnumerable<PageHeaderContent> headers)
+		public static TestPageContent Create(string title, PageHeaderContent? header, IEnumerable<PageHeaderContent>? headers)
 		{
 			return new TestPageContent
 			{
@@ -50,6 +50,6 @@ namespace BrandUp.Pages.MongoDb.Tests.ContentModels
 		public string Title { get; set; } = "Test";
 
 		[Model(Title = "Шапка страницы")]
-		public PageHeaderContent Header { get; set; }
+		public PageHeaderContent? Header { get; set; }
 	}
 }

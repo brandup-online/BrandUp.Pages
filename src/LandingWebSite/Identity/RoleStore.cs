@@ -39,20 +39,20 @@ namespace LandingWebSite.Identity
 			return IdentityResult.Success;
 		}
 		public virtual Task<string> GetRoleIdAsync(TRole role, CancellationToken cancellationToken) => Task.FromResult(role.Id.ToString());
-		public virtual Task<string> GetRoleNameAsync(TRole role, CancellationToken cancellationToken) => Task.FromResult(role.Name);
-		public virtual Task SetRoleNameAsync(TRole role, string roleName, CancellationToken cancellationToken)
+		public virtual Task<string?> GetRoleNameAsync(TRole role, CancellationToken cancellationToken) => Task.FromResult<string?>(role.Name);
+		public virtual Task SetRoleNameAsync(TRole role, string? roleName, CancellationToken cancellationToken)
 		{
-			role.Name = roleName;
+			role.Name = roleName!;
 			return Task.CompletedTask;
 		}
-		public virtual Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken) => Task.FromResult(role.NormalizedName);
-		public virtual Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken)
+		public virtual Task<string?> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken) => Task.FromResult<string?>(role.NormalizedName);
+		public virtual Task SetNormalizedRoleNameAsync(TRole role, string? normalizedName, CancellationToken cancellationToken)
 		{
-			role.NormalizedName = normalizedName;
+			role.NormalizedName = normalizedName!;
 			return Task.CompletedTask;
 		}
-		public virtual Task<TRole> FindByIdAsync(string roleId, CancellationToken token) => roles.Find(r => r.Id == Guid.Parse(roleId)).FirstOrDefaultAsync(token);
-		public virtual Task<TRole> FindByNameAsync(string normalizedName, CancellationToken token) => roles.Find(r => r.NormalizedName == normalizedName).FirstOrDefaultAsync(token);
+		public virtual async Task<TRole?> FindByIdAsync(string roleId, CancellationToken token) => await roles.Find(r => r.Id == Guid.Parse(roleId)).FirstOrDefaultAsync(token);
+		public virtual async Task<TRole?> FindByNameAsync(string normalizedName, CancellationToken token) => await roles.Find(r => r.NormalizedName == normalizedName).FirstOrDefaultAsync(token);
 
 		#endregion
 

@@ -24,7 +24,7 @@ namespace BrandUp.Pages.Url
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
-            pageUrlHelper = serviceScope.ServiceProvider.GetService<IPageUrlHelper>();
+            pageUrlHelper = serviceScope.ServiceProvider.GetRequiredService<IPageUrlHelper>();
         }
 
         #region IAsyncLifetime members

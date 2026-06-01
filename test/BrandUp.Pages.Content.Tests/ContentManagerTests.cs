@@ -25,7 +25,7 @@ namespace BrandUp.Pages.Content
 
             var pageContent = await contentManager.GetContentAsync(page, TestContext.Current.CancellationToken);
 
-            Assert.Equal(page, pageContent.Entry);
+            Assert.Equal(page, pageContent!.Entry);
         }
 
         #endregion

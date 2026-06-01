@@ -2,25 +2,25 @@
 {
 	public class PageContentForm
 	{
-		public PageContentPath Path { get; set; }
+		public PageContentPath Path { get; set; } = null!;
 		public List<ContentFieldModel> Fields { get; } = new List<ContentFieldModel>();
-		public Dictionary<string, object> Values { get; } = new Dictionary<string, object>();
+		public Dictionary<string, object?> Values { get; } = new Dictionary<string, object?>();
 	}
 
 	public class PageContentPath
 	{
-		public PageContentPath Parent { get; set; }
-		public string ModelPath { get; set; }
-		public string Name { get; set; }
-		public string Title { get; set; }
+		public PageContentPath? Parent { get; set; }
+		public string ModelPath { get; set; } = null!;
+		public string Name { get; set; } = null!;
+		public string Title { get; set; } = null!;
 		public int Index { get; set; }
 	}
 
 	public class ContentFieldModel
 	{
-		public string Type { get; set; }
-		public string Name { get; set; }
-		public string Title { get; set; }
-		public object Options { get; set; }
+		public string Type { get; set; } = null!;
+		public string Name { get; set; } = null!;
+		public string Title { get; set; } = null!;
+		public object? Options { get; set; }
 	}
 }

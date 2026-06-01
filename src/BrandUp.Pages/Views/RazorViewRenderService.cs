@@ -58,7 +58,7 @@ namespace BrandUp.Pages.Views
 			{
 				var viewContext = new ViewContext
 				{
-					HttpContext = httpContextAccessor.HttpContext,
+					HttpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No active HTTP context."),
 					ViewData = viewData,
 					Writer = contentOutput,
 					RouteData = new RouteData()

@@ -25,7 +25,7 @@ namespace BrandUp.Pages.Url
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
-            pageUrlPathGenerator = serviceScope.ServiceProvider.GetService<IPageUrlPathGenerator>();
+            pageUrlPathGenerator = serviceScope.ServiceProvider.GetRequiredService<IPageUrlPathGenerator>();
         }
 
         #region IAsyncLifetime members
@@ -75,7 +75,7 @@ namespace BrandUp.Pages.Url
             public string TypeName => throw new NotImplementedException();
             public Guid OwnCollectionId => throw new NotImplementedException();
             public string Header { get; set; }
-            public string UrlPath { get; set; }
+            public string UrlPath { get; set; } = null!;
             public string EntryId => throw new NotImplementedException();
 
             public bool IsPublished => throw new NotImplementedException();

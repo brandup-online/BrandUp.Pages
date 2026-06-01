@@ -14,19 +14,19 @@ namespace BrandUp.Pages.ContentModels
 		public string Title { get; set; } = "Test";
 
 		[Model(Title = "Шапка страницы")]
-		public PageHeaderContent Header { get; set; }
+		public PageHeaderContent? Header { get; set; }
 
 		[Model(Title = "Шапки страницы")]
-		public List<PageHeaderContent> Headers { get; set; }
+		public List<PageHeaderContent>? Headers { get; set; }
 
 		[ContentInject]
-		public TestService Service { get; set; }
+		public TestService Service { get; set; } = null!;
 
 		public static TestPageContent CreateWithOnlyTitle(string title)
 		{
 			return Create(title, null, null);
 		}
-		public static TestPageContent Create(string title, PageHeaderContent header = null, IEnumerable<PageHeaderContent> headers = null)
+		public static TestPageContent Create(string title, PageHeaderContent? header = null, IEnumerable<PageHeaderContent>? headers = null)
 		{
 			return new TestPageContent
 			{
@@ -41,7 +41,7 @@ namespace BrandUp.Pages.ContentModels
 	public class ArticlePage : TestPageContent
 	{
 		[Text(DisplayBeforeField = nameof(Header))]
-		public string SubHeader { get; set; }
+		public string? SubHeader { get; set; }
 	}
 
 	[ContentType(Title = "News"), View]
@@ -57,6 +57,6 @@ namespace BrandUp.Pages.ContentModels
 		public string Title { get; set; } = "Test";
 
 		[ContentInject]
-		public TestService Service { get; set; }
+		public TestService Service { get; set; } = null!;
 	}
 }

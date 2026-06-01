@@ -8,8 +8,8 @@ namespace BrandUp.Pages.Models
 
 	public class PageEditorModel
 	{
-		public string Id { get; set; }
-		public string Email { get; set; }
+		public string Id { get; set; } = null!;
+		public string Email { get; set; } = null!;
 	}
 
 	public class PageEditorAssignForm : FormModel<PageEditorAssignValues>
@@ -19,6 +19,6 @@ namespace BrandUp.Pages.Models
 	public class PageEditorAssignValues
 	{
 		[Required(AllowEmptyStrings = false), EmailAddress]
-		public string Email { get; set; }
+		public string Email { get; set; } = null!;
 	}
 }

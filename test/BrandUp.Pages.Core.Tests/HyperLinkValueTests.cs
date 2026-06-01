@@ -101,7 +101,7 @@
 		{
 			var value1 = new HyperLinkValue(new Uri("http://test/test.jpg"));
 
-			var result = value1.Equals((object)null);
+			var result = value1.Equals((object?)null);
 
 			Assert.False(result);
 		}

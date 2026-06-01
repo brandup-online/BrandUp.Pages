@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Controllers
 		private readonly IPageService pageService;
 		private readonly IPageLinkGenerator pageLinkGenerator;
 		private readonly IPageUrlPathGenerator pageUrlPathGenerator;
-		private IPage page;
+		private IPage page = null!;
 
 		public PagePublishController(IPageService pageService, IPageLinkGenerator pageLinkGenerator, IPageUrlPathGenerator pageUrlPathGenerator)
 		{
@@ -25,24 +25,25 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (!RouteData.Values.TryGetValue("id", out object pageIdValue))
+			if (!RouteData.Values.TryGetValue("id", out object? pageIdValue))
 			{
 				AddErrors("Not valid id.");
 				return;
 			}
 
-			if (!Guid.TryParse(pageIdValue.ToString(), out Guid pageId))
+			if (!Guid.TryParse(pageIdValue?.ToString(), out Guid pageId))
 			{
 				AddErrors("Not valid id.");
 				return;
 			}
 
-			page = await pageService.FindPageByIdAsync(pageId);
-			if (page == null)
+			var loadedPage = await pageService.FindPageByIdAsync(pageId);
+			if (loadedPage == null)
 			{
 				AddErrors("Not found page.");
 				return;
 			}
+			page = loadedPage;
 		}
 
 		protected override async Task OnBuildFormAsync(PagePublishForm formModel)
@@ -50,7 +51,7 @@ namespace BrandUp.Pages.Controllers
 			formModel.Page = await GetItemModelAsync(page);
 
 			formModel.Values.Header = page.Header;
-			formModel.Values.UrlPath = await pageUrlPathGenerator.GenerateAsync(page);
+			formModel.Values.UrlPath = await pageUrlPathGenerator.GenerateAsync(page) ?? string.Empty;
 		}
 
 		protected override Task OnChangeValueAsync(string field, PagePublishValues values)
@@ -58,7 +59,7 @@ namespace BrandUp.Pages.Controllers
 			return Task.CompletedTask;
 		}
 
-		protected override async Task<PagePublishResult> OnCommitAsync(PagePublishValues values)
+		protected override async Task<PagePublishResult?> OnCommitAsync(PagePublishValues values)
 		{
 			var publishResult = await pageService.PublishPageAsync(page, values.UrlPath);
 			if (!publishResult.IsSuccess)

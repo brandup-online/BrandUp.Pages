@@ -32,19 +32,19 @@ namespace BrandUp.Pages.Services
             serviceProvider = services.BuildServiceProvider();
             serviceScope = serviceProvider.CreateScope();
 
-            pageService = serviceScope.ServiceProvider.GetService<IPageService>();
-            pageCollectionService = serviceScope.ServiceProvider.GetService<IPageCollectionService>();
-            pageMetadataManager = serviceScope.ServiceProvider.GetService<IPageMetadataManager>();
+            pageService = serviceScope.ServiceProvider.GetRequiredService<IPageService>();
+            pageCollectionService = serviceScope.ServiceProvider.GetRequiredService<IPageCollectionService>();
+            pageMetadataManager = serviceScope.ServiceProvider.GetRequiredService<IPageMetadataManager>();
         }
 
         #region IAsyncLifetime members
 
         async ValueTask IAsyncLifetime.InitializeAsync()
         {
-            var pageCollectionRepository = serviceScope.ServiceProvider.GetService<IPageCollectionRepository>();
-            var pageRepository = serviceScope.ServiceProvider.GetService<IPageRepository>();
+            var pageCollectionRepository = serviceScope.ServiceProvider.GetRequiredService<IPageCollectionRepository>();
+            var pageRepository = serviceScope.ServiceProvider.GetRequiredService<IPageRepository>();
 
-            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+            var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent))!;
 
             var pageCollection = await pageCollectionRepository.CreateCollectionAsync("test", "Test collection", pageType.Name, PageSortMode.FirstOld, null);
 
@@ -83,7 +83,7 @@ namespace BrandUp.Pages.Services
         [Fact]
         public async Task CreateCollection_bypage()
         {
-            var defaultPage = await pageService.GetDefaultPageAsync(websiteContext.Website.Id, TestContext.Current.CancellationToken);
+            var defaultPage = (await pageService.GetDefaultPageAsync(websiteContext.Website.Id, TestContext.Current.CancellationToken))!;
             var result = await pageCollectionService.CreateCollectionAsync(defaultPage, "Test collection", "TestPage", PageSortMode.FirstOld);
 
             Assert.True(result.IsSuccess);

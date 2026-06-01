@@ -12,8 +12,8 @@ namespace BrandUp.Pages.MongoDb.Tests
     public abstract class TestBase(MongoDbInstance mongoDbInstance) : IAsyncLifetime
     {
         protected readonly IWebsiteContext websiteContext = new TestWebsiteContext("test", "test");
-        ServiceProvider serviceProvider;
-        IServiceScope serviceScope;
+        ServiceProvider serviceProvider = null!;
+        IServiceScope serviceScope = null!;
 
         public IServiceProvider Services => serviceScope.ServiceProvider;
 
@@ -68,10 +68,10 @@ namespace BrandUp.Pages.MongoDb.Tests
 
     public class MongoDbInstance : IMongoDbClientFactory, IAsyncLifetime
     {
-        ServiceProvider serviceProvider;
-        IMongoDbClientFactory factory;
-        IMongoClient client;
-        List<string> systemDatabaseNames;
+        ServiceProvider serviceProvider = null!;
+        IMongoDbClientFactory factory = null!;
+        IMongoClient client = null!;
+        List<string> systemDatabaseNames = null!;
 
         public IMongoClient Client => client;
 

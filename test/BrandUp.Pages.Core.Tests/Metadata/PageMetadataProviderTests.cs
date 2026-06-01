@@ -19,8 +19,8 @@ namespace BrandUp.Pages.Metadata
 		[Fact]
 		public void IsInheritedOf()
 		{
-			var basePageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
-			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(ArticlePageContent));
+			var basePageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent))!;
+			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(ArticlePageContent))!;
 
 			Assert.True(pageType.IsInherited(basePageType));
 		}
@@ -28,7 +28,7 @@ namespace BrandUp.Pages.Metadata
 		[Fact]
 		public void GetPageTitle()
 		{
-			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent))!;
 			var pageContent = new TestPageContent { Title = "test" };
 
 			var pageTitle = pageType.GetPageHeader(pageContent);
@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Metadata
 		[Fact]
 		public void CreatePageModel()
 		{
-			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+			var pageType = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent))!;
 
 			var pageContent = (TestPageContent)pageType.CreatePageModel();
 
@@ -49,8 +49,8 @@ namespace BrandUp.Pages.Metadata
 		[Fact]
 		public void IsEqual()
 		{
-			var pageType1 = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
-			var pageType2 = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent));
+			var pageType1 = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent))!;
+			var pageType2 = pageMetadataManager.FindPageMetadataByContentType(typeof(TestPageContent))!;
 
 			Assert.Equal(pageType1, pageType2);
 

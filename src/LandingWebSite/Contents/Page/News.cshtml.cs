@@ -7,9 +7,9 @@ namespace LandingWebSite.Contents.Page
 	public class NewsPageContent : PageContent
 	{
 		[Text(Placeholder = "Input page sub header")]
-		public string SubHeader { get; set; }
+		public string? SubHeader { get; set; }
 
 		[Model]
-		public List<PageBlockContent> Blocks { get; set; }
+		public List<PageBlockContent> Blocks { get; set; } = [];
 	}
 }

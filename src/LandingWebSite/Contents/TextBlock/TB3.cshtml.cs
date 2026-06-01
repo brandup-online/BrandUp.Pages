@@ -8,7 +8,7 @@ namespace LandingWebSite.Contents.TextBlock
 	public class TB3 : TextBlockContent
 	{
 		[Text]
-		public string Header { get; set; }
+		public string? Header { get; set; }
 		[Image]
 		public ImageValue Background { get; set; }
 	}

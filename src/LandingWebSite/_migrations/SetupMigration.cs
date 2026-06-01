@@ -23,10 +23,13 @@ namespace LandingWebSite._migrations
 
 		public async Task UpAsync(CancellationToken cancellationToken = default)
 		{
-			var website = await websiteStore.FindByNameAsync(string.Empty);
+			var website = await websiteStore.FindByNameAsync(string.Empty)
+				?? throw new InvalidOperationException("Website not found.");
 
-			var commonPageMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.CommonPageContent));
-			var newsPageMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.NewsPageContent));
+			var commonPageMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.CommonPageContent))
+				?? throw new InvalidOperationException("Common page metadata not found.");
+			var newsPageMetadata = pageMetadataManager.FindPageMetadataByContentType(typeof(Contents.Page.NewsPageContent))
+				?? throw new InvalidOperationException("News page metadata not found.");
 
 			var mainPages = (await pageCollectionService.CreateCollectionAsync(website.Id, "Main pages", commonPageMetadata.Name, PageSortMode.FirstOld)).Data;
 

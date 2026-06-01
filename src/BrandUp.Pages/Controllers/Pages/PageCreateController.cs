@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Controllers
 		private readonly IPageService pageService;
 		private readonly IPageCollectionService pageCollectionService;
 		private readonly IPageLinkGenerator pageLinkGenerator;
-		private IPageCollection pageCollection;
+		private IPageCollection pageCollection = null!;
 
 		public PageCreateController(IPageService pageService, IPageCollectionService pageCollectionService, IPageLinkGenerator pageLinkGenerator)
 		{
@@ -25,7 +25,7 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (!Request.Query.TryGetValue("collectionId", out string pageCollectionIdValue))
+			if (!Request.Query.TryGetValue("collectionId", out string? pageCollectionIdValue))
 			{
 				AddErrors("Not valid id.");
 				return;
@@ -37,12 +37,13 @@ namespace BrandUp.Pages.Controllers
 				return;
 			}
 
-			pageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollectionId);
-			if (pageCollection == null)
+			var collection = await pageCollectionService.FindCollectiondByIdAsync(pageCollectionId);
+			if (collection == null)
 			{
 				AddErrors("Not found page collection.");
 				return;
 			}
+			pageCollection = collection;
 		}
 
 		protected override async Task OnBuildFormAsync(PageCreateForm formModel)
@@ -57,7 +58,7 @@ namespace BrandUp.Pages.Controllers
 			return Task.CompletedTask;
 		}
 
-		protected override async Task<PageModel> OnCommitAsync(PageCreateValues values)
+		protected override async Task<PageModel?> OnCommitAsync(PageCreateValues values)
 		{
 			var page = await pageService.CreatePageAsync(pageCollection, values.PageType, values.Header, HttpContext.RequestAborted);
 			return await GetPageModelAsync(page);

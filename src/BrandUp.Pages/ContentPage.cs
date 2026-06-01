@@ -6,7 +6,8 @@ namespace BrandUp.Pages
 {
 	public abstract class ContentPage<TModel> : RazorPage<TModel>
 	{
-		public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext;
+		public ContentContext Content => ViewData[Views.RazorViewRenderService.ViewData_ContentContextKeyName] as ContentContext
+			?? throw new InvalidOperationException("Content context is not available.");
 		public IPage Page => Content.Page;
 
 		public Task<IEnumerable<IPage>> GetChildPagesAsync(IPageCollectionReference pageCollectionReference)
@@ -44,7 +45,7 @@ namespace BrandUp.Pages
 			if (includeCurrentPage)
 				result.Add(page);
 
-			IPage currentPage = page;
+			IPage? currentPage = page;
 			while (currentPage != null)
 			{
 				var parentPageId = await pageService.GetParentPageIdAsync(currentPage);
@@ -52,6 +53,9 @@ namespace BrandUp.Pages
 					break;
 
 				currentPage = await pageService.FindPageByIdAsync(parentPageId.Value);
+				if (currentPage == null)
+					break;
+
 				result.Add(currentPage);
 			}
 

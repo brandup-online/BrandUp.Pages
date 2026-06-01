@@ -12,12 +12,12 @@ namespace BrandUp.Pages.TagHelpers
 	{
 		public abstract ModelExpression FieldName { get; set; }
 		[HtmlAttributeName("content-designer")]
-		public string DesignerName { get; set; }
+		public string? DesignerName { get; set; }
 		[HtmlAttributeNotBound]
-		public TField Field { get; private set; }
+		public TField Field { get; private set; } = default!;
 		[HtmlAttributeNotBound, ViewContext]
-		public ViewContext ViewContext { get; set; }
-		public ContentContext ContentContext { get; private set; }
+		public ViewContext ViewContext { get; set; } = null!;
+		public ContentContext ContentContext { get; private set; } = null!;
 		public object Content => ContentContext.Content;
 		protected IJsonHelper JsonHelper => ViewContext.HttpContext.RequestServices.GetRequiredService<IJsonHelper>();
 		[HtmlAttributeName("content-render-mode")]
@@ -30,7 +30,7 @@ namespace BrandUp.Pages.TagHelpers
 				throw new InvalidOperationException();
 			ContentContext = contentContext;
 
-			if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider field) || !(field is TField textField))
+			if (!contentContext.Explorer.Metadata.TryGetField(FieldName.Name, out IFieldProvider? field) || !(field is TField textField))
 				throw new InvalidOperationException();
 			Field = textField;
 

@@ -20,19 +20,19 @@ namespace LandingWebSite.Identity
 		[BsonId]
 		public virtual ObjectId Id { get; set; }
 
-		public virtual string UserName { get; set; }
+		public virtual string UserName { get; set; } = null!;
 
-		public virtual string NormalizedUserName { get; set; }
+		public virtual string NormalizedUserName { get; set; } = null!;
 
-		public virtual string SecurityStamp { get; set; }
+		public virtual string? SecurityStamp { get; set; }
 
-		public virtual string Email { get; set; }
+		public virtual string? Email { get; set; }
 
-		public virtual string NormalizedEmail { get; set; }
+		public virtual string? NormalizedEmail { get; set; }
 
 		public virtual bool EmailConfirmed { get; set; }
 
-		public virtual string PhoneNumber { get; set; }
+		public virtual string? PhoneNumber { get; set; }
 
 		public virtual bool PhoneNumberConfirmed { get; set; }
 
@@ -58,7 +58,7 @@ namespace LandingWebSite.Identity
 		}
 
 		[BsonIgnoreIfNull]
-		public virtual string PasswordHash { get; set; }
+		public virtual string? PasswordHash { get; set; }
 
 		[BsonIgnoreIfNull]
 		public virtual List<IdentityUserLogin> Logins { get; set; }
@@ -107,7 +107,7 @@ namespace LandingWebSite.Identity
 		[BsonIgnoreIfNull]
 		public virtual List<IdentityUserToken> Tokens { get; set; }
 
-		private IdentityUserToken GetToken(string loginProider, string name)
+		private IdentityUserToken? GetToken(string loginProider, string name)
 			=> Tokens
 				.FirstOrDefault(t => t.LoginProvider == loginProider && t.Name == name);
 
@@ -128,7 +128,7 @@ namespace LandingWebSite.Identity
 			});
 		}
 
-		public virtual string GetTokenValue(string loginProider, string name)
+		public virtual string? GetTokenValue(string loginProider, string name)
 		{
 			return GetToken(loginProider, name)?.Value;
 		}

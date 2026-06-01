@@ -4,7 +4,7 @@ namespace BrandUp.Pages.Views
 {
 	public class FakeViewLocator : IViewLocator
 	{
-		public ContentView FindView(Type contentType)
+		public ContentView? FindView(Type contentType)
 		{
 			if (contentType == null)
 				throw new ArgumentNullException(nameof(contentType));
@@ -18,7 +18,7 @@ namespace BrandUp.Pages.Views
 			foreach (var attr in defaultValueAttrs)
 				defaultData.Add(attr.FieldName, attr.Value);
 
-			return new ContentView(contentType.FullName, contentType, defaultData);
+			return new ContentView(contentType.FullName!, contentType, defaultData);
 		}
 	}
 

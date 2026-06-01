@@ -6,10 +6,10 @@ namespace BrandUp.Pages.Content.Fakes
 	public class TestContent
 	{
 		[Text(Placeholder = "placeholder", AllowMultiline = true)]
-		public string Text { get; set; }
+		public string? Text { get; set; }
 
 		[Html(Placeholder = "placeholder")]
-		public string Html { get; set; }
+		public string? Html { get; set; }
 
 		[Image]
 		public ImageValue Image { get; set; }

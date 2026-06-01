@@ -14,9 +14,9 @@ namespace BrandUp.Pages.TagHelpers
 		private readonly HtmlEncoder htmlEncoder;
 
 		[HtmlAttributeName("asp-page-path")]
-		public string PagePath { get; set; }
+		public string PagePath { get; set; } = null!;
 		[ViewContext, HtmlAttributeNotBound]
-		public ViewContext ViewContext { get; set; }
+		public ViewContext ViewContext { get; set; } = null!;
 
 		public PageLinkTagHelper(HtmlEncoder htmlEncoder)
 		{

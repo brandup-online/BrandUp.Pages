@@ -7,6 +7,6 @@ namespace LandingWebSite.Contents.TextBlock
 	public class TB2 : TextBlockContent
 	{
 		[Text(DisplayBeforeField = nameof(Text))]
-		public string Header { get; set; }
+		public string? Header { get; set; }
 	}
 }

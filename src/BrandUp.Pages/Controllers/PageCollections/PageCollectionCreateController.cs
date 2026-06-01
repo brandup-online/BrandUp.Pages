@@ -17,7 +17,7 @@ namespace BrandUp.Pages.Controllers
 		readonly IPageLinkGenerator pageLinkGenerator;
 		readonly IPageMetadataManager pageMetadataManager;
 		readonly IWebsiteContext websiteContext;
-		private IPage page;
+		private IPage? page;
 
 		#endregion
 
@@ -39,7 +39,7 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (Request.Query.TryGetValue("pageId", out string pageIdValue))
+			if (Request.Query.TryGetValue("pageId", out string? pageIdValue))
 			{
 				if (!Guid.TryParse(pageIdValue, out Guid pageId))
 				{
@@ -47,12 +47,13 @@ namespace BrandUp.Pages.Controllers
 					return;
 				}
 
-				page = await pageService.FindPageByIdAsync(pageId);
-				if (page == null)
+				var loadedPage = await pageService.FindPageByIdAsync(pageId);
+				if (loadedPage == null)
 				{
 					AddErrors("Not found page.");
 					return;
 				}
+				page = loadedPage;
 
 				if (!page.IsPublished)
 				{
@@ -78,7 +79,7 @@ namespace BrandUp.Pages.Controllers
 		{
 			return Task.CompletedTask;
 		}
-		protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionCreateValues values)
+		protected override async Task<PageCollectionModel?> OnCommitAsync(PageCollectionCreateValues values)
 		{
 			Result<IPageCollection> createResult;
 

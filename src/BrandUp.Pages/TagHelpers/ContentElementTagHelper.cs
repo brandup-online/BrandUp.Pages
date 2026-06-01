@@ -12,13 +12,13 @@ namespace BrandUp.Pages.TagHelpers
 		public string HtmlTag { get; set; } = "div";
 
 		[HtmlAttributeName("class")]
-		public string CssClass { get; set; }
+		public string? CssClass { get; set; }
 
 		[HtmlAttributeName("script")]
-		public string ScriptName { get; set; }
+		public string? ScriptName { get; set; }
 
 		[HtmlAttributeNotBound, ViewContext]
-		public ViewContext ViewContext { get; set; }
+		public ViewContext ViewContext { get; set; } = null!;
 
 		public override void Process(TagHelperContext context, TagHelperOutput output)
 		{

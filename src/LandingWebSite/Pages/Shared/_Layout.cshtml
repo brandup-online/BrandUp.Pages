@@ -17,7 +17,7 @@
                 <ul>
                     <li><a asp-page-path="/news">News</a></li>
                     <li><a asp-page="/about">About</a></li>
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <li><a href="#" data-command="signout">Sign out</a></li>
                     }
@@ -44,7 +44,7 @@
                 <li><a asp-page-path="/">Home</a></li>
                 <li><a asp-page-path="/news">News</a></li>
                 <li><a asp-page="/about">About</a></li>
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity?.IsAuthenticated ?? false)
                 {
                     <li><a href="#" data-command="signout">Sign out</a></li>
                 }

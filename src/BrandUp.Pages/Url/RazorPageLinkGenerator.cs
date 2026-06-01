@@ -28,8 +28,8 @@ namespace BrandUp.Pages.Url
 
 			var urlPath = GetPagePath(page);
 
-			var httpContext = httpContextAccessor.HttpContext;
-			var pageUrl = linkGenerator.GetPathByPage(httpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
+			var httpContext = HttpContext;
+			var pageUrl = linkGenerator.GetPathByPage(httpContext, contentPageOptions.ContentPageName, null, new { url = urlPath }) ?? throw PageUrlError();
 
 			return Task.FromResult(pageUrl);
 		}
@@ -41,11 +41,14 @@ namespace BrandUp.Pages.Url
 
 			var urlPath = GetPagePath(page);
 
-			var httpContext = httpContextAccessor.HttpContext;
-			var pageUrl = linkGenerator.GetUriByPage(httpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
+			var httpContext = HttpContext;
+			var pageUrl = linkGenerator.GetUriByPage(httpContext, contentPageOptions.ContentPageName, null, new { url = urlPath }) ?? throw PageUrlError();
 
 			return Task.FromResult(pageUrl);
 		}
+
+		private HttpContext HttpContext => httpContextAccessor.HttpContext ?? throw new InvalidOperationException("No active HTTP context.");
+		private static InvalidOperationException PageUrlError() => new("Could not generate page URL.");
 
 		private string GetPagePath(IPage page)
 		{
@@ -60,7 +63,7 @@ namespace BrandUp.Pages.Url
 			if (pageEditSession == null)
 				throw new ArgumentNullException(nameof(pageEditSession));
 
-			var url = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+			var url = linkGenerator.GetPathByPage(HttpContext, contentPageOptions.ContentPageName, null, new { editId = pageEditSession.Id.ToString().ToLower() }) ?? throw PageUrlError();
 
 			return Task.FromResult(url);
 		}
@@ -70,7 +73,7 @@ namespace BrandUp.Pages.Url
 			if (pageEditSession == null)
 				throw new ArgumentNullException(nameof(pageEditSession));
 
-			var url = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { editId = pageEditSession.Id.ToString().ToLower() });
+			var url = linkGenerator.GetUriByPage(HttpContext, contentPageOptions.ContentPageName, null, new { editId = pageEditSession.Id.ToString().ToLower() }) ?? throw PageUrlError();
 
 			return Task.FromResult(url);
 		}
@@ -81,7 +84,7 @@ namespace BrandUp.Pages.Url
 				pagePath = string.Empty;
 
 			var urlPath = NormalizePagePath(pagePath);
-			var pageUrl = linkGenerator.GetPathByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
+			var pageUrl = linkGenerator.GetPathByPage(HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath }) ?? throw PageUrlError();
 
 			return Task.FromResult(pageUrl);
 		}
@@ -92,7 +95,7 @@ namespace BrandUp.Pages.Url
 				pagePath = string.Empty;
 
 			var urlPath = NormalizePagePath(pagePath);
-			var pageUrl = linkGenerator.GetUriByPage(httpContextAccessor.HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath });
+			var pageUrl = linkGenerator.GetUriByPage(HttpContext, contentPageOptions.ContentPageName, null, new { url = urlPath }) ?? throw PageUrlError();
 
 			return Task.FromResult(pageUrl);
 		}

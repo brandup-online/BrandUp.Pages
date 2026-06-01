@@ -19,9 +19,9 @@ namespace LandingWebSite.Controllers
 			var routes = actionDescriptorCollectionProvider.ActionDescriptors.Items.Select(ad => new RouteModel
 			{
 				Id = ad.Id,
-				Name = ad.AttributeRouteInfo.Name,
-				Template = ad.AttributeRouteInfo.Template,
-				Order = ad.AttributeRouteInfo.Order,
+				Name = ad.AttributeRouteInfo?.Name,
+				Template = ad.AttributeRouteInfo?.Template,
+				Order = ad.AttributeRouteInfo?.Order ?? 0,
 				RouteValues = ad.RouteValues,
 				DisplayName = ad.DisplayName
 			}).ToList();
@@ -31,12 +31,12 @@ namespace LandingWebSite.Controllers
 
 		private class RouteModel
 		{
-			public string Id { get; set; }
-			public string Name { get; set; }
-			public string Template { get; set; }
+			public string Id { get; set; } = null!;
+			public string? Name { get; set; }
+			public string? Template { get; set; }
 			public int Order { get; set; }
-			public IDictionary<string, string> RouteValues { get; set; }
-			public string DisplayName { get; set; }
+			public IDictionary<string, string?> RouteValues { get; set; } = null!;
+			public string? DisplayName { get; set; }
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace BrandUp.Pages.Models
 
 		public static async Task<PageCollectionModel> ToViewModelAsync(this IPageCollection pageCollection, IPageService pageService, IPageLinkGenerator pageLinkGenerator)
 		{
-			IPage page = null;
+			IPage? page = null;
 			if (pageCollection.PageId.HasValue)
 				page = await pageService.FindPageByIdAsync(pageCollection.PageId.Value);
 
@@ -39,13 +39,17 @@ namespace BrandUp.Pages.Models
 			var collections = pageCollections as IReadOnlyCollection<IPageCollection> ?? pageCollections.ToList();
 
 			var pageCache = new Dictionary<Guid, IPage>();
-			foreach (var pageId in collections.Where(it => it.PageId.HasValue).Select(it => it.PageId.Value).Distinct())
-				pageCache[pageId] = await pageService.FindPageByIdAsync(pageId);
+			foreach (var pageId in collections.Where(it => it.PageId.HasValue).Select(it => it.PageId!.Value).Distinct())
+			{
+				var cachedPage = await pageService.FindPageByIdAsync(pageId);
+				if (cachedPage != null)
+					pageCache[pageId] = cachedPage;
+			}
 
 			var result = new List<PageCollectionModel>(collections.Count);
 			foreach (var pageCollection in collections)
 			{
-				IPage page = null;
+				IPage? page = null;
 				if (pageCollection.PageId.HasValue)
 					pageCache.TryGetValue(pageCollection.PageId.Value, out page);
 
@@ -55,7 +59,7 @@ namespace BrandUp.Pages.Models
 			return result;
 		}
 
-		static async Task<PageCollectionModel> ToViewModelAsync(this IPageCollection pageCollection, IPage page, IPageLinkGenerator pageLinkGenerator)
+		static async Task<PageCollectionModel> ToViewModelAsync(this IPageCollection pageCollection, IPage? page, IPageLinkGenerator pageLinkGenerator)
 		{
 			var pageUrl = page != null ? await pageLinkGenerator.GetPathAsync(page) : "/";
 

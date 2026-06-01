@@ -30,7 +30,7 @@ namespace BrandUp.Pages.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> PostAsync([FromQuery] string fileName, [FromQuery] string width = null, [FromQuery] string height = null)
+		public async Task<IActionResult> PostAsync([FromQuery] string fileName, [FromQuery] string? width = null, [FromQuery] string? height = null)
 		{
 			if (string.IsNullOrEmpty(fileName))
 				return BadRequest();
@@ -56,7 +56,7 @@ namespace BrandUp.Pages.Controllers
 		}
 
 		[HttpPost("url")]
-		public async Task<IActionResult> UrlAsync([FromQuery] string url, [FromQuery] string width = null, [FromQuery] string height = null)
+		public async Task<IActionResult> UrlAsync([FromQuery] string url, [FromQuery] string? width = null, [FromQuery] string? height = null)
 		{
 			if (string.IsNullOrEmpty(url))
 				return BadRequest();
@@ -91,7 +91,7 @@ namespace BrandUp.Pages.Controllers
 			return await FormValueAsync();
 		}
 
-		static bool TryParseSize(string width, string height, out int w, out int h)
+		static bool TryParseSize(string? width, string? height, out int w, out int h)
 		{
 			w = h = 0;
 			return width != null && height != null

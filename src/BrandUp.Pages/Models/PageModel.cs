@@ -6,10 +6,10 @@ namespace BrandUp.Pages.Models
 	{
 		public Guid Id { get; set; }
 		public DateTime CreatedDate { get; set; }
-		public string Title { get; set; }
+		public string Title { get; set; } = null!;
 		[JsonConverter(typeof(JsonStringEnumConverter))]
 		public PageStatus Status { get; set; }
-		public string Url { get; set; }
+		public string Url { get; set; } = null!;
 	}
 
 	public enum PageStatus
@@ -21,6 +21,6 @@ namespace BrandUp.Pages.Models
 	public class BeginPageEditResult
 	{
 		public DateTime? CurrentDate { get; set; }
-		public string Url { get; set; }
+		public string Url { get; set; } = null!;
 	}
 }

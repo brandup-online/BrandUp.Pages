@@ -7,6 +7,6 @@ namespace LandingWebSite.Contents.Page
 	public class CommonPageContent : PageContent
 	{
 		[Model]
-		public List<PageBlockContent> Blocks { get; set; }
+		public List<PageBlockContent> Blocks { get; set; } = [];
 	}
 }

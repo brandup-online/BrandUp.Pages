@@ -11,7 +11,7 @@ namespace BrandUp.Pages.Controllers
 	{
 		private readonly IPageService pageService;
 		private readonly IPageLinkGenerator pageLinkGenerator;
-		private IPage page;
+		private IPage page = null!;
 
 		public PageSeoController(IPageService pageService, IPageLinkGenerator pageLinkGenerator)
 		{
@@ -23,7 +23,7 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (!Request.Query.TryGetValue("pageId", out string pageIdValue))
+			if (!Request.Query.TryGetValue("pageId", out string? pageIdValue))
 			{
 				AddErrors("Not valid id.");
 				return;
@@ -35,12 +35,13 @@ namespace BrandUp.Pages.Controllers
 				return;
 			}
 
-			page = await pageService.FindPageByIdAsync(pageId);
-			if (page == null)
+			var loadedPage = await pageService.FindPageByIdAsync(pageId);
+			if (loadedPage == null)
 			{
 				AddErrors("Not found page collection.");
 				return;
 			}
+			page = loadedPage;
 		}
 
 		protected override async Task OnBuildFormAsync(PageSeoForm formModel)
@@ -60,7 +61,7 @@ namespace BrandUp.Pages.Controllers
 			return Task.CompletedTask;
 		}
 
-		protected override async Task<PageModel> OnCommitAsync(PageSeoValues values)
+		protected override async Task<PageModel?> OnCommitAsync(PageSeoValues values)
 		{
 			var keywords = new List<string>();
 			if (values.Keywords != null)

@@ -6,10 +6,10 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class HtmlFieldTests : IAsyncLifetime
     {
-        ServiceProvider serviceProvider;
-        IServiceScope serviceScope;
-        IContentMetadataManager metadataManager;
-        IHtmlField field;
+        ServiceProvider serviceProvider = null!;
+        IServiceScope serviceScope = null!;
+        IContentMetadataManager metadataManager = null!;
+        IHtmlField field = null!;
 
         #region IAsyncLifetime members
 
@@ -28,8 +28,9 @@ namespace BrandUp.Pages.Content.Fields
             metadataManager = serviceScope.ServiceProvider.GetRequiredService<IContentMetadataManager>();
 
             var metadataProvider = metadataManager.GetMetadata<TestContent>();
-            if (!metadataProvider.TryGetField("Html", out field))
+            if (!metadataProvider.TryGetField<IHtmlField>("Html", out var foundField))
                 throw new System.Exception();
+            field = foundField;
 
             await ValueTask.CompletedTask;
         }
@@ -98,7 +99,7 @@ namespace BrandUp.Pages.Content.Fields
         {
             var content = new TestContent { Html = "test" };
 
-            var formOptions = (HtmlFieldFormOptions)field.GetFormOptions(serviceScope.ServiceProvider);
+            var formOptions = (HtmlFieldFormOptions)field.GetFormOptions(serviceScope.ServiceProvider)!;
 
             Assert.NotNull(formOptions);
             Assert.Equal("placeholder", formOptions.Placeholder);
@@ -110,7 +111,7 @@ namespace BrandUp.Pages.Content.Fields
             var content = new TestContent { Html = "test" };
 
             var modelValue = field.GetModelValue(content);
-            var formValue = (string)await field.GetFormValueAsync(modelValue, serviceScope.ServiceProvider);
+            var formValue = (string)(await field.GetFormValueAsync(modelValue, serviceScope.ServiceProvider))!;
 
             Assert.Equal(content.Html, formValue);
         }

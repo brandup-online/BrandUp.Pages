@@ -13,21 +13,22 @@ namespace LandingWebSite.Identity
 			this.httpContextAccessor = httpContextAccessor ?? throw new Exception(nameof(httpContextAccessor));
 		}
 
-		public Task<string> GetUserIdAsync(CancellationToken cancellationToken = default)
+		public Task<string?> GetUserIdAsync(CancellationToken cancellationToken = default)
 		{
-			var claimId = httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+			var claimId = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
 			if (claimId == null)
-				return null;
+				return Task.FromResult<string?>(null);
 
-			return Task.FromResult(claimId.Value);
+			return Task.FromResult<string?>(claimId.Value);
 		}
 
 		public Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default)
 		{
-			if (!httpContextAccessor.HttpContext.User.Identity.IsAuthenticated)
+			var user = httpContextAccessor.HttpContext?.User;
+			if (user?.Identity == null || !user.Identity.IsAuthenticated)
 				return Task.FromResult(false);
 
-			return Task.FromResult(httpContextAccessor.HttpContext.User.IsInRole(RoleName));
+			return Task.FromResult(user.IsInRole(RoleName));
 		}
 	}
 }

@@ -17,14 +17,15 @@ namespace BrandUp.Pages.Views
 
 			foreach (var viewDescriptor in viewsFeature.ViewDescriptors)
 			{
-				if (!viewDescriptor.Type.BaseType.IsGenericType)
+				var baseType = viewDescriptor.Type?.BaseType;
+				if (baseType == null || !baseType.IsGenericType)
 					continue;
 
-				var d = viewDescriptor.Type.BaseType.GetGenericTypeDefinition();
+				var d = baseType.GetGenericTypeDefinition();
 				if (d == typeof(ContentPage<>))
 				{
-					var contentType = viewDescriptor.Type.BaseType.GenericTypeArguments[0];
-					IDictionary<string, object> defaultModelData = null;
+					var contentType = baseType.GenericTypeArguments[0];
+					IDictionary<string, object>? defaultModelData = null;
 
 					var fileInfo = hostingEnvironment.ContentRootFileProvider.GetFileInfo(viewDescriptor.RelativePath + ".json");
 					if (fileInfo.Exists)
@@ -39,9 +40,9 @@ namespace BrandUp.Pages.Views
 			}
 		}
 
-		public ContentView FindView(Type contentType)
+		public ContentView? FindView(Type contentType)
 		{
-			if (!views.TryGetValue(contentType, out ContentView contentView))
+			if (!views.TryGetValue(contentType, out ContentView? contentView))
 				return null;
 
 			return contentView;

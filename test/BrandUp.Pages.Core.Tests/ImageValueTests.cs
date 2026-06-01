@@ -87,7 +87,7 @@
 		{
 			var value1 = new ImageValue(new Uri("http://test/test.jpg"));
 
-			var result = value1.Equals((object)null);
+			var result = value1.Equals((object?)null);
 
 			Assert.False(result);
 		}

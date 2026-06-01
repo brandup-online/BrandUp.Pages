@@ -2,7 +2,7 @@
 {
 	public class PageTypeModel
 	{
-		public string Name { get; set; }
-		public string Title { get; set; }
+		public string Name { get; set; } = null!;
+		public string Title { get; set; } = null!;
 	}
 }

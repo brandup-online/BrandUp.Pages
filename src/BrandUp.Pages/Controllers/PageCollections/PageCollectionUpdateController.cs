@@ -10,7 +10,7 @@ namespace BrandUp.Pages.Controllers
 		#region Fields
 
 		private readonly IPageCollectionService pageCollectionService;
-		private IPageCollection pageCollection;
+		private IPageCollection pageCollection = null!;
 
 		#endregion
 
@@ -23,24 +23,25 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (!RouteData.Values.TryGetValue("id", out object pageCollectionIdValue))
+			if (!RouteData.Values.TryGetValue("id", out object? pageCollectionIdValue))
 			{
 				AddErrors("Not valid id.");
 				return;
 			}
 
-			if (!Guid.TryParse(pageCollectionIdValue.ToString(), out Guid pageCollectionId))
+			if (!Guid.TryParse(pageCollectionIdValue?.ToString(), out Guid pageCollectionId))
 			{
 				AddErrors("Not valid id.");
 				return;
 			}
 
-			pageCollection = await pageCollectionService.FindCollectiondByIdAsync(pageCollectionId);
-			if (pageCollection == null)
+			var collection = await pageCollectionService.FindCollectiondByIdAsync(pageCollectionId);
+			if (collection == null)
 			{
 				AddErrors("Not found page collection.");
 				return;
 			}
+			pageCollection = collection;
 		}
 		protected override Task OnBuildFormAsync(PageCollectionUpdateForm formModel)
 		{
@@ -61,7 +62,7 @@ namespace BrandUp.Pages.Controllers
 		{
 			return Task.CompletedTask;
 		}
-		protected override async Task<PageCollectionModel> OnCommitAsync(PageCollectionUpdateValues values)
+		protected override async Task<PageCollectionModel?> OnCommitAsync(PageCollectionUpdateValues values)
 		{
 			pageCollection.SetTitle(values.Title);
 			pageCollection.SetSortModel(values.Sort);

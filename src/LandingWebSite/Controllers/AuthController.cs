@@ -28,6 +28,8 @@ namespace LandingWebSite.Controllers
 					return BadRequest();
 
 				user = await userManager.FindByNameAsync("test@test.ru");
+				if (user == null)
+					return BadRequest();
 
 				var role = await roleManager.FindByNameAsync(RoleBasedAccessProvider.RoleName);
 				if (role == null)

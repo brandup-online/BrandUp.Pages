@@ -10,19 +10,19 @@ namespace BrandUp.Pages
 {
 	public sealed class ContentPageModel : AppPageModel
 	{
-		IPage page;
-		IPageEdit editSession;
-		PageSeoOptions pageSeo;
+		IPage page = null!;
+		IPageEdit? editSession;
+		PageSeoOptions pageSeo = null!;
 
 		#region Properties
 
 		[FromQuery(Name = "editId"), ClientProperty]
 		public Guid? EditId { get; set; }
-		public IPageService PageService { get; private set; }
+		public IPageService PageService { get; private set; } = null!;
 		public IPage PageEntry => page;
-		public PageMetadataProvider PageMetadata { get; private set; }
-		public object PageContent { get; private set; }
-		public ContentContext ContentContext { get; private set; }
+		public PageMetadataProvider PageMetadata { get; private set; } = null!;
+		public object PageContent { get; private set; } = null!;
+		public ContentContext ContentContext { get; private set; } = null!;
 		[ClientProperty]
 		public Guid Id => page.Id;
 		[ClientProperty]
@@ -35,8 +35,8 @@ namespace BrandUp.Pages
 		#region AppPageModel members
 
 		public override string Title => !string.IsNullOrEmpty(pageSeo.Title) ? pageSeo.Title : PageMetadata.GetPageHeader(PageContent);
-		public override string Description => pageSeo.Description;
-		public override string Keywords => pageSeo.Keywords != null ? string.Join(",", pageSeo.Keywords) : null;
+		public override string? Description => pageSeo.Description;
+		public override string? Keywords => pageSeo.Keywords != null ? string.Join(",", pageSeo.Keywords) : null;
 		public override string ScriptName => "content";
 		protected override async Task OnPageRequestAsync(PageRequestContext context)
 		{
@@ -52,12 +52,13 @@ namespace BrandUp.Pages
 					return;
 				}
 
-				page = await PageService.FindPageByIdAsync(editSession.PageId);
-				if (page == null)
+				var editPage = await PageService.FindPageByIdAsync(editSession.PageId);
+				if (editPage == null)
 				{
 					context.Result = NotFound();
 					return;
 				}
+				page = editPage;
 
 				var accessProvider = HttpContext.RequestServices.GetRequiredService<Identity.IAccessProvider>();
 				if (!await accessProvider.CheckAccessAsync() || await accessProvider.GetUserIdAsync() != editSession.UserId)
@@ -73,7 +74,7 @@ namespace BrandUp.Pages
 				var routeData = RouteData;
 
 				var pagePath = string.Empty;
-				if (routeData.Values.TryGetValue("url", out object urlValue) && urlValue != null)
+				if (routeData.Values.TryGetValue("url", out object? urlValue) && urlValue != null)
 					pagePath = (string)urlValue;
 
 				var url = await PageService.FindUrlByPathAsync(WebsiteContext.Website.Id, pagePath);
@@ -85,12 +86,13 @@ namespace BrandUp.Pages
 
 				if (url.PageId.HasValue)
 				{
-					page = await PageService.FindPageByIdAsync(url.PageId.Value);
-					if (page == null)
+					var urlPage = await PageService.FindPageByIdAsync(url.PageId.Value);
+					if (urlPage == null)
 					{
 						context.Result = NotFound();
 						return;
 					}
+					page = urlPage;
 
 					if (!page.IsPublished)
 					{
@@ -104,6 +106,12 @@ namespace BrandUp.Pages
 				}
 				else
 				{
+					if (url.Redirect == null)
+					{
+						context.Result = NotFound();
+						return;
+					}
+
 					var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
 					var redirectUrl = await pageLinkGenerator.GetPathAsync(url.Redirect.Path);
 

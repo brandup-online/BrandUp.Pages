@@ -45,12 +45,12 @@ namespace BrandUp.Pages.Content.Serialization
 			var json = JsonContentDataSerializer.SerializeToString(contentData);
 
 			var deserializedContentData = JsonContentDataSerializer.DeserializeFromString(json);
-			var deserializedContent = (TestPageContent)contentMetadata.ConvertDictionaryToContentModel(deserializedContentData);
+			var deserializedContent = (TestPageContent)contentMetadata.ConvertDictionaryToContentModel(deserializedContentData!)!;
 
 			Assert.NotNull(deserializedContent);
 			Assert.Equal(deserializedContent.Title, content.Title);
-			Assert.Equal(deserializedContent.Header.Title, content.Header.Title);
-			Assert.Equal(deserializedContent.Headers[0].Title, content.Headers[0].Title);
+			Assert.Equal(deserializedContent.Header!.Title, content.Header!.Title);
+			Assert.Equal(deserializedContent.Headers![0].Title, content.Headers![0].Title);
 		}
 
 		#endregion

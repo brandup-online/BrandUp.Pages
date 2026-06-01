@@ -230,7 +230,8 @@ namespace BrandUp.Pages.Services
 			if (!urlPathValidationResult.IsSuccess)
 				return urlPathValidationResult;
 
-			var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
+			var collection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId)
+				?? throw new InvalidOperationException("Page collection not found.");
 			if (collection.PageId.HasValue)
 			{
 				var parentPage = await pageRepositiry.FindPageByIdAsync(collection.PageId.Value, cancellationToken);
@@ -272,7 +273,8 @@ namespace BrandUp.Pages.Services
 			if (page == null)
 				throw new ArgumentNullException(nameof(page));
 
-			var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId);
+			var pageCollection = await pageCollectionRepositiry.FindCollectiondByIdAsync(page.OwnCollectionId)
+				?? throw new InvalidOperationException("Page collection not found.");
 			return pageCollection.PageId;
 		}
 		public async Task<PageSeoOptions> GetPageSeoOptionsAsync(IPage page, CancellationToken cancellationToken = default)

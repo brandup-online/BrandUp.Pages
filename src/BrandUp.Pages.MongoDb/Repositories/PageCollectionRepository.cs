@@ -42,7 +42,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 			return collection;
 		}
 
-		public async Task<IPageCollection> FindCollectiondByIdAsync(Guid id)
+		public async Task<IPageCollection?> FindCollectiondByIdAsync(Guid id)
 		{
 			var filter = Builders<PageCollectionDocument>.Filter.Eq(it => it.Id, id);
 			var cursor = await documents.FindAsync(filter);

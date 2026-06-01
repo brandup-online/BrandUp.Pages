@@ -2,14 +2,14 @@
 {
 	public class PageListModel
 	{
-		public List<PagePathModel> Parents { get; set; }
-		public List<PageCollectionModel> Collections { get; set; }
+		public List<PagePathModel> Parents { get; set; } = null!;
+		public List<PageCollectionModel> Collections { get; set; } = null!;
 	}
 
 	public class PagePathModel
 	{
 		public Guid Id { get; set; }
-		public string Header { get; set; }
-		public string Url { get; set; }
+		public string Header { get; set; } = null!;
+		public string Url { get; set; } = null!;
 	}
 }

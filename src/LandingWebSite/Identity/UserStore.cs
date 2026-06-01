@@ -53,36 +53,36 @@ namespace LandingWebSite.Identity
 			return IdentityResult.Success;
 		}
 		public virtual Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult(user.Id.ToString());
-		public virtual Task<string> GetUserNameAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult(user.UserName);
-		public virtual Task SetUserNameAsync(TUser user, string userName, CancellationToken cancellationToken)
+		public virtual Task<string?> GetUserNameAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult<string?>(user.UserName);
+		public virtual Task SetUserNameAsync(TUser user, string? userName, CancellationToken cancellationToken)
 		{
-			user.UserName = userName;
+			user.UserName = userName!;
 			return Task.CompletedTask;
 		}
-		public virtual Task<string> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult(user.NormalizedUserName);
-		public virtual Task SetNormalizedUserNameAsync(TUser user, string normalizedUserName, CancellationToken cancellationToken)
+		public virtual Task<string?> GetNormalizedUserNameAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult<string?>(user.NormalizedUserName);
+		public virtual Task SetNormalizedUserNameAsync(TUser user, string? normalizedUserName, CancellationToken cancellationToken)
 		{
-			user.NormalizedUserName = normalizedUserName;
+			user.NormalizedUserName = normalizedUserName!;
 			return Task.CompletedTask;
 		}
-		public virtual Task<TUser> FindByIdAsync(string userId, CancellationToken token)
+		public virtual async Task<TUser?> FindByIdAsync(string userId, CancellationToken token)
 		{
 			var id = new ObjectId(userId);
-			return users.Find(u => u.Id == id).FirstOrDefaultAsync(token);
+			return await users.Find(u => u.Id == id).FirstOrDefaultAsync(token);
 		}
-		public virtual Task<TUser> FindByNameAsync(string normalizedUserName, CancellationToken token)
-			=> users.Find(u => u.NormalizedUserName == normalizedUserName).FirstOrDefaultAsync(token);
+		public virtual async Task<TUser?> FindByNameAsync(string normalizedUserName, CancellationToken token)
+			=> await users.Find(u => u.NormalizedUserName == normalizedUserName).FirstOrDefaultAsync(token);
 
 		#endregion
 
 		#region IUserPasswordStore members
 
-		public virtual Task SetPasswordHashAsync(TUser user, string passwordHash, CancellationToken token)
+		public virtual Task SetPasswordHashAsync(TUser user, string? passwordHash, CancellationToken token)
 		{
 			user.PasswordHash = passwordHash;
 			return Task.CompletedTask;
 		}
-		public virtual Task<string> GetPasswordHashAsync(TUser user, CancellationToken token) => Task.FromResult(user.PasswordHash);
+		public virtual Task<string?> GetPasswordHashAsync(TUser user, CancellationToken token) => Task.FromResult(user.PasswordHash);
 		public virtual Task<bool> HasPasswordAsync(TUser user, CancellationToken token) => Task.FromResult(user.HasPassword());
 
 		#endregion
@@ -120,8 +120,8 @@ namespace LandingWebSite.Identity
 		}
 		public virtual Task<IList<UserLoginInfo>> GetLoginsAsync(TUser user, CancellationToken token)
 			=> Task.FromResult<IList<UserLoginInfo>>(user.Logins.Select(l => l.ToUserLoginInfo()).ToList());
-		public virtual Task<TUser> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken = default)
-			=> users.Find(u => u.Logins.Any(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
+		public virtual async Task<TUser?> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken = default)
+			=> await users.Find(u => u.Logins.Any(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey)).FirstOrDefaultAsync(cancellationToken);
 
 		#endregion
 
@@ -132,7 +132,7 @@ namespace LandingWebSite.Identity
 			user.SecurityStamp = stamp;
 			return Task.CompletedTask;
 		}
-		public virtual Task<string> GetSecurityStampAsync(TUser user, CancellationToken token) => Task.FromResult(user.SecurityStamp);
+		public virtual Task<string?> GetSecurityStampAsync(TUser user, CancellationToken token) => Task.FromResult(user.SecurityStamp);
 
 		#endregion
 
@@ -144,21 +144,21 @@ namespace LandingWebSite.Identity
 			user.EmailConfirmed = confirmed;
 			return Task.CompletedTask;
 		}
-		public virtual Task SetEmailAsync(TUser user, string email, CancellationToken token)
+		public virtual Task SetEmailAsync(TUser user, string? email, CancellationToken token)
 		{
 			user.Email = email;
 			return Task.CompletedTask;
 		}
-		public virtual Task<string> GetEmailAsync(TUser user, CancellationToken token) => Task.FromResult(user.Email);
-		public virtual Task<string> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult(user.NormalizedEmail);
-		public virtual Task SetNormalizedEmailAsync(TUser user, string normalizedEmail, CancellationToken cancellationToken)
+		public virtual Task<string?> GetEmailAsync(TUser user, CancellationToken token) => Task.FromResult(user.Email);
+		public virtual Task<string?> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken) => Task.FromResult(user.NormalizedEmail);
+		public virtual Task SetNormalizedEmailAsync(TUser user, string? normalizedEmail, CancellationToken cancellationToken)
 		{
 			user.NormalizedEmail = normalizedEmail;
 			return Task.CompletedTask;
 		}
-		public virtual Task<TUser> FindByEmailAsync(string normalizedEmail, CancellationToken token)
+		public virtual async Task<TUser?> FindByEmailAsync(string normalizedEmail, CancellationToken token)
 		{
-			return users.Find(u => u.NormalizedEmail == normalizedEmail).FirstOrDefaultAsync(token);
+			return await users.Find(u => u.NormalizedEmail == normalizedEmail).FirstOrDefaultAsync(token);
 		}
 
 		#endregion
@@ -193,12 +193,12 @@ namespace LandingWebSite.Identity
 
 		#region IUserPhoneNumberStore members
 
-		public virtual Task SetPhoneNumberAsync(TUser user, string phoneNumber, CancellationToken token)
+		public virtual Task SetPhoneNumberAsync(TUser user, string? phoneNumber, CancellationToken token)
 		{
 			user.PhoneNumber = phoneNumber;
 			return Task.FromResult(0);
 		}
-		public virtual Task<string> GetPhoneNumberAsync(TUser user, CancellationToken token)
+		public virtual Task<string?> GetPhoneNumberAsync(TUser user, CancellationToken token)
 		{
 			return Task.FromResult(user.PhoneNumber);
 		}
@@ -265,9 +265,9 @@ namespace LandingWebSite.Identity
 
 		#region IUserAuthenticationTokenStore members
 
-		public virtual Task SetTokenAsync(TUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+		public virtual Task SetTokenAsync(TUser user, string loginProvider, string name, string? value, CancellationToken cancellationToken)
 		{
-			user.SetToken(loginProvider, name, value);
+			user.SetToken(loginProvider, name, value!);
 			return Task.CompletedTask;
 		}
 		public virtual Task RemoveTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
@@ -275,7 +275,7 @@ namespace LandingWebSite.Identity
 			user.RemoveToken(loginProvider, name);
 			return Task.CompletedTask;
 		}
-		public virtual Task<string> GetTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
+		public virtual Task<string?> GetTokenAsync(TUser user, string loginProvider, string name, CancellationToken cancellationToken)
 		{
 			return Task.FromResult(user.GetTokenValue(loginProvider, name));
 		}

@@ -13,7 +13,7 @@ namespace BrandUp.Pages.TagHelpers
 		private readonly IViewRenderService viewRenderService;
 
 		[HtmlAttributeName("content-object")]
-		public override ModelExpression FieldName { get; set; }
+		public override ModelExpression FieldName { get; set; } = null!;
 
 		public ContentTagHelper(IViewRenderService viewRenderService)
 		{
@@ -27,11 +27,13 @@ namespace BrandUp.Pages.TagHelpers
 			if (Field.IsListValue)
 			{
 				var list = Field.GetModelValue(Content) as IList;
-				if (Field.HasValue(list))
+				if (Field.HasValue(list) && list != null)
 				{
 					for (var i = 0; i < list.Count; i++)
 					{
 						var itemContentContext = ContentContext.Navigate($"{FieldName.Name}[{i}]");
+						if (itemContentContext == null)
+							continue;
 						var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
 
 						output.Content.AppendHtmlLine(itemHtml);
@@ -44,9 +46,12 @@ namespace BrandUp.Pages.TagHelpers
 				if (Field.HasValue(value))
 				{
 					var itemContentContext = ContentContext.Navigate(FieldName.Name);
-					var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
+					if (itemContentContext != null)
+					{
+						var itemHtml = await viewRenderService.RenderToStringAsync(itemContentContext);
 
-					output.Content.AppendHtmlLine(itemHtml);
+						output.Content.AppendHtmlLine(itemHtml);
+					}
 				}
 			}
 		}

@@ -17,12 +17,12 @@ namespace LandingWebSite.Identity
 		/// <summary>
 		/// Claim type
 		/// </summary>
-		public string Type { get; set; }
+		public string Type { get; set; } = null!;
 
 		/// <summary>
 		/// Claim value
 		/// </summary>
-		public string Value { get; set; }
+		public string Value { get; set; } = null!;
 
 		public Claim ToSecurityClaim()
 		{

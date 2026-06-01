@@ -8,7 +8,7 @@ namespace BrandUp.Pages.Controllers
 	public class ContentTypeListController : ListController<ContentTypeListModel, ContentTypeItemModel, ContentMetadataProvider, string>
 	{
 		readonly IContentMetadataManager contentMetadataManager;
-		private ContentMetadataProvider contentMetadataProvider;
+		private ContentMetadataProvider? contentMetadataProvider;
 
 		public ContentTypeListController(IContentMetadataManager contentMetadataManager)
 		{
@@ -19,7 +19,7 @@ namespace BrandUp.Pages.Controllers
 
 		protected override Task OnInitializeAsync()
 		{
-			if (Request.Query.TryGetValue("baseType", out string baseTypeName))
+			if (Request.Query.TryGetValue("baseType", out string? baseTypeName))
 			{
 				if (!contentMetadataManager.TryGetMetadata(baseTypeName, out contentMetadataProvider))
 				{
@@ -66,9 +66,10 @@ namespace BrandUp.Pages.Controllers
 
 		protected override Task<ContentMetadataProvider> OnGetItemAsync(string id)
 		{
-			contentMetadataManager.TryGetMetadata(id, out ContentMetadataProvider contentMetadataProvider);
+			if (!contentMetadataManager.TryGetMetadata(id, out ContentMetadataProvider? metadata))
+				throw new InvalidOperationException("Content type not found.");
 
-			return Task.FromResult(contentMetadataProvider);
+			return Task.FromResult(metadata);
 		}
 
 		protected override Task<ContentTypeItemModel> OnGetItemModelAsync(ContentMetadataProvider item)

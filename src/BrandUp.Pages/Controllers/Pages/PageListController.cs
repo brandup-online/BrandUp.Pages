@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Controllers
 		readonly IPageCollectionService pageCollectionService;
 		readonly Url.IPageLinkGenerator pageLinkGenerator;
 		readonly IWebsiteContext websiteContext;
-		private IPage page;
+		private IPage? page;
 
 		public PageListController(IPageService pageService, IPageCollectionService pageCollectionService, Url.IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext)
 		{
@@ -26,7 +26,7 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (Request.Query.TryGetValue("pageId", out string pageIdValue))
+			if (Request.Query.TryGetValue("pageId", out string? pageIdValue))
 			{
 				if (!Guid.TryParse(pageIdValue, out Guid pageId))
 				{
@@ -52,7 +52,7 @@ namespace BrandUp.Pages.Controllers
 			{
 				listModel.Parents.Add(await GetPathModelAsync(page));
 
-				IPage currentPage = page;
+				IPage? currentPage = page;
 				while (currentPage != null)
 				{
 					var parentPageId = await pageService.GetParentPageIdAsync(currentPage);
@@ -60,6 +60,9 @@ namespace BrandUp.Pages.Controllers
 						break;
 
 					currentPage = await pageService.FindPageByIdAsync(parentPageId.Value);
+					if (currentPage == null)
+						break;
+
 					listModel.Parents.Add(await GetPathModelAsync(currentPage));
 				}
 
@@ -82,24 +85,24 @@ namespace BrandUp.Pages.Controllers
 
 		protected override Task<IEnumerable<IPage>> OnGetItemsAsync(int offset, int limit)
 		{
-			if (!Request.Query.TryGetValue("collectionId", out string collectionIdValue))
+			if (!Request.Query.TryGetValue("collectionId", out string? collectionIdValue))
 			{
 				AddErrors("Not valid id.");
-				return Task.FromResult<IEnumerable<IPage>>(null);
+				return Task.FromResult<IEnumerable<IPage>>([]);
 			}
 
 			if (!Guid.TryParse(collectionIdValue, out Guid collectionId))
 			{
 				AddErrors("Not valid id.");
-				return Task.FromResult<IEnumerable<IPage>>(null);
+				return Task.FromResult<IEnumerable<IPage>>([]);
 			}
 
 			return pageService.GetPagesAsync(new GetPagesOptions(collectionId) { IncludeDrafts = true, Pagination = new PagePaginationOptions(offset, limit) });
 		}
 
-		protected override Task<IPage> OnGetItemAsync(Guid id)
+		protected override async Task<IPage> OnGetItemAsync(Guid id)
 		{
-			return pageService.FindPageByIdAsync(id);
+			return await pageService.FindPageByIdAsync(id) ?? throw new InvalidOperationException("Page not found.");
 		}
 
 		protected override Task<PageModel> OnGetItemModelAsync(IPage item)

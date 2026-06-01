@@ -17,7 +17,7 @@ namespace BrandUp.Pages.Url
 			if (!image.HasValue)
 				throw new ArgumentException();
 
-			string url;
+			string? url;
 			switch (image.ValueType)
 			{
 				case ImageValueType.Id:
@@ -33,7 +33,7 @@ namespace BrandUp.Pages.Url
 					throw new InvalidOperationException();
 			}
 
-			return Task.FromResult(url);
+			return Task.FromResult(url ?? throw new InvalidOperationException("Could not generate file URL."));
 		}
 
 		static string NormalizeUrl(string url)

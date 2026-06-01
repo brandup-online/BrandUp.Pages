@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Content
             var contentType = typeof(TestPageContent);
             var contentMetadata = metadataManager.GetMetadata(contentType);
 
-            Assert.True(metadataManager.TryGetMetadata(contentType, out ContentMetadataProvider contentMetadata2));
+            Assert.True(metadataManager.TryGetMetadata(contentType, out ContentMetadataProvider? contentMetadata2));
             Assert.Equal(contentMetadata, contentMetadata2);
         }
 
@@ -90,8 +90,8 @@ namespace BrandUp.Pages.Content
             metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, false);
 
             Assert.NotNull(page.Service);
-            Assert.Null(page.Header.Service);
-            Assert.Null(page.Headers[0].Service);
+            Assert.Null(page.Header!.Service);
+            Assert.Null(page.Headers![0].Service);
         }
 
         [Fact]
@@ -105,8 +105,8 @@ namespace BrandUp.Pages.Content
             metadataManager.ApplyInjections(page, serviceScope.ServiceProvider, true);
 
             Assert.NotNull(page.Service);
-            Assert.NotNull(page.Header.Service);
-            Assert.NotNull(page.Headers[0].Service);
+            Assert.NotNull(page.Header!.Service);
+            Assert.NotNull(page.Headers![0].Service);
         }
 
         #endregion

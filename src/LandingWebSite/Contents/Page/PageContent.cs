@@ -8,6 +8,6 @@ namespace LandingWebSite.Contents.Page
 	public abstract class PageContent
 	{
 		[Text(Placeholder = "Input page header"), Title]
-		public string Header { get; set; }
+		public string Header { get; set; } = null!;
 	}
 }

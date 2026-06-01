@@ -50,19 +50,19 @@ namespace LandingWebSite.Controllers
 		public class SitemapModel
 		{
 			[XmlElement("url")]
-			public List<SitemapUrl> Urls { get; set; }
+			public List<SitemapUrl> Urls { get; set; } = [];
 		}
 
 		public class SitemapUrl
 		{
 			[XmlElement("loc")]
-			public string Location { get; set; }
+			public string Location { get; set; } = null!;
 			[XmlElement("lastmod")]
-			public string LastMod { get; set; }
+			public string LastMod { get; set; } = null!;
 			[XmlElement("changefreq")]
-			public string ChangeFreq { get; set; }
+			public string ChangeFreq { get; set; } = null!;
 			[XmlElement("priority")]
-			public string Priority { get; set; }
+			public string Priority { get; set; } = null!;
 		}
 
 		class XmlResult : ActionResult

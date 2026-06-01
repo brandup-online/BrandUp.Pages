@@ -56,9 +56,9 @@ namespace LandingWebSite._migrations
 	public class MigrationDocument
 	{
 		[BsonId]
-		public string Name { get; set; }
+		public string Name { get; set; } = null!;
 		[BsonDateTimeOptions(DateOnly = false, Kind = DateTimeKind.Utc, Representation = MongoDB.Bson.BsonType.DateTime), BsonRequired]
 		public DateTime Date { get; set; }
-		public string Description { get; set; }
+		public string? Description { get; set; }
 	}
 }

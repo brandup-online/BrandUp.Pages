@@ -12,7 +12,7 @@ namespace BrandUp.Pages.TagHelpers
 		private readonly IFileUrlGenerator fileUrlGenerator;
 
 		[HtmlAttributeName("content-image")]
-		public override ModelExpression FieldName { get; set; }
+		public override ModelExpression FieldName { get; set; } = null!;
 
 		[HtmlAttributeName("content-image-width")]
 		public int Width { get; set; }
@@ -30,7 +30,7 @@ namespace BrandUp.Pages.TagHelpers
 			output.TagMode = TagMode.StartTagAndEndTag;
 
 			var value = Field.GetModelValue(Content);
-			if (!Field.HasValue(value))
+			if (!Field.HasValue(value) || value == null)
 				return;
 			var imageValue = (ImageValue)value;
 

@@ -6,10 +6,10 @@ namespace BrandUp.Pages.Content.Fields
 {
     public class ImageFieldTests : IAsyncLifetime
     {
-        ServiceProvider serviceProvider;
-        IServiceScope serviceScope;
-        IContentMetadataManager metadataManager;
-        IImageField field;
+        ServiceProvider serviceProvider = null!;
+        IServiceScope serviceScope = null!;
+        IContentMetadataManager metadataManager = null!;
+        IImageField field = null!;
 
         #region IAsyncLifetime members
 
@@ -29,8 +29,9 @@ namespace BrandUp.Pages.Content.Fields
             metadataManager = serviceScope.ServiceProvider.GetRequiredService<IContentMetadataManager>();
 
             var metadataProvider = metadataManager.GetMetadata<TestContent>();
-            if (!metadataProvider.TryGetField("Image", out field))
+            if (!metadataProvider.TryGetField<IImageField>("Image", out var foundField))
                 throw new System.Exception();
+            field = foundField;
 
             await ValueTask.CompletedTask;
         }
@@ -107,7 +108,7 @@ namespace BrandUp.Pages.Content.Fields
             var content = new TestContent { Image = "url(http://test/test.jpg)" };
 
             var modelValue = field.GetModelValue(content);
-            var formValue = (ImageFieldFormValue)await field.GetFormValueAsync(modelValue, serviceScope.ServiceProvider);
+            var formValue = (ImageFieldFormValue)(await field.GetFormValueAsync(modelValue, serviceScope.ServiceProvider))!;
 
             Assert.Equal(content.Image.Value, formValue.Value);
             Assert.Equal(content.Image.ValueType, formValue.ValueType);

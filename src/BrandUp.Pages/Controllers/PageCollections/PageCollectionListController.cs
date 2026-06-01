@@ -12,7 +12,7 @@ namespace BrandUp.Pages.Controllers
 		readonly IPageCollectionService pageCollectionService;
 		readonly Url.IPageLinkGenerator pageLinkGenerator;
 		readonly IWebsiteContext websiteContext;
-		private IPage page;
+		private IPage? page;
 
 		public PageCollectionListController(IPageService pageService, IPageCollectionService pageCollectionService, Url.IPageLinkGenerator pageLinkGenerator, IWebsiteContext websiteContext)
 		{
@@ -26,7 +26,7 @@ namespace BrandUp.Pages.Controllers
 
 		protected override async Task OnInitializeAsync()
 		{
-			if (Request.Query.TryGetValue("pageId", out string pageIdValue))
+			if (Request.Query.TryGetValue("pageId", out string? pageIdValue))
 			{
 				if (!Guid.TryParse(pageIdValue, out Guid pageId))
 				{
@@ -51,7 +51,7 @@ namespace BrandUp.Pages.Controllers
 			{
 				listModel.Parents.Add(page.Header);
 
-				IPage currentPage = page;
+				IPage? currentPage = page;
 				while (currentPage != null)
 				{
 					var parentPageId = await pageService.GetParentPageIdAsync(currentPage);
@@ -59,6 +59,9 @@ namespace BrandUp.Pages.Controllers
 						break;
 
 					currentPage = await pageService.FindPageByIdAsync(parentPageId.Value);
+					if (currentPage == null)
+						break;
+
 					listModel.Parents.Add(currentPage.Header);
 				}
 
@@ -79,9 +82,9 @@ namespace BrandUp.Pages.Controllers
 				return pageCollectionService.ListCollectionsAsync(websiteContext.Website.Id);
 		}
 
-		protected override Task<IPageCollection> OnGetItemAsync(Guid id)
+		protected override async Task<IPageCollection> OnGetItemAsync(Guid id)
 		{
-			return pageCollectionService.FindCollectiondByIdAsync(id);
+			return await pageCollectionService.FindCollectiondByIdAsync(id) ?? throw new InvalidOperationException("Collection not found.");
 		}
 
 		protected override Task<PageCollectionModel> OnGetItemModelAsync(IPageCollection item)

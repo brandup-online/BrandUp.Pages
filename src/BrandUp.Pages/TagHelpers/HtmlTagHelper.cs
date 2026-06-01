@@ -8,7 +8,7 @@ namespace BrandUp.Pages.TagHelpers
 	public class HtmlTagHelper : FieldTagHelper<IHtmlField>
 	{
 		[HtmlAttributeName("content-html")]
-		public override ModelExpression FieldName { get; set; }
+		public override ModelExpression FieldName { get; set; } = null!;
 
 		protected override Task RenderContentAsync(TagHelperOutput output)
 		{

@@ -2,6 +2,6 @@
 {
 	public class PageCollectionListModel
 	{
-		public List<string> Parents { get; set; }
+		public List<string> Parents { get; set; } = null!;
 	}
 }

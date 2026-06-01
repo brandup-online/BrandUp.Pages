@@ -93,7 +93,7 @@ namespace BrandUp.Pages.Controllers
 			if (itemType == null)
 				return BadRequest();
 
-			if (!Field.ValueContentMetadata.Manager.TryGetMetadata(itemType, out ContentMetadataProvider contentMetadataProvider))
+			if (!Field.ValueContentMetadata.Manager.TryGetMetadata(itemType, out ContentMetadataProvider? contentMetadataProvider))
 				return BadRequest();
 
 			if (!contentMetadataProvider.IsInheritedOrEqual(Field.ValueContentMetadata))
@@ -108,7 +108,7 @@ namespace BrandUp.Pages.Controllers
 			if (Field.IsListValue)
 			{
 				if (!(Field.GetModelValue(ContentContext.Content) is IList list))
-					list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(Field.ValueContentMetadata.ModelType));
+					list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(Field.ValueContentMetadata.ModelType))!;
 
 				if (itemIndex == -1)
 					itemIndex = list.Count;

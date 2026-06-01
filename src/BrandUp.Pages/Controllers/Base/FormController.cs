@@ -56,7 +56,7 @@ namespace BrandUp.Pages.Controllers
 		protected abstract Task OnInitializeAsync();
 		protected abstract Task OnBuildFormAsync(TForm formModel);
 		protected abstract Task OnChangeValueAsync(string field, TValues values);
-		protected abstract Task<TResult> OnCommitAsync(TValues values);
+		protected abstract Task<TResult?> OnCommitAsync(TValues values);
 
 		protected void AddErrors(IResult result)
 		{
