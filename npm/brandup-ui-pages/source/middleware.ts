@@ -29,14 +29,14 @@ export class PagesMiddleware implements Middleware {
             if (!page.model.editId) {
                 import("./admin/website").then(d => {
                     const toolbar = new d.WebSiteToolbar(page);
-                    page.onDestroy(() => toolbar.destroy());
+                    page.on("destroy", () => toolbar.destroy());
                 });
             }
 
             if (page instanceof ContentPage) {
                 import("./admin/page").then(d => {
                     const toolbar = new d.PageToolbar(page);
-                    page.onDestroy(() => toolbar.destroy());
+                    page.on("destroy", () => toolbar.destroy());
                 });
             }
         }

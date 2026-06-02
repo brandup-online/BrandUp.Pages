@@ -1,5 +1,5 @@
 ﻿import { Page } from "@brandup/ui-website";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 
 class AboutPage extends Page {
     override get typeName(): string { return "AboutPage" }

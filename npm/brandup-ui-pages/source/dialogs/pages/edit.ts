@@ -8,7 +8,7 @@ import { ModelField } from "../../content/field/model";
 import { HyperLinkContent } from "../../content/field/hyperlink";
 import { PagesContent } from "../../content/field/pages";
 import "../dialog-form.less";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem?: HTMLFormElement;

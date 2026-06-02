@@ -1,30 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
 		<RootNamespace>BrandUp.Pages</RootNamespace>
-		<Authors>Dmitry Kovyazin</Authors>
-		<Product>BrandUp.Pages</Product>
-		<PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
-		<PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
-		<Company>BrandUp.online</Company>
-		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="BrandUp.Website.Abstractions" Version="10.0.29" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.8" />
+		<PackageReference Include="BrandUp.Website.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
 	</ItemGroup>
 
 	<ItemGroup>

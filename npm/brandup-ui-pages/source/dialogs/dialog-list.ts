@@ -3,7 +3,7 @@ import { ajaxRequest, AjaxQueue, AjaxResponse } from "@brandup/ui-ajax";
 import "./dialog-list.less";
 import iconDots from "../svg/list-item-dots.svg";
 import iconSort from "../svg/list-item-sort.svg";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 
 export abstract class ListDialog<TList, TItem> extends Dialog {
     protected __itemsElem: HTMLElement;

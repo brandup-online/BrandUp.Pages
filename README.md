@@ -133,19 +133,23 @@ services.AddPages()
 public abstract class PageContent
 {
     [Text(Placeholder = "Input page header"), Title]
-    public string Header { get; set; }
+    public string Header { get; set; } = null!;
 }
 
 [PageContent(Title = "Article page")]
 public class ArticlePageContent : PageContent
 {
     [Text(Placeholder = "Input page sub header")]
-    public string SubHeader { get; set; }
+    public string? SubHeader { get; set; }
 
     [Model]
-    public List<PageBlockContent> Blocks { get; set; }
+    public List<PageBlockContent> Blocks { get; set; } = [];
 }
 ```
+
+> Проект собирается с `<Nullable>enable</Nullable>`. Обязательные поля
+> аннотируются `= null!` (их заполняет биндер/редактор), необязательные — `?`,
+> коллекции — `= []`.
 
 ### Модели контента
 
@@ -159,14 +163,14 @@ public abstract class PageBlockContent { }
 public abstract class TextBlockContent : PageBlockContent
 {
     [Html(Placeholder = "Введите текст")]
-    public string Text { get; set; }
+    public string Text { get; set; } = null!;
 }
 
 [ContentType(Title = "Текст с заголовком и фоном")]
 public class TB3 : TextBlockContent
 {
     [Text]
-    public string Header { get; set; }
+    public string? Header { get; set; }
     [Image]
     public ImageValue Background { get; set; }
 }
@@ -210,7 +214,7 @@ services.AddPages()
 ```csharp
 public interface IAccessProvider
 {
-    Task<string> GetUserIdAsync(CancellationToken cancellationToken = default);
+    Task<string?> GetUserIdAsync(CancellationToken cancellationToken = default);
     Task<bool> CheckAccessAsync(CancellationToken cancellationToken = default);
 }
 ```

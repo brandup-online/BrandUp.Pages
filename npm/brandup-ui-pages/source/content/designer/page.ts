@@ -1,4 +1,4 @@
-﻿import { DOM } from "@brandup/ui-dom";
+﻿import { DOM } from "@brandup/ui";
 import { AjaxQueue } from "@brandup/ui-ajax";
 import { IPageDesigner, IContentFieldDesigner, ContentFieldModel } from "../../typings/content";
 import { TextDesigner } from "./text";

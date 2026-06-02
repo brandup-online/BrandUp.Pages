@@ -1,4 +1,4 @@
-﻿import { UIElement } from "@brandup/ui";
+﻿import { UIElement, DOM } from "@brandup/ui";
 import { ContentPage } from "../pages/content";
 import { PageDesigner } from "../content/designer/page";
 import { editPage } from "../dialogs/pages/edit";
@@ -10,7 +10,6 @@ import iconPublish from "../svg/toolbar-button-publish.svg";
 import iconSave from "../svg/toolbar-button-save.svg";
 import iconSettings from "../svg/toolbar-button-settings.svg";
 import iconSeo from "../svg/toolbar-button-seo.svg";
-import { DOM } from "@brandup/ui-dom";
 import { AjaxResponse } from "@brandup/ui-ajax";
 
 export class PageToolbar extends UIElement {

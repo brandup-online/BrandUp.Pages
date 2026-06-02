@@ -1,5 +1,5 @@
 ﻿import { FieldDesigner } from "./base";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import { editPage } from "../../dialogs/pages/edit";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import { ContentTypeModel } from "../../typings/models";

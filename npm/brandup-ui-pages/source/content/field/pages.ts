@@ -3,7 +3,7 @@ import { Field } from "../../form/field";
 import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { PageCollectionModel } from "../../typings/models";
 import "./pages.less";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
     readonly form: IContentForm;

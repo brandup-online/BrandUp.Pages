@@ -1,6 +1,6 @@
 ﻿import { DialogOptions } from "../dialog";
 import { ListDialog } from "../dialog-list";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import { createPage } from "./create";
 import { createPageCollection } from "../collections/create";
 import { deletePage } from "./delete";

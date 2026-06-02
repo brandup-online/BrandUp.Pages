@@ -1,24 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<Authors>Dmitry Kovyazin</Authors>
-		<Product>BrandUp.Pages</Product>
-		<PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
-		<PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
-		<Company>BrandUp.online</Company>
-		<PackageIcon>icon.png</PackageIcon>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
 		<ProjectReference Include="..\BrandUp.Pages.Content\BrandUp.Pages.Content.csproj" />

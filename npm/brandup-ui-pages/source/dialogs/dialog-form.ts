@@ -1,5 +1,5 @@
 ﻿import { Dialog, DialogOptions } from "./dialog";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import { Field } from "../form/field";
 import { TextboxOptions, Textbox } from "../form/textbox";
 import { ComboBoxFieldOptions, ComboBoxItem, ComboBoxField } from "../form/combobox";

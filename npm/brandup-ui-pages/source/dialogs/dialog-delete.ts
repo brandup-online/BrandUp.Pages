@@ -1,5 +1,5 @@
 ﻿import { Dialog } from "./dialog";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import { Result } from "../typings/models";
 import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import "./dialog-delete.less";

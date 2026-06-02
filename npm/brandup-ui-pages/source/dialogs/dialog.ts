@@ -1,4 +1,4 @@
-﻿import { DOM } from "@brandup/ui-dom";
+﻿import { DOM } from "@brandup/ui";
 import { UIControl } from "../control";
 import iconBack from "../svg/dialog-back.svg";
 import iconClose from "../svg/dialog-close.svg";

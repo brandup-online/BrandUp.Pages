@@ -1,5 +1,5 @@
 ﻿import { Field } from "./field";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import iconArrow from "../svg/combobox-arrow.svg";
 import "./combobox.less";
 

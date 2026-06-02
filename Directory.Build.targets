@@ -1,0 +1,21 @@
+<Project>
+
+	<!--
+	  Imported after each project body, so $(IsPackable) set in the .csproj is already visible.
+	  Applies the shared NuGet package metadata only to packable library projects.
+	-->
+	<PropertyGroup Condition="'$(IsPackable)' != 'false'">
+		<Authors>Dmitry Kovyazin</Authors>
+		<Company>BrandUp.online</Company>
+		<Product>BrandUp.Pages</Product>
+		<PackageProjectUrl>https://github.com/brandup-online/BrandUp.Pages</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/brandup-online/BrandUp.Pages</RepositoryUrl>
+		<PackageLicenseUrl>https://github.com/brandup-online/BrandUp.Pages/blob/master/LICENSE</PackageLicenseUrl>
+		<PackageIcon>icon.png</PackageIcon>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(IsPackable)' != 'false'">
+		<None Include="$(MSBuildThisFileDirectory)icon.png" Pack="True" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+</Project>

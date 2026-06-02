@@ -4,7 +4,7 @@ import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import iconArrow from "../../svg/combobox-arrow.svg";
 import { PageModel } from "../../typings/models";
 import "./hyperlink.less";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 
 export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> implements IContentField {
     readonly form: IContentForm;

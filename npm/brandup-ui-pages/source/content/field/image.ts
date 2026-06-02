@@ -1,6 +1,6 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import "./image.less";
 import { AjaxResponse } from "@brandup/ui-ajax";
 

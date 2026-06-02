@@ -1,6 +1,6 @@
 ﻿import { IContentField, IContentForm } from "../../typings/content";
 import { Field } from "../../form/field";
-import { DOM } from "@brandup/ui-dom";
+import { DOM } from "@brandup/ui";
 import { ContentModel, ContentTypeModel } from "../../typings/models";
 import iconEdit from "../../svg/toolbar-button-edit.svg";
 import iconDelete from "../../svg/toolbar-button-discard.svg";
