@@ -48,7 +48,10 @@ namespace BrandUp.Pages
 				editSession = await pageEditingService.FindEditByIdAsync(EditId.Value);
 				if (editSession == null)
 				{
-					context.Result = NotFound();
+					// The edit URL is always "?editId=..." over the default (home) content page,
+					// so a stale editId falls back to the home page.
+					var pageLinkGenerator = HttpContext.RequestServices.GetRequiredService<IPageLinkGenerator>();
+					context.Result = Redirect(await pageLinkGenerator.GetPathAsync(string.Empty));
 					return;
 				}
 
