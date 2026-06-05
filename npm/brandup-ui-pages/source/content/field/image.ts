@@ -3,6 +3,7 @@ import { Field } from "../../form/field";
 import { DOM } from "@brandup/ui";
 import "./image.less";
 import { AjaxResponse } from "@brandup/ui-ajax";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 
 export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> implements IContentField {
     readonly form: IContentForm;
@@ -105,6 +106,11 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
                 method: "POST",
                 data: file,
                 success: (response: AjaxResponse<ImageFieldValue>) => {
+                    if (isEditConflict(response)) {
+                        handleEditConflict();
+                        return;
+                    }
+
                     switch (response.status) {
                         case 200:
                             this.setValue(response.data);
@@ -126,6 +132,11 @@ export class ImageContent extends Field<ImageFieldValue, ImageFieldOptions> impl
                 query: { url: file },
                 method: "POST",
                 success: (response: AjaxResponse<ImageFieldValue>) => {
+                    if (isEditConflict(response)) {
+                        handleEditConflict();
+                        return;
+                    }
+
                     switch (response.status) {
                         case 200:
                             this.setValue(response.data);

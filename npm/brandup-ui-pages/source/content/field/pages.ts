@@ -4,6 +4,7 @@ import { ajaxRequest, AjaxResponse } from "@brandup/ui-ajax";
 import { PageCollectionModel } from "../../typings/models";
 import "./pages.less";
 import { DOM } from "@brandup/ui";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 
 export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptions> implements IContentField {
     readonly form: IContentForm;
@@ -124,6 +125,11 @@ export class PagesContent extends Field<PagesFieldFormValue, PagesFieldFormOptio
                 query: { pageCollectionId: pageCollectionId },
                 method: "POST",
                 success: (response: AjaxResponse<PagesFieldFormValue>) => {
+                    if (isEditConflict(response)) {
+                        handleEditConflict();
+                        return;
+                    }
+
                     switch (response.status) {
                         case 200:
                             this.setValue(response.data);

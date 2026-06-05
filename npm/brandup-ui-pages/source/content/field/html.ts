@@ -2,6 +2,7 @@
 import { Field } from "../../form/field";
 import { DOM } from "@brandup/ui";
 import ContentEditor from "brandup-pages-ckeditor";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 import "./html.less";
 
 export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements IContentField {
@@ -97,6 +98,11 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements 
             type: "JSON",
             data: value ? value : "",
             success: (response) => {
+                if (isEditConflict(response)) {
+                    handleEditConflict();
+                    return;
+                }
+
                 if (response.status === 200) {
                     this.setValue(response.data);
                 }

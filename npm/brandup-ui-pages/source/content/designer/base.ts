@@ -1,6 +1,7 @@
 ﻿import { UIElement } from "@brandup/ui";
 import { AjaxRequest } from "@brandup/ui-ajax";
 import { IContentFieldDesigner, IPageDesigner } from "../../typings/content";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 import "./base.less";
 
 export abstract class FieldDesigner<TOptions> extends UIElement implements IContentFieldDesigner {
@@ -36,6 +37,19 @@ export abstract class FieldDesigner<TOptions> extends UIElement implements ICont
         options.query["editId"] = this.page.editId;
         options.query["path"] = this.path;
         options.query["field"] = this.name;
+
+        // Перехватываем устаревшую сессию редактирования (409) до пользовательского
+        // обработчика, чтобы единообразно показать сообщение и перезагрузить страницу.
+        const originalSuccess = options.success;
+        options.success = (response) => {
+            if (isEditConflict(response)) {
+                handleEditConflict();
+                return;
+            }
+
+            if (originalSuccess)
+                originalSuccess(response);
+        };
 
         this.page.queue.push(options);
     }

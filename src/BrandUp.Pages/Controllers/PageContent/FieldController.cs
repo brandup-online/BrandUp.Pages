@@ -40,7 +40,9 @@ namespace BrandUp.Pages.Controllers
             var loadedEdit = await pageEditingService.FindEditByIdAsync(editId, HttpContext.RequestAborted);
             if (loadedEdit == null)
             {
-                context.Result = BadRequest();
+                // editId is well-formed but the session is gone (committed/discarded, e.g.
+                // from another tab) — a stale-edit conflict, not a malformed request.
+                context.Result = new ConflictResult();
                 return;
             }
             editSession = loadedEdit;

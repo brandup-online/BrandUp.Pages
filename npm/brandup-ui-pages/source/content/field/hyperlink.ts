@@ -5,6 +5,7 @@ import iconArrow from "../../svg/combobox-arrow.svg";
 import { PageModel } from "../../typings/models";
 import "./hyperlink.less";
 import { DOM } from "@brandup/ui";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 
 export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFieldFormOptions> implements IContentField {
     readonly form: IContentForm;
@@ -52,6 +53,11 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                 },
                 method: "POST",
                 success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
+                    if (isEditConflict(response)) {
+                        handleEditConflict();
+                        return;
+                    }
+
                     switch (response.status) {
                         case 200:
                             this.setValue(response.data);
@@ -211,6 +217,11 @@ export class HyperLinkContent extends Field<HyperLinkFieldFormValue, HyperLinkFi
                 },
                 method: "POST",
                 success: (response: AjaxResponse<HyperLinkFieldFormValue>) => {
+                    if (isEditConflict(response)) {
+                        handleEditConflict();
+                        return;
+                    }
+
                     switch (response.status) {
                         case 200:
                             this.setValue(response.data);

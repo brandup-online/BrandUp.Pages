@@ -7,6 +7,7 @@ import iconDelete from "../../svg/toolbar-button-discard.svg";
 import { selectContentType } from "../../dialogs/dialog-select-content-type";
 import "./model.less";
 import { AjaxResponse } from "@brandup/ui-ajax";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 
 export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions> implements IContentField {
     readonly form: IContentForm;
@@ -112,6 +113,11 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
                             query: { itemIndex: sourceIndexValue, newIndex: destIndexValue },
                             method: "POST",
                             success: (response: AjaxResponse<ModelFieldFormValue>) => {
+                                if (isEditConflict(response)) {
+                                    handleEditConflict();
+                                    return;
+                                }
+
                                 if (response.status === 200) {
                                     this.setValue(response.data);
                                 }
@@ -214,6 +220,11 @@ export class ModelField extends Field<ModelFieldFormValue, ModelDesignerOptions>
             query: { itemType: itemType },
             method: "PUT",
             success: (response: AjaxResponse<ModelFieldFormValue>) => {
+                if (isEditConflict(response)) {
+                    handleEditConflict();
+                    return;
+                }
+
                 if (response.status === 200) {
                     this.setValue(response.data);
                 }

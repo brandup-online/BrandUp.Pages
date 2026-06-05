@@ -52,7 +52,7 @@ namespace BrandUp.Pages.Controllers
 		{
 			var editSession = await pageContentService.FindEditByIdAsync(editId);
 			if (editSession == null)
-				return NotFound();
+				return Conflict(); // session committed/discarded — stale edit conflict
 
 			var page = await pageService.FindPageByIdAsync(editSession.PageId);
 			if (page == null)
@@ -123,7 +123,7 @@ namespace BrandUp.Pages.Controllers
 
 			var editSession = await pageContentService.FindEditByIdAsync(editId);
 			if (editSession == null)
-				return NotFound();
+				return Conflict(); // session committed/discarded — stale edit conflict
 
 			var page = await pageService.FindPageByIdAsync(editSession.PageId);
 			if (page == null)

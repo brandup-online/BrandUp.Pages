@@ -77,13 +77,8 @@ export class HtmlDesigner extends FieldDesigner<HtmlFieldFormOptions> {
 
         const value = this.getValue();
 
-        this.page.queue.push({
+        this.request({
             url: '/brandup.pages/content/html',
-            query: {
-                editId: this.page.editId,
-                path: this.path,
-                field: this.name
-            },
             method: "POST",
             type: "JSON",
             data: value ? value : "",

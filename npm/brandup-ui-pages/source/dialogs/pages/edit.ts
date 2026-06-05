@@ -9,6 +9,7 @@ import { HyperLinkContent } from "../../content/field/hyperlink";
 import { PagesContent } from "../../content/field/pages";
 import "../dialog-form.less";
 import { DOM } from "@brandup/ui";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 
 export class PageEditDialog extends Dialog<any> implements IContentForm {
     private __formElem?: HTMLFormElement;
@@ -74,6 +75,11 @@ export class PageEditDialog extends Dialog<any> implements IContentForm {
             query: { editId: this.editId, modelPath: this.__modelPath },
             method: "GET",
             success: (response: AjaxResponse<PageContentForm>) => {
+                if (isEditConflict(response)) {
+                    handleEditConflict();
+                    return;
+                }
+
                 if (response.status !== 200 || !response.data) {
                     this.setError("Не удалось загрузить форму.");
                     return;

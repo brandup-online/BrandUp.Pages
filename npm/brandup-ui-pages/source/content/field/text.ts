@@ -1,6 +1,7 @@
 ﻿import { Textbox, TextboxOptions } from "../../form/textbox";
 import { IContentField, IContentForm } from "../../typings/content";
 import { AjaxResponse } from "@brandup/ui-ajax";
+import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
 
 export class TextContent extends Textbox implements IContentField {
     readonly form: IContentForm;
@@ -22,6 +23,11 @@ export class TextContent extends Textbox implements IContentField {
             type: "JSON",
             data: value ? value : "",
             success: (response: AjaxResponse<string>) => {
+                if (isEditConflict(response)) {
+                    handleEditConflict();
+                    return;
+                }
+
                 if (response.status === 200) {
                     this.setValue(response.data);
                 }
