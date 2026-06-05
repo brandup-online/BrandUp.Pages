@@ -184,6 +184,22 @@ namespace BrandUp.Pages.Services
             Assert.Equal("test", contentData.Title);
         }
 
+        [Fact]
+        public async Task SetContent_AfterSessionRemoved_Throws()
+        {
+            var page = (await pageService.FindPageByPathAsync(websiteContext.Website.Id, "test", TestContext.Current.CancellationToken))!;
+            var edit = await pageContentService.BeginEditAsync(page, TestContext.Current.CancellationToken);
+
+            // The session is gone (committed/discarded elsewhere) but the caller still holds it.
+            await pageContentService.DiscardEditAsync(edit, TestContext.Current.CancellationToken);
+
+            var newContent = new TestPageContent() { Title = "stale" };
+            var ex = await Assert.ThrowsAsync<PageEditNotFoundException>(
+                () => pageContentService.SetContentAsync(edit, newContent, TestContext.Current.CancellationToken));
+
+            Assert.Equal(edit.Id, ex.EditId);
+        }
+
         #endregion
     }
 }

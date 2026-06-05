@@ -85,7 +85,7 @@ namespace BrandUp.Pages.MongoDb.Repositories
 
 			var updateResult = await documents.UpdateOneAsync(it => it.Id == pageEdit.Id, updateDefinition, cancellationToken: cancellationToken);
 			if (updateResult.MatchedCount != 1)
-				throw new InvalidOperationException();
+				throw new PageEditNotFoundException(pageEdit.Id);
 		}
 
 		public async Task DeleteEditAsync(IPageEdit pageEdit, CancellationToken cancellationToken = default)

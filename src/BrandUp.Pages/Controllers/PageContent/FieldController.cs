@@ -93,7 +93,15 @@ namespace BrandUp.Pages.Controllers
             }
             @field = foundField;
 
-            await next();
+            var executedContext = await next();
+
+            // The edit session can be committed/discarded (e.g. from another tab) between
+            // loading it above and saving in the action — surface that as 409 Conflict, not 500.
+            if (executedContext.Exception is PageEditNotFoundException && !executedContext.ExceptionHandled)
+            {
+                executedContext.Result = new ConflictResult();
+                executedContext.ExceptionHandled = true;
+            }
         }
 
         #endregion

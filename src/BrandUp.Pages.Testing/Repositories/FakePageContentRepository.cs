@@ -65,6 +65,9 @@ namespace BrandUp.Pages.Repositories
 
 		public Task SetContentAsync(IPageEdit pageEdit, IDictionary<string, object> contentData, CancellationToken cancellationToken = default)
 		{
+			if (!edits.ContainsKey(GetId(pageEdit)))
+				throw new PageEditNotFoundException(pageEdit.Id);
+
 			((PageEdit)pageEdit).Content = contentData;
 
 			return Task.CompletedTask;
