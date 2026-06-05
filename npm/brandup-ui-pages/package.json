@@ -38,10 +38,10 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@brandup/ui": "^2.0.3",
-    "@brandup/ui-ajax": "^2.0.3",
-    "@brandup/ui-app": "^2.0.3",
-    "@brandup/ui-helpers": "^2.0.3",
+    "@brandup/ui": "^2.0.5",
+    "@brandup/ui-ajax": "^2.0.5",
+    "@brandup/ui-app": "^2.0.5",
+    "@brandup/ui-helpers": "^2.0.5",
     "@brandup/ui-website": "^10.0.34",
     "brandup-pages-ckeditor": "^3.0.1"
   },

@@ -26,8 +26,8 @@
     "webpack-cli": "^7.0.3"
   },
   "dependencies": {
-    "@brandup/ui": "^2.0.3",
-    "@brandup/ui-ajax": "^2.0.3",
+    "@brandup/ui": "^2.0.5",
+    "@brandup/ui-ajax": "^2.0.5",
     "@brandup/ui-website": "^10.0.34",
     "@brandup/ui-pages": "file:../brandup-ui-pages",
     "brandup-pages-ckeditor": "^3.0.1"
