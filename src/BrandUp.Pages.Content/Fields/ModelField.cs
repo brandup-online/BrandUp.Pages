@@ -25,6 +25,11 @@ namespace BrandUp.Pages.Content.Fields
 					throw new ArgumentException();
 
 				var list = (IList)value;
+				// The index can be stale (e.g. the item was removed while a client still
+				// references it by path) — treat an out-of-range index as "not found".
+				if (index >= list.Count)
+					return null;
+
 				return list[index];
 			}
 			else

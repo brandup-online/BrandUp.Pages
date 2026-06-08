@@ -92,6 +92,20 @@ namespace BrandUp.Pages.Content
             Assert.Null(explorer);
         }
 
+        [Fact]
+        public void Navigate_ContentListField_IndexOutOfRange_Null()
+        {
+            // Stale path: the list has fewer items than the requested index
+            // (e.g. an item was removed) — must return null, not throw.
+            var content = new TestPageContent
+            {
+                Headers = new List<PageHeaderContent> { new PageHeaderContent() }
+            };
+            var explorer = ContentExplorer.Create(metadataManager, content, "Headers[3]");
+
+            Assert.Null(explorer);
+        }
+
         #endregion
     }
 }
