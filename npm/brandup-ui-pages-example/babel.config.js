@@ -1,20 +1,22 @@
 const plugins = [
 	[
 		'@babel/plugin-transform-runtime', {
-			absoluteRuntime: false,
-			corejs: false,
-			helpers: true,
-			useESModules: true
+			absoluteRuntime: false
 		}
-	]
-]; // '@babel/plugin-transform-runtime'
+	], // '@babel/plugin-transform-runtime'
+	[
+		// Babel 8 dropped useBuiltIns/corejs from preset-env; core-js polyfills are injected by this plugin now.
+		'polyfill-corejs3', {
+			method: 'usage-global',
+			version: '3.50'
+		}
+	] // 'babel-plugin-polyfill-corejs3'
+];
 
 module.exports = {
 	presets: [
 		[
 			"@babel/preset-env", {
-				useBuiltIns: "usage",
-				corejs: "3.37.1",
 				// targets берётся из .browserslistrc (единый источник истины)
 				debug: false
 			}

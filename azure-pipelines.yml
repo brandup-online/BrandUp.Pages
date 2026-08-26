@@ -11,8 +11,6 @@ variables:
     value: "ubuntu-latest"
   - name: restore-projects
     value: "**/*.csproj"
-  - name: test-projects
-    value: "**/*[Tt]ests/*.csproj"
   - name: buildPlatform
     value: "Any CPU"
   - name: buildConfiguration
@@ -71,23 +69,29 @@ stages:
               projects: $(restore-projects)
               arguments: --configuration $(buildConfiguration) /p:Version=$(Build.BuildNumber) /p:FileVersion=$(Build.BuildNumber)
 
-          - task: DotNetCoreCLI@2
+          # xunit.v3 4.x runs on Microsoft.Testing.Platform (see global.json), so the
+          # VSTest-oriented DotNetCoreCLI@2 test task and --collect no longer apply.
+          - script: >
+              dotnet test --solution BrandUp.Pages.sln
+              --configuration $(buildConfiguration)
+              --results-directory $(Agent.TempDirectory)
+              --report-xunit-trx
+              --coverage --coverage-output-format cobertura
             displayName: "dotnet test"
-            inputs:
-              command: test
-              projects: $(test-projects)
-              arguments: --configuration $(buildConfiguration) --collect "Code coverage"
-              failTaskOnFailedTests: true
-              publishTestResults: true
-              testRunTitle: "solution tests"
 
           - task: PublishTestResults@2
-            enabled: false
-            displayName: "publish test/coverage results"
+            displayName: "publish test results"
             condition: succeededOrFailed()
             inputs:
               testRunner: VSTest
               testResultsFiles: "$(Agent.TempDirectory)/**/*.trx"
+              testRunTitle: "solution tests"
+
+          - task: PublishCodeCoverageResults@2
+            displayName: "publish code coverage"
+            condition: succeededOrFailed()
+            inputs:
+              summaryFileLocation: "$(Agent.TempDirectory)/**/*.cobertura.xml"
 
           - task: DotNetCoreCLI@2
             displayName: "dotnet pack"

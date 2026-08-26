@@ -3,6 +3,7 @@ import { Field } from "../../form/field";
 import { DOM } from "@brandup/ui";
 import ContentEditor from "brandup-pages-ckeditor";
 import { isEditConflict, handleEditConflict } from "../../utils/edit-conflict";
+import { asEmitter } from "../../utils/ckeditor";
 import "./html.less";
 
 export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements IContentField {
@@ -35,7 +36,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements 
 
                 // change:data срабатывает на любое изменение данных, включая форматирование
                 // (атрибуты вроде bold/italic), которое обычный change + hasDataChanges может пропустить.
-                editor.model.document.on('change:data', () => {
+                asEmitter(editor.model.document).on('change:data', () => {
                     this.__isChanged = true;
 
                     this.__refreshUI();
@@ -45,7 +46,7 @@ export class HtmlContent extends Field<string, HtmlFieldFormOptions> implements 
                 // редактируемой области: focusTracker считает редактор в фокусе, пока фокус внутри
                 // его UI (включая тулбары). Иначе клик по кнопке форматирования вызывает blur области
                 // ДО применения формата, и изменение форматирования не сохраняется.
-                editor.ui.focusTracker.on('change:isFocused', (_evt, _name, isFocused) => {
+                asEmitter(editor.ui.focusTracker).on<[string, boolean]>('change:isFocused', (_evt, _name, isFocused) => {
                     if (isFocused)
                         this.__isChanged = false;
                     else if (this.__isChanged) {
